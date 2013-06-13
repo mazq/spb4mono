@@ -1,0 +1,204 @@
+﻿@model RecommendItemEditModel
+@{
+    bool hasFeaturedImage = ViewData.Get<bool>("HasFeaturedImage", false);
+    var itemName = Request.QueryString.Get<string>("itemName", Model.RecommendItemName);
+    var itemId = Model.ItemId;
+    bool showLink = ViewData.Get<bool>("showLink", false);
+    bool needRefresh = Request.QueryString.Get<bool>("needRefresh", true);
+    bool showInList = ViewData.Get<bool>("showInList", true);
+    var tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", Model.TenantTypeId);
+    IEnumerable<RecommendItem> recommendItems = ViewData.Get<IEnumerable<RecommendItem>>("recommendItems", null);
+    string typeName = ViewData.Get<string>("RecommendTypeName", null);
+    string typeId = ViewData.Get<string>("RecommendTypeId", null);
+    long userId = Request.QueryString.Get<long>("userId", 0);
+    long firstItemId = 0;
+}
+<div class="tnc-admin-rec-to">
+    @using (Html.BeginAjaxForm("_RecommendItem", "ControlPanel", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json, OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "RecommendItemForm", enctype = "MULTIPART/FORM-DATA" }))
+    {
+        @Html.Hidden("tenantTypeId")
+        @Html.Hidden("itemId")
+        @Html.HiddenFor(n => n.Id)
+        <div class="tnc-dailog-pd">
+            <div class="tn-form-box">
+                @Html.StatusMessage()
+                <div class="tnc-rec-type tn-helper-clearfix">
+                    @if (Model.ItemId != 0)
+                    {
+                        foreach (var item in recommendItems)
+                        {
+                        <span id="recommendType-@(item.Id)" class="tnc-rec-type-item tn-border-gray tn-bg-gray">
+                            <a id="itemTypeId-@(item.Id)" href="@SiteUrls.Instance()._RecommendItem(recommendId: item.Id, showInList: false)">
+                                <span>@(item.RecommendItemType.Name)</span></a>
+                            @if (recommendItems.Count() > 1)
+                            {
+                                firstItemId = recommendItems.Where(n => n.Id != item.Id).First().Id;                               
+                                <a id="deleteRecommendItem-@(item.Id)" data-item-id="@firstItemId" href="@SiteUrls.Instance()._DeleteRecommend(item.Id)" title="删除推荐" class="tn-icon tn-smallicon-cross tn-icon-inline">
+                                </a>
+                            }
+                        </span>
+                        }
+                    }
+                </div>
+                <table>
+                    <tr>
+                        <th>
+                            推荐类别：
+                        </th>
+                        <td>
+                            @if (showInList)
+                            { 
+                                @Html.DropDownList("TypeId", null, new { @class = "tn-dropdownlist" })
+                            }
+                            else
+                            { 
+                                <label class="tn-form-label">@typeName</label>                     
+                                @Html.Hidden("TypeId", typeId)
+                            }
+                        </td>
+                    </tr>
+                    @if (showLink || Model.IsLink)
+                    { 
+                        @Html.Hidden("IsLink", true)
+                        <tr id="showLink">
+                            <th>
+                                链接：
+                            </th>
+                            <td>
+                                @Html.TextBoxFor(n => n.LinkAddress, new { @class = "tn-textbox tn-input-long tn-border-gray", watermark = "http://" })<br />
+                                @Html.ValidationMessageFor(n => n.LinkAddress)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th>
+                            标题：
+                        </th>
+                        <td>
+                            @Html.TextAreaFor(n => n.RecommendItemName, new { @class = "tn-textbox tn-input-long tn-border-gray", watermark = "请输入标题" })<br />
+                            @Html.ValidationMessageFor(n => n.RecommendItemName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            截止日期：
+                        </th>
+                        <td>
+
+                            @Html.DatePicker("ExpiredDate", Model.ExpiredDate, "0", "+1Y")
+                        </td>
+                    </tr>
+
+                    @if (hasFeaturedImage)
+                    { 
+                        <tr>
+                            <th>
+                                标题图：
+                            </th>
+                            <td>
+                                <input id="LogoImage" name="LogoImage" type="file" />
+                            </td>
+                        </tr>
+
+                        <tr id="recommendLogo">
+                            <th>
+                            </th>
+                            <td>
+                                @if (Model != null && !string.IsNullOrEmpty(Model.FeaturedImage))
+                                {
+                                    <img src="@SiteUrls.Instance().LogoUrl(Model.FeaturedImage, TenantTypeIds.Instance().Recommend(), ImageSizeTypeKeys.Instance().Medium(), false)" width="100" height="100"/>
+                                    @Html.Link("删除", SiteUrls.Instance()._DeleteRecommendLogo(Model.Id), "删除Logo", new { id = "deleterecommendItemLogo" })
+                                }
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                            </th>
+                            <td class="tn-text-note">
+                                推荐幻灯片图片尺寸：日志320*240，其他688*235。
+                            </td>
+                        </tr>
+                    }
+                    @Html.Hidden("UserId", userId)
+                </table>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "recommendSubmitBtn" })
+
+            @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+</div>
+
+<script type="text/dialog">
+this.title("管理员推荐");
+</script>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        var description = data.MessageContent.split('&')[0];
+        var recommendTitle = data.MessageContent.split('&')[1];
+        var title = data.MessageContent.split('&')[2];
+        if ('@needRefresh' == "True") {
+            art.dialog.tips(description, 1.5, data.MessageType, function () { window.location.reload() });
+        }
+        else {
+            art.dialog.tips(description, 1.5, data.MessageType, function () {
+                $("#recommendTitle-@(Model.Id)").html(recommendTitle);
+                $("#recommendTitle-@(Model.Id)").attr("title", title);
+            });
+        }
+    }
+
+    $(function () {
+        //$.ajaxSetup({ cache: false });        
+
+        $("a[id^='itemTypeId-']").click(function () {
+            var url = $(this).attr("href");
+            $.get(url, function (data) {
+                $("#RecommendItemForm").replaceWith(data);
+            });
+            return false;
+        });
+
+
+        $("#TypeId").change(function (data) {
+            var typeId = $(this).val();
+            $.ajaxSetup({ cache: false });
+            $.get('@Html.Raw(@SiteUrls.Instance()._RecommendItem(tenantTypeId, itemId, itemName, showLink: showLink, needRefresh: needRefresh, showInList: showInList, userId: userId))', { recommendItemTypeId: typeId }, function (data) {
+                $("#RecommendItemForm").replaceWith(data);
+            });
+        });
+        $("a[id^='deleteRecommendItem-']").click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除该推荐吗？', function () {
+                $.post(url, function (data) {
+                    if (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            if ($("a[id^='deleteRecommendItem-']").length == 1)
+                                $("a[id^='deleteRecommendItem-']").remove();
+                        });
+                        var itemId = $this.data("itemId");
+                        $("#itemTypeId-" + itemId).click();
+                    }
+                });
+            });
+        });
+
+        $("#deleterecommendItemLogo").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, function (data) {
+                    if (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                        $("tr#recommendLogo").remove();
+                    }
+                });
+            });
+        });
+    });
+</script>

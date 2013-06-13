@@ -1,0 +1,51 @@
+﻿@{
+    int attachmentLength = ViewData.Get<int>("attachmentLength", 0);
+    long associateId = ViewData.Get<long>("associateId", 0);
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", string.Empty);
+    int imageHeight = ViewData.Get<int>("imageHeight", 0);
+    int imageWidth = ViewData.Get<int>("imageWidth", 0);
+}
+<div class="tnc-dailog-pd">
+    <div class="tnc-upload-btn">
+        <div class="tn-helper-clearfix">
+            @Html.Uploadify("uploadImageManage", tenantTypeId, "gif,jpg,png,bmp,jpeg", buttonOptions: new ButtonOptions().SetText("上传图片"),
+            uploadFileOptions: new UploadFileOptions()
+                  .SetAssociateId(associateId)
+                  .MergeUploadifyCallBack("onQueueComplete", "OnQueueComplete")
+                  .SetAutoUpload(true)
+                  .SetMultiple(true)
+                  .SetPreventCaching(true)
+                  .SetQueueId("queueManage")
+                  .SetQueueSizeLimit(6)
+                  .SetRemoveCompleted(true)
+                  .SetUploadLimit(100)
+                  .MergeUploadifyFormData("CurrentUserIdToken", Utility.EncryptTokenForUploadfile(0.1, UserContext.CurrentUser.UserId))
+                  .MergeUploadifyFormData("resize", true)
+            )
+            <span class="tn-text-note">限制图片大小：@Formatter.FormatFriendlyFileSize(attachmentLength * 1024)<br />
+                允许图片类型：gif,jpg,png </span>
+        </div>
+        <div id="queueManage">
+        </div>
+    </div>
+    <div id="_ListImages" class="tnc-upload-attach">
+        @{
+            Html.RenderAction("_ListImages", new { tenantTypeId = tenantTypeId, associateId = associateId });
+        }
+    </div>
+</div>
+<script type="text/javascript">
+
+    function OnQueueComplete(queueData) {
+        $("#_ListImages").load("@Html.Raw(SiteUrls.Instance()._ListImages(tenantTypeId, associateId))", { date: new Date() });
+    }
+    $(document).ready(function () {        
+        $("#insertEditImage").click(function () {
+            $("img[name='imageSelect']").click();
+        });
+    });
+</script>
+<div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+    @Html.Button("全部插入", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "insertEditImage", dialogOperation = "close" })
+    @Html.Button("关闭", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { id = "cancelEditImage", dialogOperation = "close" })
+</div>

@@ -1,0 +1,56 @@
+﻿@Html.StatusMessage()
+@using (Html.BeginAjaxForm("_BatchRemoveNavigation", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack", OnErrorCallBack = "OnErrorCallBack" }, new { id = "BatchRemoveNavigation" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form">
+            <div class="tn-form-row">
+                <strong>确认批量删除选中的导航？</strong>
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label"> 
+                    @Html.SipmleCheckBox("forceOwnerDelete", false)
+                    @Html.Hidden("navigationIds", false)
+                    强制删除
+                </label>
+            </div>
+            <div class="tn-form-row">
+                <span>选中后会同时删除用户、群组相关导航</span>
+            </div>
+            <div class="tn-form-row tn-form-row-button">
+                @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+                @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+            </div>
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    
+      this.title("消息");
+    
+</script>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("input[name='forceOwnerDelete']").click(function () {
+            if ($(this).attr("checked")) {
+                $(this).attr("value", true);
+            } else {
+                $(this).attr("value", false);
+            }
+        });
+        debugger;
+        var navIds = '';
+        $("input[id^='navigationIds-']:checked").each(function () {
+            navIds += $(this).val() + ',';
+        });
+        
+
+        $('#navigationIds').val(navIds);
+    });
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+            function () {
+                window.location.reload(true);
+            })
+    }
+</script>

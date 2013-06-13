@@ -1,0 +1,57 @@
+﻿@model CategoryEditModel
+@{
+    var option = ViewData.Get<string>("option", "move");
+    int maxDepth = 10;
+    int level = Request.QueryString.Get<int>("level", 0);
+    if(option=="move")
+    {
+        if (level != 0)
+        { 
+            maxDepth =level-ViewData.Get<int>("maxDepth", 9);
+        }
+    }
+    
+}
+@using (Html.BeginAjaxForm("_MoveSiteCategory", "ControlPanelContent", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.Hidden("fromCategoryId", Model.CategoryId)
+    @Html.Hidden("option", "move")
+    @Html.Hidden("level",level)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                <label>
+                    从 ：@Model.CategoryName
+                </label>
+                <br />
+                <br />
+                到 ：@Html.CategoryDropDownListFor(n => n.CategoryId, Model.TenantTypeId, 0, Model.CategoryId, maxDepth)
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+@if (option == "move")
+{ 
+    @:this.title("移动类别");
+}
+else
+{ 
+    @:this.title("合并类别");
+}
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        setTimeout(function () { window.location.reload(); }, 500);
+        }
+    function OnErrorCallBack(data) {
+        alert(data.MessageContent, function () {
+            window.location.reload();
+        })
+    }
+</script>

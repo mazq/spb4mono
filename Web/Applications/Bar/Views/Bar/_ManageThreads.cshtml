@@ -1,0 +1,69 @@
+﻿@model ManageThreadEditModel
+@{
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    ViewData["SectionId"] = Model.SectionId;
+}
+<div class="tn-toolbar-area tn-helper-clearfix tn-border-gray tn-border-bottom">
+    @Html.LinkButton("通过审核", SiteUrls.Instance().BatchUpdateThreadAuditStatusForSection(Model.SectionId ?? 0), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "Thread-Batch-UpdateAuditStatus" })
+    @Html.LinkButton("不通过审核", SiteUrls.Instance().BatchUpdateThreadAuditStatusForSection(Model.SectionId ?? 0, false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "Thread-Batch-UpdateAuditStatus-false" })
+    @Html.LinkButton("精华", SiteUrls.Instance().BatchSetEssentialForSection(Model.SectionId ?? 0), iconType: IconTypes.SmallElite, htmlAttributes: new { id = "Thread-Batch-SetEssential" })
+    @Html.LinkButton("取消精华", SiteUrls.Instance().BatchSetEssentialForSection(Model.SectionId ?? 0, false), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "Thread-Batch-UpdateAuditStatus-SetEssential-false" })
+    @Html.LinkButton("置顶", SiteUrls.Instance()._SetStickyDate(), iconType: IconTypes.SmallTop, htmlAttributes: new { id = "link-SetSticky" })
+    @Html.LinkButton("取消置顶", SiteUrls.Instance().BatchSetStickyForSection(false, DateTime.UtcNow), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "Thread-Batch-SetSticky-false" })
+    @Html.LinkButton("删除", SiteUrls.Instance().BatchDeleteThreadForSection(Model.SectionId ?? 0), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "Batch-DeleteThread" })
+</div>
+@Html.Partial("~/Applications/Bar/Views/Bar/_PagingThreads.cshtml")
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //批量删除操作
+        $("a#Batch-DeleteThread").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $link = $(this);
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                    if (data.MessageType != -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                        setTimeout(function () { window.location.reload(); }, 1000);
+                    } else {
+                        alert(data.MessageContent, function () { window.location.reload(); });
+                    }
+                });
+            });
+        });
+
+        //除置顶外、删除的其他批量操作
+        $("a[id^='Thread-Batch-']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $link = $(this);
+            $.post($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                if (data.MessageType != -1) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+                } else {
+                    alert(data.MessageContent, function () { window.location.reload(); });
+                }
+            });
+        });
+
+        //link-SetSticky 置顶操作
+        $("a#link-SetSticky").click(function (e) {
+            e.preventDefault();
+            $link = $(this);
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $.get($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog(data);
+            });
+        });
+    });
+</script>

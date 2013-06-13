@@ -1,0 +1,45 @@
+﻿@model TagGroupEditModel
+@{
+    SelectList tenants = ViewData.Get<SelectList>("tenants", null);
+    string editTagGroupTitle = ViewData.Get<string>("editTagGroupTitle", null);
+}
+@using (Html.BeginAjaxForm("_EditTagGroup", "ControlPanelContent", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.HiddenFor(n => n.GroupId)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                <label class="tn-form-label">分组名：</label>
+                @Html.TextBoxFor(n => n.GroupName, new RouteValueDictionary { { "maxlength", 32 }, { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                @Html.ValidationMessage("GroupName")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">所属：</label>
+                 @Html.DropDownList("TenantTypeId", tenants, new { @class = "tn-dropdownlist tn-input-medium" })
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+@if (Model.GroupId == 0)
+{
+    @:this.title("创建标签分组");
+}
+else
+{ 
+    @:this.title("编辑标签分组");
+}
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        if (data == "same") {
+            alert("已经存在相同的分组名称");
+        }else{
+            window.location.reload();
+        } 
+    }
+</script>

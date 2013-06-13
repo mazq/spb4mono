@@ -1,0 +1,166 @@
+﻿@model PagingDataSet<PointRecord>
+@{
+    Layout = "_ControlPanel";
+
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+    bool isCheck = ViewData.Get<bool>("isCheck", false);
+    string expName = ViewData.Get<string>("expPoint", "经验");
+    string traName = ViewData.Get<string>("traPoint", "交易");
+    string preName = ViewData.Get<string>("prePoint", "威望");
+    Dictionary<long, string> displayNameDic = ViewData.Get<Dictionary<long, string>>("displayNameDic", null);
+    long? userId = ViewData.Get<long?>("userId", null);   
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>积分记录</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @Html.StatusMessage(statusMessageData)
+                        @using (Html.BeginForm("ManagePointRecords", "ControlPanelOperation", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    用户名：</label>
+                                @Html.UserSelector("userId", userId)
+                                <label id="sysPoint" for="isSystemData">
+                                    @Html.CheckBox("isSystemData", isCheck, new { @class = "tn-checkbox" })
+                                    系统积分</label>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    收支类型：</label>
+                                @Html.DropDownList("incomeList", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    操 作：</label>
+                                @Html.TextBox("pointItemName", Request.QueryString.GetString("pointItemName", string.Empty), new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    时 间：</label>
+                                @Html.DatePicker("startDate", Request.QueryString.Get<DateTime>("startDate"), null, null)
+                                - @Html.DatePicker("endDate", Request.QueryString.Get<DateTime>("endDate"), null, null)
+                            </div>
+                            
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, null, new { @class = "tn-button tn-corner-all tn-button-text-only tn-button-primary" })
+                            </div>
+                            
+                           
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    @if (Model.TotalRecords == 0)
+                    {
+                        <div class="tn-no-data">
+                            没有搜索到数据</div>
+                    }
+                    else
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        日期
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        @expName
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        @preName
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        @traName
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        用户名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        描述
+                                    </th>
+                                </tr>
+                                @foreach (var pointRecord in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-date tn-nowrap">
+                                            @pointRecord.DateCreated.ToUserDateString()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @pointRecord.PointItemName
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @pointRecord.ExperiencePoints
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @pointRecord.ReputationPoints
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @pointRecord.TradePoints
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @if (pointRecord.UserId != 0 && displayNameDic.ContainsKey(pointRecord.UserId) && displayNameDic[pointRecord.UserId] != null)
+                                            {
+                                                @Html.Link(displayNameDic[pointRecord.UserId], SiteUrls.Instance().SpaceHome(pointRecord.UserId), displayNameDic[pointRecord.UserId], new { target = "_blank" })                                             
+                                            }
+                                            else
+                                            { 
+                                                @:系统
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @Html.Raw(pointRecord.Description)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div id="ManageUsersId" class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#isSystemData").click(function () {
+            if ($("input[type='checkbox']:checked").length > 0) {
+                $("#userId").attr("disabled", true);
+            }
+            else {
+                $("#userId").attr("disabled", false);
+            }
+        });
+        var chk = $("#isSystemData");
+        if (chk.is(':checked')) {
+            $("#userId").attr("disabled", true);
+        }
+        else {
+
+            $("#userId").attr("disabled", false);
+        }
+
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+
+    })
+</script>

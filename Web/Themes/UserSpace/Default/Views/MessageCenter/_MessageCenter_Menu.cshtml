@@ -1,0 +1,41 @@
+﻿@{
+    MessageCenterMenu menu = ViewData.Get<MessageCenterMenu>("MessageCenterMenu", MessageCenterMenu.Message);
+    RegistrationMode registrationMode = ViewData.Get<RegistrationMode>("RegistrationMode", RegistrationMode.All);
+
+    int invitationCount = ViewData.Get<int>("invitationCount", 0);
+    int messageCount = ViewData.Get<int>("messageCount", 0);
+    int noticeCount = ViewData.Get<int>("noticeCount", 0);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-msg-menu">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    消息</h4>
+            </div>
+            <ul class="tn-side-menu">
+                <li @if (menu == MessageCenterMenu.Message)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-email"></span>
+                    @Html.Link("我的私信" + (messageCount > 0 ? "(" + messageCount + ")" : ""), SiteUrls.Instance().ListMessageSessions(Url.SpaceKey(), null), "我的私信", new { @class = "tn-menu-text" })
+                </li>
+                <li @if (menu == MessageCenterMenu.Notices)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-notice"></span>
+                    @Html.Link("我的通知" + (noticeCount > 0 ? "(" + noticeCount + ")" : ""), SiteUrls.Instance().ListNotices(Url.SpaceKey(), null, null), "我的通知", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == MessageCenterMenu.Invitation)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-user-invite"></span>
+                    @Html.Link("我的请求" + (invitationCount > 0 ? "(" + invitationCount + ")" : ""), SiteUrls.Instance().ListInvitations(Url.SpaceKey()), "我的请求", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == MessageCenterMenu.CommentsInBox)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-bubble"></span>
+                    @Html.Link("我的评论", SiteUrls.Instance().ListCommentsInBox(Url.SpaceKey(), null), "我的评论", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == MessageCenterMenu.UserReminder)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-clock"></span>
+                    @Html.Link("提醒设置", SiteUrls.Instance().ListUserReminderSettings(Url.SpaceKey()), "提醒设置", new { @class = "tn-menu-text" })</li>
+            </ul>
+        </div>
+    </div>
+</div>

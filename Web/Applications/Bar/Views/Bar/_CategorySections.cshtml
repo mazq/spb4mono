@@ -1,0 +1,113 @@
+﻿@model IEnumerable<BarSection>
+@{
+    var childCategories = ViewData.Get<IEnumerable<Category>>("childCategories", new List<Category>());
+    var allParentCategories = ViewData.Get<List<Category>>("allParentCategories", new List<Category>());
+    var currentCategory = ViewData.Get<Category>("currentCategory", null);
+}
+<div id="categorySections" class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-sort">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">帖吧分类</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (currentCategory != null)
+        { <div class="tn-breadcrumb">
+            <span class="tn-breadcrumb-item"><a href="@SiteUrls.Instance()._CategorySections()">顶级</a></span>
+            @foreach (var category in allParentCategories)
+            { 
+                <span class="tn-seperator">&gt;</span>
+                <span class="tn-breadcrumb-item"><a href="@Html.Raw(SiteUrls.Instance()._CategorySections(category.CategoryId))">@category.CategoryName</a></span>
+            }
+            <span class="tn-seperator">&gt;</span> <a href="@Html.Raw(SiteUrls.Instance().ListSections(currentCategory.CategoryId))" class="tn-breadcrumb-item tn-selected">@currentCategory.CategoryName @Html.Icon(IconTypes.SmallTriangleRight)</a>
+        </div>
+        }
+        @if (childCategories.Count() > 0)
+        { 
+            <div id="BarSort" class="spb-slider spb-carousel-slider">
+                <div class="spb-slider-nav">
+                    <div class="spb-slider-nav-clip">
+                        <ul class="tn-helper-clearfix">
+                            @foreach (var category in childCategories)
+                            {
+                                string selectedClass = string.Empty;
+                                if (currentCategory != null && category.CategoryId == currentCategory.CategoryId)
+                                {
+                                    selectedClass = "tn-bg-deep tn-border-deep tn-selected";
+                                }
+                                <li class="tn-widget-content tn-corner-all tn-border-gray @selectedClass"><a href="@Html.Raw(SiteUrls.Instance()._CategorySections(category.CategoryId))"><em>@category.CategoryName</em><span></span></a></li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="spb-slider-btn spb-slider-nav-btn spb-slider-nav-prev"><a title="向左滑动" href="javascript:void(0)"><span class="tn-icon tn-icon-slide-prev"></span></a></div>
+                    <div class="spb-slider-btn spb-slider-nav-btn spb-slider-nav-next"><a title="向右滑动" href="javascript:void(0)"><span class="tn-icon tn-icon-slide-next"></span></a></div>
+                </div>
+            </div>
+        }
+        <div class="spb-top-bar-list tn-border-gray tn-border-top">
+            @if (Model.Count() > 0)
+            { 
+                <ul class="tn-list tn-helper-clearfix">
+                    @foreach (var bar in Model.Take(6))
+                    {                 
+                        <li class="tn-list-item">
+                            <div class="tn-list-item-area-left">
+                                <div class="spb-smallbar-figure">
+                                    <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">
+                                        <img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium())" width="50px" height="50px" title="@bar.Name" alt="@bar.Name"/>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-text-heading">
+                                    <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name"><span>@(bar.Name)</span></a></div>
+                                <div class="tn-list-item-row">
+                                    <em>今日(@bar.ToDayThreadAndPostCount)</em><em>帖子(@bar.ThreadAndPostCount)</em><em>关注(@bar.FollowedCount)</em></div>
+                            </div>
+                        </li>                       
+                    }
+                </ul>
+                if (Model.Count() > 6)
+                {
+                     <div class="tn-helper-right">
+                    @if (currentCategory != null)
+                    {
+                        <a href="@SiteUrls.Instance().ListSections(currentCategory.CategoryId)">更多</a>
+                    }
+                    else
+                    { 
+                        <a href="@SiteUrls.Instance().ListSections()">更多</a>
+                    }
+                </div>
+            }
+            }
+            else
+            { 
+                <div class="tn-no-data">
+                    暂无帖吧</div>
+            }
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#BarSort", "#categorySections").find("li.tn-widget-content").hover(function () {
+                $(this).addClass("tn-bg-gray");
+            }, function () {
+                $(this).removeClass("tn-bg-gray");
+            })
+			.find("a").add("span.tn-breadcrumb-item a", "#categorySections")
+			.click(function () {
+				$("#categorySections").load($(this).attr("href"));
+				return false;
+			});
+            $("#BarSort").sliderkit({
+                cssprefix: "spb-slider",
+				auto: false,
+                autospeed: 4000,
+                shownavitems: 9,
+                circular: true,
+                fastchange: false,
+                scrolleasing: "easeOutExpo",
+                scrollspeed: 500
+            });
+        });
+    </script>
+</div>

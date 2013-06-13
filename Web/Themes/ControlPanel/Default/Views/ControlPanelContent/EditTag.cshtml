@@ -1,0 +1,157 @@
+﻿@model TagEditModel
+@{
+    Layout = "_ControlPanel";
+
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+
+    SelectList tenants = ViewData.Get<SelectList>("tenants", null);
+    SelectList tagGroups = ViewData.Get<SelectList>("tagGroups", null);
+    string editTagTitle = ViewData.Get<string>("editTagTitle", null);
+    bool enable = editTagTitle == "编辑标签" ? true : false;
+    IEnumerable<string> seletedTagNames = ViewData.Get<IEnumerable<string>>("seletedTagNames", null);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>@editTagTitle</span>
+            </h1>
+            <div>
+            @Html.StatusMessage()
+            </div>
+            @using (Html.BeginForm("EditTag", "ControlPanelContent", FormMethod.Post, new { enctype = "MULTIPART/FORM-DATA" }))
+            {
+                @Html.HiddenFor(n => n.TagId)
+                @Html.HiddenFor(n => n.FeaturedImage)
+                <div class="tnc-ctnright-list">
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        标签名：
+                                    </th>
+                                    <td>
+                                        @{RouteValueDictionary rvd = new RouteValueDictionary { { "maxlength", 64 }, { "class", "tn-textbox tn-input-medium tn-border-gray" } };}
+                                        @if (enable)
+                                        {
+                                            rvd = new RouteValueDictionary { { "maxlength", 64 }, { "class", "tn-textbox tn-input-medium tn-border-gray" },{"readonly","true"}};
+                                        }
+                                        @Html.TextBoxFor(n => n.TagName,rvd)
+                                        @Html.ValidationMessage("TagName")
+                                    </td>
+                                </tr>
+                                @*<tr>
+                                    <th>
+                                        标签显示名：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.DisplayName, new RouteValueDictionary { { "maxlength", 64 }, { "class", "tn-textbox tn-input-medium tn-border-gray" } })
+                                        @Html.ValidationMessage("DisplayName")
+                                    </td>
+                                </tr>*@
+                                <tr>
+                                    <th>
+                                        所属：
+                                    </th>
+                                    <td>@Html.DropDownList("TenantTypeId", tenants, new { @class = "tn-dropdownlist tn-input-medium" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        标签分组：
+                                    </th>
+                                    <td>@Html.DropDownList("GroupId", tagGroups,new { @class = "tn-dropdownlist tn-input-medium" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        相关标签：
+                                    </th>
+                                    <td>
+                                        <div class="tn-expand-control tn-expand-has-icon">
+                                            @Html.TagSelector("RelatedTags", ViewData.Get<IEnumerable<string>>("seletedTagNames", null), Model.TenantTypeId, Model.TagId)
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        特色标签：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("IsFeatured", true, Model.IsFeatured, new { @class = "IsFeatured" })<label>是</label>&nbsp;&nbsp;
+                                        @Html.RadioButton("IsFeatured", false, !Model.IsFeatured, new { @class = "IsFeatured" })<label>否</label>
+                                    </td>
+                                </tr>
+                                <tr class="special-tag-display" style="display: none">
+                                    <th>
+                                        标识图片：
+                                    </th>
+                                    <td>
+                                        <input id="tagLogo" name="tagLogo" type="file" />
+                                    </td>
+                                </tr>
+                                <tr class="special-tag-display" style="display: none">
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(Model.FeaturedImage))
+                                        {
+                                            <img src="@SiteUrls.Instance().LogoUrl(Model.FeaturedImage,TenantTypeIds.Instance().Tag(), ImageSizeTypeKeys.Instance().Medium())" />
+                                        }
+                                    </td>
+                                </tr>
+                                <tr class="special-tag-display" style="display: none">
+                                    <th>
+                                        标签描述：
+                                    </th>
+                                    <td>@Html.HtmlEditor("Description", @Model.Description, new HtmlEditorOptions(HtmlEditorMode.Simple))
+                                     @Html.ValidationMessage("Description")
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                                        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary,url:@SiteUrls.Instance().ManageTags(),htmlAttributes: new { id = "btnCancel"})
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script id="template-tag-group" type="text/x-jquery-tmpl">
+    <option value='${value}'>${text}</option>
+</script>
+<script>
+    $(function () {
+        if ('@(Model.IsFeatured)' == 'True') {
+            $(".special-tag-display").show();
+        }
+
+        $(".IsFeatured").click(function () {
+            if ($(this).val() === "True") {
+                $(".special-tag-display").show();
+            } else {
+                $(".special-tag-display").hide();
+            }
+        });
+
+        $("#TenantTypeId").change(function () {
+            var tenantTypeId = $(this).val();
+            $.getJSON('@SiteUrls.Instance().GetTagGroupsByTenantTypeId()?tenantTypeId=' + tenantTypeId, function (data) {
+                if (data) {
+                    $("#GroupId").empty();
+                    $("#template-tag-group").tmpl(data).appendTo("#GroupId");
+                }
+            });
+        });
+    });
+</script>

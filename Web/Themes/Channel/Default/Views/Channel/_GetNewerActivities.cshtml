@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Activity>
+@if (Model != null)
+{
+    var applicationService = new ApplicationService();
+    foreach (var item in Model)
+    {
+        string areaName = "Common";
+        if (item.ApplicationId > 0)
+        {
+            var application = applicationService.Get(item.ApplicationId);
+            if (application == null || !application.IsEnabled)
+            {
+                continue;
+            }
+            areaName = application.ApplicationKey;
+        } string tenantTypeIdPart = "";
+        if (!string.IsNullOrEmpty(item.TenantTypeId))
+        {
+            tenantTypeIdPart = "_" + item.TenantTypeId;
+        }
+    @Html.AjaxRouteAction(string.Format("ActivityDetail{0}_{1}", tenantTypeIdPart, item.ActivityItemKey), new { ActivityId = item.ActivityId,  area = areaName })
+    }
+}

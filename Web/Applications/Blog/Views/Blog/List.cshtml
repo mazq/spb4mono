@@ -1,0 +1,44 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    Layout = "app-list-2cols";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 11100203;
+
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+
+    string title = ViewData.Get<string>("title", string.Empty);
+}
+@section Aside{
+    @Html.AjaxAction("_Categories", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Tags", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Archives", "Blog", new { spaceKey = Url.SpaceKey() })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-list">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>@title</h2>
+        </div>
+        @if (Model != null && Model.Count > 0)
+        { 
+            <div class=" spb-blog-list-wrap">
+                <ul class="tn-list">
+                    @foreach (BlogThread blogThread in Model)
+                    {
+                        @Html.Partial("_Blog", blogThread)
+                    }
+                </ul>
+                <div class="tn-pagination">
+                    @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                    @Html.PagingResults(Model)
+                </div>
+            </div>
+        }
+        else
+        { 
+            <div class="tn-no-data">
+                还没有日志。
+            </div>
+        }
+    </div>
+</div>

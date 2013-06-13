@@ -1,0 +1,14 @@
+﻿@model ParsedMedia
+<dl class="tnc-dynamic-imgbox tn-helper-clearfix">
+    <dd class="tnc-bigimg-box tn-border-light tn-bg-light " style="width: 420px">
+        <p class="tnc-bigshow-header">
+            <a class="tn-action tn-action-text-icon" href="javascript:;" ntype="closeMedia"><span
+                class="tn-icon tn-smallicon-collapse-close"></span><span class="tn-action-text">收起</span></a>
+        </p>
+        <ul class="tnc-bigphoto-list">
+            <li>
+                <embed height="400" width="400" allowscriptaccess="sameDomain" wmode="transparent"  allowfullscreen="true" type="application/x-shockwave-flash" src="@Model.PlayerUrl"></embed>
+            </li>
+        </ul>
+    </dd>
+</dl>

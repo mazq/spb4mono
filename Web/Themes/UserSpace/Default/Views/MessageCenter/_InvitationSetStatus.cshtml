@@ -1,0 +1,59 @@
+﻿@model Invitation
+@{
+    int unhandledCount = ViewData.Get<int>("UnhandledCount", 0);
+    string invitationUnhandledCount = unhandledCount > 0 ? string.Format("（{0}条未处理）", unhandledCount) : "";
+}
+@helper GetDisposeLink(Invitation invitation)
+    {
+        if (invitation.Status == InvitationStatus.Unhandled)
+        {
+    <span class="tn-action">
+        @Html.Link("接受", SiteUrls.Instance()._InvitationSetStatus(Url.SpaceKey(), Model.Id, InvitationStatus.Accept), "接受", new { id = "invitation-setstatus-" + Model.Id })
+    </span><span class="tn-action">
+        @Html.Link("拒绝", SiteUrls.Instance()._InvitationSetStatus(Url.SpaceKey(), Model.Id, InvitationStatus.Refuse), "拒绝", new { id = "invitation-setstatus-" + Model.Id })
+    </span>
+        }
+        else
+        {
+    <span class="tn-text-note tn-action">
+        @if (invitation.Status == InvitationStatus.Accept)
+        { 
+            @:已接受
+        }
+        else
+        {
+            @:已拒绝
+                                                                                                                                                                                                                                                                                                                                                                                }
+    </span>
+        }
+}
+@helper GetClass(InvitationStatus status)
+    {
+        if (status == InvitationStatus.Unhandled)
+        {
+    @:tnc-unrequest tn-bg-gray
+        }
+        else
+        {
+    @:tnc-requested
+        }
+}
+<li id="invitation-div-@Model.Id" class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom @GetClass(Model.Status)">
+    <div class="tn-list-item-area-left">
+        @Html.CheckBox("invitationIds", new { @class = "tn-checkbox", value = Model.Id, id = Model.Id })
+    </div>
+    <div class="tn-list-item-area-main">
+        <p class="tnc-info-content">
+            请求内容: @Html.Raw(Model.GetResolvedBody())</p>
+        <div class="tn-list-item-row tn-helper-align-right tn-helper-clearfix">
+            <em class="tn-date tn-text-note tn-helper-left">@Html.Raw(Model.DateCreated.ToFriendlyDate())
+            </em>
+            @GetDisposeLink(Model)
+        </div>
+    </div>
+</li>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#invitation-unhandledCount").html("@invitationUnhandledCount");
+    });
+</script>

@@ -1,0 +1,50 @@
+﻿@model IEnumerable<AccountType>
+@{
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.UserAccount;
+    Layout = "_UserSpaceSettings";
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                帐号绑定</h2>
+        </div>
+        <div class="spb-bindlist">
+            <table class="tn-table-grid">
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @Html.Action("_AccountBinding", "UserSpaceSettings", new { spaceKey = Url.SpaceKey(), accountTypeKey = item.AccountTypeKey })
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("a[name='CancelAccountBinding_button']").die("click").live("click", function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var confirmText = "你确定要解除绑定吗？";
+            if ($("a[name='CancelAccountBinding_button']").length == 1)
+                confirmText = "你正在解除所有第三方帐号绑定，确定要继续解除绑定吗？";
+            art.dialog.confirm(confirmText, function () {
+                $.post($this.attr("href"), function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        $.get("@SiteUrls.Instance()._AccountBinding(Url.SpaceKey())", { accountTypeKey: $this.attr("linktype") }, function (data) {
+                            $this.parents("tr:first").replaceWith(data);
+                        });
+                    }
+                });
+            });
+            return false;
+        });
+    });
+</script>

@@ -1,0 +1,240 @@
+﻿@{
+    Layout = "_UserSpace_Wide";
+    User user = (User)UserContext.CurrentUser;
+    int integrity = user.Profile.Integrity;
+    Spacebuilder.Common.Configuration.UserProfileSettings userProfileSetting = new Spacebuilder.Common.Configuration.UserProfileSettings();
+    string url=null;
+    if(integrity>=userProfileSetting.MinIntegrity || user.Profile.IsNeedGuide)
+    {
+        url=SiteUrls.Instance().MyHome(user.UserId);
+    }
+    else
+    {
+        url=SiteUrls.Instance()._CompleteGuide(Url.SpaceKey());
+    }
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-step-intersted">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-step-wrap">
+            <div class="tn-head">
+                <div class="tn-instructions">
+                    <div class="tn-progress-bar tn-widget-content tn-corner-all">
+                        <div class="tn-progress-bar-value tn-widget-header tn-corner-left tn-border-tbl"
+                            style="width:80%;">
+                        </div>
+                    </div>
+                    <ul class="tn-helper-clearfix tn-step-scale">
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>1、上传头像</span></li>
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>2、填写个人资料</span></li>
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>3、填写个人标签</span></li>
+                        <li style="width: 19.98%" class="tn-step tn-selected"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>4、看看感兴趣的人</span></li>
+                        <li style="width: 19.98%" class="tn-step"><b class="tn-widget-content tn-corner-all">
+                        </b><span>5、完成，进入我的首页</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tn-body">
+                <div class="tn-tabs tnc-interested">
+                    <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                        <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a class="tnui-menu" href="@SiteUrls.Instance()._InterestedWithAll()" data-view="_UserProfileGuideInterestedWithAll">可能感兴趣的人</a></li>
+                        <li class="tn-widget-content tn-border-gray tn-border-trl"><a class="tnui-menu" href="@SiteUrls.Instance()._InterestedWithCompanys()" data-view="_UserProfileGuideInterestedWithCompanys">供职于同一公司</a></li>
+                        <li class="tn-widget-content tn-border-gray tn-border-trl"><a class="tnui-menu" href="@SiteUrls.Instance()._InterestedWithSchools()" data-view="_UserProfileGuideInterestedWithSchools">毕业于同一学校</a></li>
+                        <li class="tn-widget-content tn-border-gray tn-border-trl"><a class="tnui-menu" href="@SiteUrls.Instance()._InterestedWithTags()" data-view="_UserProfileGuideInterestedWithTags">使用了相同标签</a></li>
+                    </ul>
+                    <div class="tn-tabs-panel">                        
+                        <ul id="user-list" class="tn-list tn-helper-clearfix">
+                        </ul>
+                        <div class="tn-load-more tn-bg-gray tn-border-gray" style="display:none;"> <a id="load-more" href="#" class="tn-action tn-action-text-icon-right"> <span class="tn-icon tn-smallicon-collapse-open"></span><span class="tn-action-text">更多</span> </a> </div>
+                        <div class="tn-loading tn-border-gray tn-corner-all" style="display:none;"></div>
+                        <div class="tn-load-end tn-border-gray tn-corner-all" style="display:none;">加载失败，请稍候再试...</div>
+                    </div>
+                    <div id="recommend-interested" class="tnc-recommend-interested" style="display:none;">
+                        <div id="noresults-notice" class="tn-no-data">很遗憾，还没有和您有共同关注的人</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tn-foot">
+                <div class="tn-actions tn-border-gray tn-border-top tn-helper-clearfix">
+                    <div class="tn-confirm">
+                        <label class="tn-check-all">
+                            <input type="checkbox" class="tn-checkbox" id="select-all" name="checkbox" />
+                            全选</label>
+                        <span class="tn-count">已选<strong>0</strong>人</span>
+                        @Html.LinkButton("一键关注", url: SiteUrls.Instance()._BatchAddFollowedUsers(Url.SpaceKey()),size:ButtonSizes.Large, highlightStyle: HighlightStyles.Primary, htmlAttributes: new {id = "addFollowedUsers" })
+                    </div>
+                    <div class="tn-next">
+                        @Html.LinkButton("完成",null,size:ButtonSizes.Large,htmlAttributes:new{id="complete"})
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //根据Url判断是否模式显示
+        $("#complete").click(function (e) {
+            e.preventDefault();
+            if ('@url' === '@SiteUrls.Instance()._CompleteGuide(Url.SpaceKey())') {
+                $(this).attr("href", '@url');
+                $(this).prop({ "plugin": "dialog" });
+                $(this).attr({ "plugin": "dialog" });
+            }
+            else {
+                window.location = '@url';
+            }
+        });
+        var count = 0;
+        $('li.tnui-user-id').livequery('click', function (e) {
+            //e.preventDefault();
+
+            if ($(e.target).hasClass("tn-user-name")) {
+                return;
+            }
+
+            if ($(this).hasClass("tn-selected")) {
+                $(this).removeClass("tn-selected");
+                count--;
+                $(this).children(".tn-inner").removeClass("tn-border-deep");
+                $(this).children(".tn-inner").addClass("tn-border-gray");
+                $(this).data("checked", false);
+                $(".tn-count strong").html(count);
+            }
+            else {
+                $(this).addClass("tn-selected");
+                count++;
+                $(this).children(".tn-inner").removeClass("tn-border-gray");
+                $(this).children(".tn-inner").addClass("tn-border-deep");
+                $(this).data("checked", true);
+                $(".tn-count strong").html(count);
+            }
+        });
+
+        //全选
+        $("#select-all").click(function () {
+            if ($(this).attr("checked")) {
+                count = 0;
+                $("li.tnui-user-id").each(function () {
+                    count++;
+                    $(this).data("checked", true);
+                    $(this).addClass("tn-selected");
+                    $(this).children(".tn-inner").removeClass("tn-border-gray");
+                    $(this).children(".tn-inner").addClass("tn-border-deep");
+                });
+                $(".tn-count strong").html(count);
+            }
+            else {
+                $("li.tnui-user-id").each(function () {
+                    $(this).data("checked", false);
+                    $(this).removeClass("tn-selected");
+                    $(this).children(".tn-inner").removeClass("tn-border-deep");
+                    $(this).children(".tn-inner").addClass("tn-border-gray");
+                });
+                $(".tn-count strong").html(0);
+                count = 0;
+            }
+        });
+
+        //组合所有选中的复选框的只，以,分隔
+        function getCheckedfollowedUserIds() {
+            var followedUserIds = "";
+            $("li.tnui-user-id").each(function () {
+                if ($(this).data("checked")) {
+                    followedUserIds += $(this).data("userId") + ",";
+                }
+            });
+            return followedUserIds;
+        }
+
+        //批量添加关注用户
+        $("#addFollowedUsers").click(function (e) {
+            e.preventDefault();
+            var followedUserIds = getCheckedfollowedUserIds();
+            if (!followedUserIds) {
+                $(this).removeProp("plugin");
+                $(this).removeAttr("plugin");
+                alert("至少选择一个用户");
+                return;
+            }
+            else {
+                $(this).attr("href", '@SiteUrls.Instance()._BatchAddFollowedUsers(Url.SpaceKey())' + "?followedUserIds=" + followedUserIds);
+                $(this).prop({ "plugin": "dialog" });
+                $(this).attr({ "plugin": "dialog" });
+            }
+        });
+
+        /*加载感兴趣的人用户列表*/
+        var url = '@SiteUrls.Instance()._InterestedWithAll()';
+        var view = "_UserProfileGuideInterestedWithAll";
+        var pageIndex = 1;
+
+        //加载页面列表
+        function loadUserList() {
+            $('.tn-load-more').hide();
+            $('.tn-load-end').hide();
+            $('.tn-loading').show();
+
+            $.get(url, { view: view, pageSize: 20, pageIndex: pageIndex }, function (data, status, xhr) {
+                $('.tn-loading').hide();
+                if (status === "success") {
+                    $('#user-list').append(data);
+                    var pageCount = $('#pageCount:last').val();
+                    if (pageCount == 0) {
+                        $('.tn-tabs-panel').hide();
+                        $('#recommend-interested').show();
+                    } else if (pageCount <= pageIndex) {
+                        $('#recommend-interested').hide();
+                        $('.tn-tabs-panel').show();
+                    } else {
+                        $('.tn-load-more').show();
+                        $('#recommend-interested').hide();
+                        $('.tn-tabs-panel').show();
+                        pageIndex++;
+                    }
+                } else {
+                    $('.tn-load-end').show();
+                }
+            });
+        }
+
+        //点击更多
+        $('#load-more').click(function (e) {
+            e.preventDefault();
+            loadUserList();
+        });
+
+        //切换菜单
+        $('.tnui-menu').click(function (e) {
+            e.preventDefault();
+
+            $(".tn-count strong").html(0);
+            $("#select-all").removeAttr("checked");
+            count = 0;
+
+            url = $(this).attr('href');
+            view = $(this).data('view');
+
+            pageIndex = 1;
+            $('.tn-load-more').hide();
+            $('#recommend-interested').hide();
+            $('.tn-tabs-panel').hide();
+            $('#user-list').empty();
+            $('.tnui-menu').closest('li').removeClass("tn-tabs-selected");
+            $(this).closest('li').addClass('tn-tabs-selected');
+            if ($(this).text() === "有共同关注的人") {
+                $('#noresults-notice').text("很遗憾，还没有和您有共同关注的人");
+            } else {
+                $('#noresults-notice').text("很遗憾，还没有和您" + $(this).text() + "的人");
+            }
+            loadUserList();
+
+        });
+
+        loadUserList();
+
+    });
+</script>

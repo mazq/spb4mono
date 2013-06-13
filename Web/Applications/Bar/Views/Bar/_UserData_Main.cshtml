@@ -1,0 +1,43 @@
+﻿@model User
+@{
+    long userThreadCount = ViewData.Get<long>("userThreadCount", 0);
+    long userPostCount = ViewData.Get<long>("userPostCount", 0);
+    long userFollowSectionCount = ViewData.Get<long>("userFollowSectionCount", 0);
+    IUser currentUser = UserContext.CurrentUser;
+    bool identificationTypeVisiable = ViewData.Get<bool>("identificationTypeVisiable", false);
+}
+<div class="tn-card tn-cue-highlight tn-corner-all tn-message-box tn-helper-clearfix">
+    @Html.ShowUserAvatar(Model.UserId, AvatarSizeType.Medium, true)
+    <div class="tn-info">
+        <p class="tn-user-name">
+            <a href="@SiteUrls.Instance().SpaceHome(Model.UserId)"><strong>@Model.DisplayName</strong></a>
+            <span class="spb-user-type">
+                @if (identificationTypeVisiable)
+                {
+                    @Html.IdentificationType(Model.UserId)
+                }
+                else{
+                    if (currentUser!=null&&currentUser.UserName==Url.SpaceKey())
+                    {
+                        <a href="@SiteUrls.Instance().UpdateIdentification(currentUser.UserName)">申请身份认证</a> 
+                    }
+                }
+            </span>
+        </p>
+        @if (Model.Profile != null)
+        { 
+            <p class="tn-user-data">
+                @if (Model.Profile.Gender == GenderType.Male)
+                { 
+                    @Html.Icon(IconTypes.Male, "男")
+                }
+                else if (Model.Profile.Gender == GenderType.FeMale)
+                { 
+                    @Html.Icon(IconTypes.Female, "女")
+                }
+                <span class="tn-location">@Formatter.FormatArea(Model.Profile.NowAreaCode)</span></p>
+        }
+        <p class="tn-stat">
+            <span>帖子：<em>@userThreadCount</em></span><span>回帖：<em>@userPostCount</em></span><span>关注的帖吧：<em>@userFollowSectionCount</em></span></p>
+    </div>
+</div>

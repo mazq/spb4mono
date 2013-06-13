@@ -1,0 +1,63 @@
+﻿@{
+    SiteSettings siteSettings = ViewData.Get<SiteSettings>("SiteSettings", null);
+}
+<div class="tn-footer-legal">
+    @if (siteSettings != null)
+    {
+        <p>
+            @Html.Raw(siteSettings.Links)
+        </p>
+    }
+    <p>
+        Powered by <a href="http://www.spacebuilder.cn/" target="_blank">Spacebuilder</a> v4.0 ©2005-2013 Tunynet Inc.
+        @if (siteSettings != null)
+        {
+            @Html.Raw(siteSettings.BeiAnScript)
+            @Html.Raw(siteSettings.StatScript)
+        }
+    </p>
+</div>
+<div class="tn-return-to-top" id="to_top">
+    <a href="#" class="tn-button tn-corner-all tn-button-secondary tn-button-hollow tn-button-icon-only">
+        <span class="tn-icon tn-icon-top"></span><span class="tn-button-text">返回顶部</span></a>
+</div>
+<script type="text/javascript">
+    jQuery.fn.topLink = function (settings) {
+        settings = jQuery.extend({
+            min: 1,
+            fadeSpeed: 200,
+            ieOffset: 50
+        }, settings);
+        return this.each(function () {
+            //listen for scroll  
+            var el = $(this);
+            el.css('display', 'none'); //in case the user forgot
+            $(window).scroll(function () {
+                if (!jQuery.support.hrefNormalized) {
+                    el.css({
+                        'position': 'absolute',
+                        'top': $(window).scrollTop() + $(window).height() - 100
+                    });
+                }
+                if ($(window).scrollTop() >= settings.min) {
+                    el.show();
+                }
+                else {
+                    el.hide();
+                }
+            });
+        });
+    };
+
+    $(document).ready(function () {
+        $('#to_top').topLink({
+            min: 10,
+            fadeSpeed: 500
+        });
+        //smoothscroll
+        $('#to_top').click(function (e) {
+            e.preventDefault();
+            $.scrollTo(0, 300);
+        });
+    });
+</script>

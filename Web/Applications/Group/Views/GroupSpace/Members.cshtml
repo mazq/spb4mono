@@ -1,0 +1,96 @@
+﻿@model PagingDataSet<GroupMember>
+@{
+    Layout = "list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    var group = ViewData.Get<GroupEntity>("Group", null);
+}
+@section GroupInfo{
+}
+@section Aside{
+    @Html.AjaxAction("_GroupProfile", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_LastGroupVisitors", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_ListMembers", "GroupSpace", new { spaceKey = Url.SpaceKey(), topNumber = 10 })
+}
+@section ContentHeader{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            @Html.Action("_GroupHeader", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), showManageButton = false })
+        </div>
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-member-list">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().Members(Url.SpaceKey())">
+                    全部</a> </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().MyFollowedUsers(Url.SpaceKey())">
+                    我关注的人</a></li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                    <h4>
+                        群组管理员</h4>
+                </div>
+                <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+                    @if (group.User != null)
+                    {
+                        <li class="tn-avatar-item">
+                            @Html.ShowUserAvatar(group.User, SiteUrls.Instance().SpaceHome(group.User.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                            <a href="@SiteUrls.Instance().SpaceHome(group.User.UserId)" title="@group.User.DisplayName" class="tn-user-name">@group.User.DisplayName</a>
+                            <span class="tn-icon-colorful tn-icon-colorful-manager tn-icon-inline" title="群主">
+                            </span></li>                   
+                    }
+                    @if (group.GroupManagers != null && group.GroupManagers.Count() > 0)
+                    {
+                        foreach (var manager in group.GroupManagers)
+                        {
+                        <li class="tn-avatar-item tn-hover" id="manager_@(manager.UserId)">
+                            @Html.ShowUserAvatar(manager, SiteUrls.Instance().SpaceHome(manager.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                            <a href="@SiteUrls.Instance().SpaceHome(manager.UserId)" title="@manager.DisplayName" class="tn-user-name" target="_blank">@manager.DisplayName</a>
+                            @if (new Authorizer().Group_SetManager(group))
+                            { 
+                                @Html.AjaxDeleteButton(new AjaxDeleteButton()
+                                    .SetConfirm("确定要删除此管理员？")
+                                    .SetIcon(IconTypes.SmallCross)
+                                    .SetUrl(SiteUrls.Instance().DeleteManager(Url.SpaceKey(), manager.UserId))
+                                    .MergeHtmlAttribute("class", "tn-delete tn-state-hidden tn-in-pic")
+                                    .MergeHtmlAttribute("title", "删除管理员")
+                                    .MergeHtmlAttribute("name", "operate_" + manager.UserId)
+                                    .SetDeleteTarget("#manager_" + manager.UserId))
+                            }
+                        </li>
+                        }
+                    }
+                </ul>
+                <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                    <h4>
+                        普通成员</h4>
+                </div>
+                @if (Model != null && Model.Count() > 0)
+                { <ul class="tn-avatar-list">
+                    @foreach (var member in Model)
+                    {
+                        if (member.User == null)
+                        { continue; }
+                        <li class="tn-avatar-item">
+                            @Html.ShowUserAvatar(member.User, SiteUrls.Instance().SpaceHome(member.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                            <a href="@SiteUrls.Instance().SpaceHome(member.UserId)" title="@Html.ShowUserDisplayName(member.UserId)" class="tn-user-name" target="_blank">@Html.ShowUserDisplayName(member.UserId)</a>
+                        </li>                                            
+                    }
+                </ul>
+                    <div class="tn-pagination">
+                        @Html.PagingButton(Model)
+                    </div>
+                }
+                else
+                { 
+                    <div class="tn-no-data">
+                        暂无成员</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+﻿@model  List<Spacebuilder.Search.ISearcher>
+@{
+    string globalSearchCode = Spacebuilder.Search.SearcherFactory.GlobalSearchCode;
+    string searcherCode = ViewData.Get<string>("searcherCode", globalSearchCode);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+
+    int maxSearcherIndex = 9; //一行最多显示9个搜索器
+    int currentSearcherIndex = 0;
+
+    for (int i = 0; i < Model.Count; i++)
+    {
+        if (Model[i].Code.Equals(searcherCode))
+        {
+            currentSearcherIndex = i;
+            break;
+        }
+    }
+
+    if (currentSearcherIndex > maxSearcherIndex)
+    {
+        Spacebuilder.Search.ISearcher searcher = Model[maxSearcherIndex];
+        Model[maxSearcherIndex] = Model[currentSearcherIndex];
+        Model[currentSearcherIndex] = searcher;
+    }
+}
+<ul class="tnc-searchitems tn-helper-clearfix">
+    <li @if (searcherCode == globalSearchCode)
+        {<text> class="tn-selected" </text>}><a href="@(SiteUrls.Instance().GlobalSearch(keyword))">@Spacebuilder.Search.SearcherFactory.GlobalSearchName</a></li>
+    @for (int i = 0; i < Math.Min(Model.Count, maxSearcherIndex); i++)
+    {
+        Spacebuilder.Search.ISearcher searcher = Model[i];
+        if (Model[i].Code.Equals(searcherCode))
+        {
+            <li class="tn-selected">@(searcher.Name)</li>
+        }
+        else
+        { 
+            <li><a href="@(searcher.PageSearchActionUrl(keyword))">@(searcher.Name)</a></li>
+        }
+    }
+
+    @if (Model.Count > maxSearcherIndex)
+    {
+    <li>
+        <a data_menu_clicktrigger="true" name="searcher-more" menu="#searcher-more" href="#">
+        应用<span class="tn-icon tn-smallicon-triangle-down tn-icon-inline"></span></a>
+        <div id="searcher-more" class="tn-widget tn-bubble tn-bubble-arrow-top tn-menu tnc-more-app-menu"
+            style="display: none">
+            <div class="tn-bubble-arrow">
+                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                </b>
+            </div>
+            <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                <ul class="tn-list">
+                    @for (int i = maxSearcherIndex; i < Model.Count; i++)
+                    {
+                        <li><a class="tn-item-link" href="@(Model[i].PageSearchActionUrl(keyword))">@(Model[i].Name)</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </li>
+    }
+</ul>

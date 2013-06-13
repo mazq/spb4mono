@@ -1,0 +1,104 @@
+﻿@{
+    //读取顶踩的全局配置
+    AttitudeSettings attitudeSettings = ViewData.Get<AttitudeSettings>("attitudeSettings", DIContainer.Resolve<IAttitudeSettingsManager>().Get());
+
+    //是否允许取消
+    string enableCancel = attitudeSettings.EnableCancel.ToString().ToLower();
+
+    //是否可修改
+    string isModify = attitudeSettings.IsModify.ToString().ToLower();
+
+    //总的顶踩数
+    int supportCount = 0;   //初始的顶数
+    int opposeCount = 0;    //初始的踩数
+    Attitude attitude = ViewData.Get<Attitude>("attitude", null);
+    if (attitude != null)
+    {
+        supportCount = attitude.SupportCount;
+        opposeCount = attitude.OpposeCount;
+    }
+
+    //当前登录用户的顶踩状态，为null时说明没有顶踩过，true表示顶过，false表示踩过
+    bool? isSupport = ViewData.Get<bool?>("isSupport", null);
+
+    //用户设置参数
+    string tenantTypeId = ViewData.Get<String>("tenantTypeId", string.Empty);
+    long objectId = ViewData.Get<long>("objectId", 0);
+    long userId = ViewData.Get<long>("userId", 0);
+    AttitudeMode mode = ViewData.Get<AttitudeMode>("mode", AttitudeMode.Bidirection);
+
+    //限制未登录用户和当前用户不能顶踩自己的
+    string disabled = "false";
+    string loginUrl = string.Empty;
+    IUser currentUser = UserContext.CurrentUser;
+    if (currentUser == null)
+    {
+        disabled="NotLogin";
+        loginUrl = SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal);
+    }else if(userId == currentUser.UserId)
+    {
+        disabled="CurrentUser";
+    }
+    //js回调函数
+    string onSuccessCallBack = ViewData.Get<String>("onSuccessCallBack", string.Empty);
+
+}
+@if (mode == AttitudeMode.Bidirection)
+{
+    AttitudeStyle style = ViewData.Get<AttitudeStyle>("style", AttitudeStyle.SupportOppose);
+
+    if (style == AttitudeStyle.SupportOppose)
+    { 
+        <div class="tn-thumb-rate">
+            <em id="attitude-support-@(objectId)-action-count" class="tn-thumb-up-count tn-count" >@supportCount</em> 
+            <a id="attitude-support-@(objectId)-action" title="支持" class="tn-icon tn-icon-thumb-up @if (isSupport == true)
+                                                                                                   {<text> tn-icon-active</text>} @if (disabled != "false" || (isSupport == false && isModify == "false"))
+                                                                                                                                  {<text> tn-icon-disabled</text>}" href="@SiteUrls.Instance()._SupportOppose(tenantTypeId, objectId, userId, AttitudeMode.Bidirection, true)" data-attitude='{"mode":"@mode","enableCancel":@enableCancel,"isModify":@isModify,"AttitudeStyle":"@style","onSuccessCallBack":"@onSuccessCallBack","disabled":"@disabled","loginUrl":"@loginUrl"}'>支持</a>
+            <a id="attitude-oppose-@(objectId)-action" title="反对" class="tn-icon tn-icon-thumb-down  @if (isSupport == false)
+                                                                                                     {<text> tn-icon-active</text>} @if (disabled != "false" || (isSupport == true && isModify == "false"))
+                                                                                                                                    {<text> tn-icon-disabled</text>}" href="@SiteUrls.Instance()._SupportOppose(tenantTypeId, objectId, userId, AttitudeMode.Bidirection, false)" data-attitude='{"mode":"@mode","enableCancel":@enableCancel,"isModify":@isModify,"AttitudeStyle":"@style","onSuccessCallBack":"@onSuccessCallBack","disabled":"@disabled","loginUrl":"@loginUrl"}'>反对</a> 
+            <em id="attitude-oppose-@(objectId)-action-count" class="tn-thumb-up-count tn-count tnui-oppose">@opposeCount</em>
+        </div>    
+    }
+    else if (style == AttitudeStyle.UpDown)
+    {
+        <div class="tn-show-opinion">
+            <em id="attitude-support-@(objectId)-action-count" class="tn-opinion-pro-count tn-count">@(supportCount)</em>票
+            <a id="attitude-support-@(objectId)-action" title="支持" class="tn-opinion-pro tn-border-light @if (isSupport == true)
+                                                                                                         {<text> tn-bg-deep </text>} @if (disabled != "false" || (isSupport == false && isModify == "false"))
+                                                                                                                                                         {<text> tn-icon-disabled</text>}" href="@SiteUrls.Instance()._SupportOppose(tenantTypeId, objectId, userId, AttitudeMode.Bidirection, true)"  data-attitude='{"mode":"@mode","enableCancel":@enableCancel,"isModify":@isModify,"AttitudeStyle":"@style","onSuccessCallBack":"@onSuccessCallBack","disabled":"@disabled","loginUrl":"@loginUrl"}'><span class="tn-opinion-arrow  @if (isSupport == true)
+                                                                                                         {<text>tn-border-light</text>}else
+                                                                                                                                           {<text>tn-border-deep</text>}"></span><span class="tn-text">支持</span></a>
+            <a id="attitude-oppose-@(objectId)-action" title="反对" class="tn-opinion-con tn-border-light @if (isSupport == false)
+                                                                                              {<text>tn-bg-deep</text>} @if (disabled != "false" || (isSupport == true && isModify == "false"))
+                                                                                                                                    {<text> tn-icon-disabled</text>}" href="@SiteUrls.Instance()._SupportOppose(tenantTypeId, objectId, userId, AttitudeMode.Bidirection, false)" data-attitude='{"mode":"@mode","enableCancel":@enableCancel,"isModify":@isModify,"AttitudeStyle":"@style","onSuccessCallBack":"@onSuccessCallBack","disabled":"@disabled","loginUrl":"@loginUrl"}'><span class="tn-opinion-arrow  @if (isSupport == false)
+                                                                                              {<text>tn-border-light</text>}
+                                                                                              else
+                                                                                              {<text>tn-border-deep</text>}"></span><span class="tn-text">反对</span></a>
+            <em id="attitude-oppose-@(objectId)-action-count" class="tn-opinion-con-count tn-count">999票反对</em>
+       </div>
+    }
+}
+else
+{
+    AttitudeStyle style = ViewData.Get<AttitudeStyle>("style", AttitudeStyle.Support);
+
+    if (style == AttitudeStyle.Support)
+    {
+        <div class="tn-thumb-rate">
+            <em id="attitude-support-@(objectId)-action-count" class="tn-praise-count tn-count">@supportCount</em>
+            <a id="attitude-support-@(objectId)-action" title="支持" class="tn-icon  tn-icon-thumb-up @if (isSupport == true)
+                                                                                                    {<text> tn-icon-active</text>} @if (disabled != "false")
+                                                                                                                                    {<text> tn-icon-disabled</text>}" href="@SiteUrls.Instance()._SupportOppose(tenantTypeId, objectId, userId, AttitudeMode.Unidirection, true)" data-attitude='{"mode":"@mode","enableCancel":@enableCancel,"isModify":@isModify,"AttitudeStyle":"@style","onSuccessCallBack":"@onSuccessCallBack","disabled":"@disabled","loginUrl":"@loginUrl"}'>喜欢</a>
+        </div> 
+    }
+    else if (style == AttitudeStyle.Like)
+    {
+      <div class="tn-praise">
+        <em id="attitude-support-@(objectId)-action-count" class="tn-praise-count tn-count">@supportCount</em>
+        <a id="attitude-support-@(objectId)-action" title="喜欢" class="tn-icon tn-icon-favorite @if (isSupport == true)
+                                                                                               {<text> tn-icon-active</text>} @if (disabled != "false")
+                                                                                                                              {<text> tn-icon-disabled</text>}" href="@SiteUrls.Instance()._SupportOppose(tenantTypeId, objectId, userId, AttitudeMode.Unidirection, true)" data-attitude='{"mode":"@mode","enableCancel":@enableCancel,"isModify":@isModify,"AttitudeStyle":"@style","onSuccessCallBack":"@onSuccessCallBack","disabled":"@disabled","loginUrl":"@loginUrl"}'>喜欢</a>
+     </div> 
+    }
+}

@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Visit>
+@{
+    int pageCount = (int)ViewData["pageCount"];
+    int pageIndex = (int)ViewData["pageIndex"];
+    string spaceKey = ViewData["spaceKey"].ToString();
+}
+<div id="homeVisitListDiv" class="tn-box tn-widget tn-widget-content tn-corner-all spb-recent-visitors">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-helper-clearfix">
+            @if (Model != null && Model.Count() != 0)
+            {
+                <div class="tn-option"><a @(pageIndex == 1 || pageCount == 1 ? "style=display:none;" : "") href="@SiteUrls.Instance()._HomeLastVisitList(spaceKey, pageIndex - 1)" id="prevPage">上一组</a><a @(pageCount == 1 || pageIndex == 3 || (pageIndex == 2 && pageCount == 2) ? "style=display:none;" : "") href="@SiteUrls.Instance()._HomeLastVisitList(spaceKey, pageIndex + 1)" id="nextPage">下一组</a></div>
+            }
+            <h3 class="tn-helper-reset">最近访客</h3>
+        </div>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+            @if (Model == null || Model.Count() == 0)
+            {
+                @Html.Raw("暂无访客")
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                <li class="tn-avatar-item tn-hover">
+                    @Html.ShowUserAvatar(item.VisitorId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                    <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(item.VisitorId)"  title="@item.Visitor" target="_blank" title="@item.Visitor">@item.Visitor</a>
+                    <span class="tn-text-note" title="@item.LastVisitTime.ConvertToUserDate()">@item.LastVisitTime.ToFriendlyDate(false)</span>
+                    <a href="@SiteUrls.Instance().DeleteHomeVisitors(Url.SpaceKey())" data-id="@item.Id" id="visitUser-@item.VisitorId" class="tn-delete tn-state-hidden tn-in-pic" title="删除该访客记录">
+                        <span class="tn-icon tn-icon tn-smallicon-cross"></span></a></li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#prevPage,#nextPage").click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            $.get(url, function (data) {
+                $("#homeVisitListDiv").replaceWith(data);
+            }
+            );
+        });
+
+        $("a[id^='visitUser']").click(function (e) {
+
+            e.preventDefault();
+            $visitUser = $(this);
+            var id = $visitUser.data("id");
+
+            art.dialog.confirm("确认删除该条访客记录？", function () {
+                $.ajax({
+                    type: "POST",
+                    url: $visitUser.attr("href"),
+                    data: { id: id },
+                    cache: false,
+                    success: function (data) {
+                        $("#homeVisitListDiv").replaceWith(data);
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+
+            });
+        });
+
+    })
+</script>

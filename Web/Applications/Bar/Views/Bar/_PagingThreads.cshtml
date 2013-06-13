@@ -1,0 +1,104 @@
+﻿@model ManageThreadEditModel
+@{
+    PagingDataSet<BarThread> barThreads = ViewData.Get<PagingDataSet<BarThread>>("BarThreads", null);
+    bool showSectionInfo = ViewData.Get<bool>("ShowSectionInfo", false);
+    TenantType tenantType = ViewData.Get<TenantType>("TenantType", null);
+
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantType == null ? TenantTypeIds.Instance().Bar() : tenantType.TenantTypeId);
+}
+@if (barThreads != null && barThreads.TotalRecords > 0)
+{
+    <form action="#" method="post" id="Form-BatchSet">
+    <table class="tn-table-grid">
+        <tbody>
+            <tr class="tn-table-grid-header ">
+                <td class="tn-border-gray tn-border-bottom tn-text-note">
+                    @Html.CheckBox("threadIds-checkAll", false, "threadIds-checkAll")
+                </td>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    标题
+                </th>
+                @if (showSectionInfo)
+                {
+                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                        @(tenantType == null ? "帖吧" : tenantType.Name)
+                    </th>
+                }
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    作者
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    审核状态
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    创建时间
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    操作
+                </th>
+            </tr>
+            @foreach (var item in barThreads)
+            {
+                <tr class="tn-table-grid-row" id="ajaxdelete-thread-@item.ThreadId">
+                    <td class="tn-border-gray tn-border-bottom tn-width-check">
+                        <input type="checkbox" value="@item.ThreadId" name="threadIds" id="threadIds-@item.ThreadId" />
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                        @Html.Link(item.Subject, urlGetter.ThreadDetail(item.ThreadId), item.Subject, null, HyperLinkTarget._blank)
+                        @if (item.IsSticky)
+                        {<span title="置顶" class="tn-icon-colorful tn-icon-colorful-top tn-icon-inline"></span>}
+                        @if (item.IsEssential)
+                        {<span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>}
+                    </td>
+                    @if (showSectionInfo)
+                    {
+                        <td class="tn-border-gray tn-border-bottom tn-width-category">
+                            @if (item.BarSection != null)
+                            {
+                                @Html.Link(item.BarSection == null ? "" : item.BarSection.Name, urlGetter.SectionDetail(item.SectionId), item.BarSection == null ? "" : item.BarSection.Name, null, HyperLinkTarget._blank)
+                            }
+                        </td>
+                    }
+                    <td class="tn-border-gray tn-border-bottom tn-width-user-name">
+                        @if (item.User != null)
+                        {                    
+                            @Html.Link(item.User.DisplayName, urlGetter.UserSpaceHome(item.UserId, item.SectionId), item.User.DisplayName, null, HyperLinkTarget._blank)
+                        }
+                        else
+                        { 
+                            @:作者已被删除
+                                                }
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">@Html.AuditStatusIcon(item.AuditStatus)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                        @item.DateCreated.ToFriendlyDate()
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                        @Html.Link("编辑", urlGetter.Edit(item.SectionId, item.ThreadId), "编辑", null, HyperLinkTarget._blank)
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("您确定要删除？").SetDeleteTarget("#ajaxdelete-thread-" + item.ThreadId).SetUrl(SiteUrls.Instance().DeleteThread(item.ThreadId)).SetText("删除"))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="tn-pagination">
+        @Html.PageSizeDropdownList("PageSize")
+        @Html.PagingButton(barThreads, PaginationMode.NumericNextPrevious, 7)
+        @Html.PagingResults(barThreads)
+    </div>
+    </form>
+}
+else
+{
+    <div class="tn-no-data">
+        搜索不到帖子</div>
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //全选按钮
+        $("input#threadIds-checkAll").click(function () {
+            checkAll(this, "threadIds");
+        });
+    });
+</script>

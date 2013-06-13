@@ -1,0 +1,88 @@
+/* 
+Offical Style for Spacebuilder
+(c) 2007-2012 Tunynet Inc.
+*/ 
+
+/* Theme
+----------------------------------*/
+a { color: #599681; } 
+a:hover { color: #296f57; }
+.tn-page-bg { background: #f1f1f1; }
+.tn-doc-bg { background: #fff; }
+.tn-header-bg { background: url(Images/top-x.png) repeat-x center 0; }
+.tn-header-bg .tn-wrapper { background: url(Images/top.png) no-repeat center 0; }
+/*.tn-content-bg { background: url(Images/content-bg-x.png) repeat-x; }*/
+
+/* Global navigation */
+.spb-top-menubar .spb-user-menu,
+.spb-top-menubar .spb-user-act,
+.spb-top-menubar .spb-sign-menu { background: url(Images/top-tab.png); }
+.spb-top-menubar .spb-user-menu { background-position: right 0; }
+.spb-top-menubar .spb-user-act,
+.spb-top-menubar .spb-sign-menu { background-position: 0 -40px; }
+.tn-msg-bubble { background: #85273f; }
+
+.spb-po-g-profile { background: url(Images/panel-x.png) repeat-x 0 bottom; border-top: solid #e1e1e1 1px; }
+.spb-po-g-profile .tn-figure { background: url(Images/avatar-shadow.png) no-repeat center bottom; }
+.spb-po-g-profile .tn-figure a { background: #fff; border: 1px solid #ddd; display: block; }
+
+.spb-g-nav-wrap,
+.spb-g-nav-wrap .spb-g-nav { background: url(Images/group-menu-bg.png) no-repeat; }
+.spb-g-nav-wrap .spb-g-nav { background-position: right -40px; }
+.spb-g-nav-wrap .spb-g-nav li.tn-selected { background: #4e7164; }
+.spb-g-nav-wrap .spb-g-nav li .spb-g-nav-link,
+.spb-g-nav-wrap .spb-g-nav li .spb-g-nav-link:hover { color: #fff; line-height: 34px; }
+.spb-g-nav-wrap .spb-g-nav li .spb-g-nav-link:hover { background: #4e7164; text-decoration: none; }
+
+/* Component containers
+----------------------------------*/
+.tn-widget-content, 
+.ui-widget-content { border-color: #72b39b; background: #fff; }
+.tn-widget-bubble,
+.tn-widget-same { border-color: #fff; }
+.tn-widget-header, 
+.ui-widget-header { border-color: #72b39b; background: #8dcbb5; }
+
+/* Background 
+----------------------------------*/
+.tn-bg-light { background: #dff2eb; }
+.tn-bubble-light { border-color: #dff2eb; }
+.tn-bg-gray { background: #f5f5f5; }
+.tn-bubble-gray { border-color: #f5f5f5; }
+.tn-bg-deep { background: #1d6249; }
+.tn-bubble-deep { border-color: #1d6249; }
+
+/* Border
+----------------------------------*/
+.tn-border-light { border-color: #9dcbbb; }
+.tn-border-gray { border-color: #ddd; }
+.tn-border-deep { border-color: #0e4732; }
+
+/* Button
+----------------------------------*/
+.tn-button-default { background: #c8e5db; border-color: #78b39e; box-shadow: 0 1px 0 #f7fffc inset; }
+.tn-button-default:hover { background: #dff2eb; border-color: #9dcbbb; box-shadow: 0 1px 0 #f7fffc inset; }
+.tn-button-primary { background: #85273f; border-color: #6b142a; box-shadow: 0 1px 0 #b85a71 inset; }
+.tn-button-primary:hover { background: #9e3e56; border-color: #85273f; box-shadow: 0 1px 0 #b85a71 inset; }
+.tn-button-secondary { background: #eee; border-color: #ddd; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-secondary:hover { background: #e8e8e8; border-color: #ddd; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-primary .tn-button-text, 
+.tn-button-primary:hover .tn-button-text { color: #fff; }
+.tn-button-secondary .tn-button-text,
+.tn-button-secondary:hover .tn-button-text { font-weight: normal; color: #999; }
+.tn-button-lite { background: none; border-color: transparent; _border: none; box-shadow: none; }
+.tn-button-hollow { background: none; box-shadow: none; }
+.tn-button-lite:hover,
+.tn-button-hollow:hover { box-shadow: none; }
+.tn-button-disabled,
+.tn-button-disabled:hover { background: #f8f8f8; border-color: #eee; cursor: default; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-disabled .tn-button-text, 
+.tn-button-disabled:hover .tn-button-text { color: #ccc; }
+
+/* Box */
+.tn-box { border-radius: 0; background: none; }
+.tn-box .tn-box-header { background: url(Images/box-content-header.png) repeat-x 0 bottom; }
+.tn-box .tn-box-content { border-radius: 0; background: none; }
+
+/* Footer */
+.tn-footer-bg { background: #f1f1f1; border-top: #ddd solid 1px; }

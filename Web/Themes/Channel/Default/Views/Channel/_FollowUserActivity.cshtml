@@ -1,0 +1,39 @@
+﻿@model Activity
+@{
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    long userId = ViewData.Get<long>("ActivityUserId", 0);
+    List<User> users = ViewData.Get<List<User>>("FollowUsers", null);
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+    <div class="tn-list-item-area-left">
+        @Html.ShowUserAvatar(userId, AvatarSizeType.Small)
+    </div>
+    <div class="tn-list-item-area-main">
+        @Html.ActivityOperation(Model.ActivityId)
+        <div class="tnc-dynamic-title">
+            <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(userId)" target="_blank" >@Html.ShowUserDisplayName(userId, 8)</a>
+            关注了</div>
+        <ul class="tnc-dynamic-mayknow">
+            @if (users != null)
+            {
+                foreach (var user in users)
+                {
+                <li class="tnc-mayknow-single">
+                    @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small)
+                    <div class="tnc-mayknow-main">
+                        <a href="@SiteUrls.Instance().SpaceHome(user.UserId)" class="tnc-mayknow-tit">@Html.ShowUserDisplayName(user.UserId, 8)</a>
+                        <p class="tnc-mayknow-tit">
+                            @Formatter.FormatArea(user.Profile.NowAreaCode)</p>
+                        @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                        {     
+                            @Html.FollowUser(user.UserId, "关注")
+                        }
+                    </div>
+                </li>
+                }
+            }
+        </ul>
+        <div class="tnc-mayknow-time">
+            <span class="tn-date tn-text-note">@Model.LastModified.ToFriendlyDate()</span></div>
+    </div>
+</li>

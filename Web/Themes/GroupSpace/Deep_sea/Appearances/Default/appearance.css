@@ -1,0 +1,107 @@
+/* 
+Offical Style for Spacebuilder
+(c) Tunynet Inc.
+*/ 
+
+/* Theme
+----------------------------------*/
+html { overflow-x:hidden;}
+body { color: #333; }
+a { color: #288285; }
+a:hover { color: #288285; }
+.tn-page-bg { background-color:#288285; }
+.tn-content-bg .tn-wrapper .tn-grid-19-5{ background: url("Images/spb-col-line.png") repeat-y scroll 0 0 transparent; border-radius: 3px 3px 3px 3px; }
+.tn-doc-bg { background:url(Images/tnc-webbg.jpg) no-repeat center top #87f8f2; }
+.tn-footer-bg { background-color:#288285; border-top:1px solid #17777a; color: #fff; }
+.spb-top-menubar{ background-color: #034259; }
+.tn-box .tn-box-content { background: none ;border:0;}
+
+/* Title
+----------------------------------*/
+.tn-box h3{ font-size: 14px; }
+
+/* Font color
+----------------------------------*/
+.tn-text-note{font-size: 12px; color: #bbb;font-weight: normal;}
+
+/* Box
+----------------------------------*/
+.tn-box,
+.tn-box-content,
+.ui-tabs { background: none ; border-width: 0;}
+.tn-box .tn-box-header { background: none; }
+
+/* Component containers
+----------------------------------*/
+
+/* Line Color
+----------------------------------*/
+.tn-border-gray {border-color:#DDDDDD;}
+.tn-border-light { border-color: #eaeaea ; }
+.tn-border-deep {  border-color: #002f3f; }
+
+/* Background 
+----------------------------------*/
+.tn-bg-light{ background: #f8f8f8;}
+.tn-bg-gray { background: #eee; }
+.tn-bubble-gray{ border-color: #eee; }
+.tn-bg-deep { background: #034259; }
+
+/* Button
+----------------------------------*/
+.tn-button { border-width: 1px; border-style: solid;}
+.tn-button-default { background: #dffeff; border-color: #9bcecf; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-default:hover { background: #efffff; border-color: #b5dedf; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-primary { background: #034259; border-color: #002f3f; box-shadow: 0 1px 0 #0081af inset; }
+.tn-button-primary:hover { background: #005e7f; border-color: #00465f; box-shadow: 0 1px 0 #0081af inset; }
+.tn-button-secondary { background: #eee; border-color: #ddd; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-secondary:hover { background: #e8e8e8; border-color: #ddd; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-primary .tn-button-text, 
+.tn-button-primary:hover .tn-button-text { color: #fff; }
+.tn-button-secondary .tn-button-text,
+.tn-button-secondary:hover .tn-button-text { font-weight: normal; color: #999; }
+.tn-button-lite { background: none; border-color: transparent; _border: none; box-shadow: none; }
+.tn-button-hollow { background: none; box-shadow: none; }
+.tn-button-lite:hover,
+.tn-button-hollow:hover { box-shadow: none; }
+.tn-button-disabled,
+.tn-button-disabled:hover { background: #f8f8f8; border-color: #eee; cursor: default; box-shadow: 0 1px 0 #fff inset; }
+.tn-button-disabled .tn-button-text, 
+.tn-button-disabled:hover .tn-button-text { color: #ccc; }
+
+/* Header
+----------------------------------*/
+.spb-top-menubar .spb-logo{ background-image: url(../../../../../Images/logo-light.png); }
+.spb-top-menubar .spb-menu a.spb-menu-link:hover { background: #075a77; }
+.spb-top-menubar .spb-menu .spb-menu-link .tn-icon{ background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png); }
+.spb-top-menubar .tn-drop-menu a.tn-item-link:hover{ background-color:#075a77; color:#FFF; }
+.spb-top-menubar .spb-user-menu .tn-user-name:hover{ border:#578db2 solid 1px; line-height:23px; color:#8ebfe0; padding:0 2px; text-decoration:none; }
+.spb-top-menubar a.spb-menu-link, 
+.spb-top-menubar .spb-user-menu .tn-user-name { color: #FFFFFF; }
+.spb-top-menubar .spb-user-menu .tn-icon-menu .tn-icon{ background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png); }
+.spb-top-menubar .spb-user-menu .tn-icon-menu .tn-icon:hover{ background-image: url(../../../../Shared/Styles/icons/25gray/tn-icon-small.png); }
+.spb-top-menubar .spb-sign-menu a,
+.spb-top-menubar .spb-sign-menu a:hover { color: #fff; }
+
+/* Footer
+----------------------------------*/
+#tn-footer a,
+#tn-footer a:hover { color: #87f8f2; }
+
+/* Dynamic
+----------------------------------*/
+.tnc-down-blkarrow a.tn-icon { background-color: #d4d4d4; background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png);  }
+.tnc-down-blkarrow a.tn-icon:hover { background-color: #0065a2; background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png); }
+
+/* Aside Style */
+.tnc-aside .tn-box-header { border-color: #27809f; }
+.tnc-aside .tn-box { color: #31474f; }
+.tnc-aside .tn-box .tn-text-note { color: #62838f; }
+.tnc-aside .tn-box a,
+.tnc-aside .tn-box a:hover { color: #effffe; }
+.tnc-aside .tn-bg-gray { background-color: #27809f; }
+.tnc-aside .tn-border-gray { border-color: #0f627f; }
+.tnc-aside .spb-group-panel { background: #5ab0cf; border-color: #0f627f; border-width: 1px; }
+
+.tnc-aside .tn-button-default { background: #5ab0cf; border-color: #368faf; box-shadow: 0 1px 0 #86d4ef inset; }
+.tnc-aside .tn-button-default:hover { background: #6fc2df; border-color: #47a0bf; box-shadow: 0 1px 0 #86d4ef inset; }

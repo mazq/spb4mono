@@ -1,0 +1,24 @@
+﻿@{
+    string menu = ViewData.Get<string>("menu", "Home");
+   
+}
+<div class="tn-section tn-helper-clearfix">
+    <h2 class="tn-pagename">
+        <span class="tn-icon-special tn-special-icon-search"></span>找人</h2>
+    <div class="tn-shortcut">
+        @Html.LinkButton("邀请朋友", UserContext.CurrentUser == null ? SiteUrls.Instance().Login(true) : SiteUrls.Instance().InviteFriend(UserContext.CurrentUser.UserName), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "add-tag", @class = "tn-button-hollow tn-button-large" })
+    </div>
+</div>
+<div class="tn-submenu-area">
+    <div class="tn-submenu-inner">
+        <ul class="tn-submenu tn-drop-menu tn-helper-clearfix" id="tn-submenu">
+            <li class="tn-submenu-item @if (menu.Equals("Home"))
+                                       {<text>tn-selected</text>}"><a class="tn-submenu-link" href="@SiteUrls.Instance().FindUserHome()">首页</a></li>
+            <li class="tn-submenu-item @if (menu.Equals("Interested"))
+                                       {<text>tn-selected</text>}"><a class="tn-submenu-link" href="@SiteUrls.Instance().FindUserInterested()">可能感兴趣的人</a></li>
+            <li class="tn-submenu-item @if (menu.Equals("Ranking"))
+                                       {<text>tn-selected</text>}"><a class="tn-submenu-link" href="@SiteUrls.Instance().FindUserRanking(SortBy_User.HitTimes)">用户排行</a></li>
+            <li class="tn-submenu-item"><a class="tn-submenu-link" href="@SiteUrls.Instance().UserSearch()">搜索用户</a></li>
+        </ul>
+    </div>
+</div>

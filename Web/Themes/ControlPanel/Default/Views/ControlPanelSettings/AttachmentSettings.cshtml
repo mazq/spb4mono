@@ -1,0 +1,169 @@
+﻿@model AttachmentSettingsEditModel           
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">            
+                <h1>
+                    <span>附件设置</span>
+                </h1>
+                <div class="tnc-ctnright-list">                
+                @using (Html.BeginAjaxForm("SaveAttachmentSettings", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "saveAttachmentSettings" }))
+                {
+                    <div class="tn-form tn-label-right tnc-user-register">
+                    <div class="tn-form-row">
+                       <label class="tn-form-label"> 单个附件限制：</label>
+                         @Html.TextBoxFor(n => n.MaxAttachmentLength, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } }) KB                                 
+                         @Html.ValidationMessageFor(n => n.MaxAttachmentLength)
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">最多同时上传个数：</label>
+                        @Html.TextBoxFor(n => n.BatchUploadLimit, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })                               
+                        @Html.ValidationMessageFor(n => n.BatchUploadLimit)
+                        <span class="tn-text-note">多文件上传时用户同时选择文件个数</span>
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">临时附件保留的天数：</label>
+                        @Html.TextBoxFor(n => n.TemporaryAttachmentStorageDay, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } }) 天                              
+                        @Html.ValidationMessageFor(n => n.TemporaryAttachmentStorageDay)
+                    </div>                    
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">允许的附件扩展名：</label>
+                        @Html.TextAreaFor(n => n.AllowedFileExtensions, new RouteValueDictionary { { "class", "tn-textbox tn-input-long tn-border-gray" } })                                
+                        @Html.ValidationMessageFor(n => n.AllowedFileExtensions)
+                        <span class="tn-text-note">支持上传的文件类型</span>        
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">图片最大尺寸：</label>
+                        宽 @Html.TextBoxFor(n => n.MaxImageWidth, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })px @Html.ValidationMessageFor(n => n.MaxImageWidth)  
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">&nbsp;</label>                        
+                        高 @Html.TextBoxFor(n => n.MaxImageHeight, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })px @Html.ValidationMessageFor(n => n.MaxImageHeight)                        
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">&nbsp;</label>        
+                        <span class="tn-text-note">程序中图片的默认最大高、宽度，超过设置尺寸则自动进行缩放裁剪，如果应用有自己的配置则以应用的配置为准</span>
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">图片在页面呈现的最大尺寸：</label>
+                        宽 @Html.TextBoxFor(n => n.InlinedImageWidth, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })px @Html.ValidationMessageFor(n => n.InlinedImageWidth)  
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">&nbsp;</label>
+                        高 @Html.TextBoxFor(n => n.InlinedImageHeight, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })px @Html.ValidationMessageFor(n => n.InlinedImageHeight)
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">&nbsp;</label>
+                        <span class="tn-text-note">程序中图片在页面显示的默认最大高、宽度，超过设置尺寸则限制为指定的高度和宽度，如果应用有自己的配置则以应用的配置为准</span>
+                    </div>
+                    <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                        <strong>
+                            水印设置
+                        </strong>                       
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">水印类型：</label>
+                        @Html.EnumDropDownListFor(n => n.WatermarkType)                 
+                    </div>
+                    <div class="tn-form-row tnui-watermark-setting tn-helper-flowfix">
+                        <label class="tn-form-label">水印位置：</label>
+                        <div class="tnc-squared-up tnui-watermark-location tn-helper-left">
+                            <ul>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.LeftTop"></a></li>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.MiddleTop"></a></li>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.RightTop"></a></li>
+                            </ul>
+                            <ul>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.LeftMiddle"></a></li>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.Middle"></a></li>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.RightMiddle"></a></li>
+                            </ul>
+                            <ul>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.LeftBottom"></a></li>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.MiddleBottom"></a></li>
+                                 <li><a href="###" data-watermark-location="@Tunynet.Imaging.AnchorLocation.RightBottom"></a></li>
+                            </ul>
+                            @Html.Hidden("WatermarkLocation",Model.WatermarkLocation)
+                        </div>
+                    </div>                    
+                    <div class="tn-form-row tnui-watermarktext-setting tn-helper-clear" @if(Model.WatermarkType!=WatermarkType.Text){<text>style="display:none"</text>}>
+                        <label class="tn-form-label">水印文字：</label>
+                        @Html.TextBoxFor(n => n.WatermarkText, new RouteValueDictionary { { "class", "tn-textbox tn-input-medium tn-border-gray" } })@Html.ValidationMessageFor(n => n.WatermarkText)
+                    </div> 
+                    <div class="tn-form-row tnui-watermarkimage-setting tn-helper-clear" @if(Model.WatermarkType!=WatermarkType.Image){<text>style="display:none"</text>}>
+                        <label class="tn-form-label">水印图片名称：</label>
+                        @Html.TextBoxFor(n => n.WatermarkImageName, new RouteValueDictionary { { "class", "tn-textbox tn-input-medium tn-border-gray" } })@Html.ValidationMessageFor(n => n.WatermarkText)                       
+                        <span class="tn-text-note">图片存储位置"~/Images/"</span>
+                    </div>                    
+                    <div class="tn-form-row tnui-watermark-setting">
+                        <label class="tn-form-label">要添加水印图片的最小尺寸：</label>
+                        宽 @Html.TextBoxFor(n => n.WatermarkMinWidth, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })px @Html.ValidationMessageFor(n => n.WatermarkMinWidth)  
+                    </div>
+                    <div class="tn-form-row tnui-watermark-setting">
+                        <label class="tn-form-label">&nbsp;</label>
+                        高 @Html.TextBoxFor(n => n.WatermarkMinHeight, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })px @Html.ValidationMessageFor(n => n.WatermarkMinHeight)                        
+                    </div>                 
+                    <div class="tn-form-row tnui-watermark-setting">
+                        <label class="tn-form-label">透明度：</label>
+                        @Html.TextBoxFor(n => n.WatermarkOpacity, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                        @Html.ValidationMessageFor(n => n.WatermarkOpacity)
+                        <span class="tn-text-note">取值范围为0.1~1.0</span>
+                    </div>                                  
+                    <div class="tn-form-row tn-form-row-button">
+                        <label class="tn-form-label">&nbsp;</label>
+                        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                    </div>
+                  </div>  
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType)
+    }
+    $(function () {
+        if ('@Model.WatermarkType' == '@WatermarkType.None') {
+            $(".tnui-watermark-setting").hide();
+            $(".tnui-watermarkimage-setting").hide();
+            $(".tnui-watermarktext-setting").hide();
+        }
+        $("#WatermarkType").change(function () {
+            var $this = $(this);
+            if ($this.val() == '@WatermarkType.None') {
+                $(".tnui-watermark-setting").hide();
+                $(".tnui-watermarkimage-setting").hide();
+                $(".tnui-watermarktext-setting").hide();
+            }
+            else if ($this.val() == '@WatermarkType.Image') {
+                $(".tnui-watermark-setting").show();
+                $(".tnui-watermarktext-setting").hide()
+                $(".tnui-watermarkimage-setting").show();
+            }
+            else {
+                $(".tnui-watermark-setting").show();
+                $(".tnui-watermarktext-setting").show();
+                $(".tnui-watermarkimage-setting").hide();
+            }
+        });
+
+        var watermarkLocation = $(".tnui-watermark-location").find("a");
+        watermarkLocation.each(function () {
+            var $this = $(this);
+            if ($this.data("watermarkLocation") == '@Model.WatermarkLocation') {
+                $this.addClass("tn-selected");
+            }
+        });
+
+        watermarkLocation.click(function () {
+            var $this = $(this);
+            var location = $this.data("watermarkLocation");
+            $("#WatermarkLocation").val(location);
+            watermarkLocation.removeClass("tn-selected");
+            $this.addClass("tn-selected");
+        });
+    });
+</script>

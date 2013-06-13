@@ -1,0 +1,195 @@
+﻿@model RegisterEditModel
+@{
+    Layout = "_Account";
+    int minRequiredPasswordLength = ViewData.Get<int>("MinRequiredPasswordLength", 4);
+    int maxUserNameLength = ViewData.Get<int>("MaxUserNameLength", 64);
+                //Html.IncludeScript("~/Scripts/tunynet/jquery.autoComplete-external.js");
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-register">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-register-wrapper">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>
+                    注册</h2>
+            </div>
+            @Html.StatusMessage(ViewData["StatusMessage"] as StatusMessageData)
+            <div class="tnc-login-directly">
+                <div class="tnc-have-id">
+                    <p>
+                        已有帐号？</p>
+                    <p>
+                        @Html.LinkButton("现在登录", SiteUrls.Instance().Login(returnUrl: Model.ReturnUrl), HighlightStyles.Primary, ButtonSizes.Default)
+                    </p>
+                </div>
+                <div class="tnc-third-id-login tn-border-gray tn-border-top">
+                    <p>
+                        使用第三方帐号登录</p>
+                    <p>
+                        @foreach (var accountType in new AccountBindingService().GetAccountTypes(true))
+                        {     
+                            <a href="javascript:;" onclick="window.open('@SiteUrls.Instance().LoginToThird(accountType.AccountTypeKey)', 'ThirdLogin', 'width=600,height=500,menubar=0,scrollbars=0, status=1,titlebar=0,toolbar=0,location=1'); return false;">
+                                <img src="@SiteUrls.Instance().ThirdLoginButtonUrl(accountType.AccountTypeKey)" alt="使用第三方帐号登录" /></a>
+                        }
+                    </p>
+                </div>
+            </div>
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "tn-helper-flowfix", id = "registerUser" }))
+            {
+                <div class="tn-form tn-label-right tn-border-gray tn-border-right">
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.AccountEmail)
+                        @Html.TextBoxFor(n => n.AccountEmail, InputWidthTypes.Long, new RouteValueDictionary { { "plugin", "EmailAutoComplete" }, { "autocomplete", "off" } })
+                        @Html.ValidationMessageFor(n => n.AccountEmail)
+                        <div class="span-js-prompt" style="display: none" id="AccountEmail-span-prompt">
+                            使用正确的邮箱地址注册</div>
+                    </div>
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.UserName)
+                        @Html.TextBoxFor(n => n.UserName, InputWidthTypes.Long, new RouteValueDictionary { { "autocomplete", "off" } })
+                        @Html.ValidationMessageFor(n => n.UserName)
+                        <div class="span-js-prompt" style="display: none" id="UserName-span-prompt">
+                            中英文、数字、汉字、_均可，最长@(maxUserNameLength)个字符</div>
+                    </div>
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.NickName)
+                        @Html.TextBoxFor(n => n.NickName, InputWidthTypes.Long, new RouteValueDictionary { { "autocomplete", "off" } })
+                        @Html.ValidationMessageFor(n => n.NickName)
+                        <div class="span-js-prompt" style="display: none" id="NickName-span-prompt">
+                            中英文、数字、汉字、_均可，最长@(maxUserNameLength)个字符</div>
+                    </div>
+                    <div class="tn-form-row tn-password-box">
+                        @Html.FormLabelFor(n => n.Password)
+                        @Html.TextBoxFor(n => n.Password, InputWidthTypes.Long, new RouteValueDictionary { { "type", "password" }, { "autocomplete", "off" } })
+                        @Html.ValidationMessageFor(n => n.Password)
+                        <div class="span-js-prompt" style="display: none" id="Password-span-prompt">
+                            不少于 @minRequiredPasswordLength 个字符</div>
+                        <div class="password-meter">
+                            <div class="password-meter-message">
+                            </div>
+                            <div class="password-meter-bg">
+                                <div class="password-meter-bar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.ConfirmPassword)
+                        @Html.TextBoxFor(n => n.ConfirmPassword, InputWidthTypes.Long, new RouteValueDictionary { { "type", "password" } })
+                        @Html.ValidationMessageFor(n => n.ConfirmPassword)
+                        <div class="span-js-prompt" style="display: none" id="ConfirmPassword-span-prompt">
+                            请再次输入密码</div>
+                    </div>
+                    @Html.Captcha(VerifyScenarios.Register, true)
+                    <div class="tn-form-row tn-agree">
+                        <span class="tn-inner">
+                            @Html.CheckBoxFor(n => n.AcceptableProvision, new { @class = "tn-checkbox" })
+                            @Html.LabelFor(n => n.AcceptableProvision)
+                            @Html.Link("《会员服务条款》", SiteUrls.Instance()._Provision(), "《会员服务条款》", new { plugin = "dialog" })
+                        </span>
+                        @Html.ValidationMessageFor(n => n.AcceptableProvision)
+                    </div>
+                    @Html.TextBoxFor(n => n.ReturnUrl, new { type = "hidden" })
+                    <div class="tn-form-row tn-form-row-button">
+                        @Html.Button("立即注册", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large, htmlAttributes: new { id = "button-register-submit" })
+                    </div>
+                </div>
+                @Html.AntiForgeryToken("Spacebuilder")
+            }
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    jQuery.validator.setDefaults({
+        highlight: function (element, errorClass, validClass) {
+            if (!$(element).parents("#registerUser").length) {
+                return;
+            }
+            $(element).parent().find(".span-js-prompt").hide();
+            $(element).next(".tn-icon-colorful-pass").remove();
+            $(element).addClass(errorClass).removeClass(validClass);
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            if (!$(element).parents("#registerUser").length) {
+                return;
+            }
+            $(element).parent().find(".span-js-prompt").hide();
+            $(element).next(".tn-icon-colorful-pass").remove();
+            if ($(element).attr("type") != "checkbox" && $(element).attr("name") != "CaptchaInputName") {
+                $(element).after("<span class='tn-icon-colorful tn-icon-colorful-pass'></span>");
+            }
+            $(element).removeClass(errorClass).addClass(validClass);
+        }
+    });
+    $(document).ready(function () {
+        //用户录入提示
+        $("input[type='text']").add("input:password").focus(function () {
+            $parent = $(this).parent();
+            $titleCount = $parent.find(".field-validation-error").children().length + $parent.find(".tn-icon-colorful-pass").length;
+            if (!$titleCount) {
+                $parent.find(".span-js-prompt").show();
+            }
+        });
+
+        $("input[type='text']").add("input:password").focusout(function () {
+            $(this).parent().find(".span-js-prompt").hide();
+        });
+
+        //是否显示录入提示信息
+        function ShowInputPrompt(input) {
+            $thisId = $(input).attr("id");
+            if (!$("span[for='" + $thisId + "']").html() || $("span[for='" + $thisId + "']").html() == "") {
+                $("#" + $thisId + "-span-prompt").show();
+            } else {
+                $("#" + $thisId + "-span-prompt").hide();
+            }
+            if ($(input).is(":focus")) {
+                setTimeout(function () { ShowInputPrompt(input); }, 200);
+            } else {
+                $("#" + $thisId + "-span-prompt").hide();
+            }
+        }
+
+        //以下为密码强度代码
+        var LOWER = /[a-z]/,
+		UPPER = /[A-Z]/,
+		DIGIT = /[0-9]/,
+		DIGITS = /[0-9].*[0-9]/,
+		SPECIAL = /[^a-zA-Z0-9]/,
+		SAME = /^(.)\1+$/;
+
+        function rating(rate, message) {
+            var meter = $("div.password-meter");
+            meter.find(".password-meter-bar").removeClass().addClass("password-meter-bar").addClass("password-meter-" + message);
+            meter.find(".password-meter-message")
+		.removeClass()
+		.addClass("password-meter-message")
+		.addClass("password-meter-message-" + message)
+		.text(messages[message]);
+        }
+
+        $("input#Password").keyup(function () {
+            var password = $(this).val();
+            if (!password || password.length < 6)
+                return rating(1, "weak");
+            var lower = LOWER.test(password),
+			upper = UPPER.test(password),
+			digit = DIGIT.test(password),
+			digits = DIGITS.test(password),
+			special = SPECIAL.test(password);
+            //            if (lower && upper && digit || lower && digits || upper && digits || special)
+            if (lower && digit && special && password.length > 10 || upper && digit && special && password.length > 10)
+                return rating(4, "strong");
+            if (lower && upper && password.length > 8 || lower && digit && password.length > 8 || upper && digit && password.length > 8)
+                return rating(3, "good");
+            return rating(2, "weak");
+        });
+
+        messages = {
+            "too-short": "弱",
+            "very-weak": "弱",
+            "weak": "弱",
+            "good": "中",
+            "strong": "强"
+        }
+    });
+</script>

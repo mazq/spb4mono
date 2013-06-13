@@ -1,0 +1,99 @@
+﻿@model IEnumerable<AdvertisingPosition>
+@{
+    var positionSizeSelectList = ViewData.Get<SelectList>("positionSize", null);
+    var presentAreaKeySelectList = ViewData.Get<SelectList>("presentAreaKey", null);
+    
+    var selectedIds = ViewData.Get<IEnumerable<string>>("positionIds", null);
+    var advertisingId = ViewData.Get<long>("advertisingId",0);
+}
+<div class="spb-add-ad-advertising" id="positions">
+    <table class="tn-form-box">
+        <tbody>
+            <tr>
+                <td>
+                    <input id="position-select-all" type="checkbox"/>
+                </td>
+                <td class="tn-table-grid-td">
+                    广告位描述
+                </td>
+                <td>
+                    @Html.DropDownList("size", positionSizeSelectList, "尺寸")
+                </td>
+                <td>
+                    @Html.DropDownList("presentAreaKey", presentAreaKeySelectList, "投放区域")
+                </td>
+            </tr>
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (var position in Model)
+                { 
+                <tr>
+                    <td>
+                        @if (selectedIds.Contains(position.PositionId))
+                        { 
+                            <input type="checkbox" value="@position.PositionId" checked="checked" name="positionIds" id="positionIds" class="tnui-position-id" />
+                        }
+                        else 
+                        { 
+                            @Html.SipmleCheckBox("positionIds", position.PositionId, false, new { @class = "tnui-position-id" })
+                        }
+                    </td>
+                    <td class="tn-table-grid-td">
+                        <label title="@position.Description">
+                            @StringUtility.Trim(position.Description.Trim(), 10)</label>
+                    </td>
+                    <td>
+                        @position.Width*@position.Height
+                    </td>
+                    <td>
+                        @Tunynet.Globalization.ResourceAccessor.GetString(position.PresentAreaKey)
+                    </td>
+                </tr>
+                }
+            }
+            else
+            { 
+                <tr>
+                <td>
+                </td>
+                <td>
+                </td>
+                    <td>
+                        暂无数据
+                    </td>
+                </tr>
+                    
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("select#size").change(function () {
+            var url = '@SiteUrls.Instance()._AdvertisingPositionList(advertisingId)';
+            var size = $(this).val();
+            var presentAreaKey = $("#presentAreaKey").val();
+            $.get(url, { size: size, presentAreaKey: presentAreaKey }, function (data) {
+                $("#positions").replaceWith(data);
+            });
+        });
+        $("select#presentAreaKey").change(function () {
+            var url = '@SiteUrls.Instance()._AdvertisingPositionList(advertisingId)';
+            var presentAreaKey = $(this).val();
+            var size = $("#size").val();
+            $.get(url, { presentAreaKey: presentAreaKey,size:size }, function (data) {
+                $("#positions").replaceWith(data);
+            });
+        });
+    });
+
+    //处理全选按钮
+    $("#position-select-all").click(function () {
+        if ($(this).attr("checked")) {
+            $(".tnui-position-id").attr("checked", true);
+        } else {
+            $(".tnui-position-id").removeAttr("checked");
+        }
+    });
+
+</script>

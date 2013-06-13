@@ -1,0 +1,83 @@
+﻿@model IEnumerable<ApplicationBase>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.ManageApplications;
+    User currentSpaceUser = ViewData.Get<User>("currentSpaceUser", null);
+    Dictionary<int, bool> isBuiltIn = ViewData.Get<Dictionary<int, bool>>("dictionary", null);
+    var statisticDatas = new OwnerDataService(TenantTypeIds.Instance().User());
+    
+    
+}   
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-manage-app">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <div class="tn-option">
+                @Html.Button("添加新应用", ButtonTypes.Link, HighlightStyles.Primary, ButtonSizes.Default, IconTypes.SmallAdd, url: SiteUrls.Instance().UserAddApplication(currentSpaceUser.UserName)) <a class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary" href="@SiteUrls.Instance().ManagePresentAreaNavigations(currentSpaceUser.UserName)"><span class="tn-icon tn-smallicon-set"></span><span class="tn-button-text">导航管理</span></a></div>
+            <h2>
+                应用管理
+            </h2>
+            
+        </div>
+        <table class="tn-table-grid">
+            <tbody>
+                <tr class="tn-table-grid-header">
+                    <td class="tn-border-gray tn-border-bottom tn-text-note">
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-text-note">
+                        应用名
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-text-note">
+                        应用描述
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-text-note">
+                        内容数
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-text-note">
+                        操作
+                    </td>
+                </tr>
+                @foreach (var application in Model)
+                {
+                    if (application.IsEnabled)
+                    {
+
+                    <tr class="tn-table-grid-row" id="@application.ApplicationId">
+                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">                                
+                        <span class="tn-icon tn-icon-@application.ApplicationKey.ToLower()"></span>                               
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">@application.Config.ApplicationName
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-width-auto">@application.Description
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                           @statisticDatas.GetLong(currentSpaceUser.UserId, application.ApplicationKey + "-ThreadCount")
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                            @if (!isBuiltIn[application.ApplicationId])
+                            {
+                                @Html.AjaxDeleteButton(new AjaxDeleteButton().SetUrl(SiteUrls.Instance().UnInstallApplication(currentSpaceUser.UserName, application.ApplicationId)).SetConfirm("卸载此应用会同时卸载该应用的数据，确认要卸载吗？").SetText("卸载").SetTooltip("卸载").SetDeleteTarget("#" + application.ApplicationId).SetOnErrorCallBack("error").SetOnSuccessCallBack("success"))
+                            }
+                            else
+                            {
+                                <span class="tn-text-note" title="内置应用不允许卸载">卸载</span>
+                            }
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    function error() {
+        art.dialog.tips("卸载失败", 1.5, -1);
+    }
+    function success() {
+        art.dialog.tips("卸载成功", 1.5, 1);
+    }
+</script>

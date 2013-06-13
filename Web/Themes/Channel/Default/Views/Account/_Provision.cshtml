@@ -1,0 +1,43 @@
+﻿<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-registration-provisions">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-provisions-main">
+            <div class="tn-form tn-label-top">
+                <p class="tnc-provisions-top">
+                    欢迎加入Spacebuilder用户社区_共创社区价值_Powered by Spacebuilder。所有用户，只要进入Spacebuilder用户社区_共创社区价值_Powered by Spacebuilder注册及发表言论，即被视为已经阅读、理解并同意本协议的以下各项条款：
+                </p>
+                <div class="tn-border-gray tn-border-all tnc-provisions-content">
+                    <p>
+                        第一条 在本站发表的文章、内容、评论等任何信息仅代表用户本人的观点，与本站立场无关。出于遵守国家相关法规的前提，我们有权在不经作者准许的情况下删除其在本站所发表的任何信息。
+                    </p>
+                    <p>
+                        第二条 本站的所有文章、内容、信息、资料等都不保证其准确性、完整性、有效性、时间性，请依据信息本身情况做出判断。阅读本站任何信息而误导造成的损失，请责任自负，一概与本站无关。</p>
+                    <p>
+                        第三条 本站因系统维护或升级而需暂停服务时，将事先公告。若因线路及非本公司控制范围内的硬件故障或其它不可确定性的因素而导致暂停服务，在暂停服务期间造成的一切不便与损失，本站不负任何责任。
+                    </p>
+                    <p>
+                        第四条 用户因违反本站条款的规定而触犯中华人民共和国法律的，后果一切自负，本站将不承担任何法律责任。
+                    </p>
+                    <p>
+                        第五条 凡以任何方式登录本站或直接、间接使用本站的用户，一律被视为自愿接受本站声明条款的约束。本站声明条款中未涉及的相关法律、法规问题，请您参考国家有关法律、法规，当本站条款声明与国家法律、法规冲突时，以国家法律、法规为准。
+                    </p>
+                </div>
+                <div class="tn-form-row-button">
+                    <button type="submit" id="AcceptableProvision-button" class="tn-button tn-corner-all tn-button-text-only tn-button-primary" dialogoperation="closeAll">
+                        <span class="tn-button-text">同意</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#AcceptableProvision-button").click(function () {
+            document.getElementById("AcceptableProvision").checked = true;
+        });
+    });
+</script>
+<script type="text/dialog">
+    this.title("注册条款");
+    this.lock();
+</script>

@@ -1,0 +1,180 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    Layout = "app-detail-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    var allParentSectionCategories = ViewData.Get<List<Category>>("allParentSectionCategories", null);
+    var currentSectionCategory = ViewData.Get<Category>("currentSectionCategory", null);
+    var barSection = ViewData.Get<BarSection>("section", new BarSection());
+    IEnumerable<User> topMembers = ViewData.Get<IEnumerable<User>>("topMembers", new List<User>());
+    var topSections = ViewData.Get<IEnumerable<BarSection>>("topSections", new List<BarSection>());
+    Authorizer authorizer = new Authorizer();
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@if (authorizer.IsAdministrator(BarConfig.Instance().ApplicationId) && (int)barSection.AuditStatus < (int)(new AuditService().GetPubliclyAuditStatus(BarConfig.Instance().ApplicationId)))
+{
+    <div class="tn-cue-highlight tn-corner-all tn-message-box" id="prompt">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right" id="hidespan"></a>
+        <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>当前帖吧尚未通过审核，你可以<a href="@SiteUrls.Instance().BatchUpdateSectionAuditStatu(barSection.SectionId,true)" id = "audit-success">通过审核</a>
+            @if (barSection.AuditStatus == AuditStatus.Pending)
+            {
+                @:或者
+                <a href="@SiteUrls.Instance().BatchUpdateSectionAuditStatu(barSection.SectionId,false)" id = "audit-fail">不通过审核</a>
+            }
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#hidespan").click(function (e) {
+                e.preventDefault();
+                $("#prompt").hide();
+            });
+
+            //通过审核
+            $("a[id^='audit-']").click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "Post",
+                    url: $(this).attr("href"),
+                    success: function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            $("#prompt").hide();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-intro">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if (currentSectionCategory != null)
+        { <div class="tn-breadcrumb">
+            <span class="tn-breadcrumb-item"><a href="@SiteUrls.Instance().ListSections()">全部</a></span>
+            @foreach (var category in allParentSectionCategories)
+            { 
+                <span class="tn-seperator">&gt;</span>
+                <span class="tn-breadcrumb-item"><a href="@SiteUrls.Instance().ListSections(category.CategoryId)">@category.CategoryName</a></span>
+            }
+            <span class="tn-seperator">&gt;</span> <span class="tn-breadcrumb-item"><a href="@SiteUrls.Instance().ListSections(currentSectionCategory.CategoryId)" class="tn-action tn-action-text-icon-right" menu="#topSectionsDiv">
+                @Html.Icon(IconTypes.SmallTriangleDown)
+                <span class="tn-action-text">@currentSectionCategory.CategoryName</span></a>
+            </span>
+            @if (topSections != null && topSections.Count() > 0)
+            { 
+                <div id="topSectionsDiv" style="display: none" class="tn-more-options tn-widget-content tn-border-gray">
+                    <ul class="tn-more-list">
+                        @foreach (var item in topSections)
+                        {
+                            <li><a class="tn-item-link" href="@SiteUrls.Instance().SectionDetail(item.SectionId)" title="@item.Name">@item.Name</a></li>
+                        }
+                    </ul>
+                </div>
+            }
+            <span class="tn-seperator">&gt;</span> <span class="tn-breadcrumb-item">@barSection.Name</span>
+        </div>
+        }
+        <div class="spb-bar-intro-wrap tn-cue-highlight tn-corner-all tn-message-box tn-helper-clearfix">
+            <div class="spb-bar-figure">
+                <img src="@SiteUrls.Instance().LogoUrl(barSection.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), barSection.HasLogoImage)" width="100px" title="@barSection.Name" alt="@barSection.Name"/>
+            </div>
+            <div class="tn-info">
+                @if (new Authorizer().BarSection_Manage(barSection))
+                { 
+                    <span class="tn-helper-right"><a href="@SiteUrls.Instance().ManageThreadsForSection(barSection.SectionId)" title="管理帖吧" class="tn-action">
+                        <span class="tn-action-text">管理</span></a> </span>     }
+                @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BarSection()))
+                {
+                    <span class="tn-helper-right"><a href="@SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().BarSection(), barSection.SectionId, barSection.Name,userId:barSection.UserId)" plugin="dialog" title="推荐帖吧" class="tn-action">
+                        <span class="tn-action-text">推荐</span></a> </span>
+                }
+                <p class="tn-stat">
+                    <span>今日：<em>@barSection.ToDayThreadAndPostCount</em></span> <span>帖子：<em>@barSection.ThreadAndPostCount</em></span>
+                    <span>关注：<a href="@SiteUrls.Instance().SectionMembers(barSection.SectionId)">@barSection.FollowedCount</a></span></p>
+                <p class="tn-brief">
+                    @Html.Raw(barSection.Description)
+                </p>
+            </div>
+        </div>
+        @Html.AdvertisingPosition("10101200002")
+        @Html.Partial("~/Applications/Bar/Views/Bar/_SectionDetail.cshtml", Model)
+    </div>
+</div>
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-manager">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                管理员</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <ul class="tn-list">
+                @if (barSection.User != null)
+                { 
+                    <li class="tn-helper-clearfix">
+                        @Html.ShowUserAvatar(barSection.User, SiteUrls.Instance().UserThreads(barSection.UserId), AvatarSizeType.Micro, HyperLinkTarget._blank)
+                        <a href="@SiteUrls.Instance().UserThreads(barSection.UserId)" title="@barSection.User.DisplayName" class="tn-user-name">@barSection.User.DisplayName</a>
+                        <span class="tn-icon-colorful tn-icon-colorful-manager tn-icon-inline" title="吧主">
+                        </span></li>
+                }
+                @if (barSection.SectionManagers.Count() > 0)
+                {
+                    foreach (var manager in barSection.SectionManagers)
+                    {                 
+                    <li class="tn-helper-clearfix">
+                        @Html.ShowUserAvatar(manager, SiteUrls.Instance().UserThreads(manager.UserId), AvatarSizeType.Micro, HyperLinkTarget._blank)
+                        <a href="@SiteUrls.Instance().UserThreads(manager.UserId)" title="@manager.DisplayName" class="tn-user-name">@manager.DisplayName</a></li>                           
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+    @if (topMembers.Count() > 0)
+    { 
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-member">
+            <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+                <span class="tn-helper-right"><a href="@SiteUrls.Instance().SectionMembers(barSection.SectionId)">
+                    更多</a> </span>
+                <h3 class="tn-helper-reset">
+                    谁在关注</h3>
+            </div>
+            <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                <ul class="tn-list tn-helper-clearfix">
+                    @foreach (var user in topMembers)
+                    {
+                        <li>
+                            <div class="tn-avatar-mini">
+                                <a title="@user.DisplayName" href="@SiteUrls.Instance().UserThreads(user.UserId)">
+                                    <img src="@SiteUrls.Instance().UserAvatarUrl(user, AvatarSizeType.Micro, true)" alt="@user.DisplayName" title="@user.DisplayName"/>
+                                    @user.DisplayName</a></div>
+                        </li>                   
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+    @Html.AjaxAction("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.ThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Headline })
+    @Html.AdvertisingPosition("10101200003")
+}
+<script language="javascript" type="text/javascript">
+    $(function () {
+        $("#blog-search").click(function () {
+            searchblog();
+        })
+        $("#blog-keyword").keydown(function (e) {
+            if (e.keyCode == 13) {
+                searchblog();
+            }
+        })
+        function searchblog() {
+            var keyword = $("#blog-keyword").val();
+            if (keyword == "") {
+                return;
+            }
+            window.location = '@(SiteUrls.Instance().BarPageSearch(""))?keyword=' + keyword + "&Range=@(barSection.SectionId)&barId=@(barSection.SectionId)";
+        }
+    })
+</script>

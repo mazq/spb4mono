@@ -1,0 +1,28 @@
+﻿@{
+    bool isSameUser = ViewData.Get<bool>("isSameUser", false);
+    bool isAnonymousUser = ViewData.Get<bool>("isAnonymousUser", false);
+    User user = ViewData.Get<User>("user", null);
+}
+<div class="tn-unit">
+    <div class="tnc-myhome-proside">
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-last-visitors">
+        @Html.AjaxAction("_SpaceLastVisitList", new { spaceKey = Url.SpaceKey() })
+        </div>
+        @Html.AjaxAction("_OwnerLinks", "Channel", new { ownerType = OwnerTypes.Instance().User(), ownerId = user.UserId })
+        @if (!isSameUser)
+        { 
+            <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-fans-followed">
+                @Html.AjaxAction("_FollowedUsersOfFollowersList", new { spaceKey = Url.SpaceKey() })
+            </div>
+            if (!isAnonymousUser)
+            { 
+                <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-also-followed">
+                    @Html.AjaxAction("_FollowedUsersFromUserList", new { spaceKey = Url.SpaceKey() })
+                </div>
+                <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-same-followed">
+                    @Html.AjaxAction("_TogetherFollowedUsersList", new { spaceKey = Url.SpaceKey() })
+                </div>
+            }
+        }
+    </div>
+</div>

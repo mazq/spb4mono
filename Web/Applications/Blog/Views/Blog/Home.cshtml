@@ -1,0 +1,30 @@
+﻿@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+}
+@section Aside{
+    @Html.Action("_Panel", "Blog", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() }, { "menu", "Home" } })
+    @Html.AjaxAction("_Categories", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Tags", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Archives", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AdvertisingPosition("11000000003")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-flow">
+  <div class="tn-box-content tn-widget-content tn-corner-all">
+    <div id="loadActivity" data-url="@(SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), applicationId: BlogConfig.Instance().ApplicationId))" class="spb-blog-flow-wrap"> </div>
+  </div>
+</div>
+<script>
+    $(function () {
+        var url = $("#loadActivity").data("url");
+        function loadList() {
+            $.get(url, function (data, status, xhr) {
+                if (status === "success") {
+                    $('#loadActivity').append(data);
+                }
+            });
+        }
+        loadList();
+    })
+</script>

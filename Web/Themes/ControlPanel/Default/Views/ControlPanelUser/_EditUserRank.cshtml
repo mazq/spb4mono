@@ -1,0 +1,68 @@
+﻿@model UserRankEditModel
+@{
+
+    RouteValueDictionary htmlattr = new RouteValueDictionary();
+
+    if (Model.IsEdit)
+    {
+        htmlattr.Add("readonly", "readonly");
+    }
+
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+}
+<div id="editUserRankDialog" class="tn-box-content tn-widget-content tn-corner-bottom" style="width: 260px">
+    @Html.StatusMessage(statusMessageData)
+    @using (Html.BeginAjaxForm("_EditUserRank", "ControlPanelUser", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "success", BeforeSubmitCallBack = "editUserRankBeforeSubmitCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right tnc-label-short">
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Rank)
+                    @Html.TextBoxFor(n => n.Rank, InputWidthTypes.Medium, htmlattr)<br />
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.ValidationMessageFor(n => n.Rank)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.RankName)
+                    @Html.TextBoxFor(n => n.RankName, InputWidthTypes.Medium)<br />
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.ValidationMessageFor(n => n.RankName)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.PointLower)
+                    @Html.TextBoxFor(n => n.PointLower, InputWidthTypes.Medium)<br />
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.ValidationMessageFor(n => n.PointLower)
+                </div>
+                @Html.HiddenFor(n => n.IsEdit)
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        </div>
+       
+    }
+    <script type="text/dialog">
+
+    @if (Model.IsEdit)
+    {
+       @: this.title("编辑用户等级");
+    }
+    else
+    {
+       @: this.title("添加用户等级");
+    }
+    </script>
+    <script type="text/javascript" language="javascript">
+        function error(data) {
+            $("#editUserRankDialog").replaceWith(data);
+        }
+        function editUserRankBeforeSubmitCallBack(arr, $form) {
+            $form.hide();
+            $form.after("<div class='tn-loading' style='margin:70px'></div>");
+        }
+    </script>
+</div>

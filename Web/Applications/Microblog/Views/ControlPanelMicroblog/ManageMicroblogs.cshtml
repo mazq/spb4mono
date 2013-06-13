@@ -1,0 +1,284 @@
+﻿@model PagingDataSet<MicroblogEntity>
+@{
+    Layout = "_ControlPanel";
+    AuditStatus? auditStatus = Request.QueryString.Get<AuditStatus?>("auditStatus", null);
+    MediaType? mediaType = Request.QueryString.Get<MediaType?>("mediaType", null);
+    var userId = ViewData.Get<long?>("userId", null);
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", TenantTypeIds.Instance().User());
+    IMicroblogUrlGetter urlGetter = MicroblogUrlGetterFactory.Get(tenantTypeId);
+    GroupUrlGetter groupUrlGetter = new GroupUrlGetter();
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+            @Html.Partial("_ManageMicroblogRightMenu")
+            </div>
+        </div>
+        <div class="tnc-ctn-center">
+            <h1>
+                @if (tenantTypeId != null && tenantTypeId == TenantTypeIds.Instance().Group())
+                { 
+                    @Html.Link("群组", SiteUrls.Instance().ManageGroups(), "群组管理")
+                    <span class="tn-pipe tn-text-note">></span>
+                }
+                <span class="tn-selected">微博管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageMicroblogs", "ControlPanelMicroblog", FormMethod.Get))
+                        {
+                            @Html.Hidden("tenantTypeId", tenantTypeId)
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    微博关键字：</label>
+                                @Html.TextBox("keyword", "", new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                           if (tenantTypeId != null && tenantTypeId == TenantTypeIds.Instance().Group())
+                           {
+                                <div class="tn-form-row">
+                                    <label class="tn-form-label">
+                                        群组名：</label>
+                                     @Html.Action("_BarSetionSelector", "Bar", new { name = "ownerId", area = Spacebuilder.Bar.BarConfig.Instance().ApplicationKey, tenantTypeId = TenantTypeIds.Instance().Group() })
+                                </div>
+                           }
+                           else
+                           { 
+                                <div class="tn-form-row">
+                                    <label class="tn-form-label">
+                                        用户名：</label>
+                                     @Html.UserSelector("userId", userId)
+                                </div>
+                           }
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    微博类型：</label>
+                                @(Html.EnumDropDownList<MediaType?>("mediaType", mediaType, "全部", new { @class = "tn-dropdownlist" }))
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    时 间：</label>
+                                @Html.DatePicker("startdate", Request.QueryString.Get<DateTime>("startdate"), "-5Y", "+0D")
+                                -
+                                @Html.DatePicker("enddate", Request.QueryString.Get<DateTime>("enddate"), "-5Y", "+0D")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    审核状态：</label>
+                                @(Html.EnumDropDownList<AuditStatus?>("auditStatus", auditStatus, "全部", new { @class = "tn-dropdownlist" }))
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "search" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("通过审核", SiteUrls.Instance().UpdateMicroblogAuditStatus(), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "audit-success" })
+                            @Html.LinkButton("不通过审核", SiteUrls.Instance().UpdateMicroblogAuditStatus(), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "audit-fail" })
+                            @Html.LinkButton("删除", SiteUrls.Instance().DeleteMicroblogs(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-microblogs" })
+                        </div>
+                    </div>
+                    @if (Model != null && Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else if (Model != null)
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" class="tn-checkbox" id="select-all" name="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        微博
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        作者
+                                    </th>
+                                    @if (tenantTypeId != null && tenantTypeId == TenantTypeIds.Instance().Group())
+                                    {
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        所属群组
+                                    </th>
+                                    }
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        审核状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        创建时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (MicroblogEntity microblog in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.CheckBox("microblog-id", new { @class = "tnui-microblog-id", value = @microblog.MicroblogId })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @Html.Link(string.IsNullOrEmpty(microblog.Body) ? ".." : microblog.Body, urlGetter.MicroblogDetail(microblog.MicroblogId), microblog.Body, navigateTarget: HyperLinkTarget._blank)
+                                        </td>                                        
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @Html.Link(StringUtility.Trim(microblog.Author, 8), SiteUrls.Instance().SpaceHome(@microblog.UserId), microblog.Author, htmlAttributes: new { @class = "tn-user-name" }, navigateTarget: HyperLinkTarget._blank)
+                                        </td>                                        
+                                        @if (tenantTypeId != null && tenantTypeId == TenantTypeIds.Instance().Group())
+                                        {
+                                            <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            <a href="@groupUrlGetter.GetOwnerUrl(microblog.OwnerId)" target="_blank" title="@groupUrlGetter.GetOwnerName(microblog.OwnerId)">@groupUrlGetter.GetOwnerName(microblog.OwnerId)</a>                                                  
+                                            </td>
+                                        }
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1 tn-nowrap">
+                                            @Html.AuditStatusIcon(microblog.AuditStatus)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @microblog.DateCreated.ToUserDateString(true)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                                            @Html.Link("删除", SiteUrls.Instance().DeleteMicroblogs(microblog.MicroblogId.ToString()), "删除该条微博", new { @class = "tn-action-text tnui-delete-microblog", id = "delete-microblog" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">    
+                            @Html.PageSizeDropdownList("pageSize")   
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#mediaType option[value=Other]").remove();
+        $("#mediaType option[value=Flash]").remove();
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removechecked();
+        function removechecked() {
+            $(".tnui-microblog-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //组合所有选中的复选框的只，以,分隔
+        function getCheckedMicroblogIds() {
+            var microblogIds = "";
+            $(".tnui-microblog-id").each(function () {
+                if ($(this).attr("checked")) {
+                    microblogIds += $(this).val() + ",";
+                }
+            });
+            return microblogIds;
+        }
+
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".tnui-microblog-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".tnui-microblog-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+
+        //点通过审核
+        $("#audit-success").click(function (e) {
+            e.preventDefault();
+
+            var microblogIds = getCheckedMicroblogIds();
+            if (!microblogIds) {
+                alert("请至少选择一条微博！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            $.post(url, { microblogIds: microblogIds, isApproved: true }, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                setTimeout(function () { window.location.reload(true); }, 500);
+            })
+        });
+
+
+        //点不通过审核
+        $("#audit-fail").click(function (e) {
+            e.preventDefault();
+
+            var microblogIds = getCheckedMicroblogIds();
+            if (!microblogIds) {
+                alert("请至少选择一条微博！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            $.post(url, { microblogIds: microblogIds, isApproved: false }, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                setTimeout(function () { window.location.reload(true); }, 500);
+            });
+        });
+
+        //点批量删除
+        $("#delete-microblogs").click(function (e) {
+            e.preventDefault();
+
+            var microblogIds = getCheckedMicroblogIds();
+            if (!microblogIds) {
+                alert("请至少选择一条微博！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, { microblogIds: microblogIds }, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    setTimeout(function () { window.location.reload(true); }, 500);
+                });
+                removechecked();
+            });
+        });
+
+        //单个删除
+        $('.tnui-delete-microblog').click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, function (data) {
+                    art.dialog.tips("删除成功！", 1.5, 1);
+                    setTimeout(function () { window.location.reload(true); }, 500);
+                });
+            });
+        });
+    });
+</script>

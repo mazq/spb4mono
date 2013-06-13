@@ -1,0 +1,163 @@
+﻿@model  IEnumerable<ApplicationBase>
+@{
+    Layout = "_ControlPanel";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000053;
+
+    Dictionary<string, PermissionItemInUserRole> dicPermissionItemInUserRoles = ViewData.Get<Dictionary<string, PermissionItemInUserRole>>("PermissionItemsInUserRoles", null);
+    string RoleName = Request.QueryString.Get<string>("roleName", null);
+    string FriendlyRoleName = ViewData.Get<string>("FriendlyRoleName", null);
+    int index = 0;
+
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>设置@(FriendlyRoleName)权限 </span>
+            </h1>
+            <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                <ul>
+                    <li>许可额度：是指对创建类的权限可以设置创建的个数，例如允许创建群组但是不允许超过10个，则10属于“创建群组”权限项目的许可额度；</li>
+                    <li>许可范围：对于创建类的权限一般无需使用许可范围，对于修改、删除等管理操作时可能需要许可范围，例如：版主可以编辑删除特定版块下的帖子，但不能管理其他版块下的帖子；</li>
+                </ul>
+            </div>
+            @using (Html.BeginForm("ManagePermissionItemsInUserRoles", "ControlPanelSettings", FormMethod.Post))
+            {
+                IEnumerable<PermissionItem> PermissionItems = null;
+                <div class="tn-form-box">
+                    @foreach (var applicationBase in Model)
+                    {
+
+                        PermissionItems = ViewData.Get<IEnumerable<PermissionItem>>("permissionItem_" + applicationBase.ApplicationKey, null);
+                        if (PermissionItems.Count() == 0)
+                        {
+@* <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                                    <p>
+                                        没有任何权限项</p>
+                                </div>*@
+                            continue;
+                        }
+                        <div class="tnc-list">
+                            <h2>
+                                <span class="tnc-admin-icon tnc-icon-position-4">@applicationBase.Config.ApplicationName</span></h2>
+                            <table>
+                                @foreach (var permissionItem in PermissionItems)
+                                {
+                                    object attr = null;
+                                    object attrTxt = null;
+                                    if (dicPermissionItemInUserRoles.ContainsKey(permissionItem.ItemKey))
+                                    {
+                                    <tr>
+                                        <th>
+                                            @Html.Hidden("PermissionItemInUserRoles[" + index + "].RoleName", dicPermissionItemInUserRoles[permissionItem.ItemKey].RoleName)
+                                            @Html.Hidden("PermissionItemInUserRoles[" + index + "].ItemKey", dicPermissionItemInUserRoles[permissionItem.ItemKey].ItemKey)
+                                            @permissionItem.ItemName：
+                                        </th>
+                                        @if (dicPermissionItemInUserRoles[permissionItem.ItemKey].IsLocked)
+                                        {
+                                            attr = new { disabled = "disabled", @class = "tn-dropdownlist tn-input-medium" };
+                                            attrTxt = new { disabled = "disabled", @class = "tn-textbox tn-input-medium tn-border-gray", min = "0", watermark = "许可额度" };
+                                        }
+                                        else
+                                        {
+                                            attr = new { @class = "tn-dropdownlist tn-input-medium" };
+                                            attrTxt = new { @class = "tn-textbox tn-input-medium tn-border-gray", min = "0", watermark = "许可额度" };
+                                        }
+                                        <td>
+                                            <span class="permission-type">
+                                                @Html.EnumDropDownList("PermissionItemInUserRoles[" + index + "].PermissionType", dicPermissionItemInUserRoles[permissionItem.ItemKey].PermissionType, htmlAttributes: attr)
+                                            </span>
+                                        </td>
+                                        @if ((int)dicPermissionItemInUserRoles[permissionItem.ItemKey].PermissionType == 2)
+                                        {
+                                            attr = new { style = "display:none", @class = "tn-dropdownlist tn-input-medium" };
+                                            attrTxt = new { @class = "tn-textbox tn-input-medium tn-border-gray", min = "0", watermark = "许可额度", style = "display:none" };
+                                        }
+                                        @if (permissionItem.EnableScope)
+                                        {
+                                            <td>
+                                                @Html.EnumDropDownList("PermissionItemInUserRoles[" + index + "].PermissionScope", dicPermissionItemInUserRoles[permissionItem.ItemKey].PermissionScope, htmlAttributes: attr)
+                                            </td>
+                                        }
+                                        @if (permissionItem.EnableQuota)
+                                        {
+                                            <td>
+                                                @Html.TextBox("PermissionItemInUserRoles[" + index + "].PermissionQuota", dicPermissionItemInUserRoles[permissionItem.ItemKey].PermissionQuota.ToString() == "0" ? "" : dicPermissionItemInUserRoles[permissionItem.ItemKey].PermissionQuota.ToString(), attrTxt)
+                                                @Html.ValidationMessage("PermissionItemInUserRoles[" + index + "].PermissionQuota")
+                                            </td>
+                                        }
+                                        @Html.Hidden("PermissionItemInUserRoles[" + index + "].IsLocked", dicPermissionItemInUserRoles[permissionItem.ItemKey].IsLocked)
+                                    </tr>
+                                   index++;
+                                    }
+                                    else
+                                    {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden("PermissionItemInUserRoles[" + index + "].RoleName", RoleName)
+                                            @Html.Hidden("PermissionItemInUserRoles[" + index + "].ItemKey", permissionItem.ItemKey)
+                                            @permissionItem.ItemName：
+                                        </td>
+                                        <td>
+                                            <span class="permission-type">
+                                                @Html.EnumDropDownList("PermissionItemInUserRoles[" + index + "].PermissionType", PermissionType.NotSet, htmlAttributes: new { @class = "tn-dropdownlist tn-input-medium" })
+                                            </span>
+                                        </td>
+                                        @if (permissionItem.EnableScope)
+                                        {
+                                            <td>
+                                                @Html.EnumDropDownList("PermissionItemInUserRoles[" + index + "].PermissionScope", PermissionScope.All, htmlAttributes: new { @class = "tn-dropdownlist tn-input-medium" })
+                                            </td>
+                                        }
+                                        @if (permissionItem.EnableQuota)
+                                        {
+                                            <td>
+                                                @Html.TextBox("PermissionItemInUserRoles[" + index + "].PermissionQuota", "", new { min = "0", watermark = "许可额度" })
+                                                @Html.ValidationMessage("PermissionItemInUserRoles[" + index + "].PermissionQuota")
+                                            </td>
+                                        }
+                                        @Html.Hidden("PermissionItemInUserRoles[" + index + "].IsLocked", "0")
+                                    </tr>
+                                   index++;
+                                    }
+                                }
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                                        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { id = "btnCancel", onclick = "history.go(-1)" })
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                </div> 
+            }
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var refuseObject = function () {
+            this.init();
+        }
+        refuseObject.fn = refuseObject.prototype = {
+            init: function () {
+                $(".permission-type").change(function () {
+                    var permissionType = $(this).find("option:selected").val();
+                    if (permissionType == "Refuse") {
+                        $(this).parent().next().children().hide();
+                        $(this).parent().next().next().children().hide();
+                    }
+                    if (permissionType == "Allow") {
+                        $(this).parent().next().children().show();
+                        $(this).parent().next().next().children().show();
+                    }
+                })
+            }
+        }
+        refuseObject = new refuseObject();
+    })
+</script>

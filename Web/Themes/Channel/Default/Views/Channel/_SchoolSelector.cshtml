@@ -1,0 +1,70 @@
+﻿@model PagingDataSet<School>
+@{
+    var inputId = ViewData.Get<string>("inputId", null);
+    var areaCode = ViewData.Get<string>("areaCode", null);    
+}
+<div class="tnc-dailog-pd" id="schoolSelector-all">
+    <div class="spb-school-selector">
+        <div class="tn-form tn-label-right tnc-label-short">
+            @using (Html.BeginAjaxForm("_SchoolSelector", "Channel", FormMethod.Get, new AjaxFormOptions().SetOnSuccessCallBack("Success")))
+            {
+                @Html.Hidden("inputId", inputId)
+                <div class="tn-form-row">
+                    <label>
+                        学校所在地区：</label>
+                    @Html.AreaDropDownList("areaCode", areaCode, 3, string.Empty)
+                </div>
+                <div class="tn-form-row">
+                    <label>
+                        学校名称：</label>
+                    @Html.TextBox("keyword", Request.QueryString.GetString("keyword", string.Empty), new { maxlength = "32", @class = "tn-textbox tn-border-gray tn-input-medium" })
+                    @Html.EnumDropDownList("schoolType", Request.QueryString.Get<SchoolType?>("schoolType"), "请选择", new { @class = "tn-dropdownlist" })
+                    @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                </div>
+            }
+            @if (Model.Count() == 0)
+            {
+                <div class="tn-no-data">
+                    暂无数据</div>
+            }
+            else
+            {
+                <div class="tn-form-row tn-border-gray tn-corner-all spb-school-selector-name" id="schoolSelector-mouseover">
+                    @foreach (var item in Model)
+                    {
+                        <span><a href="javascript:void(0)">@item.Name</a></span>
+                    }
+                </div>        
+            }
+        </div>
+    </div>
+</div>
+<div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+    @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close", id = "schoolSelector-cancelButton" })
+</div>
+<script type="text/dialog">
+       this.title("选择学校");
+       this.lock();
+</script>
+<script type="text/javascript" language="javascript">
+    //异步搜索的时候调用
+    function Success(data) {
+        $("#schoolSelector-cancelButton").parent().remove();
+        $("#schoolSelector-all").replaceWith(data);
+    }
+
+    $(document).ready(function () {
+        $("#schoolSelector-mouseover>span").mouseover(function () {
+            $(this).addClass("tn-bg-gray tn-corner-all tn-selected")
+        }).mouseout(function () {
+            $(this).removeClass("tn-bg-gray tn-corner-all tn-selected")
+        }).click(function (e) {
+            e.preventDefault();
+            $("#@inputId").val($(this).find("a:first").html());
+            $("#schoolSelector-cancelButton").click();
+        })
+
+
+    });
+
+</script>

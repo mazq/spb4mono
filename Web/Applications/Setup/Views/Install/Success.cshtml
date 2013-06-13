@@ -1,0 +1,28 @@
+﻿@{
+    Layout = "Common";
+}
+<div class="spb-complete">
+    <span class="spb-bg spb-icon-complete"></span>
+    <div class="spb-info">
+        <p>
+            <strong>安装成功,欢迎使用Spacebuilder</strong></p>
+        <p>
+            接下来可以：</p>
+    </div>
+</div>
+<div class="spb-btn-area">
+    @*<a class="spb-btn spb-btn-deep" href="Setup_step1.html">添加演示数据</a>*@ <a id="siteHome"
+        class="spb-btn" href="javascript:;">访问站点首页</a><a id="controlPanelHome" class="spb-btn"
+            href="javascript:;">访问管理后台</a></div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.post('@Url.Action("ResetSite", "Install")', function () {
+            var href = window.location.href;
+            var domain = href.substring(0, href.indexOf('\Install'));
+            $('#siteHome').attr('href', domain + 'Home' + (href.indexOf('.aspx') > 0 ? '.aspx' : ''));
+            $('#controlPanelHome').attr('href', domain + 'ControlPanel/Home' + (href.indexOf('.aspx') > 0 ? '.aspx' : ''));
+        });
+    });
+
+     
+</script>

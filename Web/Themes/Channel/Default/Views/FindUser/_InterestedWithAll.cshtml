@@ -1,0 +1,76 @@
+﻿@model  IEnumerable<User>
+@{    
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, string> interestedDic = ViewData["interestedDic"] as Dictionary<long, string>;
+}
+@if (Model.Count() > 0)
+{ 
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-interested">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option">
+                <a id="load-another-page-interested" href="#">换一换</a></div>
+            <h3 class="tn-helper-reset">
+                可能感兴趣的人</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <ul class="tn-list tn-helper-clearfix">
+                @foreach (var user in Model)
+                { 
+                    <li class="tn-list-item">
+                        <div class="tn-inner tn-border-gray">
+                            <div class="tn-list-item-area-left">
+                                @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-list-item-heading">
+                                    @if (isCurrentUserFollowDic !=null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                                    {
+                                        @Html.FollowUser(user.UserId,"加关注")
+                                    }     
+                                    @Html.Link(StringUtility.Trim(user.DisplayName,5),SiteUrls.Instance().SpaceHome(user.UserName),user.DisplayName,new{@class="tn-user-name"},HyperLinkTarget._blank)
+                                </div>
+                                <div class="tn-list-item-row">
+                                    <em class="tn-count">粉丝：<a href="@SiteUrls.Instance().ListFollowers(user.UserName)" target="_blank"><strong>@user.FollowerCount</strong></a></em></div>
+                                <div class="tn-list-item-row tn-same">
+                                    @{
+                                    string interested = interestedDic[user.UserId];
+                                    }
+                                    @if ("WithFollows".Equals(interested))
+                                    {
+                                        <text>有共同关注的人</text>
+                                    }
+                                    else if ("WithCompanys".Equals(interested))
+                                    {
+                                        <text>供职于同一公司</text>
+                                    }
+                                    else if ("WithSchools".Equals(interested))
+                                    {
+                                        <text>毕业于同一学校</text>
+                                    }
+                                    else if ("WithTags".Equals(interested))
+                                    {
+                                        <text>使用了相同标签</text>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            var url = '@SiteUrls.Instance()._InterestedWithAll()';
+
+            //点击更多
+            $('#load-another-page-interested').click(function (e) {
+                e.preventDefault();
+
+                $.get(url, { pageSize: 6 }, function (data) {
+                    $('.tnc-interested').replaceWith(data);
+                });
+            });
+        });
+    </script>
+}

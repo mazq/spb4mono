@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.UserWork;
+    KeyValuePair<PrivacyStatus, string> privacySet = ViewData.Get<KeyValuePair<PrivacyStatus, string>>("EditUserWorkPrivacy", new KeyValuePair<PrivacyStatus, string>(PrivacyStatus.Part, "我关注的人可见"));
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-form tn-label-right tnc-work-experience">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div id="privacyset" style="position: absolute; display: none;" class="tn-privacy-set-box tn-widget-content tn-border-gray">
+                    @using (Html.BeginAjaxForm("EditUserWorkPrivacyPrivacySetting", "UserSpaceSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "EditUserEducationPrivacySettingOnSuccessCallBack" }))
+                    {
+                        <div class="tn-form">
+                            <div class="tn-form-row">
+                                <ul class="tn-radiobutton-list">
+                                    <li>
+                                        @Html.RadioButton("EditUserWorkPrivacy", PrivacyStatus.Public.ToString(), privacySet.Key == PrivacyStatus.Public, new { id = "EditUserWorkPrivacy-" + PrivacyStatus.Public.ToString() })
+                                        <label for="EditUserWorkPrivacy-@PrivacyStatus.Public.ToString()">
+                                            所有人可见</label>
+                                    </li>
+                                    <li>
+                                        @Html.RadioButton("EditUserWorkPrivacy", PrivacyStatus.Part.ToString(), privacySet.Key == PrivacyStatus.Part, new { id = "EditUserWorkPrivacy-" + PrivacyStatus.Part.ToString() })
+                                        <label for="EditUserWorkPrivacy-@PrivacyStatus.Part.ToString()">
+                                            我关注的人可见</label>
+                                    </li>
+                                    <li>
+                                        @Html.RadioButton("EditUserWorkPrivacy", PrivacyStatus.Private.ToString(), privacySet.Key == PrivacyStatus.Private, new { id = "EditUserWorkPrivacy-" + PrivacyStatus.Private.ToString() })
+                                        <label for="EditUserWorkPrivacy-@PrivacyStatus.Private.ToString()">
+                                            仅自己可见</label>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tn-form-row tn-form-row-button">
+                                @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default)
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tn-option">
+                    <span id="spanprivacyset">隐私设置：@privacySet.Value </span><a menu="#privacyset" data_menu_clicktrigger="true"
+                        href="javascript:;" class="tn-action"><span class="tn-action-text">更改</span></a></div>
+                <h2>
+                    工作经历</h2>
+            </div>
+            <div id="UserWorks">
+                @Html.Action("_UserWorks", "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } })
+            </div>
+            <div id="UserWorkInfo">
+                @Html.Action("_EditUserWorkInfo", "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } })
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function UserWorkInfoCallback(workId) {
+        $("#UserWorkInfo").load('@(Url.Action("_EditUserWorkInfo", "UserSpaceSettings"))?workId=' + workId + '&spaceKey=@(Url.SpaceKey())');
+        $("#CreateWork").focus();
+    }
+    function EditUserEducationPrivacySettingOnSuccessCallBack(data) {
+        $("#spanprivacyset").html("隐私设置：" + $("input[name='EditUserWorkPrivacy']:checked").next().html());
+        $("#privacyset").hide();
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

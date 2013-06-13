@@ -1,0 +1,42 @@
+﻿@model PagingDataSet<Activity>
+@{
+    ViewBag.Title = "我的首页";
+    Layout = "_UserSpace_Profile";
+    User user = ViewData.Get<User>("user", null);
+    int integrity = ViewData.Get<int>("integrity", 0);
+
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    Dictionary<int, List<OwnerStatisticData>> OwnerStatisticDataDictionary = ViewData.Get<Dictionary<int, List<OwnerStatisticData>>>("OwnerStatisticDataDictionary", null);
+    Dictionary<int, string> dictionary = ViewData.Get<Dictionary<int, string>>("dictionary", null);
+    IEnumerable<ApplicationBase> applicationBase = ViewData.Get<IEnumerable<ApplicationBase>>("applicationBase", null);
+}
+@section ContentHeader{
+    <div class="spb-po-my-profile">
+        <div class="spb-po-my-profile-wrap tn-helper-clearfix">
+            @Html.Action("_MyHomeUserInfo", new { spaceKey = Url.SpaceKey() })
+            @Html.Action("_SelectMenu", new { spaceKey = Url.SpaceKey() })
+        </div>
+    </div>
+}
+@section Aside_First{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-user-panel">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="spb-user-panel-wrap">
+                @Html.Action("_MyHomeNavigations", new { spaceKey = Url.SpaceKey(), showOperation = true })
+            </div>
+        </div>
+    </div>
+}
+<script src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js")" type="text/javascript"></script>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-my-following">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_AnnouncementItem", "Channel", new { displayArea = Announcement_DisplayArea.UserSpace })
+        @Html.Action("_MyHomeActivities", new { spaceKey = Url.SpaceKey() })
+    </div>
+</div>
+@section Aside_Second{
+    @Html.AjaxAction("_InterestedWithAllSide", "FindUser", new { pageSize = 5 })
+    @Html.AjaxAction("_HomeLastVisitList", "UserSpace", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_ListTopUsers", "UserSpace", new { spaceKey = Url.SpaceKey(), topNumber = 12 })
+    @Html.AdvertisingPosition("11000000001")
+}

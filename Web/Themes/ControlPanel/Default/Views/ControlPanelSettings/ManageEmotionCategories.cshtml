@@ -1,0 +1,111 @@
+﻿@model IList<EmotionCategory>
+@{
+   
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);    
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>表情包管理</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                @Html.StatusMessage()
+                <form action="@SiteUrls.Instance().ExtractEmoticon()" method="post" enctype="multipart/form-data">
+                <label class="tn-form-label">
+                    上传表情包：</label>
+                <input type="file" id="emotionName" name="emotionName" class="ignore" accept="application/x-zip-compressed" />
+                @Html.Button("上传", ButtonTypes.Submit, HighlightStyles.Default, ButtonSizes.Default, IconTypes.Upload)
+                </form>
+                <div class="tnc-content-manage">
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header">
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    表情包名称
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    表情描述
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    所在目录名称
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    是否启用
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    排序
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    操作
+                                </th>
+                            </tr>
+                            @foreach (var emotion in Model)
+                            {
+                          
+                                <tr class="tn-table-grid-row" id="@emotion.DirectoryName" data-id="@emotion.DirectoryName">
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        <span class="tn-action tn-action-text-icon"><a class="tn-action-text"
+                                            plugin="dialog" href="@SiteUrls.Instance()._ListEmotions(emotion.DirectoryName)">@emotion.CategoryName</a>
+                                        </span>
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        @emotion.Description
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        <p>
+                                            ~/Web/Images/Emotions/@emotion.DirectoryName</p>
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                        <span class="tn-icon-colorful tn-icon-colorful-@(emotion.IsEnabled ? "pass" : "stop")">
+                                        </span>
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                        @Html.Link("上移", SiteUrls.Instance().ChangeEmotionDisplayOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "display-order-up" + emotion.DirectoryName, name = emotion.DirectoryName })
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                        @Html.Link("下移", SiteUrls.Instance().ChangeEmotionDisplayOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "display-order-down" + emotion.DirectoryName, name = emotion.DirectoryName })
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                        <a name="changeEnableStatusButton" class="tn-action" href="@SiteUrls.Instance().SetEmotionCategoryStatus(emotion.DirectoryName)" data-isenabled="@emotion.IsEnabled.ToString().ToLower()">
+                                            <span class="tn-action-text">@(emotion.IsEnabled ? "禁用" : "启用")</span></a>
+                                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetUrl(SiteUrls.Instance().DeleteEmotionCategory(emotion.DirectoryName)).SetConfirm("确认要卸载吗？").SetText("卸载").SetTooltip("卸载").SetDeleteTarget("#" + emotion.DirectoryName).SetOnErrorCallBack("error").SetOnSuccessCallBack("success"))
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("a[name='changeEnableStatusButton']").click(function (e) {
+            var self = $(this);
+            var isEnabled = self.data("isenabled");
+            $.post(self.attr("href"), { isEnabled: !isEnabled }, function (data) {
+                if (data.MessageType >= 0) {
+                    self.data("isenabled", !isEnabled);
+                    self.text(isEnabled ? "启用" : "禁用");
+                    self.closest("tr").find("span.tn-icon-colorful-pass,span.tn-icon-colorful-stop").toggleClass("tn-icon-colorful-pass").toggleClass("tn-icon-colorful-stop");
+                }
+                art.dialog.tips(data.MessageContent, 2, data.MessageType);
+            });
+            return false;
+        });
+    });
+
+    function error() {
+        art.dialog.tips("卸载失败！", 2, -1);
+    }
+
+    function success() {
+        art.dialog.tips("卸载成功！", 2, 1);
+    }
+</script>

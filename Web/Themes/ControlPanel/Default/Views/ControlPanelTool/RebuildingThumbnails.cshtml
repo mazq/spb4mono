@@ -1,0 +1,121 @@
+﻿@model IEnumerable<Tunynet.Common.PointItem>
+@{
+    Layout = "_ControlPanel";
+
+    IEnumerable<TenantAttachmentSettings> tenantAttachmentSettings = ViewData.Get<IEnumerable<TenantAttachmentSettings>>("TenantAttachmentSettings", null);
+    IEnumerable<TenantLogoSettings> tenantLogoSettings = ViewData.Get<IEnumerable<TenantLogoSettings>>("TenantLogoSettings", null);
+    string uploadsPath = ViewData.Get<string>("uploadsPath", "/Uploads");
+    Dictionary<string, string> applicationName = ViewData.Get<Dictionary<string, string>>("ApplicationName", null);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>重建缩略图</span>
+            </h1>
+            <div class="tnc-ctnright-list tnc-integral-rule-module">
+                <div class="tnc-inegral-table">
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr>
+                                <td class="tnc-half-width">
+                                    <div class="tnc-list tnc-float-left">
+                                        <h2>
+                                            <span class="tnc-admin-icon tnc-icon-position-4">重建缩略图</span>
+                                        </h2>
+                                        <div class="tnc-list-text">
+                                            <table class="tn-table-grid">
+                                                <tbody>
+                                                    <tr class="tn-table-grid-header">
+                                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                            附件名称
+                                                        </td>
+                                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                            保存位置
+                                                        </td>
+                                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                            操作
+                                                        </td>
+                                                    </tr>
+                                                    @foreach (var item in tenantAttachmentSettings)
+                                                    {
+                                                        string name = applicationName.ContainsKey(item.TenantTypeId) ? applicationName[item.TenantTypeId] : item.TenantAttachmentDirectory;
+                                                        string url = SiteUrls.Instance().ControlPanelOperating("正在执行【重建\"" + name + "\"缩略图】操作，请耐心等待", SiteUrls.Instance().RebuildingThumbnails(), SiteUrls.Instance()._RebuildingThumbnails(item.TenantTypeId));
+                                                         <tr class="tn-table-grid-row">
+                                                            <td class="tn-border-gray tn-border-bottom">
+                                                                @name
+                                                            </td>
+                                                            <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                                                @(Path.Combine(uploadsPath, item.TenantAttachmentDirectory))
+                                                            </td>
+                                                            <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                                                @Html.Link("重建", url, "重建", new { id = "reset-attachment-" + item.TenantTypeId })
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tnc-half-width">
+                                    <div class="tnc-list tnc-float-left">
+                                        <h2>
+                                            <span class="tnc-admin-icon tnc-icon-position-4">重建标识图</span>
+                                        </h2>
+                                        <div class="tnc-list-text">
+                                            <table class="tn-table-grid">
+                                                <tbody>
+                                                    <tr class="tn-table-grid-header">
+                                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                            标识图名称
+                                                        </td>
+                                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                            保存位置
+                                                        </td>
+                                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                            操作
+                                                        </td>
+                                                    </tr>
+                                                    @foreach (var item in tenantLogoSettings)
+                                                    {
+                                                        string name = applicationName.ContainsKey(item.TenantTypeId) ? applicationName[item.TenantTypeId] : item.TenantLogoDirectory;
+                                                        string url = SiteUrls.Instance().ControlPanelOperating("正在执行【重建\"" + name + "\"标识图】操作，请耐心等待", SiteUrls.Instance().RebuildingThumbnails(), SiteUrls.Instance()._ReBuildingLogs(item.TenantTypeId));
+
+                                                        <tr class="tn-table-grid-row">
+                                                            <td class="tn-border-gray tn-border-bottom">
+                                                                @name
+                                                            </td>
+                                                            <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                                                @(Path.Combine(uploadsPath, item.TenantLogoDirectory))
+                                                            </td>
+                                                            <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                                                @Html.Link("重建", url, "重建", new { id = "reset-logo-" + item.TenantTypeId })
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("a[id^='reset-']").click(function (e) {
+            var $this = $(this);
+            e.preventDefault();
+            art.dialog.confirm('您确认要重建吗？', function () {
+                window.location.href = $this.attr("href");
+            });
+        });
+    })
+</script>

@@ -1,0 +1,31 @@
+﻿@model InviteFollowEditModel
+@using (Html.BeginAjaxForm("InviteFollow", "UserSpace", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "InviteFollowOnSuccessCallBack" }))
+{
+    <div class=" tnc-dailog-pd">
+        <div class="tn-form">
+            <div class="tn-form-row">
+                @Model.DisplayName
+            </div>
+            <div class="tn-form-row">
+                @Html.TextAreaFor(n => n.remark, new { @class = "tn-textarea tn-border-gray  tn-input-long" })
+            </div>
+            <div class="tn-form-row">
+                <div class="tn-helper-right">
+                    @Html.ValidationMessageFor(n => n.remark)
+                </div>
+            </div>
+            <input name="UserId" type="hidden" value="@UserContext.CurrentUser.UserId" />
+        </div>
+    </div>
+    <div class=" tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("发送", ButtonTypes.Submit, HighlightStyles.Primary)
+    </div>
+}
+<script type="text/dialog">
+    this.title("求关注");
+</script>
+<script type="text/javascript" language="javascript">
+    function InviteFollowOnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

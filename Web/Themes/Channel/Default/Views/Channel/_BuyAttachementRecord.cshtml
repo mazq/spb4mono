@@ -1,0 +1,49 @@
+﻿@model PagingDataSet<AttachmentDownloadRecord>
+@{
+    var tradePointCategory = new PointService().GetPointCategory("TradePoints");
+}
+@if (Model != null && Model.Count > 0)
+{
+    <table class="tn-table-grid">
+        <tbody>
+            <tr class="tn-table-grid-header">
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    名称
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    时间
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    @tradePointCategory.CategoryName
+                </th>
+            </tr>
+            @foreach (var record in Model)
+            {
+                <tr class="tn-table-grid-row">
+                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                        @Html.Link(record.UserDisplayName, SiteUrls.Instance().SpaceHome(record.UserId), record.UserDisplayName)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                        @record.DownloadDate.ToFriendlyDate()
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                        @record.Price
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+    <script type="text/dialog">
+    this.title("下载记录");
+    </script>
+}
+else
+{
+    <script type="text/dialog">
+    this.close();
+    </script>
+    <script type="text/javascript" language="javascript">
+        art.dialog.tips('暂时没有下载记录！', 1.5, 0);
+    </script>
+}

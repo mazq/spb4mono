@@ -1,0 +1,221 @@
+﻿@model IEnumerable<AdvertisingPosition>
+@{
+    Layout = "_ControlPanel";
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000035;
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        @Html.AjaxAction("_AdvertisingRightMenu", "ControlPanelOperation")
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>广告位管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManagePositions", "ControlPanelOperation", FormMethod.Get))
+                        {                            
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    投放区域：</label>
+                                @Html.DropDownList("presentAreaKey", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否启用：</label>
+                                @Html.DropDownList("isEnable", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>                            
+                            <div class="tn-form-row tn-form-row-button">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "search" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加", SiteUrls.Instance()._EditPosition(), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "create-position", plugin = "dialog" })
+                            @Html.LinkButton("删除", SiteUrls.Instance()._DeletePosition(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-positions" })
+                        </div>
+                    </div>
+                    @if (Model == null || Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    {
+                        <form action="#" method="post" id="Form-BatchSet">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" class="tn-checkbox" id="select-all" name="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        广告位编码
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        描述
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        示意图
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        建议尺寸
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        投放区域
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        是否启用
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                </tr>
+                                @foreach (AdvertisingPosition position in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("positionIds", position.PositionId, isChecked: false, htmlAttributes: new { @class = "tnui-position-id" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                            @position.PositionId
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <span title="@position.Description">@StringUtility.Trim(position.Description, 25)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                            @{
+                                                string logoUrl = null;
+                                                if (!string.IsNullOrEmpty(position.FeaturedImage))
+                                                {
+                                                    logoUrl = SiteUrls.Instance().LogoUrl(position.FeaturedImage, TenantTypeIds.Instance().AdvertisingPosition(), ImageSizeTypeKeys.Instance().Original(), false);
+                                                }
+                                            }
+                                            @if (!string.IsNullOrEmpty(logoUrl))
+                                            { 
+                                                @Html.Link("查看", logoUrl, position.Description, new { id = "view-position-" + position.PositionId })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                            @position.Width*@position.Height
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                            @Tunynet.Globalization.ResourceAccessor.GetString(position.PresentAreaKey)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1 tn-nowrap">
+                                            @if (position.IsEnable)
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-pass" title="启用"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-stop" title="不启用"></span>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditPosition(position.PositionId), "编辑该广告位", new { @class = "tn-action-text", id = "edit-position", plugin = "dialog" })
+                                            @Html.Link("查看广告", SiteUrls.Instance().ManageAdvertisings(position.PresentAreaKey, position.PositionId), "查看该广告位下的广告", new { @class = "tn-action-text", id = "edit-position" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+//        $("a[id^='view-position-']").click(function (e) {
+//            e.preventDefault();
+//            if ($(this).attr("href") != "") {
+//                SyntaxHighlighter.defaults['toolbar'] = false;
+//                SyntaxHighlighter.all();
+//                $(this).fancybox({
+//                    'transitionIn': 'elastic',
+//                    'transitionOut': 'elastic',
+//                    'speedIn': 600,
+//                    'speedOut': 200
+//                });
+//                $(this).click();
+//            }
+//            else {
+//                alert("尚未上传示意图！");
+//            }
+//            //return false;
+//        });
+
+        $("a[id^='view-position-']").fancybox(
+        {
+            'transitionIn': 'elastic',
+            'transitionOut': 'elastic',
+            'speedIn': 600,
+            'speedOut': 200
+        });
+
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removechecked();
+        function removechecked() {
+            $(".tnui-position-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //全选按钮
+        $("input#select-all").click(function () {
+            checkAll(this, "positionIds");
+        });
+
+        //查看示意图
+        //        $("a[id^='view-position-']").click(function () {
+        //            var imageurl = $(this).attr("imageurl");
+        //            if (imageurl != "") {
+        //                art.dialog({
+        //                    padding: 10,
+        //                    title: '查看示意图',
+        //                    content: '<img src="' + imageurl + '"/>',
+        //                    lock: true
+        //                });
+        //            }
+        //            else {
+        //                alert("尚未上传示意图！");
+        //            }
+        //        });
+
+        //点批量删除
+        $("#delete-positions").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='positionIds']:checked").length) {
+                alert("至少选择一个广告位");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                });
+                removechecked();
+            });
+        });
+    });
+</script>

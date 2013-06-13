@@ -1,0 +1,11 @@
+﻿@model  IEnumerable<MicroblogEntity>
+@{
+    long lastMicroblogId = ViewData.Get<long>("lastMicroblogId", 0);
+    int pageCount = ViewData.Get<int>("pageCount", 0);
+}
+<input type="hidden" class="lastMicroblogId" value="@(lastMicroblogId)" />
+<input type="hidden" class="pageCount" value="@(pageCount)" />
+@foreach (var microblog in Model)
+{
+    Html.RenderPartial("~/Applications/Microblog/Views/MicroblogActivity/_Microblog.cshtml", microblog);
+}

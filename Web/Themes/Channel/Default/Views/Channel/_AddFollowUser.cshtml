@@ -1,0 +1,4 @@
+﻿@{
+    long userId = ViewData.Get<long>("userId",0);
+}
+@Html.FollowUser(userId, "加关注", followButtonType: FollowButtonTypes.Link)

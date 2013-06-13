@@ -1,0 +1,35 @@
+﻿@{
+    Layout = "app-home-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    IEnumerable<BarSection> recommendSections = ViewData.Get<IEnumerable<BarSection>>("recommendSections", new List<BarSection>());
+    IEnumerable<BarSection> topSections = ViewData.Get<IEnumerable<BarSection>>("topSections", new List<BarSection>());
+    IEnumerable<RecommendItem> recommendItems = ViewData.Get<IEnumerable<RecommendItem>>("recommendItems", null);
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @if (UserContext.CurrentUser != null)
+    { 
+        @Html.Action("_UserData", "Bar", new { userId = UserContext.CurrentUser.UserId })
+    }
+    @Html.AjaxAction("_Tops", "Bar", new { topNumber = 10, sortBy = SortBy_BarThread.DateCreated_Desc })
+    @Html.AjaxAction("_Tops", "Bar", new { topNumber = 10, sortBy = SortBy_BarThread.PostCount })
+    @Html.AjaxAction("_Tops", "Bar", new { topNumber = 10, isEssential = true })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom tn-border-gray">
+            <div class="tn-option"><a href="@SiteUrls.Instance().TagMap()">更多</a> </div>
+            <h3 class="tn-helper-reset">
+                热门标签
+            </h3>
+        </div>
+            @Html.Action("_TagCloud")
+    </div>
+}
+@Html.Action("_RecommendThread", "Bar", new { topNum = 8, recommendTypeId = "10120201" })
+@Html.Action("_RecommendSections", "Bar", new { topNumber = 12, recommendTypeId = "10120101", displayTemplate = DisplayTemplate_RecommendSections.Slide })
+@Html.Action("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.StageThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Summary })
+@Html.AdvertisingPosition("10101200001")
+@Html.Action("_CategorySections", "Bar")
+

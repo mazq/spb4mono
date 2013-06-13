@@ -1,0 +1,57 @@
+﻿@model ActivateByEmail
+@{
+    Layout = null;
+    RouteValueDictionary routeValueDictionary = new RouteValueDictionary();
+    routeValueDictionary.Add("readonly", "readonly");
+}
+<div id="div-activate-email">
+    @using (Html.BeginAjaxForm("ActivateByEmail", "Account", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack", OnErrorCallBack = "OnErrorCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right tnc-label-w">
+                @Html.StatusMessage(TempData["StatusMessageData"] as StatusMessageData)
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.AccountEmail)
+                    @Html.TextBoxFor(n => n.AccountEmail, InputWidthTypes.Long, routeValueDictionary)
+                    @Html.Link("修改邮箱", "javascrpt:;", "修改邮箱", new { id = "a-js-changepassword", tabindex = "-1" })<br />
+                    @Html.ValidationMessageFor(n => n.AccountEmail)
+                </div>
+                @Html.HiddenFor(n => n.Token)
+                @Html.Captcha(VerifyScenarios.Register, true)
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("重新发送", ButtonTypes.Submit, HighlightStyles.Primary)
+        </div>
+    }
+    <script type="text/dialog">
+    this.title("发送激活邮件");
+    </script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            $("a#a-js-changepassword").click(function (e) {
+                e.preventDefault();
+                $input = $("input#AccountEmail");
+                $input.removeAttr("readonly");
+                $input.attr("value", "");
+                $(this).remove();
+            });
+        });
+        //提交表单失败的情况
+        function OnErrorCallBack(data) {
+            $("div#div-activate-email").replaceWith(data);
+        }
+        //提交表单成功的情况
+        function OnSuccessCallBack(data) {
+            var list = art.dialog.list;
+            for (var i in list) {
+                list[i].close();
+            };
+            if (data.MessageContent) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+            } else {
+                window.location.href = data;
+            }
+        }
+    </script>
+</div>

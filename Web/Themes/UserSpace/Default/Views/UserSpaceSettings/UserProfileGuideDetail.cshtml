@@ -1,0 +1,145 @@
+﻿@model WorkExperienceEditModel
+@{
+    Layout = "_UserSpace_Wide";
+    User user = (User)UserContext.CurrentUser;
+    int integrity = user.Profile.Integrity;
+    SelectList StartYear = ViewData["StartYear"] as SelectList;
+    SelectList EndDate = ViewData["EndDate"] as SelectList;
+    UserProfile userProfile = ViewData.Get<UserProfile>("userProfile", null);
+    string areacode = IPSeeker.Instance().GetAreaCode(Tunynet.Utilities.WebUtility.GetIP());
+    if (!string.IsNullOrEmpty(userProfile.HomeAreaCode))
+    {
+        areacode = userProfile.HomeAreaCode;
+    }
+    if (!string.IsNullOrEmpty(userProfile.NowAreaCode))
+    {
+        areacode = userProfile.NowAreaCode;
+    }
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-step-intersted">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-step-wrap">
+            <div class="tn-head">
+                <div class="tn-instructions">
+                    <div class="tn-progress-bar tn-widget-content tn-corner-all">
+                        <div class="tn-progress-bar-value tn-widget-header tn-corner-left tn-border-tbl"
+                            style="width:40%;">
+                        </div>
+                    </div>
+                    <ul class="tn-helper-clearfix tn-step-scale">
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>1、上传头像</span></li>
+                        <li style="width: 19.99%" class="tn-step tn-selected"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>2、填写个人资料</span></li>
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>3、填写个人标签</span></li>
+                        <li style="width: 19.98%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>4、看看感兴趣的人</span></li>
+                        <li style="width: 19.98%" class="tn-step"><b class="tn-widget-content tn-corner-all">
+                        </b><span>5、完成，进入我的首页</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tn-body">
+                <div class="tn-form">
+                    <div class="tn-text-heading tn-border-gray tn-border-bottom"><strong>基本资料</strong></div>
+                    @using (Html.BeginAjaxForm("EditUserProfile", "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } }, FormMethod.Post,new AjaxFormOptions() ,htmlAttributes: new { id = "edit-userProfile" }))
+                    {
+                        <div class="tn-form-box">
+                            <table>
+                                @Html.Action("_EditUserProfileDetail", new { spaceKey = Url.SpaceKey() })
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div class="tn-form tn-label-right tnc-education">
+                    <div class="tn-text-heading tn-border-gray tn-border-bottom"><strong>最高学历</strong></div>
+                    @using (Html.BeginAjaxForm("CreateEducation", "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } }, FormMethod.Post,new AjaxFormOptions(), htmlAttributes: new { id = "create-education" }))
+                    {
+                        var education = new EducationExperienceEditModel();
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => education.Degree)
+                            @Html.EnumDropDownList("Degree", DegreeType.Undergraduate)
+                        </div>
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(model => education.School)
+                            @Html.TextBox("School", null, new { maxlength = "50", @class = "tn-textbox tn-border-gray  tn-input-long", @id = "open-SchoolSelector" })
+                            <a class="tn-icon tn-icon-school" href="@SiteUrls.Instance()._SchoolSelector("open-SchoolSelector", areacode)" plugin = "dialog" id="SchoolSelector"></a>
+                        </div>
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(model => education.StartYear)
+                            @Html.DropDownList("StartYear", StartYear)
+                        </div>
+                    }
+                </div>
+                <div class="tn-form tn-label-right tnc-work-experience">
+                    <div class="tn-text-heading tn-border-gray tn-border-bottom"><strong>最近工作经历</strong></div>
+                    @using (Html.BeginAjaxForm("CreateWork", "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } }, FormMethod.Post,new AjaxFormOptions(), htmlAttributes: new { id = "create-work" }))
+                    {
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.CompanyName)
+                            @Html.TextBox("CompanyName", null, new { maxlength = "50", @class = "tn-textbox tn-border-gray  tn-input-long" })
+                        </div>
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.CompanyAreaCode)
+                            @Html.AreaDropDownListFor(n => n.CompanyAreaCode, 3)
+                            @Html.ValidationMessageFor(n => n.CompanyAreaCode)
+                        </div>
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.StartDate)
+                            @Html.DropDownList("StartDate", StartYear)-@Html.DropDownList("EndDate", EndDate)
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="tn-foot">
+                <div class="tn-actions tn-border-gray tn-border-top tn-helper-clearfix">
+                    <div class="tn-confirm">
+                        @Html.Button("保存", ButtonTypes.Button, HighlightStyles.Primary, size:ButtonSizes.Large, htmlAttributes: new { id = "save-all" })
+                    </div>
+                    <div class="tn-next">
+                        @Html.Button("跳过", ButtonTypes.Button, size:ButtonSizes.Large, url: SiteUrls.Instance().UserProfileGuideTag(Url.SpaceKey()))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#save-all").click(function (e) {
+            e.preventDefault();
+
+            if ($("form#edit-userProfile").valid()) {
+                $("form#edit-userProfile").submit();
+            } else {
+                art.dialog.tips("保存失败！", 1.5, -1);
+                return false;
+            }
+
+            if ($("#open-SchoolSelector").val()) {
+                if ($("form#create-education").valid()) {
+                    $("form#create-education").submit();
+                }
+                else {
+                    art.dialog.tips("保存失败！", 1.5, -1);
+                    return false;
+                }
+            }
+
+            if ($("#CompanyName").val()) {
+                if ($("form#create-work").validate) {
+                    $("form#create-work").submit();
+                }
+                else {
+                    art.dialog.tips("保存失败！", 1.5, -1);
+                    return false;
+                }
+            }
+
+            art.dialog.tips("保存成功！", 1.5, 1, function () {
+                window.location = '@SiteUrls.Instance().UserProfileGuideTag(Url.SpaceKey())';
+            });            
+        });
+    });
+</script>

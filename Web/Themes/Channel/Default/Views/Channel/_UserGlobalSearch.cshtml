@@ -1,0 +1,67 @@
+﻿@model  PagingDataSet<User>
+@{
+    UserSearcher userSearcher = (UserSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(UserSearcher.CODE);
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@if (Model.TotalRecords > 0)
+{
+    <input type="hidden" class="totalRecords" value="@Model.TotalRecords" />
+    <input type="hidden" class="queryDuration" value="@Model.QueryDuration" />
+    <div class="tn-content-heading tn-border-light tn-border-bottom">
+        <div class="tn-option">
+            <a href="@userSearcher.PageSearchActionUrl(keyword)">更多</a>
+        </div>
+        <h4>
+            用户</h4>
+    </div>
+    <div class="tnc-search-person">
+        <ul class="tn-list">
+            @foreach (var user in Model)
+            {
+                string gender = "";
+                string introduction = "";
+                if (user.Profile != null)
+                {
+                    introduction = user.Profile.Introduction;
+
+                    if (user.Profile.Gender == GenderType.Male)
+                    {
+                        gender = "tn-icon tn-smallicon-male";
+                    }
+                    else if (user.Profile.Gender == GenderType.FeMale)
+                    {
+                        gender = "tn-icon tn-smallicon-female";
+                    }
+                    else
+                    {
+                        gender = "";
+                    }
+                }
+                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                    <div class="tn-list-item-area-left">
+                        @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                    </div>
+                    @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                    {
+                        <div class="tn-list-item-area-right">
+                            @Html.FollowUser(user.UserId,"加关注")
+                        </div>
+                    }
+                    <div class="tn-list-item-area-main">
+                        <div class="tn-list-item-row tn-list-item-heading">
+                            <h5 class="tn-helper-reset">
+                                <a target="_blank" class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(user.UserId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), user.DisplayName, 100))</a>
+                                @Html.IdentificationType(user.UserId)
+                            </h5>
+                        </div>
+                        <div class="tn-list-item-row tn-list-info">
+                            <span class="@gender"></span><em class="tn-count">粉丝： <a target="_blank" href="@SiteUrls.Instance().ListFollowers(user.UserName)">
+                                <strong>@user.FollowerCount</strong></a> </em>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+}

@@ -1,0 +1,19 @@
+﻿@model PagingDataSet<OnlineUser>
+@{
+    Layout = "app-list-2cols";
+}
+@section ContentHeader{
+    @Html.Action("_Header", "FindUser", new { menu = "Home" })
+}
+@section Aside{
+
+@Html.Action("_RecommendUser", "FindUser", new { topNumber = 5 })
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                热门用户标签</h3>
+        </div>
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().User()}) 
+    </div>
+}
+@Html.Partial("OnlineUserItem", Model)

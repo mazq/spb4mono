@@ -1,0 +1,51 @@
+﻿@model GroupEntity
+@{
+    string content = string.Format("@{0} 的群组 \"{1}\" {2} 很不错 推荐给大家看看", Model.User.NickName, Model.GroupName, SiteUrls.FullUrl(SiteUrls.Instance().GroupHome(Model.GroupId)));
+    string url = SiteUrls.Instance()._ShareToMicroblog(content, SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Big()));
+}
+@if (Model != null)
+{
+    <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-group-item">
+        <div class="tn-list-item-area-left">
+            @{
+                HyperLinkTarget hyperLinkTarget;
+                if (Model.User == UserContext.CurrentUser)
+                {
+                    hyperLinkTarget = HyperLinkTarget._self;
+                }
+                else
+                {
+                    hyperLinkTarget = HyperLinkTarget._blank;
+                }
+            }
+            @Html.ShowUserAvatar(Model.UserId, AvatarSizeType.Small, true, hyperLinkTarget)
+        </div>
+        <div class="tn-list-item-area-main">
+            @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+            <div class="tnc-dynamic-title">
+                <a href="@SiteUrls.Instance().SpaceHome(Model.UserId)" class="tn-user-name" @(Model.User == UserContext.CurrentUser ? "target=_self" : "target=_blank")>@Model.User.DisplayName</a>
+                @Html.IdentificationType(Model.UserId)
+                创建了群组
+            </div>
+            <div class="tnc-dynamic-group tn-helper-clearfix">
+                <div class="tn-group-avatar">
+                    <div class="tn-avatar">
+                        <a target="_blank" href="@SiteUrls.Instance().GroupHome(Model.GroupKey)">
+                            <img src="@SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Small())" height="50px" width="50px" alt="@Model.GroupName"/></a></div>
+                </div>
+                <div class="tn-group-info">
+                    <div class="tn-title">
+                        @Html.Link(Model.GroupName, SiteUrls.Instance().GroupHome(Model.GroupKey), Model.GroupName, navigateTarget: HyperLinkTarget._blank)</div>
+                    <div class="tn-actions">
+                        @Html.Action("_ApplyJoinButton", "ChannelGroup", new { groupId = Model.GroupId, buttonName = "加入" })
+                    </div>
+                </div>
+            </div>
+            <p class="tnc-dynamic-box">@Html.Raw(Model.Description)</p>
+            <p class="tnc-dynamic-box tnc-textsize-small">
+                @Html.Link("分享", url, Model.GroupName, navigateTarget: HyperLinkTarget._blank, htmlAttributes: new { plugin="dialog"})
+                <em class="tn-date tn-text-note">@Model.DateCreated.ToFriendlyDate() </em>
+            </p>
+        </div>
+    </li>
+}

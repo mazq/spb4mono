@@ -1,0 +1,56 @@
+﻿@model InitialNavigation
+@{
+    int navigationId = ViewData.Get<int>("navigationId", 0);
+}
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_DeleteNavigation", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack", OnErrorCallBack = "OnErrorCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form">
+                <div class="tn-form-row">
+                    @Html.Hidden("navigationId", navigationId)
+                    <strong>确认删除当前导航？</strong>
+                </div>
+                @if (Model.NavigationType == NavigationType.PresentAreaInitial)
+                {
+                <div class="tn-form-row">
+                    <label class="tn-form-label"> 
+                        @Html.SipmleCheckBox("forceOwnerDelete", false)
+                        强制删除
+                    </label>
+                </div>
+                <div class="tn-form-row">
+                    <span>选中后会同时删除用户、群组相关导航</span>
+                </div>
+                }
+                <div class="tn-form-row tn-form-row-button">
+                    @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+                    @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+                </div>
+            </div>
+        </div>
+
+    }
+    <script type="text/dialog">
+    
+      this.title("消息");
+    
+    </script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            $("input[name='forceOwnerDelete']").click(function () {
+                if ($(this).attr("checked")) {
+                    $(this).attr("value",true);
+                } else {
+                    $(this).attr("value",false);
+                }
+            });
+        })
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+            function () {
+                window.location.reload(true);
+            })
+        }
+    </script>
+

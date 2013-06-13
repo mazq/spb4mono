@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Tag>
+<div id="topicContainer" class="tn-widget tn-bubble tn-bubble-arrow-top tnc-mode-windows tnc-mode-wid-one"
+    style="display: none; position: absolute;">
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+        </b>
+    </div>
+    <div class="tn-bubble-content tn-widget-content">
+        <div class=" tnc-mode-content" id="tipContainerDiv">
+            <div class="tnc-mode-icon">
+                <a class="tn-icon tn-smallicon-cross" href="javascript:;" id="closetopicContainer">
+                </a>
+            </div>
+            <h3>
+                热门话题</h3>
+            <div class="tnc-mode-ctn" id="topicLinkDiv">
+                <div class="tn-border-bottom tn-border-dashed tn-border-gray tnc-mode-topic-btn">
+                    <center>
+                        <a class="tn-button tn-corner-all tn-button-text-only tn-button-large tn-button-primary tn-button-text-icon-primary"
+                            href="javascript:;" onclick="newTopicCreate();"><span class="tn-icon tn-smallicon-add">
+                            </span><span class="tn-button-text">插入话题</span> </a>
+                    </center>
+                </div>
+                @if (Model != null)
+                {
+       
+                    <p class=" tnc-mode-topic-title">
+                        热门话题</p>
+                    <ul class="tnc-mode-topic">
+                        @foreach (var item in Model)
+                        {
+                            <li><a href="javascript:;" onclick="createNewTopicClick(this);" title="@item.TagName">@StringUtility.Trim(item.TagName, 8)</a></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+
+    var createNewTopicClick = function (obj) {
+        var topicName = "#" + $(obj).attr("title") + "#";
+        newTopicClickEvent("microblogBody", topicName);
+    }
+
+    var newTopicCreate = function () {
+        newTopicClickEvent("microblogBody", "#请输入话题内容#");
+    }
+
+    $(function () {
+        $('#closetopicContainer').click(function () {
+            $('#topicContainer').hide();
+        });
+    });
+
+</script>

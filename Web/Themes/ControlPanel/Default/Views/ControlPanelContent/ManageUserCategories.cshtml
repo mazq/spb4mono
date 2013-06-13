@@ -1,0 +1,257 @@
+﻿@model PagingDataSet<Category>
+@{
+    Layout = "_ControlPanel";
+    AuditStatus? auditStatus = Request.QueryString.Get<AuditStatus?>("auditStatus", null);
+    SelectList tenants = ViewData.Get<SelectList>("tenants", null);
+    var userId = ViewData.Get<long?>("userId", null);
+    Dictionary<string, string> tenantsDic = tenants.ToDictionary(n => n.Value, n => n.Text);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>用户类别管理</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageUserCategories", "ControlPanelContent", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    关键字：</label>
+                                @Html.TextBox("keyword", Request.QueryString.Get<string>("keyword"), new { maxlength = "64", @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    作者：</label>
+                                @Html.UserSelector("ownerId", userId)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    所属：</label>
+                                @Html.DropDownList("tenantTypeId", tenants, "所有", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    审核状态：</label>
+                                @(Html.EnumDropDownList<AuditStatus?>("auditStatus", auditStatus, "全部", new { @class = "tn-dropdownlist" }))
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "search" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("通过审核", SiteUrls.Instance().UpdateAuditStatus(), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "audit-success" })
+                            @Html.LinkButton("不通过审核", SiteUrls.Instance().UpdateAuditStatus(), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "audit-fail" })
+                            @Html.LinkButton("删除", SiteUrls.Instance().DeleteUserCategorys(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-user-categorys" })
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-width-check">
+                                        <input id="select-all" type="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        类别名
+                                    </th>                                    
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        所属
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        审核状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        内容数
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (Category category in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.CheckBox("category-id", new { @class = "category-id", value = @category.CategoryId })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <label title ="@category.CategoryName">@StringUtility.Trim(category.CategoryName, 12, "...")</label>
+                                        </td>                                        
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @if (tenantsDic.ContainsKey(category.TenantTypeId))
+                                            {
+                                                @(tenantsDic[category.TenantTypeId])
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1 tn-nowrap">
+                                           @Html.AuditStatusIcon(category.AuditStatus)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @category.CumulateItemCount
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditUserCategory(category.CategoryId), "编辑分类", htmlAttributes: new { id = "edit-user-category", plugin = "dialog" })
+                                            @Html.Link("删除", SiteUrls.Instance().DeleteUserCategorys(category.CategoryId.ToString()), "删除分类", new { @class = "delete-user-category" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>			
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {        
+        //处理火狐下浏览器刷新后复选框仍然选中
+        function removechecked() {
+            $(".category-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //组合所有选中的复选框的只，以,分隔
+        function getCheckedCategoryIds() {
+            var categoryIds = "";
+            $(".category-id").each(function () {
+                if ($(this).attr("checked")) {
+                    categoryIds += $(this).val() + ",";
+                }
+            });
+            return categoryIds;
+        }
+
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".category-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".category-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+
+        //点通过审核
+        $("#audit-success").click(function (e) {
+            e.preventDefault();
+
+            var categoryIds = getCheckedCategoryIds();
+            if (!categoryIds) {
+                alert("请至少选择一个类别！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            $.getJSON(url, { categoryIds: categoryIds, auditStatus: '@AuditStatus.Success' }, function (data) {
+                if (data) {
+                    //将审核状态变为通过审核
+                    $(".category-id").each(function () {
+                        if ($(this).attr("checked")) {
+                            $(this).parent().next().next().next().html("<span class='tn-icon tnc-icon-rights tnc-icon-rights-success'></span>");
+                        }
+                    });
+                    removechecked();
+                }
+            });
+        });
+
+
+        //点不通过审核
+        $("#audit-fail").click(function (e) {
+            e.preventDefault();
+
+            var categoryIds = getCheckedCategoryIds();
+            if (!categoryIds) {
+                alert("请至少选择一个类别！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            $.getJSON(url, { categoryIds: categoryIds, auditStatus: '@AuditStatus.Fail' }, function (data) {
+                if (data) {
+                    //将审核状态变为通过审核
+                    $(".category-id").each(function () {
+                        if ($(this).attr("checked")) {
+                            $(this).parent().next().next().next().html("<span class='tn-icon tnc-icon-rights tnc-icon-rights-null'></span>");
+                        }
+                    });
+                    removechecked();
+                }
+            });
+        });
+
+        //点批量删除
+        $("#delete-user-categorys").click(function (e) {
+            e.preventDefault();
+
+            var categoryIds = getCheckedCategoryIds();
+            if (!categoryIds) {
+                alert("请至少选择一个类别！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.getJSON(url, { categoryIds: categoryIds }, function (data) {
+                    if (data) {
+                        window.location.reload(true);
+                    }
+                });
+                removechecked();
+            });
+        });
+
+        //单个删除
+        $('.delete-user-category').click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.getJSON(url, function (data) {
+                    if (data) {
+                        art.dialog.tips("删除成功！", 1.5, 1);
+                        setTimeout(function () { window.location.reload(true); }, 500);
+                    }
+                });
+            });
+        });
+    });
+</script>

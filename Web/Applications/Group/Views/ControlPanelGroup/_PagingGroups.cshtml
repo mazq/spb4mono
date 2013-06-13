@@ -1,0 +1,93 @@
+﻿@model PagingDataSet<GroupEntity>
+@if (Model != null && Model.TotalRecords > 0)
+{
+    <form action="#" method="post" id="Form-BatchSet">
+    <table class="tn-table-grid">
+        <tbody>
+            <tr class="tn-table-grid-header ">
+                <td class="tn-border-gray tn-border-bottom tn-text-note">
+                    @Html.CheckBox("groupIds-checkAll", false)
+                </td>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    群组名称
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    审核状态
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    群主
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    群组类别
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    创建时间
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    成员数
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    操作
+                </th>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr class="tn-table-grid-row" id="ajaxdelete-group-@item.GroupId">
+                    <td class="tn-border-gray tn-border-bottom tn-width-check">
+                        <input type="checkbox" value="@item.GroupId" name="groupIds" id="groupIds-@item.GroupId" />
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                        @Html.Link(item.GroupName, SiteUrls.Instance().GroupHome(item.GroupKey), item.GroupName, null, HyperLinkTarget._blank)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                        @Html.AuditStatusIcon(item.AuditStatus)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                        @Html.Link(item.User == null ? " " : item.User.DisplayName, SiteUrls.Instance().SpaceHome(item.UserId), item.User == null ? " " : item.User.DisplayName, null, HyperLinkTarget._blank)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                        @Html.Link(item.Category == null ? " " : item.Category.CategoryName, item.Category == null ? null : SiteUrls.Instance().FindGroup(categoryId: item.Category.CategoryId), item.Category == null ? " " : item.Category.CategoryName, navigateTarget: HyperLinkTarget._blank)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                        @item.DateCreated.ToFriendlyDate()
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                        @item.MemberCount
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("删除").SetDeleteTarget("#ajaxdelete-group-" + item.GroupId).SetUrl(SiteUrls.Instance().DeleteGroup(item.GroupId)).SetConfirm("您确实要删除该群组吗？").SetOnSuccessCallBack("onDeleteSuccessCallBack"))
+                        @Html.Link("管理群组", SiteUrls.Instance().ManageMembers(item.GroupKey), "管理群组", null, HyperLinkTarget._blank)
+                        @Html.Link("更换群主", SiteUrls.Instance()._ChangeGroupOwner(GroupIdToGroupKeyDictionary.GetGroupKey(item.GroupId),Request.RawUrl ), "更换群主", htmlAttributes: new { plugin = "dialog" })
+                        @if(item.IsPublic)
+                        {
+                            @Html.Link("推荐",SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().Group(), item.GroupId, item.GroupName),"推荐",htmlAttributes: new { plugin = "dialog" })
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="tn-pagination">
+        @Html.PageSizeDropdownList("PageSize")
+        @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 7)
+        @Html.PagingResults(Model)
+    </div>
+    </form>
+}
+else
+{
+    <div class="tn-no-data">
+        搜索不到群组</div>
+}
+<script language="javascript" type="text/javascript">
+    function onDeleteSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    $(document).ready(function () {
+        //全选按钮
+        $("input#groupIds-checkAll").click(function () {
+            checkAll(this, "groupIds");
+        });       
+
+    });
+</script>

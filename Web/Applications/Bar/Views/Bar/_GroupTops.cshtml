@@ -1,0 +1,96 @@
+﻿@model IEnumerable<BarThread>
+@{
+    SortBy_BarThread sortBy = ViewData.Get<SortBy_BarThread>("SortBy", SortBy_BarThread.DateCreated_Desc);
+    bool? isEssential = ViewData.Get<bool?>("isEssential", null);
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(TenantTypeIds.Instance().Group());
+    
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-hot-group-bar">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+        <h3 class="tn-helper-reset">
+            @if (isEssential.HasValue && isEssential.Value)
+            {
+                @:精华帖子
+            }
+            else
+            {
+                switch (sortBy)
+                {
+                    case SortBy_BarThread.DateCreated_Desc:
+                @:最新帖子
+                    break;
+                    case SortBy_BarThread.HitTimes:
+                @:热点帖子
+                    break;
+                    case SortBy_BarThread.StageHitTimes:
+                @:近期热点
+                    break;
+                    case SortBy_BarThread.PostCount:
+                @:热门讨论
+                    break;
+                    default:
+                @:最新帖子
+                                                        break;
+                }
+            }</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <table class="tn-table-grid">
+                <tbody>
+                    <tr class="tn-table-grid-header">
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            名称
+                        </th>
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            所属群组
+                        </th>
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            作者
+                        </th>
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            最后回复时间
+                        </th>
+                    </tr>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="tn-table-grid-row">
+                            <td class="tn-border-gray tn-border-bottom tn-border-dashed">
+                                <a href="@urlGetter.ThreadDetail(item.ThreadId)" title="@item.Subject" target="_blank" class="tn-title">@StringUtility.Trim(item.Subject,10)</a>
+                                <div class="tn-widget tn-bubble tn-bubble-arrow-left">
+                                    <div class="tn-bubble-arrow">
+                                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-bubble-gray"></b>
+                                    </div>
+                                    <div class="tn-bubble-content tn-border-gray tn-bg-gray tn-corner-all">
+                                        <p>
+                                            @item.PostCount</p>
+                                    </div>
+                                </div>
+                            </td>
+                            @if (item.BarSection != null)
+                            {
+                                <td class="tn-border-gray tn-border-bottom tn-border-dashed tn-nowrap">
+                                    <div class="tn-avatar-mini">
+                                        <img src="@SiteUrls.Instance().LogoUrl(item.BarSection.LogoImage, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" width="50" alt=""/>
+                                    </div>
+                                    <a href="@SiteUrls.Instance().GroupHome(item.SectionId)" class="tn-user-name" title="@item.BarSection.Name">@StringUtility.Trim(item.BarSection.Name,7)</a>
+                                </td>
+                            }
+                            <td class="tn-border-gray tn-border-bottom tn-border-dashed tn-nowrap">
+                                @item.User.UserName
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom tn-border-dashed tn-nowrap">
+                                @item.LastModified.ToUserDateString(true)
+                            </td>
+                        </tr>}
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="tn-no-data">
+                暂无热门讨论!</div>
+        }
+    </div>
+</div>

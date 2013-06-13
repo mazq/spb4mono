@@ -1,0 +1,38 @@
+﻿@model Announcement
+@{
+    Layout = "announcement-layout";
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-detail" id="announcementdetail">
+            <div class="tn-text-heading">
+                <h1 class="tn-title" style="@(Model.SubjectStyle)">
+                    @Model.Subject
+                </h1>
+                <p class="tn-more">
+                    <a href="@SiteUrls.Instance().AnnouncementList()">查看更多公告</a></p>
+            </div>
+            <div class="tn-text-note tn-border-gray tn-border-top tn-detail-info">
+                <em class="tn-date">撰稿人:@Model.UserName</em><span>&nbsp;</span>
+                <em class="tn-date">发布时间:@Model.ReleaseDate.ToUserDateString()</em> <span>&nbsp;</span>
+                <em class="tn-view">浏览数:@Model.HitTimes</em> <span>&nbsp;</span>
+                @if (Model.IsAdministrator)
+                {
+                    <a  href="@SiteUrls.Instance().EditAnnouncement(Model.Id)" title="编辑" target="_blank">编辑</a>
+                    @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定删除吗？").SetText("删除").SetTooltip("删除")
+                                                  .SetDeleteTarget("#announcementdetail")
+                                                  .SetUrl(SiteUrls.Instance().DeleteAnnouncement(Model.Id))
+                                                  .SetOnSuccessCallBack("success"))
+                }
+            </div>
+            <div class="tn-detail-text">
+                @Html.Raw(Model.Body)
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function success() {
+        window.location = '@SiteUrls.Instance().AnnouncementList()';
+    }
+</script>

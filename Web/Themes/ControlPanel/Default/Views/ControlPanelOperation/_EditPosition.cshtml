@@ -1,0 +1,134 @@
+﻿@model AdvertisingPositionEditModel
+@{
+    string positionId = ViewData.Get<string>("positionId", string.Empty);
+    string title = string.Empty;
+    if (!string.IsNullOrEmpty(positionId))
+    {
+        title = "编辑广告位";
+    }
+    else
+    {
+        title = "添加广告位";
+    }
+}
+
+@using (Html.BeginAjaxForm("_EditPosition", "ControlPanelOperation", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json, OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "positionForm", enctype = "MULTIPART/FORM-DATA" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tr>
+                    <th>
+                    <span class="tn-form-required">*</span>
+                        广告位编码：
+                    </th>
+                    <td>
+                        @if (string.IsNullOrEmpty(positionId))
+                        { 
+                            @Html.TextBoxFor(n => n.PositionId, new { @class = "tn-textbox tn-input-long tn-border-gray" })<br />
+                            @Html.ValidationMessageFor(n=>n.PositionId)
+                        }
+                        else
+                        { 
+                            @Html.Label("Id",Model.Id)
+                            @Html.Hidden("PositionId",Model.PositionId)
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                    <span class="tn-form-required">*</span>
+                        描述：
+                    </th>
+                    <td>                            
+                        @Html.TextAreaFor(n => n.Description,InputWidthTypes.Long)<br />
+                        @Html.ValidationMessageFor(n=>n.Description)                            
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        示意图：
+                    </th>
+                    <td>
+                        <input id="positionImage" name="positionImage" type="file" />
+                    </td>
+                </tr>
+                <tr id="positionLogo">
+                    <th>
+                    </th>
+                    <td>
+                        @if (Model != null && !string.IsNullOrEmpty(Model.FeaturedImage))
+                        {
+                            <img title="@Model.Description" src="@SiteUrls.Instance().LogoUrl(Model.FeaturedImage, TenantTypeIds.Instance().AdvertisingPosition(), ImageSizeTypeKeys.Instance().Original(),false)" width="100" height="100"/>
+                            @Html.Link("删除", SiteUrls.Instance()._DeletePositionImage(Model.PositionId), "删除示意图", new { id = "deletePositionImage" })
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        投放区域：
+                    </th>
+                    <td>
+                        @Html.DropDownList("PresentAreaKey", null, new { @class = "tn-dropdownlist" })
+                        @Html.ValidationMessageFor(n => n.PresentAreaKey)
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                    <span class="tn-form-required">*</span>
+                        建议广告宽度：
+                    </th>
+                    <td>
+                        @Html.TextBoxFor(n => n.Width, new { @class = "tn-textbox tn-input-medium tn-border-gray" }) px
+                        @Html.ValidationMessageFor(n=>n.Width)                            
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                    <span class="tn-form-required">*</span>
+                        建议广告高度：
+                    </th>
+                    <td>                           
+                        @Html.TextBoxFor(n => n.Height, new { @class = "tn-textbox tn-input-medium tn-border-gray" }) px
+                        @Html.ValidationMessageFor(n=>n.Height)                           
+                    </td>
+                </tr>                    
+                <tr>
+                    <th>
+                        是否启用：
+                    </th>
+                    <td>
+                        @Html.RadioButton("IsEnable",true,Model.IsEnable,new{id="enable"})
+                        <label for="enable">是</label>
+                        @Html.RadioButton("IsEnable",false,!Model.IsEnable,new{id="disable"})
+                        <label for="disable">否</label>        
+                    </td>
+                </tr>                  
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "recommendSubmitBtn" })
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+
+<script type="text/dialog">
+    this.title('@title');
+</script>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload() });        
+    }
+    $(function () {
+        $("#deletePositionImage").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除该示意图吗？', function () {
+                $.post(url, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { $("tr#positionLogo").remove();});
+                });
+            });
+        });
+    });
+</script>

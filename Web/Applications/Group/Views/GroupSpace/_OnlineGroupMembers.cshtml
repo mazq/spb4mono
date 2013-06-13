@@ -1,0 +1,48 @@
+﻿@model IEnumerable<GroupMember>
+@{
+    IUser currentUser = UserContext.CurrentUser;
+    User user = ViewData.Get<User>("User", null);
+    bool isfollowed = false;
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-new-members">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">在线成员</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model != null && Model.Count() > 0)
+        {
+            <ul class="tn-user-list">
+                @if (user.IsOnline)
+                {
+                    isfollowed = currentUser.IsFollowed(user.UserId);
+                    <li class="tn-user-item tn-helper-clearfix">
+                        <div class="tn-pic">
+                            @Html.ShowUserAvatar(user, AvatarSizeType.Small)
+                        </div>
+                        <div class="tn-con">
+                            <div class="tn-name"><a class="tn-user-name" href="@SiteUrls.Instance().MyHome(user.UserId)" target="_blank" title="@user.UserName">@user.DisplayName</a></div>
+                            <div class="tn-act">@Html.FollowUser(user.UserId, "关注")</div>
+                        </div>
+                    </li>
+                }
+                @foreach (var item in Model)
+                {
+                    isfollowed = currentUser.IsFollowed(item.UserId);
+                    <li class="tn-user-item tn-helper-clearfix">
+                        <div class="tn-pic">
+                            @Html.ShowUserAvatar(item.UserId, avatarSizeType: AvatarSizeType.Small)
+                        </div>
+                        <div class="tn-con">
+                            <div class="tn-name"><a class="tn-user-name" href="@SiteUrls.Instance().MyHome(item.UserId)" target="_blank" title="@item.User.UserName">@item.User.DisplayName</a></div>
+                            <div class="tn-act">@Html.FollowUser(item.UserId, "关注")</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="tn-no-data">没有人在线!</div>
+        }
+    </div>
+</div>

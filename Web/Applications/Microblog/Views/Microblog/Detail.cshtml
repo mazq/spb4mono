@@ -1,0 +1,66 @@
+﻿@model MicroblogEntity
+@{
+    Layout = "app-list-2cols";
+
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 11100101;
+    Html.ViewContext.RouteData.Values["ShowNavigation"] = false;
+    Authorizer authorizer = new Authorizer();
+}
+@section Aside{
+    @Html.Action("_TopUserTags", "UserSpace", new { spaceKey = Url.SpaceKey(), topNumber = 12, area = "Common" })
+    @Html.Action("_TopTopics", "ChannelMicroblog", new { topNum = 16 })
+}
+@if (authorizer.IsAdministrator(MicroblogConfig.Instance().ApplicationId) && (int)Model.AuditStatus < (int)(new AuditService().GetPubliclyAuditStatus(MicroblogConfig.Instance().ApplicationId)))
+{
+    <div class="tn-cue-highlight tn-corner-all tn-message-box" id="prompt">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right" id="hidespan"></a>
+        <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>当前微博尚未通过审核，你可以<a href="@SiteUrls.Instance().UpdateMicroblogAuditStatus(true, Model.MicroblogId.ToString())" id = "audit-success">通过审核</a>
+            @if (Model.AuditStatus == AuditStatus.Pending)
+            {
+                @:或者
+                <a href="@SiteUrls.Instance().UpdateMicroblogAuditStatus(false, Model.MicroblogId.ToString())" id = "audit-fail">不通过审核</a>
+            }
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#hidespan").click(function (e) {
+                e.preventDefault();
+                $("#prompt").hide();
+            });
+
+            //通过审核
+            $("a[id^='audit-']").click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "Post",
+                    url: $(this).attr("href"),
+                    success: function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            $("#prompt").hide();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+@if (Model != null)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microdetail">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="spb-microdetail-wrap">
+                @Html.Action("_Detail", "Microblog", new { spaceKey = Url.SpaceKey(), microblogId = Model.MicroblogId })
+                <div class="tnc-Comment-on" id="comment">
+                    @Html.Action("_Comment", "ChannelMicroblog", new { Area = "Microblog", commentedObjectId = Model.MicroblogId, ownerId = Model.UserId, tenantTypeId = TenantTypeIds.Instance().Microblog(), originalAuthor = Model.OriginalMicroblog != null ? Model.OriginalMicroblog.Author : string.Empty, subject = HtmlUtility.TrimHtml(Model.Body, 10) })
+                </div>
+            </div>
+        </div>
+    </div>
+}

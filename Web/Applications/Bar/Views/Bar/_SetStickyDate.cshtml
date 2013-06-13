@@ -1,0 +1,57 @@
+﻿<div id="stickyDateDialog">
+    @using (Html.BeginAjaxForm("BatchSetSticky", "Bar", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack " }))
+    {
+        List<long> threadIds = ViewData.Get<List<long>>("threadId", new List<long> { });
+        foreach (var item in threadIds)
+        {
+        <input type="hidden" value="@item" name="threadIds" id="threadIds" />
+        }
+        @Html.Hidden("isSticky", true)
+        <div class="tnc-dailog-pd">
+            <div class="tn-form-box">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                置顶截止时间：
+                            </th>
+                            <td>
+                                @Html.DateTimePicker("stickyDate", new DateTimePicker().SetDateFormat("yyyy-MM-dd").SetMinDate("0").SetMaxDate("+10Y"))
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogoperation = "close" })
+        </div>
+    }
+</div>
+<script type="text/dialog">
+    this.title("置顶设置");
+    this.lock();
+</script>
+@if (ViewData.Get<bool>("ShowTips", true))
+{
+    <script type="text/javascript" language="javascript">
+        //成功的回调函数
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                window.location.href = "#";
+                window.location.reload();
+            });
+        }
+    </script>
+}
+else
+{
+    <script type="text/javascript" language="javascript">
+        //成功的回调函数
+        function OnSuccessCallBack(data) {
+            window.location.href = "#";
+            window.location.reload();
+        }
+    </script>
+}

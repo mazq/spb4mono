@@ -1,0 +1,47 @@
+﻿@{
+    StatusMessageData statusMessageData = ViewData.Get<StatusMessageData>("StatusMessageData", new StatusMessageData(StatusMessageType.Success, "操作成功"));
+    int hintMillisecondForHide = ViewData.Get<int>("HintMillisecondForHide", -1);
+    int successMillisecondForHide = ViewData.Get<int>("SuccessMillisecondForHide", 2);   
+}
+@if (statusMessageData.MessageType == StatusMessageType.Error)
+{ 
+    <div name="StatusMessageDiv" class="tn-cue-error tn-corner-all tn-message-box">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right"></a><span class="tn-helper-left"><span class="tn-icon tn-icon-cross-circle"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>错误：</strong>@Html.Raw(statusMessageData.MessageContent)</div>
+    </div>
+}
+else if (statusMessageData.MessageType == StatusMessageType.Hint)
+{
+    <div name="StatusMessageDiv" class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right"></a><span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>@Html.Raw(statusMessageData.MessageContent)
+        </div>
+    </div>
+    
+    if (hintMillisecondForHide > 0)
+    { 
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setTimeout(function () {
+            $("div[name='StatusMessageDiv'] a.tn-smallicon-cross:first").click();
+            }, 1000 * @hintMillisecondForHide);
+        });
+    </script>
+    }
+}
+else
+{
+    <script type="text/javascript">
+    art.dialog.tips('@statusMessageData.MessageContent',@successMillisecondForHide,@((int)statusMessageData.MessageType));
+    </script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        //window.location.href = "#StatusMessage";
+        $("div[name='StatusMessageDiv'] a.tn-smallicon-cross").click(function () {
+            $(this).parents("div[name='StatusMessageDiv']:first").fadeOut("normal");
+        });
+    });
+</script>

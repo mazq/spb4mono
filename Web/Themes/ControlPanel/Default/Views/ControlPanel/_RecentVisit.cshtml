@@ -1,0 +1,33 @@
+﻿@model IEnumerable<InitialNavigation>
+<div class="tnc-menu-item">
+    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+        <h4>
+            <span class="tn-icon-file"></span>最近访问</h4>
+    </div>
+    <ul class="tn-side-menu">
+        @foreach (var recentVisit in Model)
+        {
+            if (!recentVisit.IsControlPanelManageable(UserContext.CurrentUser))
+            {
+                continue;
+            }
+
+            <li><a class="tn-menu-text" href="@if (!string.IsNullOrWhiteSpace(recentVisit.NavigationUrl))
+                                              {
+                                                                @recentVisit.NavigationUrl
+                                              }
+                                              else if (!string.IsNullOrEmpty(recentVisit.UrlRouteName.Trim()))
+                                              {
+                                                                @CachedUrlHelper.RouteUrl(recentVisit.UrlRouteName)                                                    
+                                              }">
+                @if (!string.IsNullOrEmpty(recentVisit.NavigationText))
+                { 
+                    @recentVisit.NavigationText
+                }
+                else if (!string.IsNullOrEmpty(recentVisit.ResourceName))
+                {
+                    @Tunynet.Globalization.ResourceAccessor.GetString(recentVisit.ResourceName)
+                }</a></li>   
+        }
+    </ul>
+</div>

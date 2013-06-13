@@ -1,0 +1,80 @@
+﻿@model CategoryEditModel
+@{
+    long id = Model.CategoryId;
+    long parentId = Model.ParentId;
+}
+@using (Html.BeginAjaxForm("_EditSiteCategory", "ControlPanelContent", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.HiddenFor(n => n.CategoryId)
+    @Html.HiddenFor(n => n.ParentId)
+    @Html.HiddenFor(n => n.TenantTypeId)
+    @Html.HiddenFor(n => n.Depth)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr id="parent">
+                        <th>
+                            父类名称：
+                        </th>
+                        <td>
+                            @if (parentId != 0)
+                            { 
+                                @Html.Label(Model.ParentName==null?".":Model.ParentName)
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            类别名：
+                        </th>
+                        <td>
+                            @Html.TextBoxFor(n => n.CategoryName, InputWidthTypes.Long, new RouteValueDictionary { { "maxlength", 64 } })
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            描述：
+                        </th>
+                        <td>
+                            @Html.TextAreaFor(n => n.Description, new RouteValueDictionary { { "maxlength", 120 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+    @if (id == 0)
+    {
+        @: this.title("添加类别");
+    }
+    else
+    { 
+        @: this.title("编辑类别");
+    }
+</script>
+<script language="javascript" type="text/javascript">
+    $(function () {
+        if ('@parentId' != 0 && '@id' == 0) {
+            $("#parent").show();
+        }
+        else {
+            $("#parent").remove();
+        }
+    })
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        setTimeout(function () { window.location.reload(); }, 500);
+    }
+    function OnErrorCallBack(data) {
+        alert(data.MessageContent, function () {
+            window.location.reload();
+        })
+    }
+</script>

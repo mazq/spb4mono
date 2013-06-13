@@ -1,0 +1,29 @@
+﻿@{
+    string presentAreaKey = ViewData.Get<string>("presentAreaKey", string.Empty);
+ }
+@using (Html.BeginAjaxForm("_ExtractThemePost", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json, OnSuccessCallBack = "OnSuccessCallBack" }, new { enctype = "MULTIPART/FORM-DATA" }))
+{
+    @Html.Hidden("presentAreaKey",presentAreaKey);
+    <div class="tn-form tn-label-right tnc-dailog-pd">
+        <div class="tn-form-row">
+            <input type="file" name="themeFile" class="themeFile" accept="zip"/>
+        </div>
+        <div class="tn-form-row tn-helper-right">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close", id = "cancel" })
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    this.title("导入皮肤");
+</script>
+<script type="text/javascript">
+    //提交成功返回函数
+    var OnSuccessCallBack = function (data) {
+        if (data.MessageType < 0) {
+            alert(data.MessageContent);
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+        }
+    }
+</script>

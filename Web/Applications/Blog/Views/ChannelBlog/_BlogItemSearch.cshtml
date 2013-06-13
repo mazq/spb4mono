@@ -1,0 +1,63 @@
+﻿@model BlogThread
+@{
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    string spaceKey=UserIdToUserNameDictionary.GetUserName(Model.UserId);
+    IEnumerable<string> ownerCategoryNames = Model.OwnerCategoryNames;
+}
+@if (Model != null)
+{
+  <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+    <div class="tn-list-item-area-main">
+        <div class="tn-list-item-row tn-list-item-heading">
+            <h5 class="tn-helper-reset">
+                <a target="_blank" href="@SiteUrls.Instance().BlogDetail(spaceKey, Model.ThreadId)">
+                @Html.Raw(SearchEngine.Highlight(keyword, Model.ResolvedSubject, 100))
+                </a>
+                 @if (Model.IsEssential)
+                {                    
+                    <span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>
+                }
+                @if (Model.PrivacyStatus == PrivacyStatus.Private)
+                {
+                    <span title="不公开" class="tn-icon-colorful tn-icon-colorful-secret tn-icon-inline"></span>
+                }
+                else if (Model.PrivacyStatus == PrivacyStatus.Part)
+                { 
+                    <span title="特定用户可见" class="tn-icon tn-icon-limit tn-icon-inline"></span>
+                }
+            </h5>
+        </div>
+        <div class="tn-list-item-row tn-list-item-summary">
+             @if (ownerCategoryNames.Count()>0)
+             {
+               @:<p><span>类别:
+             }
+              @foreach (var ownerCategoryName in ownerCategoryNames)
+              {
+                <a class="tnui-blog-categoryname" href="#">@Html.Raw(SearchEngine.Highlight(keyword, ownerCategoryName, 100))</a>@:&nbsp
+              }
+             @if (ownerCategoryNames.Count()>0)
+             {
+               @:</span></p>
+             }
+            <p>
+              @Html.Raw(SearchEngine.Highlight(keyword, HtmlUtility.TrimHtml(Model.Summary, 100), 100))
+            </p>
+        </div>
+        <div class="tn-list-item-row tn-tags">
+            @foreach (var tag in Model.TagNames)
+            {
+              <span><a class="tnui-blog-tags" href="#">@Html.Raw(SearchEngine.Highlight(keyword, tag, 100))</a></span>
+            }
+        </div>
+        <div class="tn-list-item-row tn-list-info">
+            <a target="_blank" class="tn-user-name" href="@SiteUrls.Instance().Blog(spaceKey)">
+            @Html.Raw(SearchEngine.Highlight(keyword, Model.Author, 100))
+            </a>
+            <em class="tn-date tn-text-note">@Model.DateCreated.ToFriendlyDate()</em>
+            <span class="tn-action tn-comment-count"><a href="@SiteUrls.Instance().BlogDetail(spaceKey, Model.ThreadId)#comment" class="tn-action-text" target="_blank">评论(@Model.CommentCount)</a></span>
+            <span class="tn-action tn-view-count"><a href="@SiteUrls.Instance().BlogDetail(spaceKey, Model.ThreadId)" class="tn-action-text" target="_blank">浏览(@Model.HitTimes)</a></span>
+            </div>
+    </div>
+</li>
+}

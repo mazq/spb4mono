@@ -1,0 +1,62 @@
+﻿@model GroupEntity
+@{
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    string spaceKey=UserIdToUserNameDictionary.GetUserName(Model.UserId);
+    var sortBy = Request.QueryString.Get<SortBy_Group?>("sortBy", null);
+    var categoryId = Request.QueryString.Get<long?>("categoryId", null);
+    var areaCode = Request.QueryString.Get<string>("areaCode", null);
+    IUser currentUser = UserContext.CurrentUser;
+}
+@if (Model != null)
+{
+    <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+        <div class="tn-list-item-area-left">
+            <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)" title="@Model.GroupName" target="_blank">
+                <img src="@SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" alt="@Model.GroupName" width="100px" />
+            </a>
+        </div>
+        <div class="tn-list-item-area-main">
+        @if (currentUser != null)
+        {
+            if (Model.UserId != currentUser.UserId)
+            { 
+                <div class="tn-helper-right">
+                    @Html.Action("_ApplyJoinButton", "ChannelGroup", new { groupId = Model.GroupId, buttonName = "申请加入" })
+                </div>
+            }
+        }
+            <div class="tn-list-item-row tn-list-item-heading">
+                <h5 class="tn-helper-reset">
+                    <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)" class="tn-user-name" title="@Model.GroupName" target="_blank">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, Model.GroupName, 100))</a>
+                    @if (Model.User != null)
+                    {
+                        @:群主：<a href="@SiteUrls.Instance().UserJoinedGroups(Model.User.UserName)" title="@Model.User.DisplayName">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, Model.User.DisplayName, 100))</a>
+                    }
+                </h5>
+            </div>
+            <div class="tn-list-item-row tn-list-item-summary">
+                <p>
+                    @if (Model.Category != null)
+                    {
+                         <span>类别：<a class="tnui-searchCategory" data-category="@Model.CategoryName" href="#">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, Model.CategoryName, 10))</a></span> 
+                    }
+                    <span>地区：<a class="tnui-searchArea" data-area="@Model.AreaCode" href="#">@Formatter.FormatArea(Model.AreaCode,2,"-")</a></span>
+                </p>
+                <p>
+                    <span>成员：@Model.MemberCount</span> <span>内容数：
+                     @Model.ContentCount</span> <span class="tn-date tn-text-note">创建时间：@Model.DateCreated.ToUserDateString(true)</span></p>
+                <p>
+                    @if (Model.TagNames != null && Model.TagNames.Count() > 0)
+                    {
+                        foreach (var tag in Model.TagNames)
+                        {
+                          <a class="tnui-searchTag" data-tag="@tag" href="#"><span>@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, tag, 10))</span></a>
+                        }
+                    }
+                </p>
+            </div>
+            <div class="tn-list-item-row">
+                群组简介:<br />@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, Model.Description, 75))</div>
+        </div>
+    </li>
+}

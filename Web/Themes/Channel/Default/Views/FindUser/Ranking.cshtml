@@ -1,0 +1,138 @@
+﻿@model PagingDataSet<User>
+@{
+    Layout = "app-home-2cols";
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, List<string>> userTags = ViewData.Get<Dictionary<long, List<string>>>("userTagNameDic", null);
+    var type =ViewData.Get<SortBy_User>("sortBy",SortBy_User.HitTimes);
+}
+@section ContentHeader{
+    @Html.Action("_Header", "FindUser", new { menu = "Ranking" })
+}
+@section Aside{
+    @Html.AjaxAction("_QuickSearch", "FindUser")
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                热门用户标签</h3>
+        </div>
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().User() })
+    </div>
+}
+<div class="tn-tabs">
+    <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+        <li class="tn-widget-content tn-border-gray tn-border-trl @if (type.Equals(SortBy_User.HitTimes)){<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().FindUserRanking(SortBy_User.HitTimes)">
+            人气</a></li>
+        <li class="tn-widget-content tn-border-gray tn-border-trl @if (type.Equals(SortBy_User.Rank)){<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().FindUserRanking(SortBy_User.Rank)">
+            等级</a></li>
+        <li class="tn-widget-content tn-border-gray tn-border-trl @if (type.Equals(SortBy_User.ReputationPoints)){<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().FindUserRanking(SortBy_User.ReputationPoints)">
+            威望</a></li>
+        <li class="tn-widget-content tn-border-gray tn-border-trl @if (type.Equals(SortBy_User.TradePoints)){<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().FindUserRanking(SortBy_User.TradePoints)">
+            金币</a></li>
+        <li class="tn-widget-content tn-border-gray tn-border-trl @if (type.Equals(SortBy_User.DateCreated)){<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().FindUserRanking(SortBy_User.DateCreated)">
+            加入时间</a>
+        </li>        
+    </ul>
+    <div id="tabs-1" class="tn-tabs-panel">
+        @if (Model.TotalRecords > 0)
+        { 
+            <div class="tnc-user-list">
+                <ul class="tn-list">
+                    @foreach (var user in Model)
+                    {
+                        string gender = "";
+                        string sex = "";
+                        string introduction = "";
+
+                        if (user.Profile != null)
+                        {
+                            introduction = user.Profile.Introduction;
+
+                            if (user.Profile.Gender == GenderType.Male)
+                            {
+                                gender = "tn-icon tn-smallicon-male";
+                                sex = "男";
+                            }
+                            else if (user.Profile.Gender == GenderType.FeMale)
+                            {
+                                gender = "tn-icon tn-smallicon-female";
+                                sex = "女";
+                            }
+                        }
+                        <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                            <div class="tn-list-item-area-left">
+                                @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row">
+                                    @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserId), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+                                    @Html.IdentificationType(user.UserId)
+                                    @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                                    {
+                                        <div class="tnc-add-attention" id="followedDiv">
+                                            @Html.FollowUser(user.UserId,"加关注")
+                                        </div>
+                                    }
+                                </div>
+                                <div class="tn-list-item-row">
+                                    <div class="tn-location">
+                                        <span class="@gender" title="@sex"></span>
+                                        @if (user.Profile != null && !string.IsNullOrEmpty(user.Profile.NowAreaCode))
+                                        {
+                                            @Formatter.FormatArea(user.Profile.NowAreaCode, false)
+                                            
+                                        }
+                                        <span>加入时间：</span>@user.DateCreated.ToUserDateString(false)
+                                    </div>
+                                </div>
+                                <div class="tn-list-item-row tnc-usernums">
+                                    <span>关注 <a href="@SiteUrls.Instance().ListFollowedUsers(user.UserName)" target="_blank"><strong>@user.FollowedCount</strong></a></span>
+                                    <span class="tn-spacer tn-text-note">|</span> 
+                                    <span>粉丝 <a href="@SiteUrls.Instance().ListFollowers(user.UserName)" target="_blank"><strong>@user.FollowerCount</strong></a></span>
+                                    <span class="tn-spacer tn-text-note">|</span> 
+                                    <span>被访次数 <strong>@user.HitTimes</strong></span>
+                                    <span class="tn-spacer tn-text-note">|</span> 
+                                    <span class="spb-user-type">威望 <strong>@user.ReputationPoints</strong></span>
+                                     <span class="tn-spacer tn-text-note">|</span> 
+                                    <span class="spb-user-type">金币 <strong>@user.TradePoints</strong></span>
+                                    <span class="tn-spacer tn-text-note">|</span> 
+                                    <span class="spb-user-type">等级 <a href="@SiteUrls.Instance().MyRank(user.UserName)">@Html.UserRankIcon(user.Rank)</a></span>
+                                </div>
+                                <div class="tn-list-item-row">
+                                        @if (!string.IsNullOrEmpty(introduction))
+                                        { 
+                                            <span title="@introduction">简介：@HtmlUtility.TrimHtml(introduction, 100)</span> 
+                                        }
+                                </div>
+                                <div class="tn-list-item-row">
+                                    
+                                    @if (userTags.ContainsKey(user.UserId))
+                                    {
+                                        <span>标签：</span>
+                                        List<string> tags = userTags[user.UserId];
+
+                                        for (int i = 0; i < Math.Min(6, tags.Count); i++)
+                                        { 
+                                            <span>@Html.Link(tags[i], SiteUrls.Instance().UserSearch(tags[i], UserSearchRange.TAG), tags[i], navigateTarget: HyperLinkTarget._blank)</span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="tn-pagination">
+                @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".ui-tabs-nav li").hover(function () {
+            $(this).addClass("ui-state-hover");
+        }, function () {
+            $(this).removeClass("ui-state-hover");
+        })
+    });
+</script>

@@ -1,0 +1,87 @@
+﻿@{ StatusMessageData messageData = ViewData.Get<StatusMessageData>("StatusMessageData", new StatusMessageData(StatusMessageType.Error, "授权失败"));
+   var thirdCurrentUser = ViewData.Get<ThirdUser>("thirdCurrentUser", ThirdUser.New());
+   bool firstLogin = ViewData.Get<bool>("FirstLogin", false);
+   string returnUrl = ViewData.Get<string>("returnUrl", string.Empty);
+
+   string refreshJS = "window.opener.location.reload();";
+   if (!string.IsNullOrEmpty(returnUrl))
+   {
+       refreshJS = string.Format("window.opener.location.href='{0}';", returnUrl);
+   }
+
+   string siteName = DIContainer.Resolve<ISiteSettingsManager>().Get().SiteName;
+}
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-accountbind-prompt">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-bind-prompt-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <span class="spb-logo"></span>
+            </div>
+            <div class="tnc-bind-prompt-content tn-helper-clearfix">
+                @if (messageData.MessageType == StatusMessageType.Success)
+                {
+                    <div class="tnc-bind-prompt-left">
+                        <div class="tn-avatar-medium">
+                            <a target="_blank" href="@thirdCurrentUser.SpaceHomeUrl">
+                                <img width="100" title="@thirdCurrentUser.NickName" alt="@thirdCurrentUser.NickName" src="@thirdCurrentUser.UserAvatarUrl" /></a></div>
+                    </div>
+                    <div class="tnc-bind-prompt-right">
+                        @if (firstLogin)
+                        {
+                            <p>
+                                @thirdCurrentUser.NickName，您好！欢迎加入[@siteName]</p>
+                            <p>
+                                由于您首次登录，尚未完善帐号信息，现在将进入完善帐号信息页。</p>
+                        }
+                        else
+                        { 
+                            <p>@messageData.MessageContent</p>
+                        }
+                        <p class="tnc-automatic">
+                            系统将<b id="Reciprocal"> 3 </b>秒后自动跳转，如果不想等待，直接点击 <a id="justDoIt" href="javascript:void(0)">这里</a>跳转</p>
+                    </div>  
+                    
+                    <script type="text/javascript">
+                                        $(document).ready(function () {
+                                            var maxCount = 6;
+                                            setTimeout("@Html.Raw(refreshJS) window.close(); ", maxCount * 1000);
+                                            SetReciprocal(maxCount);
+                                            $("#justDoIt").click(function () {
+                                                @Html.Raw(refreshJS) 
+                                                window.close();
+                                            });
+                                        });
+
+                                        function SetReciprocal(count) {
+                                            $("#Reciprocal").html(count);
+                                            setTimeout(function () { SetReciprocal(count - 1) }, 1000);
+                                        }
+                    </script>           
+                }
+                else
+                { 
+                    @messageData.MessageContent
+
+               if (!string.IsNullOrEmpty(returnUrl) && ViewData.Get<bool>("ShowSystemMessage", false))
+               {
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            window.opener.location.href = '@Html.Raw(returnUrl)';
+                            window.close();
+                        });
+                    </script>      
+               }
+                }
+            </div>
+        </div>
+    </div>
+</div>

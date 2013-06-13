@@ -1,0 +1,116 @@
+﻿@model GroupEntity
+@{
+    bool showManageButton = ViewData.Get<bool>("showManageButton", false);
+    string content = string.Format("@{0} 的群组 \"{1}\" {2} 很不错 推荐给大家看看", Model.User.NickName, Model.GroupName,
+                                   SiteUrls.FullUrl(SiteUrls.Instance().GroupHome(Model.GroupId)));
+    string url = SiteUrls.Instance()._ShareToMicroblog(content, SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Big()));
+
+    Authorizer authorizer = new Authorizer();    
+}
+@if (authorizer.IsAdministrator(GroupConfig.Instance().ApplicationId) && (int)Model.AuditStatus < (int)(new AuditService().GetPubliclyAuditStatus(GroupConfig.Instance().ApplicationId)))
+{ 
+    <div class="tn-cue-highlight tn-corner-all tn-message-box" id="prompt">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right" id="hidespan"></a>
+        <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>当前群组尚未通过审核，你可以<a href="@SiteUrls.Instance().BatchUpdateGroupAuditStatu(Model.GroupId, true)" id = "audit-success">通过审核</a>
+            @if (Model.AuditStatus == AuditStatus.Pending)
+            {
+                @:或者
+                <a href="@SiteUrls.Instance().BatchUpdateGroupAuditStatu(Model.GroupId, false)" id = "audit-fail">不通过审核</a>
+            }
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#hidespan").click(function (e) {
+                e.preventDefault();
+                $("#prompt").hide();
+            });
+
+            //通过审核
+            $("a[id^='audit-']").click(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    type: "Post",
+                    url: $(this).attr("href"),
+                    success: function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            $("#prompt").hide();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="spb-group-profile tn-helper-clearfix">
+    <div class="tn-figure">
+        <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)" title="@Model.GroupName">
+            <img width="100" src="@SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())"/></a></div>
+    <div class="tn-info">
+        @if (showManageButton)
+        { 
+            
+            <ul class="tn-actions">
+                <li>@Html.Action("_ApplyJoinButton", "ChannelGroup", new { groupId = Model.GroupId, showQuit = true, buttonName = "申请加入" })</li>
+                @if (new Authorizer().Group_Invite(Model))
+                {
+                    if (new Authorizer().Group_Manage(Model))
+                    { 
+                    <li><a id="addFriend" href="@SiteUrls.Instance()._Invite(Url.SpaceKey())" plugin="dialog" class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary">
+                        <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">添加成员</span></a>
+                    </li>
+                    }
+                    else
+                    {  
+                    <li><a id="inviteFriend" href="@SiteUrls.Instance()._Invite(Url.SpaceKey())" plugin="dialog" class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary">
+                        <span class="tn-icon tn-icon-user-invite"></span><span class="tn-button-text">邀请好友</span></a></li>
+                    }
+                }
+                @if (ThemeService.Validate(PresentAreaKeysOfBuiltIn.GroupSpace, GroupIdToGroupKeyDictionary.GetGroupId(Url.SpaceKey())))
+                {
+                    <li><a class="tn-button tn-corner-all tn-button-default tn-button-hollow tn-button-icon-only"
+                                    href="@SiteUrls.Instance()._ThemeSettings(PresentAreaKeysOfBuiltIn.GroupSpace, Model.GroupId, true, Model.IsUseCustomStyle)" title="皮肤设置" plugin="dialog">
+                        <span class="tn-icon tn-icon-skin"></span><span class="tn-button-text">皮肤设置</span></a>
+                    </li>
+                }
+                @if (Model.IsPublic)
+                {
+                    <li><a href="@url" class="tn-button tn-corner-all tn-button-default tn-button-hollow tn-button-icon-only" title="分享到微博" plugin="dialog">
+                        <span class="tn-icon tn-icon-share"></span><span class="tn-button-text">分享到微博</span>
+                    </a></li>
+                }
+                @if (Model.IsPublic && new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().Group()))
+                {
+                    <li><a href="@SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().Group(), Model.GroupId, Model.GroupName)" class="tn-button tn-corner-all tn-button-default tn-button-hollow tn-button-icon-only" title="推荐" plugin="dialog">
+                        <span class="tn-icon tn-icon-flag"></span><span class="tn-button-text">推荐</span>
+                    </a></li>
+                }
+            </ul>
+    
+        }
+        <h5 class="tn-title">
+            <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)">@Model.GroupName</a>
+            @if (Model.IsPublic)
+            {
+                <span title="公开群" class="tn-icon-colorful tn-icon-colorful-privilege tn-icon-inline">
+                </span>
+            }
+            else
+            { 
+                <span title="私密群" class="tn-icon-colorful tn-icon-colorful-secret tn-icon-inline">
+                </span>
+            }
+        </h5>
+        <div class="tn-descrip">
+            <p>@Html.Raw(Model.Description)</p>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function JoinGroupSuccessCallBack() {
+        window.location.reload(true);
+    }
+</script>

@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Spacebuilder.Search.ISearcher>
+@{
+    Layout = "_ControlPanel";
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>索引管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    @if (Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    { 
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        搜索
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        位置
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        索引文件大小
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        最后索引时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var index in Model)
+                                {
+                                    string url = SiteUrls.Instance().ControlPanelOperating("正在执行【重建\"" + index.Name + "\"索引】操作，请耐心等待", SiteUrls.Instance().ManageIndex(), SiteUrls.Instance().RebuildIndex(index.Code));
+                                    <tr class="tn-table-grid-row" id="@(index.Code)">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @index.Name
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @index.IndexPath
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @Formatter.FormatFriendlyFileSize(index.SearchEngine.GetIndexSize())
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @index.SearchEngine.GetLastModified().ToUserDateString(true)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("重建", url, "重建索引", new { @class = "rebuild-index" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //点重建
+        $(".rebuild-index").click(function (e) {
+            e.preventDefault();
+            var self = $(this);
+            art.dialog.confirm('您确认要重建索引吗？', function () {
+                window.location = self.attr("href");
+            });
+        });
+        //给当前行添加样式
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+    });
+</script>

@@ -1,0 +1,121 @@
+﻿@model IEnumerable<TagInOwner>
+@{
+    Layout ="_UserSpace_Wide";
+    string tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-manage">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-blog-manage-wrap">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>标签管理</h2>
+        </div>
+        <div class="tn-list-header">
+            <div class="tn-toolbar-area">
+                @Html.LinkButton("删除", SiteUrls.Instance()._DeleteMyTags(Url.SpaceKey(),tenantTypeId), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-tags" })
+                @Html.LinkButton("添加标签", SiteUrls.Instance()._CreateMyTag(Url.SpaceKey(), tenantTypeId), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "add-tag", plugin = "dialog" })
+            </div>
+        </div>
+        @if (Model==null || Model.Count()==0) 
+        { 
+            <div class="tn-no-data">
+                没有查询到数据！
+            </div>
+        }
+        else
+        {
+        <form action="#" method="post" id="Form-BatchSet">
+        <table class="tn-table-grid">
+            <tbody>
+            <tr class="tn-table-grid-header">
+                <td class="tn-border-gray tn-border-bottom tn-text-note"><input type="checkbox" name="checkAll" id="checkAll" class="tn-checkbox"/></td>
+                <th class="tn-border-gray tn-border-bottom tn-text-note"> 标签名称</th>
+                <td class="tn-border-gray tn-border-bottom tn-text-note"> 内容数</td>
+                <td class="tn-border-gray tn-border-bottom tn-text-note"> 操作</td>
+            </tr>
+            @foreach (var tag in Model)
+            { 
+            <tr class="tn-table-grid-row">
+                <td class="tn-border-gray tn-border-bottom tn-width-check">
+                @Html.SipmleCheckBox("tagIds", tag.Id)
+                </td>
+                <th class="tn-border-gray tn-border-bottom tn-width-auto">@tag.TagName</th>
+                <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">@tag.ItemCount</td>
+                <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                <a href="@SiteUrls.Instance()._EditMyTag(Url.SpaceKey(), tag.Id, tag.TagName,tag.TenantTypeId)" class="tn-action" plugin = "dialog"><span class="tn-action-text">编辑</span>
+                </a>
+                <a href="@SiteUrls.Instance()._DeleteMyTags(Url.SpaceKey(),tenantTypeId,tag.Id)" class="tn-action delete-thread delete-tag">
+                <span class="tn-action-text">删除</span></a></td>
+            </tr> 
+            }
+            </tbody>
+        </table>
+        </form>
+            }
+        </div>
+    </div>
+</div>
+<script>
+
+    $(function () {
+
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removeChecked();
+        function removeChecked() {
+            $(".tn-checkbox").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+        }
+
+        //全选按钮
+        $("input#checkAll").click(function () {
+            if ($(this).attr("checked")) {
+                $("input[name='tagIds']").attr("checked", true);
+            } else {
+                $("input[name='tagIds']").removeAttr("checked");
+            }
+        });
+
+        //点批量删除
+        $("#delete-tags").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='tagIds']:checked").length) {
+                alert("请至少选择一条标签进行操作！");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        window.location.reload();
+                    });
+                });
+                removeChecked();
+            });
+        });
+
+        //单个删除
+        $(".delete-tag").click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        window.location.reload();
+                    });
+                });
+            });
+        });
+
+    })
+
+    function CreateCategoryCallback(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            window.location.reload();
+        });
+    }  
+</script>

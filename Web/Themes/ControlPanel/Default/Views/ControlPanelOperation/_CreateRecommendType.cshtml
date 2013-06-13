@@ -1,0 +1,77 @@
+﻿@model RecommentItemTypeCreateModel
+
+<div id="editUserRankDialog" class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_CreateRecommendType", "ControlPanelOperation", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right tnc-label-short">
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        @Html.FormLabelFor(n => n.TypeId)
+                    </label>
+                    @Html.TextBoxFor(n => n.TypeId, InputWidthTypes.Medium)
+                    <br />
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.ValidationMessageFor(n => n.TypeId)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Name)
+                    @Html.TextBoxFor(n => n.Name, InputWidthTypes.Medium)<br />
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.ValidationMessageFor(n => n.Name)
+                </div>
+                <div class="tn-form-row">
+
+                    @Html.FormLabelFor(n=>n.TenantTypeId)
+                    @Html.DropDownList("TenantTypeId")
+                    @Html.ValidationMessageFor(n => n.TenantTypeId)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.HasFeaturedImage)
+                    <ul class="tn-radiobutton-list">
+                      <li class="tn-inline-list">
+                        @Html.RadioButton("HasFeaturedImage", true, false, new { @id = "IsEnabled1", @class = "tn-radiobutton" })
+                        <label for="IsEnabled1">使用</label>
+                      </li>
+                      <li class="tn-inline-list">
+                        @Html.RadioButton("HasFeaturedImage", false, true, new { @id = "IsEnabled2", @class = "tn-radiobutton" })
+                        <label for="IsEnabled2">不使用</label>
+                      </li>
+                    </ul>
+                    @Html.ValidationMessageFor(n => n.HasFeaturedImage)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Description)
+                    @Html.TextAreaFor(n => n.Description, InputWidthTypes.Long)<br />
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.ValidationMessageFor(n => n.Description)
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+       
+    }
+    <script type="text/dialog">
+    
+      this.title("添加推荐类别");
+    
+    </script>
+    <script type="text/javascript" language="javascript">
+
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+        }
+        function OnErrorCallBack(data) {
+            alert(data.MessageContent, function () {
+                window.location.reload();
+            })
+        }
+    </script>
+</div>

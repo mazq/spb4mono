@@ -1,0 +1,229 @@
+﻿@{
+    Layout = "app-1col";
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+}
+@section ContentHeader
+{
+    @Html.Action("_Header", "ChannelMicroblog", new RouteValueDictionary { { "tab", "Ranking" } })
+}
+@{
+    IEnumerable<Tag> tagsByPerDayItemCount = ViewData.Get<IEnumerable<Tag>>("tagsByPreDayItemCount", null);
+    IEnumerable<Tag> tagsByPerWeekItemCount = ViewData.Get<IEnumerable<Tag>>("tagsByPreWeekItemCount", null);
+    IEnumerable<Tag> tagsByItemCount = ViewData.Get<IEnumerable<Tag>>("tagsByItemCount", null);
+    IEnumerable<User> usersByFollower = ViewData.Get<IEnumerable<User>>("usersByFollower", null);
+    IEnumerable<User> usersByReputationPoints = ViewData.Get<IEnumerable<User>>("usersByReputationPoints", null);
+
+    string[] ranks = { "tnc-num-topone", "tnc-num-toptwo", "tnc-num-topthree", "tnc-num-topfore" };
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog-rank">
+  <div class="tn-box-content tn-widget-content tn-corner-all">
+    <div class="spb-microtop-topic">
+      <div class="spb-microblog-rank-box tn-border-gray">
+        <h3 class="tn-border-bottom tn-border-gray"> 热门话题</h3>
+        <div> </div>
+        <ul class="tn-person-rank tn-person-rank-four">
+          <li class="tnc-bloglist-tit tn-corner-all tn-border-gray tn-border-bottom tn-border-dashed"> <span class="tnc-list-ranking">排名</span><span class="tnc-list-topic">话题</span><span
+                        class="tnc-list-hot">热度</span><span class="tnc-list-number">讨论次数</span></li>
+          @if (tagsByItemCount.Count() == 0 || tagsByItemCount == null)
+          {
+          <li class="tn-no-data">没有查询到数据！</li>
+          }
+          else
+          {
+          for (int i = 0; i < tagsByItemCount.Count(); i++)
+          {
+          double percent = 0d;
+          int multiple = 0;
+          string tagname = tagsByItemCount.ElementAt(i).TagName;
+          if (tagsByItemCount.ElementAt(0).ItemCount == 0)
+          {
+          percent = 0d;
+          }
+          else
+          {
+                percent = Convert.ToDouble(tagsByItemCount.ElementAt(i).ItemCount) / Convert.ToDouble(tagsByItemCount.ElementAt(0).ItemCount)*100;
+              if (tagsByItemCount.ElementAt(i).ItemCount != 0)
+              {
+                  multiple = tagsByItemCount.ElementAt(0).ItemCount / tagsByItemCount.ElementAt(i).ItemCount;
+              }
+              else
+              {
+                  multiple = tagsByItemCount.ElementAt(0).ItemCount;
+              }
+          }
+          <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+            <div class="tnc-list-ranking"> @if (i < 3)
+              {
+              <p class="tnc-blog-num @ranks[i]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              }
+              else
+              {
+              <p class="tnc-blog-num @ranks[3]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              } </div>
+            <div class="tnc-list-topic"> @Html.Link(StringUtility.Trim(tagname, 15, ""), SiteUrls.Instance().MicroblogTopic(tagsByItemCount.ElementAt(i).TagName), tagname) </div>
+            <div class="tn-progress-bar tn-widget-content tn-border-deep tn-corner-all tnc-list-hot">
+              <div class="tn-progress-bar-value tn-widget-header tn-bg-deep tn-border-deep tn-corner-left tn-border-tbl" style="width:@if(multiple>1000){<text>0%</text>} else{<text>@percent%</text>}"> </div>
+            </div>
+            <div class="tnc-list-number"> @tagsByItemCount.ElementAt(i).ItemCount</div>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="spb-microtop-prestige">
+      <div class="spb-microblog-rank-box tn-border-gray">
+        <h3 class="tn-border-bottom tn-border-gray"> 一周影响榜</h3>
+        <div> </div>
+        <ul class="tn-person-rank tn-person-rank-four">
+          <li class=" tn-border-gray tn-border-bottom tn-border-dashed tnc-bloglist-tit tn-corner-all"> <span class="tnc-list-ranking">排名</span><span class="tnc-list-topic">名称</span><span
+                        class="tnc-list-hot">热度</span><span class="tnc-list-number">威望</span></li>
+          @if (usersByReputationPoints.Count() == 0 || tagsByItemCount == null)
+          {
+          <li class="tn-no-data">没有查询到数据！</li>
+          }
+          else
+          {
+          for (int i = 0; i < usersByReputationPoints.Count(); i++)
+          {
+          double percent = 0;
+          int multiple = 0;
+          string name = usersByReputationPoints.ElementAt(i).DisplayName;
+          if (usersByReputationPoints.ElementAt(0).PreWeekReputationPointsCount == 0)
+          {
+          percent = 0;
+          }
+          else
+          {              
+                percent = Convert.ToDouble(usersByReputationPoints.ElementAt(i).PreWeekReputationPointsCount)/Convert.ToDouble(usersByReputationPoints.ElementAt(0).PreWeekReputationPointsCount) * 100;
+          
+              if (usersByReputationPoints.ElementAt(i).PreWeekReputationPointsCount!=0)
+              {
+                  multiple = usersByReputationPoints.ElementAt(0).PreWeekReputationPointsCount / usersByReputationPoints.ElementAt(i).PreWeekReputationPointsCount;
+              }
+              else
+              {
+                  multiple = usersByReputationPoints.ElementAt(0).PreWeekReputationPointsCount;
+              }
+          }
+          <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+            <div class="tnc-list-ranking"> @if (i < 3)
+              {
+              <p class="tnc-blog-num @ranks[i]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              }
+              else
+              {
+              <p class="tnc-blog-num @ranks[3]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              } </div>
+            <div class="tnc-list-topic"> @Html.ShowUserAvatar(usersByReputationPoints.ElementAt(i), AvatarSizeType.Micro, true, HyperLinkTarget._blank)
+              @Html.Link(StringUtility.Trim(name, 15), SiteUrls.Instance().SpaceHome(usersByReputationPoints.ElementAt(i).UserId), name, htmlAttributes: new { @class = "tn-user-name" }, navigateTarget: HyperLinkTarget._blank) </div>
+            <div class="tn-progress-bar tn-widget-content tn-border-deep tn-corner-all tnc-list-hot">
+              <div class="tn-progress-bar-value tn-widget-header tn-bg-deep tn-border-deep tn-corner-left tn-border-tbl" style="width:@if(multiple>1000){<text>0%</text>} else{<text>@percent%</text>}"> </div>
+            </div>
+            <div class="tnc-list-number"> @usersByReputationPoints.ElementAt(i).PreWeekReputationPointsCount</div>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="tn-blank15 tn-helper-clear"></div>
+    <div class="spb-microtop-day">
+      <div class="spb-microblog-rank-box tn-border-gray">
+        <h3 class="tn-border-bottom tn-border-gray"> 24小时话题榜</h3>
+        <ul class="tn-person-rank">
+          <li class=" tn-border-gray tn-border-bottom tn-border-dashed tnc-bloglist-tit"><span
+                    class="tnc-list-ranking">排名</span><span class="tnc-list-topic">话题</span><span class="tnc-list-number">讨论次数</span></li>
+          @if (tagsByPerDayItemCount.Count() == 0 || tagsByItemCount == null)
+          {
+          <li class="tn-no-data">没有查询到数据！</li>
+          }
+          else
+          {
+          for (int i = 0; i < tagsByPerDayItemCount.Count(); i++)
+          {
+          string tagname = tagsByPerDayItemCount.ElementAt(i).TagName;
+          <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+            <div class="tnc-list-ranking"> @if (i < 3)
+              {
+              <p class="tnc-blog-num @ranks[i]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              }
+              else
+              {
+              <p class="tnc-blog-num @ranks[3]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              } </div>
+            <div class="tnc-list-topic"> @Html.Link(StringUtility.Trim(tagname, 10, ""), SiteUrls.Instance().MicroblogTopic(tagsByPerDayItemCount.ElementAt(i).TagName), tagname) </div>
+            <div class="tnc-list-number"> @tagsByPerDayItemCount.ElementAt(i).PreDayItemCount </div>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="spb-microtop-week">
+      <div class="spb-microblog-rank-box tn-border-gray">
+        <h3 class="tn-border-bottom tn-border-gray"> 一周话题榜</h3>
+        <ul class="tn-person-rank">
+          <li class=" tn-border-gray tn-border-bottom tn-border-dashed tnc-bloglist-tit tn-corner-all"> <span class="tnc-list-ranking">排名</span><span class="tnc-list-topic">话题</span><span
+                        class="tnc-list-number">讨论次数</span></li>
+          @if (tagsByPerWeekItemCount.Count() == 0 || tagsByItemCount == null)
+          {
+          <li class="tn-no-data">没有查询到数据！</li>
+          }
+          else
+          {
+          for (int i = 0; i < tagsByPerWeekItemCount.Count(); i++)
+          {
+          string tagname = tagsByPerWeekItemCount.ElementAt(i).TagName;
+          <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+            <div class="tnc-list-ranking"> @if (i < 3)
+              {
+              <p class="tnc-blog-num @ranks[i]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              }
+              else
+              {
+              <p class="tnc-blog-num @ranks[3]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              } </div>
+            <div class="tnc-list-topic"> @Html.Link(StringUtility.Trim(tagname, 10, ""), SiteUrls.Instance().MicroblogTopic(tagsByPerWeekItemCount.ElementAt(i).TagName), tagname) </div>
+            <div class="tnc-list-number"> @tagsByPerWeekItemCount.ElementAt(i).PreWeekItemCount</div>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="spb-microtop-fans">
+      <div class="spb-microblog-rank-box tn-border-gray">
+        <h3 class="tn-border-bottom tn-border-gray"> 粉丝人气榜</h3>
+        <ul class="tn-person-rank">
+          <li class=" tn-border-gray tn-border-bottom tn-border-dashed tnc-bloglist-tit tn-corner-all"> <span class="tnc-list-ranking">排名</span><span class="tnc-list-topic">名称</span><span
+                        class="tnc-list-number">粉丝数</span></li>
+          @if (usersByFollower.Count() == 0 || tagsByItemCount == null)
+          {
+          <li class="tn-no-data">没有查询到数据！</li>
+          }
+          else
+          {
+          for (int i = 0; i < usersByFollower.Count(); i++)
+          {
+          string name = usersByFollower.ElementAt(i).DisplayName;
+          <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+            <div class="tnc-list-ranking"> @if (i < 3)
+              {
+              <p class="tnc-blog-num @ranks[i]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              }
+              else
+              {
+              <p class="tnc-blog-num @ranks[3]"> <span class="tnc-charts-num">@(i + 1)</span> </p>
+              } </div>
+            <div class="tnc-list-topic"> @Html.ShowUserAvatar(usersByFollower.ElementAt(i), AvatarSizeType.Micro, true, HyperLinkTarget._blank)
+              @Html.Link(StringUtility.Trim(name, 8, "..."), SiteUrls.Instance().SpaceHome(usersByFollower.ElementAt(i).UserId), name, htmlAttributes: new { @class = "tn-user-name" }, navigateTarget: HyperLinkTarget._blank) </div>
+            <div class="tnc-list-number"> @usersByFollower.ElementAt(i).FollowerCount</div>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

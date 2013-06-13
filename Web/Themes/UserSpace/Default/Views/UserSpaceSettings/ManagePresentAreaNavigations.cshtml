@@ -1,0 +1,213 @@
+﻿@model IEnumerable<PresentAreaNavigation>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.ManageNavigations;
+    string spaceKey = UserContext.CurrentUser.UserName;
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus", ViewData)
+}
+<div id="presentAreaNavigation" class="tn-box tn-widget tn-widget-content tn-corner-all tnc-manage-nav">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <div class="tn-option"><a class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary" href="@SiteUrls.Instance().UserManageApplications(spaceKey)"><span class="tn-icon tn-smallicon-slide-prev"></span><span class="tn-button-text">返回应用管理</span></a></div>
+            <h2>
+                导航管理
+            </h2>
+            </div>
+        @if (Model.Count() == 0)
+        { 
+            <div class="tn-no-data">
+                没有查询到数据！</div>
+        }
+        else
+        {
+            int count = Model.Count();                     
+            <table class="tn-table-grid">
+                <tbody>
+                    <tr class="tn-table-grid-header">
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            名称
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            链接
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            新窗
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            启用
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            操作
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                        </td>
+                    </tr>
+                    @for (int i = 0; i < count; i++)
+                    {
+                        PresentAreaNavigation pan = Model.ElementAt(i);
+                        <tr id="@pan.Id" class="tn-table-grid-row @pan.ParentNavigationId-@pan.Depth" name="@pan.ParentNavigationId-@pan.Depth">
+                            <td class="tn-border-gray tn-border-bottom">
+                                @if (pan.Depth > 0)
+                                {
+                                    for (int j = 0; j < pan.Depth; j++)
+                                    {
+                                    <span class="tnc-empty-c"></span>     
+                                    }
+                                    if (i + 1 < count)
+                                    {
+                                        if (pan.Depth > Model.ElementAt(i + 1).Depth)
+                                        { 
+                                    <span class="tn-text-note">└─</span>                                                       
+                                        }
+                                        else
+                                        {
+                                    <span class="tn-text-note">├─</span>  
+                                        }
+                                    }
+                                    else
+                                    {
+                                    <span class="tn-text-note">└─</span>
+                                    }
+                                }
+                                @pan.NavigationText
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                @pan.GetUrl(Url.SpaceKey())
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom">
+                                @{var isBlank = pan.NavigationTarget.Equals("_blank") ? true : false;}
+                                @if (isBlank)
+                                {
+                                    @Html.CheckBox("isBlank", isBlank)
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("isBlank", isBlank)
+                                }
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom">
+                                @{var isEnabled = pan.IsEnabled ? true : false;}
+                                @if (isEnabled)
+                                {
+                                    @Html.CheckBox("isEnabled", isEnabled)
+                                }
+                                else
+                                {
+                                    @Html.CheckBox("isEnabled", isEnabled)
+                                }
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                @if (i > 0 && pan.Depth <= Model.ElementAt(i - 1).Depth)
+                                { 
+                                    @Html.Link("上移", SiteUrls.Instance().ChangePresentAreaNavigationOrder(spaceKey), "上移", new { @class = "tn-icon tn-smallicon-upload" })
+                                }
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                @if (Model.Where(n => n.ParentNavigationId == pan.ParentNavigationId && n.Depth == pan.Depth && pan.DisplayOrder < n.DisplayOrder).Count() > 0)
+                                {
+                                    @Html.Link("下移", SiteUrls.Instance().ChangePresentAreaNavigationOrder(spaceKey), "下移", new { @class = "tn-icon tn-smallicon-download" })
+                                }
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                <a href="@SiteUrls.Instance()._EditPresentAreaNavigation(spaceKey, pan.Id)" plugin = "dialog">
+                                    编辑</a>
+                                @if (!pan.IsLocked)
+                                {
+                                   @Html.AjaxDeleteButton(new AjaxDeleteButton().SetUrl(SiteUrls.Instance().DeletePresentAreaNavigation(spaceKey, pan.Id)).SetConfirm("确认要删除吗？").SetText("删除").SetTooltip("删除").SetDeleteTarget("#" + pan.Id).SetOnSuccessCallBack("success"))   
+                                } 
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-top">
+        @Html.LinkButton("重置", SiteUrls.Instance().ResetPresentAreaNavigation(spaceKey), HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "btnReset" })
+        @Html.LinkButton("新增导航", SiteUrls.Instance()._EditPresentAreaNavigation(spaceKey, null), HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "btnAdd", plugin = "dialog" })
+        </div>
+    </div>
+</div>
+
+<script>
+    function success(data) {
+        art.dialog.tips("删除成功！", 1.5, 1);
+    }
+
+    $(function () {
+
+        //点击上移按钮
+        $(".tn-smallicon-upload").livequery("click", function (e) {
+            e.preventDefault();
+            var tr = $(this).closest('tr');
+            var name = tr.attr("name");
+            var fromCategoryId = tr.attr("id");
+            var toCategoryId;
+            var trs = $('.' + name);
+            for (var i = 0; i < trs.length; i++) {
+                if ($(trs[i]).attr("id") === fromCategoryId) {
+                    toCategoryId = $(trs[i - 1]).attr("id")
+                    break;
+                }
+            }
+
+            $.ajax({
+                type: "post",
+                url: $(this).attr("href"),
+                data: { fromId: fromCategoryId, toId: toCategoryId },
+                success: function () {
+                    var url = '@(SiteUrls.Instance().ManagePresentAreaNavigations(spaceKey))';
+                    $.post(url, function (data) {
+                        $("#presentAreaNavigation").replaceWith($(data).find("#presentAreaNavigation").parent().html());
+                    })
+                }
+            })
+
+        });
+        //点击下移按钮
+        $(".tn-smallicon-download").livequery("click", function (e) {
+            e.preventDefault();
+            var tr = $(this).closest('tr');
+            var name = tr.attr("name");
+            var fromCategoryId = tr.attr("id");
+            var toCategoryId;
+            var trs = $('.' + name);
+            for (var i = 0; i < trs.length; i++) {
+                if ($(trs[i]).attr("id") == fromCategoryId) {
+                    toCategoryId = $(trs[i + 1]).attr("id")
+                    break;
+                }
+            }
+
+            $.ajax({
+                type: "post",
+                url: $(this).attr("href"),
+                data: { fromId: fromCategoryId, toId: toCategoryId },
+                success: function () {
+                    var url = '@(SiteUrls.Instance().ManagePresentAreaNavigations(spaceKey))';
+                    $.post(url, function (data) {
+                        $("#presentAreaNavigation").replaceWith($(data).find("#presentAreaNavigation").parent().html());
+                    })
+                }
+            })
+        })
+        //重置
+        $("#btnReset").livequery("click", function (e) {
+            e.preventDefault();
+            art.dialog.confirm('您确认要重置吗？', function () {
+                $.ajax({
+                    type: "post",
+                    url: $("#btnReset").attr("href"),
+                    success: function (data) {
+                        art.dialog.tips("重置成功！", 1.5, 1);
+                        window.location.reload();
+                    }
+                })
+            });
+        })
+    })
+</script>

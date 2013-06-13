@@ -1,0 +1,17 @@
+﻿@{ 
+    int associateId = ViewData.Get<int>("associateId", 0);
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", string.Empty);
+}
+<div class="tnc-attchment-dailog" style="width: 580px; height: 441px;">
+    @Html.Tabs(new TabControl().SetName("_AttachmentManageTab")
+         .SetIsSimple(true)
+                 .AddTabItem(new TabItem("上传文件").SetUrl(SiteUrls.Instance()._EditAttachment(tenantTypeId, associateId)).SetSelected())
+            //.AddTabItem(new TabItem("我的文件").SetUrl(Url.Action("_EditAttachmentLibraries")))
+         .AddTabItem(new TabItem("网络文件").SetUrl(Url.Action("_EditNetAttachment")))
+)
+</div>
+@*todo:yangmj by yangmj；直接硬编码！*@
+<script type="text/dialog">
+this.position(450, 100);
+this.title('上传文件');
+</script>

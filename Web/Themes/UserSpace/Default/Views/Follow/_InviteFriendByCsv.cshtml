@@ -1,0 +1,40 @@
+﻿@model InviteFriendByCsvEditModel
+@{
+    Layout = null;
+}
+@using (Html.BeginAjaxForm("_InviteFriendByCsvPost", "Follow", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Html, OnSuccessCallBack = "_InviteFriendByCsvPostSuccess" }, new { id = "inviteFirendByCsv", enctype = "multipart/form-data" }))
+{ 
+    <div id="tnc-invite-csv" class="tnc-invite-csv" style="display: none;">
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            <span class="tn-text-note">默认支持QQ、126、163、Gmail通讯录导出的CSV类型的文件</span>
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            @Html.TextBoxFor(n => n.fileName, new { type = "file" })
+            @Html.ValidationMessageFor(n => n.fileName)
+        </div>
+        <div class="tn-form-row tn-form-row-button">
+            <label class="tn-form-label">
+            </label>
+            @Html.LinkButton("确定", "javascript:;", HighlightStyles.Primary, htmlAttributes: new { id = "button-submit-csv" })
+            <span class="tn-action"><a href="#" id="show-tnc-invite-email-row" name="tnc-invite-email-row">
+                读取邮箱联系人</a></span>
+        </div>
+    </div>
+}
+<script language="javascript" type="text/javascript">
+    function _InviteFriendByCsvPostSuccess(data) {
+        if (data.indexOf("MessageContent") > 0)
+            data = jQuery.parseJSON(data);
+
+        if (data.MessageContent) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        } else {
+            var dialog = art.dialog({ id: 'ChoiceUser', title: false, width: '730px' });
+            dialog.content(data);
+        }
+    }
+</script>

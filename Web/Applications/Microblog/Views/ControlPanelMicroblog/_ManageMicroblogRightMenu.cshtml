@@ -1,0 +1,9 @@
+﻿@{
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", TenantTypeIds.Instance().User());
+    IMicroblogUrlGetter urlGetter = MicroblogUrlGetterFactory.Get(tenantTypeId);
+  }
+<div class="tnc-settings">
+    @Html.AjaxAction("_ManageableDataDetail", "ControlPanel", new { area = "Common", applicationKey = MicroblogConfig.Instance().ApplicationKey, tenantTypeId = tenantTypeId })
+    @Html.Partial(urlGetter._ManageSubMenu())
+    @Html.AjaxAction("_StatisticDataDetail", "ControlPanel", new { area = "Common", applicationKey = MicroblogConfig.Instance().ApplicationKey, tenantTypeId = tenantTypeId })
+</div>

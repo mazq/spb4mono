@@ -1,0 +1,141 @@
+﻿@model IEnumerable<Tunynet.Tasks.TaskDetail>
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>任务管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    @Html.StatusMessage()
+                    @if (Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    {         
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        任务名
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        上次结束时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        上次执行状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        下次运行时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        当前运行状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        注册位置
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        是否启用
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var item in Model)
+                                {
+
+                                    bool isExpired = item.EndDate.HasValue && item.EndDate.Value.ToLocalTime() < DateTime.Now;
+                                    
+                                    <tr id="Tasks_@(item.Id)" class="tn-table-grid-row">
+                                        <td class="tn-border-bottom tn-border-gray tn-width-user-name tn-nowrap">
+                                            @item.Name
+                                        </td>
+                                        <td class="tn-border-bottom tn-border-gray tn-width-date tn-nowrap">
+                                            @if (isExpired)
+                                            {
+                                                <text>已过期</text>
+                                            }
+                                            else
+                                            { 
+                                                @(item.LastEnd.HasValue ? item.LastEnd.Value.ToFriendlyDate() : item.LastEnd.ToString())
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                            @(item.LastIsSuccess.HasValue ? item.LastIsSuccess.Value ? "成功" : "失败" : "")
+                                        </td>
+                                        <td class="tn-border-bottom tn-border-gray tn-width-date tn-nowrap">
+                                            @if (isExpired)
+                                            {
+                                                <text>已过期</text>
+                                            }
+                                            else
+                                            { 
+                                                @(item.NextStart.HasValue ? item.NextStart.Value.ToLocalTime() : item.NextStart)
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                            @(item.IsRunning ? "正在运行" : "空闲")
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                            @{switch (item.RunAtServer)
+                                              {
+                                                  case Tunynet.Tasks.RunAtServer.Master:
+                                                <text>主服务器</text>
+                                                      break;
+                                                  case Tunynet.Tasks.RunAtServer.Slave:
+                                                <text>从服务器</text>
+                                                      break;
+                                                  case Tunynet.Tasks.RunAtServer.Search:
+                                                <text>搜索服务器</text>
+                                                      break;
+                                              }
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                            @if (item.Enabled)
+                                            { 
+                                                <span class="tn-icon-colorful tn-icon-colorful-pass"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-stop"></span>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.ActionLink("编辑", "EditTask", new { Id = item.Id })
+                                            @Html.Link("立即执行", "javascript:;", "立即执行", htmlAttributes: new { id = "run-" + item.Id, tid = item.Id })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('a[id^="run-"]').click(function () {
+            var d = $.dialog.tips('正在执行', 1200, 0);
+            $.post('@SiteUrls.Instance().RunTask(null)', { id: $(this).attr('tid') }, function (data) {
+                var list = $.dialog.list;
+                for (var i in list) {
+                    list[i].close();
+                };
+
+                if (data.success) {
+                    $.dialog.tips(data.message, 2, 1)
+                }
+                else {
+                    $.dialog.tips(data.message, 2, -1)
+                }
+            });
+        });
+    });
+</script>

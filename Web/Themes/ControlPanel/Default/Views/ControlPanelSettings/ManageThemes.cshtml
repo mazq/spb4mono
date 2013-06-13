@@ -1,0 +1,237 @@
+﻿@model IEnumerable<ThemeAppearance>
+@{
+    Layout = "_ControlPanel";
+    string currentPresentAreaKey = Request.QueryString.Get<string>("presentAreaKey", PresentAreaKeysOfBuiltIn.UserSpace);
+    PresentArea presentArea = ViewData.Get<PresentArea>("presentArea", new PresentArea());
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>皮肤管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-tabs spb-managethemes">
+                        <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                            <li class="tn-option"><a class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary" href="@SiteUrls.Instance()._ExtractTheme(currentPresentAreaKey)" plugin = "dialog">
+                                <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">导入皮肤</span>
+                            </a></li>
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.Channel ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageThemes(PresentAreaKeysOfBuiltIn.Channel)">频道</a>
+                            </li>
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.UserSpace ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageThemes(PresentAreaKeysOfBuiltIn.UserSpace)">空间</a>
+                            </li>
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.GroupSpace ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageThemes(PresentAreaKeysOfBuiltIn.GroupSpace)">群组</a>
+                            </li>
+                        </ul>
+                        <div class="tn-tabs-panel">
+                            @using (Html.BeginAjaxForm("ManageThemes", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json }, new { enctype = "MULTIPART/FORM-DATA" }))
+                            {
+                                <ul class="spb-managethemes-list tn-helper-clearfix" data-islocked="@((!presentArea.EnableThemes).ToString().ToLower())">
+                                    @foreach (var themeAppearance in Model)
+                                    {
+                                        bool isDefaultTheme = themeAppearance.Id == presentArea.DefaultAppearanceID;
+                                        string largeImageUrl = Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/{1}/Appearances/{2}/{3}", themeAppearance.PresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey, themeAppearance.PreviewLargeImage));
+                                        string imageUrl = Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/{1}/Appearances/{2}/{3}", themeAppearance.PresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey, themeAppearance.PreviewImage));
+                                        
+                                        <li class="tn-border-gray spb-managethemes-item" themeAppearanceId="@themeAppearance.Id"  id="@(themeAppearance.ThemeKey + "_" + themeAppearance.AppearanceKey)" data-isenabled="@themeAppearance.IsEnabled.ToString().ToLower()">
+                                            <div class="tn-border-gray tn-border-bottom tn-border-dashed spb-skin-thumbnail">
+                                                <a rel="fancybox" href="@largeImageUrl">
+                                                    <img src="@imageUrl" alt="@themeAppearance.Name" title="@themeAppearance.Name"/>
+                                                </a>
+                                                <p>
+                                                    <em class="spb-skin-name">@themeAppearance.Name</em> <em class="tn-text-note tn-user-name">
+                                                        作者： @(themeAppearance.Author == "" ? "佚名" : themeAppearance.Author)</em>
+                                                </p>
+                                                <p>
+                                                    <em class="tn-text-note tn-count">使用数：@themeAppearance.UserCount</em>
+                                                    @if (themeAppearance.DateCreated > new DateTime(1900,1,1))
+                                                    { 
+                                                        <em class="tn-text-note tn-date">@themeAppearance.DateCreated.ToFriendlyDate(false)</em>
+                                                    }
+                                                </p>
+                                            </div>
+                                            <div class="spb-managethemes-operating tn-helper-clearfix">
+                                                <span class="spb-managethemes-button"><span class="tn-action" style="@( isDefaultTheme ? "display:none" : "")" >
+                                                    <a href="@SiteUrls.Instance()._EnableThemeAppearance(currentPresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey, false)" class="tnur-isEnabled" style="@(themeAppearance.IsEnabled ? "" : "display:none")">
+                                                        禁用</a> <a href="@SiteUrls.Instance()._EnableThemeAppearance(currentPresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey, true)" class="tnur-isEnabled" style="@(themeAppearance.IsEnabled ? "display:none" : "")">
+                                                            启用</a> </span>
+                                                    @if (presentArea.AllowMultipleInstances)
+                                                    { 
+                                                        <span class="tn-action tnur-isDefaultTheme" style="@( isDefaultTheme ? "" : "display:none")">
+                                                            <a href="@SiteUrls.Instance()._LockThemeAppearance(currentPresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey, true)" class="tnur-isLocked" style="@(isDefaultTheme && presentArea.EnableThemes ? "" : "display:none")" name="isLocked" title="不允许用户更换皮肤">
+                                                                锁定</a> <a href="@SiteUrls.Instance()._LockThemeAppearance(currentPresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey, false)" class="tnur-isLocked" style="@(isDefaultTheme && !presentArea.EnableThemes ? "" : "display:none")" name="isNoLocked" title="允许用户更换皮肤">
+                                                                    解锁</a></span>
+                                                    }
+                                                    <span class="tn-action" style="@( isDefaultTheme ? "display:none" : "")">
+                                                        @Html.AjaxDeleteButton(new AjaxDeleteButton()
+                                                        .SetConfirm("确实要删除该皮肤吗？")
+                                                        .SetDeleteTarget("#" + themeAppearance.ThemeKey + "_" + themeAppearance.AppearanceKey)
+                                                        .SetText("删除")
+                                                        .SetTooltip("删除皮肤")
+                                                        .SetUrl(SiteUrls.Instance()._DeleteThemeAppearance(currentPresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey))
+                                                        .MergeHtmlAttribute("class", "tnur-deleteTheme"))
+                                                    </span>
+                                                    @Html.Link("位置前移", SiteUrls.Instance()._ChangeThemeOrder(), "位置前移", new { @class = "tn-icon tn-icon-triangle-left" })
+                                                    @Html.Link("位置后移", SiteUrls.Instance()._ChangeThemeOrder(), "位置后移", new { @class = "tn-icon tn-icon-triangle-right" })
+                                                </span><a href="@SiteUrls.Instance()._SetDefaultThemeAppearance(themeAppearance.PresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey)" class="tnur-setDefaultTheme"  style="@((!isDefaultTheme && themeAppearance.IsEnabled) ? "" : "display:none")">
+                                                    设为默认皮肤</a> <b class="tnur-setDefaultTheme-b" style="@(isDefaultTheme ? "" : "display:none")">
+                                                        默认皮肤@(!presentArea.EnableThemes && presentArea.AllowMultipleInstances ? "(锁定)" : "")</b>
+                                            </div>
+                                        </li>               
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("a.tn-icon-triangle-left").first().hide();
+        $("a.tn-icon-triangle-right").last().hide();
+
+        //点击左移按钮
+        $(".tn-icon-triangle-left").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            var li = $(this).parents("li:first");
+            var id = li.attr("themeAppearanceId");
+            var referenceId = li.prev().attr("themeAppearanceId");
+
+            $.ajax({
+                type: "POST",
+                url: $this.attr("href"),
+                data: { appearanceId: id, referenceAppearanceId: referenceId },
+                success: function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        var liBefore = li.prev();
+                        li.insertBefore(liBefore);
+                        $("a.tn-icon-triangle-left,a.tn-icon-triangle-right").show();
+                        $("a.tn-icon-triangle-left").first().hide();
+                        $("a.tn-icon-triangle-right").last().hide();
+                    }
+                }
+            });
+        });
+
+        //点击右移按钮
+        $("a.tn-icon-triangle-right").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            var li = $(this).parents("li:first");
+            var id = li.attr("themeAppearanceId");
+            var referenceId = li.next().attr("themeAppearanceId");
+
+            $.ajax({
+                type: "POST",
+                url: $this.attr("href"),
+                data: { appearanceId: id, referenceAppearanceId: referenceId },
+                success: function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        var trAfter = li.next();
+                        li.insertAfter(trAfter);
+                        $("a.tn-icon-triangle-left,a.tn-icon-triangle-right").show();
+                        $("a.tn-icon-triangle-left").first().hide();
+                        $("a.tn-icon-triangle-right").last().hide();
+                    }
+                }
+            });
+        });
+
+        //锁定、解锁
+        $(".tnur-isLocked").click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var $defaultThemeText = $this.parents("li:first").find(".tnur-setDefaultTheme-b");
+            $.ajax({
+                type: "Post",
+                url: $(this).attr("href"),
+                success: function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        var isLocked = $this.parents("ul:first").data("islocked");
+                        if (isLocked) {
+                            $defaultThemeText.text("默认皮肤");
+                        } else {
+                            $defaultThemeText.text("默认皮肤(锁定)");
+                        }
+                        $this.hide().siblings('a.tnur-isLocked').show();
+                        $this.parents("ul:first").data("islocked", !isLocked);
+                    }
+                }
+            })
+        });
+        //启用禁用
+        $(".tnur-isEnabled").click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var $setDefaultThemeButton = $this.parents("li:first").find(".tnur-setDefaultTheme");
+            $.ajax({
+                type: "Post",
+                url: $(this).attr("href"),
+                success: function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        var isEnabled = $this.parents("li:first").data("isenabled");
+                        if (isEnabled) {
+                            $setDefaultThemeButton.hide();
+                        } else {
+                            $setDefaultThemeButton.show();
+                        }
+                        $this.hide().siblings('a.tnur-isEnabled').show();
+                        $this.parents("li:first").data("isenabled", !isEnabled);
+                    }
+                }
+            })
+        });
+
+        //设置默认皮肤
+        $(".tnur-setDefaultTheme").click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            $.ajax({
+                type: "POST",
+                url: $(this).attr("href"),
+                success: function (data) {
+                    if (data.MessageType > 0) {
+                        //设置默认皮肤状态.find("span.tn-action:not(.tnur-isDefaultTheme)")
+                        var isLocked = $this.parents("ul:first").data("islocked");
+                        $("b.tnur-setDefaultTheme-b:visible").hide().parents("li:first").find("span.tnur-isDefaultTheme").hide().end().find("span.tn-action:not(.tnur-isDefaultTheme),a.tnur-setDefaultTheme").show();
+                        $this.hide().parents("li:first").find("span.tn-action:not(.tnur-isDefaultTheme)").hide().end().find("b.tnur-setDefaultTheme-b,span.tnur-isDefaultTheme").show();
+
+                        $this.parents("li:first").find("a.tnur-isLocked[name='" + (isLocked ? "isNoLocked" : "isLocked") + "']").show().siblings('a.tnur-isLocked').hide();
+                        var $defaultThemeText = $this.parents("li:first").find(".tnur-setDefaultTheme-b");
+                        if (!isLocked) {
+                            $defaultThemeText.text("默认皮肤");
+                        } else {
+                            $defaultThemeText.text("默认皮肤(锁定)");
+                        }
+                    } else {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    }
+                }
+            })
+        });
+
+        //图片展示盒子
+        $("a[rel='fancybox']").fancybox({
+            'transitionIn': 'elastic',
+            'transitionOut': 'elastic',
+            'speedIn': 600,
+            'speedOut': 200
+        });
+
+    })
+</script>

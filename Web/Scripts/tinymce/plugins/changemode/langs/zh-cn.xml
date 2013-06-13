@@ -1,0 +1,5 @@
+﻿tinyMCE.addI18n('zh-cn.changemode',{
+  title:'切换模式',
+  simpleFunction:'简单功能',
+  fullFunction:'完整功能'
+});

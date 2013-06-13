@@ -1,0 +1,130 @@
+﻿@model IEnumerable<Tunynet.Email.SmtpSettings>
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block tnc-ctnborder" id="all">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1 style="border-bottom: 0px">
+                <span>邮件设置</span>
+            </h1>
+            <div class="tn-tabs">
+                <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                    <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().ListOutBox()">
+                        发件箱列表</a></li>
+                    <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().ManageEmailOtherSettings()">
+                        其他设置</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加发件邮箱", SiteUrls.Instance()._EditOutBox(), HighlightStyles.Default, ButtonSizes.Default, IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                        </div>
+                    </div>
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header ">
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    邮箱帐号
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    SMTP服务器
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    端口号
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    SSL
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    发件数/发件限制（每天）
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    强制使用Smtp邮箱作为发件人
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    是否启用
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    是否需要身份验证
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    操作
+                                </th>
+                            </tr>
+                            @if (Model != null && Model.Count() > 0)
+                            {
+                                foreach (var item in Model)
+                                {
+                                    bool enable = item.TodaySendCount < item.DailyLimit;
+                                <tr class="tn-table-grid-row" id="outbox-@item.Id">
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        @item.UserEmailAddress
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        @item.Host
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom ">
+                                        @item.Port
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        @(item.EnableSsl ? "需要" : "不需要")
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        @item.TodaySendCount / @item.DailyLimit
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        @(item.ForceSmtpUserAsFromAddress ? "是" : "否")
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        @(enable ? "是" : "否")
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom">
+                                        @(item.RequireCredentials ? "是" : "否")
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                                        @Html.Link("编辑", SiteUrls.Instance()._EditOutBox(item.Id), "编辑", new { plugin = "dialog" })
+                                        @Html.Link("测试", SiteUrls.Instance()._TestOutBox(item.Id), "测试", new { id = "TestOutBox-" + item.Id })
+                                        @Html.Link(enable ? "禁用" : "启用", SiteUrls.Instance()._SetOutBoxSendCount(item.Id, enable ? item.DailyLimit : 0), enable ? "将今日已发邮件设为上限值" : "将今日邮件已发送邮件清空", new { id = "SetOutBoxSendCount-" + item.Id })
+                                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除").SetDeleteTarget("#outbox-" + item.Id).SetText("删除").SetUrl(SiteUrls.Instance()._DeleteOutBox(item.Id)))
+                                    </td>
+                                </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    @if (Model == null || Model.Count() <= 0)
+                    {
+                        <div class="tn-no-data">
+                            现在还没有发件邮箱，@Html.Link("马上添加", SiteUrls.Instance()._EditOutBox(), "马上开始添加发件邮箱", new { plugin = "dialog" })</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //设置发件箱已经发送的个数
+        $("a[id^='SetOutBoxSendCount-']").click(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("href"), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+            });
+        });
+
+        //测试发件箱是否好用
+        $("a[id^='TestOutBox-']").click(function (e) {
+            e.preventDefault();
+            var mydialog = art.dialog.tips("正在发送测试邮件，请稍后", 10, 0);
+            var timeOut = setTimeout(function () { art.dialog.tips("等待超时", 1.5, -1, function () { window.location.reload(true); }); }, 10 * 1000);
+            $.post($(this).attr("href"), function (data) {
+                mydialog.close();
+                clearTimeout(timeOut);
+                art.dialog.tips(data.MessageContent, 3, data.MessageType);
+            });
+        });
+    });
+</script>

@@ -1,0 +1,37 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+}
+@section Aside{
+    @Html.Action("_Panel", "Blog", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } })
+    @Html.AjaxAction("_Categories", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Tags", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Archives", "Blog", new { spaceKey = Url.SpaceKey() })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-list">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if (Model != null && Model.Count > 0)
+        { 
+            <div class=" spb-blog-list-wrap">
+                <ul class="tn-list">
+                    @foreach (BlogThread blogThread in Model)
+                    {
+                        @Html.Partial("_Blog", blogThread)
+                    }
+                </ul>
+            </div>
+            <div class="tn-pagination">
+                @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                @Html.PagingResults(Model)
+            </div>
+        }
+        else
+        { 
+            <div class="tn-no-data">
+                还没有日志。
+            </div>
+        }
+    </div>
+</div>

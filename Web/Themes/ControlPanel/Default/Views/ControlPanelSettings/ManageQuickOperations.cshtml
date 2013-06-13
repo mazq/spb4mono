@@ -1,0 +1,321 @@
+﻿@model Dictionary<string, IEnumerable<ApplicationManagementOperation>>
+@{
+    Layout = "_ControlPanel";
+    ManagementOperationType? operationType = Request.QueryString.Get<ManagementOperationType?>("operationType", null);
+    string currentPresentAreaKey = Request.QueryString.Get<string>("presentAreaKey", string.Empty);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main spb-nav-manage-wrap">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>快捷操作管理</span></h1>
+            <div class="tnc-ctnright-list">
+                @*<div class="tn-cue-highlight tn-corner-all tn-message-box">
+                    快捷搜索</div>*@
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            @Html.LinkButton("添加" + operationType.EnumMetadataDisplay(), SiteUrls.Instance()._CreateOperation(operationType, currentPresentAreaKey), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                            @Html.LinkButton("删除", SiteUrls.Instance().BatchRemoveOperation(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "BatchRemoveOperation" })
+                        </div>
+                    </div>
+                    <span class="tn-filter tn-helper-right"></span>
+                    <div class="tn-tabs">
+                        <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                            <li class="tn-option">
+                                @Html.Link("返回", SiteUrls.Instance().ManageNavigations(currentPresentAreaKey), "返回")
+                                @(Html.EnumDropDownList<ManagementOperationType?>("OperationType", operationType, htmlAttributes: new { @class = "tn-dropdownlist tn-input-medium", @id = "operationType" }))
+                            </li>
+                            @*//todo:cuizhen by libsh,可以用Html.Tabs*@
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.Channel ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageQuickOperations(operationType, PresentAreaKeysOfBuiltIn.Channel)">
+                                    频道</a></li>
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.UserSpace ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageQuickOperations(operationType, PresentAreaKeysOfBuiltIn.UserSpace)">
+                                    用户空间</a></li>
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.GroupSpace ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageQuickOperations(operationType, PresentAreaKeysOfBuiltIn.GroupSpace)">
+                                    群组</a></li>
+                            <li class="tn-widget-content tn-border-gray tn-border-trl @(currentPresentAreaKey == PresentAreaKeysOfBuiltIn.ControlPanel ? "tn-tabs-selected" : "")">
+                                <a href="@SiteUrls.Instance().ManageQuickOperations(operationType, PresentAreaKeysOfBuiltIn.ControlPanel)">
+                                    后台</a></li>
+                        </ul>
+                        <div class="tn-tabs-panel">
+                            @if (Model != null && Model.Count() > 0)
+                            {
+                                <form action="#" method="post" id="Form-BatchSet">
+                                <table class="tn-table-grid">
+                                    <tbody>
+                                        <tr class="tn-table-grid-header">
+                                            <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                                @Html.CheckBox("OperationIds-checkAll", false)
+                                            </td>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                导航Id
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                操作名
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                类型
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                新窗
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                启用
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                排序
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            </th>
+                                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                                操作
+                                            </th>
+                                        </tr>
+                                        @foreach (string applicationName in Model.Keys)
+                                        {
+                                            <tr class="tn-table-grid-row">
+                                                <td class="tn-border-gray tn-border-bottom tn-width-auto tn-nowrap tnui-appName">
+                                                    @applicationName
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                </td>
+                                            </tr>
+                                            foreach (ApplicationManagementOperation item in Model[applicationName])
+                                            {
+                                            <tr class="tn-table-grid-row"  data-id="@(item.OperationId)" id="ajaxdelete-operation-@item.OperationId">
+                                                <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                                    <input type="checkbox" name="operationIds" id="operationIds-@item.OperationId" value="@item.OperationId" @if (item.IsLocked == true)
+                                                                                                                                                             {<text>disabled="true"</text>}/>
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                                    @item.OperationId
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                                    @if (item != null && !string.IsNullOrEmpty(item.IconName))
+                                                    {
+                                                        <span>&nbsp</span>@Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), item.IconName, false))
+                                                    }
+                                                    else if (item != null && !string.IsNullOrEmpty(item.ImageUrl) && item.ImageUrl.StartsWith("http://"))
+                                                    {
+                                                        <img src="@item.ImageUrl" alt="" style="height: 35px;"/>
+                                                    }
+                                                    else if (!string.IsNullOrEmpty(item.ImageUrl) && !item.ImageUrl.StartsWith("http://"))
+                                                    { 
+                                                        <img src="@Tunynet.Utilities.WebUtility.ResolveUrl(item.ImageUrl)" alt="" style="height: 35px;"/>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(item.OperationText))
+                                                    {
+                                                        <text> @item.OperationText</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        @Tunynet.Globalization.ResourceAccessor.GetString(item.ResourceName)
+                                                    }
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                                    @switch (item.OperationType)
+                                                    {
+                                                        case ManagementOperationType.Shortcut:
+                                                        @:快捷操作
+                                                        break;
+                                                        case ManagementOperationType.ManagementMenu:
+                                                        @:菜单
+                                                                                                            break;
+                                                    }
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                                    @Html.SipmleCheckBox("OperationId-IsTarget", item.NavigationTarget == "_blank" ? "true" : "", item.NavigationTarget == "_blank" ? true : false)
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                                    @Html.SipmleCheckBox("OperationId-IsEnabled", item.IsEnabled ? "true" : "", item.IsEnabled)
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                                    @Html.Link("上移", SiteUrls.Instance().ChangeOperationOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", name = applicationName })
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                                    @Html.Link("下移", SiteUrls.Instance().ChangeOperationOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", name = applicationName })
+                                                </td>
+                                                <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                                    @Html.Link("编辑", SiteUrls.Instance()._EditOperation(item.OperationId), "编辑", htmlAttributes: new { plugin = "dialog" })
+                                                    @if (!item.IsLocked)
+                                                    { 
+                                                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("删除").SetDeleteTarget("#ajaxdelete-operation-" + item.OperationId).SetUrl(SiteUrls.Instance().DeleteOperation(item.OperationId)).SetConfirm("您确实要删除该导航吗？").SetOnSuccessCallBack("onDeleteSuccessCallBack"))
+                                                    }
+                                                </td>
+                                            </tr>      
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="tn-no-data">
+                                    搜索不到数据</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#operationType").change(function () {
+            var url = "@(SiteUrls.Instance().ManageQuickOperations())?presentAreaKey=@(currentPresentAreaKey)&operationType=" + $(this).val();
+            window.location = url;
+        });
+
+        //全选按钮
+        $("input#OperationIds-checkAll").click(function () {
+            var items = $("input[type='checkbox'][name='operationIds']:enabled");
+            for (var i = 0; i < items.length; i++) {
+                items[i].checked = document.getElementById("OperationIds-checkAll").checked;
+            }
+
+        });
+
+
+        //批量删除
+        $("#BatchRemoveOperation").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='operationIds']:checked").length) {
+                alert("至少选择一条导航进行操作");
+                return false;
+            }
+
+            url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除这些导航吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+                    function () {
+                        window.location.reload(true);
+                    });
+                });
+            });
+        });
+
+        //设置快捷操作启用状态
+        var isEnabledUrl = '@(SiteUrls.Instance().setOperationStatus())';
+        $("input[name='OperationId-IsEnabled']").click(function () {
+            var self = $(this).closest('tr').data("id");
+            var value = $(this).attr("value");
+            $this = $(this);
+            var val = "";
+            if (!value) {
+                val = "true";
+            } else {
+                val = "";
+            }
+            $.post(isEnabledUrl, { operationId: self, isEnabled: !value }, function (data) {
+                $this.attr("value", val);
+                art.dialog.tips(data.MessageContent, 2, data.MessageType);
+            })
+        });
+
+        //设置快捷操作是否新窗
+        var isTargetUrl = '@(SiteUrls.Instance().setOperationTarget())';
+        $("input[name='OperationId-IsTarget']").click(function () {
+            var self = $(this).closest('tr').data("id");
+            var value = $(this).attr("value");
+            $this = $(this);
+            var val = "";
+            if (!value) {
+                val = "true";
+            } else {
+                val = "";
+            }
+            $.post(isTargetUrl, { operationId: self, isTarget: !value }, function (data) {
+                $this.attr("value", val);
+                art.dialog.tips(data.MessageContent, 2, data.MessageType);
+            })
+        });
+
+        //排序
+        $(".tnui-appName").each(function () {
+            var name = $(this).text();
+            $("a.tn-smallicon-upload[name=" + name + "]").first().hide();
+            $("a.tn-smallicon-download[name=" + name + "]").last().hide();
+        })
+
+        $(".tn-smallicon-upload").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            var tr = $(this).parents("tr:first");
+            var fromOperationId = tr.data("id");
+            var toOperationId = tr.prev().data("id");
+
+            $.ajax({
+                type: "POST",
+                url: $this.attr("href"),
+                data: { fromOperationId: fromOperationId, toOperationId: toOperationId },
+                success: function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        var trBefore = tr.prev();
+                        tr.insertBefore(trBefore);
+                        $("a.tn-smallicon-upload,a.tn-smallicon-download").show();
+                        $(".tnui-appName").each(function () {
+                            var name = $(this).text();
+                            $("a.tn-smallicon-upload[name=" + name + "]").first().hide();
+                            $("a.tn-smallicon-download[name=" + name + "]").last().hide();
+                        })
+                    }
+                }
+            });
+        });
+
+        $("a.tn-smallicon-download").click(function (e) {
+            e.preventDefault();
+
+            $this = $(this);
+            var tr = $(this).parents("tr:first");
+            var fromOperationId = tr.data("id");
+            var toOperationId = tr.next().data("id");
+
+            $.ajax({
+                type: "POST",
+                url: $this.attr("href"),
+                data: { fromOperationId: fromOperationId, toOperationId: toOperationId },
+                success: function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        var trAfter = tr.next();
+                        tr.insertAfter(trAfter);
+                        $("a.tn-smallicon-upload,a.tn-smallicon-download").show();
+                        $(".tnui-appName").each(function () {
+                            var name = $(this).text();
+                            $("a.tn-smallicon-upload[name=" + name + "]").first().hide();
+                            $("a.tn-smallicon-download[name=" + name + "]").last().hide();
+                        })
+                    }
+                }
+            });
+        });
+    });
+
+</script>

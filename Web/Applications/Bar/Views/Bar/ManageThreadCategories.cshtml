@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Category>
+@{
+    Layout = "app-manage-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+    long sectionId = ViewData.Get<long>("SectionId", 0);
+    ViewData["ManageSectionSubMenu"] = ManageSectionSubMenu.ManageThreadCategories;
+}
+@section Aside{
+    @Html.Partial("_ManageSectionLeftMenu")
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar", new { SectionId = sectionId })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-manage">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                帖子类别</h2>
+        </div>
+        <div class="tn-manage-lists">
+            <div class="tn-toolbar-area tn-border-gray tn-border-bottom">
+                @Html.LinkButton("添加分类", SiteUrls.Instance()._EditThreadCategory(sectionId), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+            </div>
+            @if (Model != null && Model.Count() > 0)
+            {
+                <table class="tn-table-grid">
+                    <tbody>
+                        <tr class="tn-table-grid-header">
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                类别名
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                描述
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                排序
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                操作
+                            </th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr data-id="@(item.CategoryId)" id="categry-@(item.CategoryId)" class="tn-table-grid-row">
+                                <td class="tn-border-gray tn-border-bottom tn-width-category">
+                                    @item.CategoryName
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                    @Html.Raw(item.Description)
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                    @Html.Link("上移", SiteUrls.Instance().ChangeSectionCategoryDisplayOrder(), "上移", new { @class = "tn-smallicon-upload tn-icon", id = "display-order-up" + item.CategoryId, name = "display-order-up" + item.CategoryId })
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                    @Html.Link("上移", SiteUrls.Instance().ChangeSectionCategoryDisplayOrder(), "下移", new { @class = "tn-smallicon-download tn-icon", id = "display-order-download" + item.CategoryId, name = "display-order-up" + item.CategoryId })
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                    @Html.Link("编辑", SiteUrls.Instance()._EditThreadCategory(sectionId, item.CategoryId), "编辑", new { plugin = "dialog" })
+                                    @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("删除").SetDeleteTarget("#categry-" + item.CategoryId).SetConfirm("确定要删除吗？").SetUrl(SiteUrls.Instance().DeleteThreadCategory(item.CategoryId)))
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+		
+            }
+            else
+            {
+                <div class="tn-no-data">
+                    此帖吧没有任何分类数据
+                </div>
+            }
+        </div>
+    </div>
+</div>

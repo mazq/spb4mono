@@ -1,0 +1,46 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    string tagName = ViewData.Get<string>("tagName", string.Empty);
+    SortBy_BarThread? sortBy = ViewData.Get<SortBy_BarThread?>("sortBy", null);
+    bool? isEssential = Request.QueryString.Get<bool?>("isEssential", null);
+
+    string allSelectedClass = string.Empty; //全部是否选中样式
+    string postCountSelectedClass = string.Empty;//热门是否选中样式
+    string essentialSelectedClass = string.Empty;//精华是否选中样式
+    if (isEssential == true)
+    {
+        essentialSelectedClass = "tn-tabs-selected";
+    }
+    else if (sortBy == SortBy_BarThread.PostCount)
+    {
+        postCountSelectedClass = "tn-tabs-selected";
+    }
+    else
+    {
+        allSelectedClass = "tn-tabs-selected";
+    }
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @if (UserContext.CurrentUser != null)
+    { 
+        @Html.Action("_UserData", "Bar", new { userId = UserContext.CurrentUser.UserId })
+    }
+    @Html.AjaxAction("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.ThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Headline })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom tn-border-gray">
+            <div class="tn-option">
+                <a href="@SiteUrls.Instance().TagMap()">更多</a></div>
+            <h3 class="tn-helper-reset">
+                热门标签
+            </h3>
+        </div>
+        @Html.Action("_TagCloud", "Channel", new { area = "Common", tenantTypeId = TenantTypeIds.Instance().BarThread() })
+    </div>
+}
+@Html.Partial("~/Applications/Bar/Views/Bar/_ListByTag.cshtml", Model)

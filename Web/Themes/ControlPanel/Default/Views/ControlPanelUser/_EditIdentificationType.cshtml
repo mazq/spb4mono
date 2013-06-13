@@ -1,0 +1,88 @@
+﻿@model IdentificationTypeEditModel
+@using (Html.BeginAjaxForm("_EditIdentificationType", "ControlPanelUser", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json, OnSuccessCallBack = "OnSuccessCallBack" }, new { enctype = "MULTIPART/FORM-DATA" }))
+{
+    @Html.HiddenFor(n => n.IdentificationTypeId)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tr>
+                    <th>
+                        名称：
+                    </th>
+                    <td>
+                        @Html.TextBoxFor(n => n.Name, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                        @Html.ValidationMessage("Name")
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        标识图片：
+                    </th>
+                    <td>
+                        <input type="file" name="IdentificationTypeLogo" id="file" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                    </th>
+                    <td>
+                        @if (Model != null)
+                        { 
+                            <img src="@SiteUrls.Instance().LogoUrl(Model.IdentificationTypeLogo, TenantTypeIds.Instance().IdentificationType(), ImageSizeTypeKeys.Instance().Small())" />
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        描述：
+                    </th>
+                    <td>
+                        @Html.TextAreaFor(n => n.Description, new { @class = "tn-textarea tn-input-long tn-border-gray" })
+                        @Html.ValidationMessage("Description")
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        是否启用：
+                    </th>
+                    <td>
+                        @Html.RadioButton("Enabled", true, Model == null ? true : Model.Enabled, new { @class = "tn-radiobutton", id = "isEnabled" })<label
+                            for="isEnabled">是</label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        @Html.RadioButton("Enabled", false, Model == null ? false : !Model.Enabled, new { @class = "tn-radiobutton", id = "unEnabled" })<label
+                            for="unEnabled">否</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                    </th>
+                    <td>
+                        @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "sub" })
+                        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close", id = "cancel" })
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+}
+<script type="text/dialog">
+    @if (Model == null)
+    {
+        @:this.title("添加认证标识");
+    }
+    else
+    {
+        @:this.title("修改认证标识");
+    }
+  
+</script>
+<script type="text/javascript" language="javascript">
+    //提交成功返回函数
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+            function () {
+                window.location.reload();
+            });
+    }
+</script>

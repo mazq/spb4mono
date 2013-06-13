@@ -1,0 +1,52 @@
+﻿<div class="tnc-dailog-pd" style="height: 356px">
+    <div class="tnc-upload-attach">
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    附件地址：</label>
+                @Html.TextBox("netAttachmentUrl", null, InputWidthTypes.Long, null)
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                </label>
+                <span class="tn-text-note">例如：http://file.spacebuilder.cn/uploads/9275.rar </span>
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    附件名称：</label>
+                @Html.TextBox("netAttachmentName", null, InputWidthTypes.Long, null)
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+    @Html.Button("插入", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "insertNetUrl", dialogOperation = "close" })
+    @Html.Button("关闭", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { id = "cancelEditAttachment", dialogOperation = "close" })
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#insertNetUrl").click(function () {
+            var attachmentUrl = $("#netAttachmentUrl").val();
+            var netAttachmentName = $("#netAttachmentName").val()
+            var $tinyMCE = $('#' + tinyMCE.activeEditor.id);
+            if (attachmentUrl && netAttachmentName) {
+                $tinyMCE.insertContentToEditor('<a href="' + attachmentUrl + '" >' + netAttachmentName + ' </a>');
+                $("#insertNetUrl").attr("value", '');
+                $("#netAttachmentName").attr("value", '');
+                $("#netAttachmentUrl").attr("value", '');
+
+            }
+            else {
+                art.dialog.tips('请填写完整信息！', 1.5, -1);
+            }
+        });
+        $("#netAttachmentUrl").focusout(function () {
+            if ($(this).val()) {
+                var url = $(this).val()
+                $("#netAttachmentName").attr("value", (url.substring(url.lastIndexOf('/') + 1)).substring(0, (url.substring(url.lastIndexOf('/') + 1)).lastIndexOf('.')));
+            }
+        });
+    })
+
+</script>

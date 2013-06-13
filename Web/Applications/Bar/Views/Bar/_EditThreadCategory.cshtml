@@ -1,0 +1,51 @@
+﻿@model CategoryEditModel
+@using (Html.BeginAjaxForm("_EditThreadCategoryPost", "Bar", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "EditCategorySuccess" }))
+{ 
+    @Html.HiddenFor(n => n.OwnerId)
+    @Html.HiddenFor(n => n.TenantTypeId)
+    @Html.HiddenFor(n => n.CategoryId)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            分类名：
+                        </th>
+                        <td>
+                            @Html.TextBoxFor(n => n.CategoryName, InputWidthTypes.Long)
+                            <br />
+                            @Html.ValidationMessageFor(n => n.CategoryName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            描述：
+                        </th>
+                        <td>
+                            @Html.TextAreaFor(n => n.Description, InputWidthTypes.Long)
+                            <br />
+                            @Html.ValidationMessageFor(n => n.Description)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogoperation = "close" })
+    </div>
+    
+}
+<script type="text/dialog">
+    this.title("@(Model.CategoryId == 0 ? "创建" : "编辑")类别");
+</script>
+<script type="text/javascript" language="javascript">
+    //创建分类成功
+    function EditCategorySuccess(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        setTimeout(function () { window.location.reload(); }, 800);
+    }
+
+</script>

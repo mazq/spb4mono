@@ -1,0 +1,53 @@
+﻿@model  PagingDataSet<User>
+@{
+    UserSearcher userSearcher = (UserSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(UserSearcher.CODE);
+    string keyword=Request.QueryString.GetString("keyword", string.Empty);
+    }
+@if (Model.TotalRecords > 0)
+{
+    <div class="tn-section tn-border-gray tn-border-bottom">
+     <div class="tn-title tn-border-bottom tn-border-gray tnui-option" data-search-url="@userSearcher.PageSearchActionUrl(keyword)">
+          <a href="@userSearcher.PageSearchActionUrl(keyword)">搜“<span class="tn-text-bright">@keyword</span>”相关用户（@Model.TotalRecords）</a>
+     </div>
+     <ul class="tn-list" >
+      @foreach (var user in Model)
+      {
+          string gender = "";
+          //string introduction = "";
+          string followCount = user.FollowerCount.ToString();
+          string areaName ="";
+          if (user.Profile != null)
+          {
+              areaName = Formatter.FormatArea(user.Profile.NowAreaCode);
+              if (user.Profile.Gender == GenderType.Male)
+              {
+                  gender = "tn-icon tn-smallicon-male";
+              }
+              else if (user.Profile.Gender == GenderType.FeMale)
+              {
+                  gender = "tn-icon tn-smallicon-female";
+              }
+          }
+      <li class="tn-list-item tn-helper-clearfix tnui-option" data-search-url="@SiteUrls.Instance().SpaceHome(user.UserId)" data-search-key="@user.DisplayName">
+       <div class="tn-list-item-area-left">
+        @Html.ShowUserAvatar(user, AvatarSizeType.Micro,true,HyperLinkTarget._blank)
+       </div>
+       <div class="tn-list-item-area-main">
+        <div class="tn-list-item-row">
+        <a title="@user.DisplayName" class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(user.UserId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), user.DisplayName, 10))</a>
+        @Html.IdentificationType(user.UserId)
+        </div>
+        <div class="tn-list-item-row">
+       @* @if (introduction.Length>40)
+        {
+          @(string.Join("", introduction.Take(40)) + "...")
+        }*@
+        粉丝数:@followCount&nbsp;@areaName
+        </div>
+       </div>
+      </li>
+      }
+     </ul>
+     </div>
+}
+

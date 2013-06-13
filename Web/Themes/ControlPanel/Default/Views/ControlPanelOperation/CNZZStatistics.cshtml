@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<body id="@Html.GenerateBodyId()">
+    <div class="tn-doc-bg" id="tn-doc">
+        <div class="tn-header-bg" id="tn-header">
+            @Html.Action("_Header", "ControlPanel", new { area = "Common" })
+        </div>
+        @{
+            string link = new CNZZStatisticsService().GetCNZZStatisticsPageLink();
+        }
+        <div class="tn-content-bg" id="tn-content">
+            <div class="tnc-site-stat">
+                <div class="tn-title">
+                    CNZZ站点统计已经 @(CNZZStatisticsService.Enable ? "启用" : "禁用")
+                    ：
+                    @Html.LinkButton(CNZZStatisticsService.Enable ? "马上禁用" : "马上启用", SiteUrls.Instance()._SetCNZZStatisticsStatus(!CNZZStatisticsService.Enable), HighlightStyles.Default, htmlAttributes: new { id = "SetCNZZStatisticsStatus" })
+                </div>
+                @if (CNZZStatisticsService.Enable)
+                {
+                    <iframe src="@link" width="100%" height="600px" style="border:0;"></iframe>   
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        resizeIframe();
+        $(window).resize(function () {
+            resizeIframe();
+        });
+
+        //设置审核状态
+        $("#SetCNZZStatisticsStatus").click(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("href"), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    window.location.reload(true);
+                });
+            });
+        });
+    });
+
+    function resizeIframe() {
+        $("iframe").attr("height", function () {
+            return $(window).height() - $("#tn-header").height() - 10 + "px";
+        });
+    }
+</script>

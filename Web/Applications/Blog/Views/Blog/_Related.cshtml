@@ -1,0 +1,15 @@
+﻿@model PagingDataSet<BlogThread>
+@if (Model!=null && Model.Count > 0)
+{
+ <div class="tn-related-content">
+    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+        <h4>相关日志</h4>
+    </div>
+    <ul class="tn-helper-clearfix tn-list">
+       @foreach (var blogThread in Model)
+       {
+            <li class="tn-border-dashed tn-border-bottom tn-border-gray"><a href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(blogThread.UserId), blogThread.ThreadId)">@blogThread.ResolvedSubject</a></li>   
+       }
+    </ul>
+</div>   
+}

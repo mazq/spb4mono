@@ -1,0 +1,123 @@
+﻿@model RoleEditModel
+@{
+    SelectList apps = ViewData["apps"] as SelectList;
+    string action = "CreateRole";
+    string title = "添加角色";
+    if (!string.IsNullOrEmpty(Model.RoleName))
+    {
+        action = "EditRole";
+        title = "修改角色";
+    }
+}
+@using (Html.BeginAjaxForm(action, "ControlPanelUser", new { }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success" }, new { id = "CreateUserForm" }))
+{
+    <div class="tnc-dailog-pd">
+        @Html.StatusMessage()
+        @{ StatusMessageData statusMessageData = ViewData.Get<StatusMessageData>("StatusMessageData", null);
+           if (statusMessageData != null && statusMessageData.MessageType == StatusMessageType.Error)
+           { 
+
+            <div name="StatusMessageDiv" class="tn-cue-error tn-corner-all tn-message-box">
+                <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right"></a><span class="tn-helper-left">
+                    <span class="tn-icon tn-icon-cross-circle"></span></span>
+                <div class="tn-helper-flowfix">
+                    <strong>错误：</strong>@Html.Raw(statusMessageData.MessageContent)</div>
+            </div>
+           }
+        }
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.RoleName)
+                @if (string.IsNullOrEmpty(Model.RoleName))
+                {
+                    @Html.TextBoxFor(m => m.RoleName, InputWidthTypes.Long, new RouteValueDictionary { { "maxLength", 24 } })
+                    @Html.ValidationMessageFor(n => n.RoleName)}
+                else
+                {
+                    @Html.Label(Model.RoleName) 
+                    @Html.HiddenFor(m => m.RoleName)
+                }
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.FriendlyRoleName)
+                @Html.TextBoxFor(m => m.FriendlyRoleName, InputWidthTypes.Long, new RouteValueDictionary { { "maxLength", 24 } })
+                @Html.ValidationMessageFor(n => n.FriendlyRoleName)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.Description)
+                @Html.TextAreaFor(m => m.Description, InputWidthTypes.Long, 0, 0, new RouteValueDictionary { { "maxLength", 100 } })
+                @Html.ValidationMessageFor(n => n.Description)
+            </div>
+            @{
+           object obj = new { };
+            }
+            @if (Model.IsBuiltIn)
+            {
+                obj = new { disabled = "disabled" };
+            }
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.ApplicationId)
+                @Html.DropDownListFor(m => m.ApplicationId, apps, obj)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.IsEnabled)
+                @Html.RadioButton("IsEnabled", true, Model.IsEnabled, new { @id = "IsEnabled1", @class = "tn-radiobutton" })
+                <label for="IsEnabled1">
+                    是</label>
+                @Html.RadioButton("IsEnabled", false, !Model.IsEnabled, new { @id = "IsEnabled2", @class = "tn-radiobutton" })
+                <label for="IsEnabled2">
+                    否</label>
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.IsPublic)
+                @Html.RadioButton("IsPublic", true, Model.IsPublic, new { @id = "IsPublic1", @class = "tn-radiobutton" })
+                <label for="IsPublic1">
+                    是</label>
+                @Html.RadioButton("IsPublic", false, !Model.IsPublic, new { @id = "IsPublic2", @class = "tn-radiobutton" })
+                <label for="IsPublic2">
+                    否</label>
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.ConnectToUser)
+                @Html.RadioButton("ConnectToUser", true, Model.ConnectToUser, new { @id = "connectToUser_T", @class = "tn-radiobutton" })
+                <label for="connectToUser_T">
+                    是</label>
+                @Html.RadioButton("ConnectToUser", false, !Model.ConnectToUser, new { @id = "connectToUser_F", @class = "tn-radiobutton" })
+                <label for="connectToUser_F">
+                    否</label>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.RoleImage))
+            {
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        角色标识图片：</label>
+                    <img src="@SiteUrls.Instance().LogoUrl(Model.RoleImage, TenantTypeIds.Instance().Advertising(), ImageSizeTypeKeys.Instance().Original())" width="20" height="20" title="@Model.FriendlyRoleName" alt="@Model.RoleName"/>
+                </div>
+            }
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    选择角色标识图：</label>
+                <input type="file" name="RoleImage" id="RoleImage" />
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                </label>
+                <span class="tn-text-note">请确保该文件存在，该角色的会员将会用该标识图片突出显示</span>
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "createButton" })
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+    this.title("@title");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("div[name='StatusMessageDiv'] a.tn-smallicon-cross").click(function () {
+            $(this).parents("div[name='StatusMessageDiv']:first").fadeOut("normal");
+        });
+    });
+</script>

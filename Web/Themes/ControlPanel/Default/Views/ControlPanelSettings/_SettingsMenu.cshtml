@@ -1,0 +1,89 @@
+﻿@{
+    SettingsMenu menu = SettingsMenu.ManagePointItems;
+    menu = ViewData["SettingsMenu"] == null ? SettingsMenu.ManagePointItems : (SettingsMenu)ViewData["SettingsMenu"];
+}
+<div class="tn-block">
+    <div class="tnc-aside">
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-sidebar">
+            <div class="tn-box-content tn-widget-content tn-corner-all">
+                <div class="tnc-menu-item">
+                    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                        <h4>
+                            <span class="tn-icon-file"></span>站点设置</h4>
+                    </div>
+                    <ul class="tn-side-menu">
+                        <li @if (menu == SettingsMenu.ManageSiteSettings)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageSiteSettings())">
+                                基础设置</a></li>
+                        <li @if (menu == SettingsMenu.ManageUserSettings)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageUserSettings())">
+                                用户设置</a></li>
+                        <li @if (menu == SettingsMenu.ManageAttachmentSettings)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageAttachmentSettings())">
+                                附件设置</a></li>
+                        <li @if (menu == SettingsMenu.ManagePrivacyItems)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManagePrivacyItems())">
+                                隐私规则</a></li>
+                        <li @if (menu == SettingsMenu.ManageAuditItems)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageAuditItems())">
+                                审核规则</a></li>
+                        <li @if (menu == SettingsMenu.ManagePointItems)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManagePointItems())">
+                                积分规则</a></li>
+                        <li @if (menu == SettingsMenu.ManagePermissionItems)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManagePermissionItems())">
+                                权限规则</a></li>
+                        <li @if (menu == SettingsMenu.ManageAreas)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageAreas(string.Empty))">
+                                地区管理</a></li>
+                        <li @if (menu == SettingsMenu.ManageSchools)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageSchools(string.Empty))">
+                                学校管理</a></li>
+                    </ul>
+                </div>
+                <div class="tnc-menu-item">
+                    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                        <h4>
+                            <span class="tn-icon-file"></span>界面设置</h4>
+                    </div>
+                    <ul class="tn-side-menu">
+                        <li @if (menu == SettingsMenu.ManageApplications)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            }><em></em><a class="tn-menu-text" href="@SiteUrls.Instance().ManageApplications()">
+                                应用管理</a></li>
+                        <li @if (menu == SettingsMenu.ManageNavigations)
+                            {
+                            <text>class="tnc-sublist-over"</text>
+                            }><em></em><a class="tn-menu-text" href="@SiteUrls.Instance().ManageNavigations(PresentAreaKeysOfBuiltIn.Channel)">
+                                导航管理</a></li>
+                        <li @if (menu == SettingsMenu.ManageThemeSettings)
+                            {
+                            <text>class="tnc-sublist-over"</text>
+                            }><em></em><a class="tn-menu-text" href="@SiteUrls.Instance().ManageThemes()">
+                                皮肤管理</a></li>
+                    </ul>
+                </div>
+                <div class="tnc-menu-item">
+                    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                        <h4>
+                            <span class="tn-icon-file"></span>最近访问</h4>
+                    </div>
+                    <ul class="tn-side-menu">
+                        <li><em></em><a class="tn-menu-text" href="#">问答管理</a></li>
+                        <li><em></em><a class="tn-menu-text" href="#">日志管理</a></li>
+                        <li><em></em><a class="tn-menu-text" href="#">投票管理</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

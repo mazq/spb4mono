@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+@{
+    string searcherCode = ViewData.Get<string>("searcherCode", Spacebuilder.Search.SearcherFactory.GlobalSearchCode);
+}
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<body id="@Html.GenerateBodyId()" class="tn-page-bg spb-layout-3-1 spb-search-page">
+    <div id="tn-doc" class="tn-doc-bg">
+        <div id="tn-header" class="tn-header-bg">
+            <div class="tn-wrapper">
+                @Html.Action("_Header", "Channel", new { area = "Common" })
+            </div>
+        </div>
+        <div id="tn-content" class="tn-content-bg">
+            <div class="tn-wrapper">
+                <div class="tnc-content-header">
+                    <div class="tn-pagename">
+                        <h2 id="mess">全文检索</h2>
+                    </div>
+                    <div class="tnc-search-formbox">
+                        @Html.Action("_SearchItems", "Channel", new { searcherCode = searcherCode, area = "Common" })
+                        <div class="tnc-search-input tn-bg-light tn-corner-all">
+                            <div class="tnc-search-input-wrap tn-border-deep tn-widget-content">
+                                @RenderSection("SearchForm")
+                            </div>
+                        </div>
+                        @Html.Action("_SearchHotWords", "Channel", new { topNumber = 10, searcherCode, area = "Common" })
+                    </div>
+                </div>
+                <div class="tn-grid-3-1">
+                    <div class="tn-unit tn-first">
+                        <div class="tnc-main">
+                            @RenderBody()
+                        </div>
+                    </div>
+                    <div class="tn-unit">
+                        <div class="tnc-aside">
+                            @RenderSection("Aside")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tn-footer" class="tn-footer-bg">
+            <div class="tn-wrapper">
+                @Html.Action("_Footer", "Channel", new { area = "Common" })
+            </div>
+        </div>
+    </div>
+</body>
+</html>

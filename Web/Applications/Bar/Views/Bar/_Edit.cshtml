@@ -1,0 +1,141 @@
+﻿@model BarThreadEditModel
+@{
+    string title = Model.ThreadId > 0 ? "编辑帖子" : "发帖";
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+    int subjectCount = Model.Subject == null ? 0 : Model.Subject.Length;
+    var barSettings = ViewData.Get<BarSettings>("barSettings", new BarSettings());
+    BarSection barSection = ViewData.Get<BarSection>("BarSection", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-topic-eidt">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-topic-eidt-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>@title</h2>
+            </div>
+            @using (Html.BeginForm("Edit", "Bar", FormMethod.Post, new { id = "form-bar-edit" }))
+            {
+                <div class="tn-publish">
+                    <div class="tn-write-title">
+                        @Html.TextBoxFor(n => n.Subject, InputWidthTypes.Longest, new RouteValueDictionary { { "id", "bar-subject" }, { "maxlength", barSettings.ThreadSubjectMaxLength } })<span
+                            id="subjectCount" class="tn-count tn-text-note">@subjectCount/@barSettings.ThreadSubjectMaxLength</span>
+                        @Html.ValidationMessageFor(n => n.Subject)
+                    </div>
+                    <div class="tn-editor">
+                        @Html.HtmlEditorFor(model => Model.Body, new HtmlEditorOptions(HtmlEditorMode.Enhanced)
+                        .MergeHtmlAttribute("style", "height:400px;")
+                        .MergeHtmlAttribute("plugin", "ShortcutSubmit")
+                        .MergeHtmlAttribute("maxlength", barSettings.ThreadBodyMaxLength)
+                                                                    .AddPhotoButton(TenantTypeIds.Instance().BarThread(), Model.ThreadId)
+                                                                    .AddFileButton(TenantTypeIds.Instance().BarThread(), Model.ThreadId)
+                                                                    .AddAtUserButton()
+                                                                    .AddMusicButton()
+                                                                    .AddVideoButton())
+                    </div>
+                    @Html.ValidationMessageFor(n => n.Body)
+                    <div class="tn-form-box">
+                        <table>
+                            <tr>
+                                <th>
+                                    标签：
+                                </th>
+                                <td>@Html.TagSelector("TagNames", TenantTypeIds.Instance().BarThread(), Model.ThreadId, Model.SectionId)
+                                </td>
+                            </tr>
+                            @if (barSection.ThreadCategoryStatus != ThreadCategoryStatus.Disabled && barSection.ThreadCategories != null && barSection.ThreadCategories.Count() > 0)
+                            {
+                                <tr>
+                                    <th>
+                                        帖子分类：
+                                    </th>
+                                    <td>
+                                        @if (barSection.ThreadCategoryStatus == ThreadCategoryStatus.ForceEnabled)
+                                        {
+                                            @Html.DropDownList("BarThreadCategory", new SelectList(barSection.ThreadCategories, "CategoryId", "CategoryName", Model.CategoryId), new { @class = "tn-dropdownlist" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownList("BarThreadCategory", new SelectList(barSection.ThreadCategories, "CategoryId", "CategoryName", Model.CategoryId), "请选择", new { @class = "tn-dropdownlist" })
+                                        }
+                                    </td>
+                                </tr>
+
+                            }
+                            <tr class="tn-basic-set">
+                                <th>
+                                    基本设置：
+                                </th>
+                                <td>
+                                    <ul class="tn-checkbox-list">
+                                        <li>
+                                            @Html.CheckBoxFor(n => n.IsHidden, new { @class = "tn-checkbox" })
+                                            @Html.LabelFor(n => n.IsHidden)
+                                        </li>
+                                        @if (new Authorizer().BarSection_Manage(Model.SectionId))
+                                        {
+                                            <li>
+                                                @Html.CheckBoxFor(n => n.IsEssential, new { @class = "tn-checkbox" })
+                                                @Html.LabelFor(n => n.IsEssential)
+                                            </li>
+                                            <li>
+                                                @Html.CheckBoxFor(n => n.IsSticky, new { @class = "tn-checkbox" })
+                                                @Html.LabelFor(n => n.IsSticky)
+                                            </li>
+                                            <li class="tn-datepicker">
+                                                @SetStickyTime(Model.StickyDate)
+                                            </li>
+                                        }
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    &nbsp;
+                                </th>
+                                <td>
+                                    @Html.Button(title, ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                                    @if (Request.UrlReferrer != null)
+                                    {
+                                        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, ButtonSizes.Large, url: Request.UrlReferrer.PathAndQuery)
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    @Html.HiddenFor(n => n.ThreadId)
+                    @Html.HiddenFor(n => n.SectionId)
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@helper SetStickyTime(DateTime StickyTime)
+    {
+    <text> 
+    <div @(!Model.IsSticky ? "style=display:none" : "") id="settime-stickyTime">
+        <div id="time-stickyTime-show" @(StickyTime.CompareTo(DateTime.UtcNow) <= 0 ? "style=display:none" : "")>
+            置顶截止时间： @StickyTime.ToFriendlyDate(false, "yyyy-MM-dd") <a id="time-edit">编辑</a></div>
+        <div id="time-stickyTime-edit" @(StickyTime.CompareTo(DateTime.UtcNow) > 0 ? "style=display:none" : "")>
+            置顶截止时间： @Html.DatePicker("StickyDate", DateTime.Now, "0", null)
+        </div>
+    </div>
+    <script type="text/javascript" language="javascript">
+        $("#time-edit").click(function (e) {
+            e.preventDefault();
+            $("#time-stickyTime-edit").show();
+            $("#time-stickyTime-show").hide();
+        });
+    </script>
+    </text>
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //截字
+        $("#bar-subject").GetTextCount('subjectCount', @barSettings.ThreadSubjectMaxLength, true);
+        //点击置顶
+        $("input[id='IsSticky'][type='checkbox']").click(function () {
+            $("#settime-stickyTime").toggle();
+        });
+    });
+</script>

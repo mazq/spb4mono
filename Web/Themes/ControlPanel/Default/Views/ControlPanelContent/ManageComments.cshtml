@@ -1,0 +1,223 @@
+﻿@model PagingDataSet<Comment>
+@{
+    Layout = "_ControlPanel";
+    AuditStatus? auditStatus = Request.QueryString.Get<AuditStatus?>("auditStatus", null);
+    var userId = ViewData.Get<long?>("userId", null);
+    SelectList tenants = ViewData.Get<SelectList>("tenants", null);
+    Dictionary<string, string> tenantsDic = tenants.ToDictionary(n => n.Value, n => n.Text);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>评论管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageComments", "ControlPanelContent", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    作者：</label>
+                                @Html.UserSelector("userId", userId)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    所属：</label>
+                                @Html.DropDownList("tenantTypeId", tenants, "所有", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    审核状态：</label>
+                                @(Html.EnumDropDownList<AuditStatus?>("auditStatus", auditStatus, "全部", new { @class = "tn-dropdownlist" }))
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    日期范围：</label>
+                                @Html.DatePicker("startDate", Request.QueryString.Get<DateTime>("startDate"), "-5Y", "+0D")
+                                -
+                                @Html.DatePicker("endDate", Request.QueryString.Get<DateTime>("endDate"), "-5Y", "+0D")
+                            </div>
+                            <div class="tn-form-row tn-form-row-button">
+                                <label class="tn-form-label">
+                                    &nbsp;
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "search" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("通过审核", SiteUrls.Instance()._UpdateCommentAuditStatus(AuditStatus.Success), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "batch-audit-success" })
+                            @Html.LinkButton("不通过审核", SiteUrls.Instance()._UpdateCommentAuditStatus(AuditStatus.Fail), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "batch-audit-fail" })
+                            @Html.LinkButton("删除", SiteUrls.Instance()._DeleteComments(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-comments" })
+                        </div>
+                    </div>
+                    @if (Model != null && Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else if (Model != null)
+                    {
+                        <form action="#" method="post" id="Form-BatchSet">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" class="tn-checkbox" id="select-all" name="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        评论内容
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        审核状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        所属
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        作者
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        发布时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (Comment comment in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("commentIds", comment.Id, isChecked: true, htmlAttributes: new { @class = "tnui-comment-id" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @if (string.IsNullOrEmpty(HtmlUtility.TrimHtml(comment.Body, 100)))
+                                            {
+                                                <text>&nbsp;</text>
+                                            }
+                                            else
+                                            { 
+                                                @Html.Link(HtmlUtility.TrimHtml(comment.Body, 100), comment.GetCommentDetailUrl(), HtmlUtility.TrimHtml(comment.Body, 0), navigateTarget: HyperLinkTarget._blank)
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1 tn-nowrap">
+                                            @Html.AuditStatusIcon(comment.AuditStatus)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                            @if (tenantsDic.ContainsKey(comment.TenantTypeId))
+                                            { 
+                                                @(tenantsDic[comment.TenantTypeId])
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @if (comment.UserId != 0)
+                                            {
+                                                @Html.Link(StringUtility.Trim(comment.Author, 8), SiteUrls.Instance().SpaceHome(@comment.UserId), comment.Author, htmlAttributes: new { @class = "tn-user-name" }, navigateTarget: HyperLinkTarget._blank)
+                                            }
+                                            else
+                                            {
+                                                <text>@StringUtility.Trim(comment.Author, 8)</text>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @comment.DateCreated.ToUserDateString(true)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                                            @Html.Link("删除", SiteUrls.Instance()._DeleteComments(comment.Id), "删除该条评论", new { @class = "tn-action-text tnui-delete-comment", id = "delete-comment" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removechecked();
+        function removechecked() {
+            $(".tnui-comment-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //全选按钮
+        $("input#select-all").click(function () {
+            checkAll(this, "commentIds");
+        });
+
+        //批量更改审核状态
+        $("a[id^='batch-']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='commentIds']:checked").length) {
+                alert("至少选择一条评论操作");
+                return false;
+            }
+            var url = $(this).attr("href");
+            $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                setTimeout(function () { window.location.reload(true); }, 500);
+            });
+        });
+
+        //点批量删除
+        $("#delete-comments").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='commentIds']:checked").length) {
+                alert("至少选择一条评论操作");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    setTimeout(function () { window.location.reload(true); }, 500);
+                });
+                removechecked();
+            });
+        });
+
+        //单个删除
+        $('.tnui-delete-comment').click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, function (data) {
+                    if (data) {
+                        art.dialog.tips("删除成功！", 1.5, 1);
+                        setTimeout(function () { window.location.reload(true); }, 500);
+                    }
+                });
+            });
+        });
+    });
+</script>

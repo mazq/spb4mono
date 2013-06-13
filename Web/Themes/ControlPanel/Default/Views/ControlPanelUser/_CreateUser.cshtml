@@ -1,0 +1,94 @@
+﻿@model ManageUsersCreateEditModel
+@{
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+}
+<div id="createUserDialog">
+    @Html.StatusMessage(statusMessageData)
+    @using (Html.BeginAjaxForm("_CreateUser", "ControlPanelUser", new { }, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "success" }, new { id = "CreateUserForm" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right  tnc-label-short  tnc-addusers">
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        @Html.LabelFor(m => m.AccountEmail)：</label>
+                    @Html.TextBoxFor(m => m.AccountEmail, InputWidthTypes.Long, new RouteValueDictionary { { "maxLength", 64 } })
+                    <div class="tn-explain">
+                        <label class="tn-form-label">
+                        </label>
+                        @Html.ValidationMessageFor(n => n.AccountEmail)
+                    </div>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        @Html.LabelFor(m => m.UserName)：</label>
+                    @Html.TextBoxFor(m => m.UserName, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", 64 } })
+                    <div class="tn-explain">
+                        <label class="tn-form-label">
+                        </label>
+                        @Html.ValidationMessageFor(n => n.UserName)
+                    </div>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        @Html.LabelFor(m => m.NickName)：</label>
+                    @Html.TextBoxFor(m => m.NickName, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", 64 } })
+                    <div class="tn-explain">
+                        <label class="tn-form-label">
+                        </label>
+                        @Html.ValidationMessageFor(n => n.NickName)
+                    </div>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        @Html.LabelFor(m => m.Password)：</label>
+                    @Html.PasswordFor(m => m.Password, new { @class = "tn-textbox tn-border-gray  tn-input-medium" })
+                    <div class="tn-explain">
+                        <label class="tn-form-label">
+                        </label>
+                        @Html.ValidationMessageFor(n => n.Password)
+                    </div>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        @Html.LabelFor(m => m.PassAgain)：</label>
+                    @Html.PasswordFor(m => m.PassAgain, new { @class = "tn-textbox tn-border-gray  tn-input-medium" })
+                    <div class="tn-explain">
+                        <label class="tn-form-label">
+                        </label>
+                        @Html.ValidationMessageFor(n => n.PassAgain)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "createButton" })
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+</div>
+<script type="text/dialog">
+    this.title("添加用户");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#createButton").click(function (e) {
+            e.preventDefault();
+            if ($("span[id='validation-email']").text() != "") {
+                return false;
+            }
+            if ($("span[id='validation-username']").text() != "") {
+                return false;
+            }
+            $('#CreateUserForm').submit();
+        });
+
+    });
+
+    function error(data) {
+        $("#createUserDialog").replaceWith(data.responseText);
+    }
+    function success(data) {
+        art.dialog.tips(data.MessageContent, 1.5, 1, function () { window.location.reload(); });
+    }
+</script>

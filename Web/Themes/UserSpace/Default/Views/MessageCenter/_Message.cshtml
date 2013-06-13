@@ -1,0 +1,49 @@
+﻿@model Tunynet.Common.Message
+@{
+    bool isFrame = (bool)ViewData["isFrame"];
+}
+@{
+
+    if (isFrame)
+    {
+        
+    @Html.Raw("<dl class=\"" + (Model.SenderUserId != UserContext.CurrentUser.UserId ? "tnc-letter-from" : "tnc-letter-to") + "\"><dt>")
+    @Html.ShowUserAvatar(Model.SenderUserId, AvatarSizeType.Small)
+    @Html.Raw("</dt><dd class=\"tnc-sender-content\">")
+    @Html.Raw("<div class=\"tn-widget tn-bubble tn-bubble-arrow-right\">")
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+        </b>
+    </div>
+        if (Model.SenderUserId != UserContext.CurrentUser.UserId)
+        {
+    @Html.Raw("<div class=\"tn-bubble-content tn-widget-content tn-bg-gray tn-border-gray tn-corner-all\">")
+        }
+        else
+        {
+    @Html.Raw("<div class=\"tn-bubble-content tn-widget-content  tn-border-gray tn-corner-all\">")
+        }
+    }
+    <div id="msg_message_@(Model.MessageId)"  class="tnc-message-info tn-border-bottom tn-border-gray">
+        <p class="tnc-info-content">
+            <span class="tnc-sender-name">
+                @Html.Raw("我")：</span>@Html.Raw(Model.Body)</p>
+        <em class="tn-date tn-text-note"><span class="tn-action">
+            @Model.DateCreated.ToFriendlyDate()</span> <span name="operate_@(Model.MessageId)" class="tn-action" style=" display:none">
+                @Html.AjaxDeleteButton(new AjaxDeleteButton()
+                                     .SetConfirm("确认要删除私信内容吗")
+                                     .SetText("删除")
+                                     .SetTooltip("删除私信")
+                                     .SetDeleteTarget("#msg_message_" + Model.MessageId)
+                                     .SetUrl(Url.Action("DeleteMessage", new { messageId = Model.MessageId, sessionId = ViewData.Get<long>("sessionId", 0) }))
+                                     .SetOnSuccessCallBack("DeleteMessageSuccess"))
+            </span></em>
+    </div>
+    if (isFrame)
+    {
+    @Html.Raw("</div>")
+    @Html.Raw("</div>")
+    @Html.Raw("</dd>")
+    @Html.Raw("</dl>")
+    }
+}

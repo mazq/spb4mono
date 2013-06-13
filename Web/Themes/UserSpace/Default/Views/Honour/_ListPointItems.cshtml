@@ -1,0 +1,67 @@
+﻿@model IEnumerable<PointItem>         
+@{
+    IEnumerable<PointCategory> pointCategories = ViewData.Get<IEnumerable<PointCategory>>("pointCategories", new List<PointCategory>());
+    string rule = ViewData.Get<string>("pointRule", "");
+    string expName = ViewData.Get<string>("expPoint", "经验");
+    string traName = ViewData.Get<string>("traPoint", "交易");
+    string preName = ViewData.Get<string>("prePoint", "威望");
+    string s = string.Empty;
+}
+<div class="tnc-integral-rule">
+    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+        <h4>
+            积分规则</h4><a name="pointRule"></a>
+    </div>
+    <table class="tn-table-grid">
+        <tbody>
+            <tr class="tn-table-grid-header">
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    操作
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    @expName
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    @preName
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    @traName
+                </th>
+            </tr>
+            @foreach (var pointItem in Model)
+            {
+                <tr class="tn-table-grid-row">
+                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                        @pointItem.ItemName
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                        @pointItem.ExperiencePoints
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                        @pointItem.ReputationPoints
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                        @pointItem.TradePoints
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+        @foreach (var pointCategory in pointCategories)
+        {
+            s += pointCategory.QuotaPerDay + pointCategory.Unit + pointCategory.CategoryName;
+
+            s = s + "/";
+        }
+        @if (s.EndsWith("/"))
+        {
+            s = s.Remove(s.Length - 1);
+        }
+        <p>
+            • 每人每日积分上限： @s</p>
+        <p>
+            • 用户综合积分 = @rule
+        </p>
+    </div>
+</div>

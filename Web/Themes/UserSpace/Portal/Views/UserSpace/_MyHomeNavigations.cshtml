@@ -1,0 +1,44 @@
+﻿@{
+    ApplicationBase microblogApplication = ViewData.Get<ApplicationBase>("MicroblogApplication", null);
+    User user = ViewData.Get<User>("user", null);
+
+    IEnumerable<PresentAreaNavigation> navigations = ViewData.Get<IEnumerable<PresentAreaNavigation>>("navigations", null);
+    IEnumerable<ApplicationManagementOperation> appManagementOperations = ViewData.Get<IEnumerable<ApplicationManagementOperation>>("ApplicationManagementOperations", null);
+
+    bool showOperation = ViewData.Get<bool>("showOperation", false);
+}
+<div class="tnc-user-menu tnc-basic-menu tn-border-top tn-border-gray">
+    <ul class="tn-side-menu">
+        @if (!showOperation)
+        {
+            <li>@Html.Icon(IconTypes.Home)<a class="tn-menu-text" title="我的首页" href="@SiteUrls.Instance().MyHome(user.UserId)">
+                我的首页</a></li>
+            <li>@Html.Icon(IconTypes.Bubble)<a class="tn-menu-text" href="@SiteUrls.Instance().ListCommentsInBox(Url.SpaceKey(), null)">
+                我的评论</a></li>
+            <li><span class="tn-icon tn-icon-email"></span><a class="tn-menu-text" href="@SiteUrls.Instance().ListMessageSessions(Url.SpaceKey(), null)">
+                我的私信</a></li>
+            if (microblogApplication != null && microblogApplication.IsEnabled)
+            {
+            <li>@Html.Icon(IconTypes.Microblog)<a class="tn-menu-text" href="@SiteUrls.Instance().Mine(Url.SpaceKey(), null)">我的微博</a></li>
+            }
+        }
+        else if (appManagementOperations != null)
+        {
+            foreach (var appManagementOperation in appManagementOperations)
+            {
+                if (!appManagementOperation.IsVisible(UserContext.CurrentUser) || appManagementOperation.AssociatedNavigationId > 0)
+                {
+                    continue;
+                }
+            <li>
+                @if (!string.IsNullOrEmpty(appManagementOperation.IconName))
+                {
+                    @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), appManagementOperation.IconName, false))
+                }
+                <a class="tn-menu-text" href="@appManagementOperation.GetUrl(Url.SpaceKey(), Html.ViewContext.RouteData.Values)" target="@appManagementOperation.NavigationTarget">
+                    @appManagementOperation.OperationText</a></li>
+            }
+
+        }
+    </ul>
+</div>

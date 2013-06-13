@@ -1,0 +1,42 @@
+﻿@{
+    string question = ViewData.Get<string>("Question", null);
+}
+@using (Html.BeginAjaxForm("_ValidateQuestion", "ChannelGroup", new { groupId = Request.QueryString.Get<long>("groupId") }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            问题：
+                        </th>
+                        <td>
+                            @Html.Label("Question", question)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            答案：
+                        </th>
+                        <td>
+                            @Html.TextArea("myAnswer", new RouteValueDictionary { { "maxlength", 120 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+    this.title("问题验证");
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+    }
+</script>

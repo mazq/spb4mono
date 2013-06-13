@@ -1,0 +1,81 @@
+﻿@model List<RecommendItem>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-top-group-master">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option">
+            @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().User()))
+            {
+                <a plugin="dialog" href="@SiteUrls.Instance()._ManageRecommendItems("00001111",false)">管理</a>
+            }
+        </div>
+        <h3 class="tn-helper-reset">
+            人气群主</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <div class="tnc-person-list">
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (var item in Model)
+                {
+                    var groupOwner = item.GetFullUser();
+                    string displayName = null;
+                    string url = null;
+                <ul class="tn-list ">
+                    <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+                        <div class="tn-list-item-area-left">
+                            @if (item.IsLink)
+                            {
+                                displayName = item.ItemName;
+                                url = item.LinkAddress;
+                                <a href="@url" target="_blank" title="@item.ItemName">@Html.ShowUserAvatar(null, AvatarSizeType.Small)</a>
+                            }
+                            else if (groupOwner != null)
+                            {
+                                displayName = groupOwner.DisplayName;
+                                url = SiteUrls.Instance().UserJoinedGroups(groupOwner.UserName);
+                                @Html.ShowUserAvatar(groupOwner, url, avatarSizeType: AvatarSizeType.Small)
+                            }
+                        </div>
+                        <div class="tn-list-item-area-main">
+                            <div class="tn-list-item-row tn-list-item-heading">
+                                <h5 class="tn-helper-reset">
+                                    <a href="@url">@displayName</a>
+                                </h5>
+                            </div>
+                            @if (!item.IsLink && groupOwner != null)
+                            {                        
+                                <div class="tn-list-item-row tn-list-item-summary">
+                                    <p>
+                                        群组：<a href="@SiteUrls.Instance().UserJoinedGroups(groupOwner.UserName)">
+                                            @groupOwner.JoinedGroupCount()
+                                        </a>
+                                    </p>
+                                    <p class="tn-user-data">
+                                        @if (groupOwner.Profile != null)
+                                        {
+
+                                            if (groupOwner.Profile.Gender == GenderType.Male)
+                                            { 
+                                            @Html.Icon(IconTypes.Male, "男")
+                                            }
+                                            else if (groupOwner.Profile.Gender == GenderType.FeMale)
+                                            { 
+                                            @Html.Icon(IconTypes.Female, "女")
+                                            }
+                                            <span class="tn-location">@Formatter.FormatArea(groupOwner.Profile.NowAreaCode)</span>                                        
+                                        }
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </li>
+                </ul>
+                }
+            }
+            else
+            {
+                <div class="tn-no-data">
+                    管理员还没推荐!</div> 
+            }
+        </div>
+    </div>
+</div>

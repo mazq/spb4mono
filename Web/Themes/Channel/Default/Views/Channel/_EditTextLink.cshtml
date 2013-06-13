@@ -1,0 +1,97 @@
+﻿@model LinkEditModel
+@{    
+    string title = "创建友情链接";
+    if (Model.LinkId > 0)
+    {
+        title = "编辑友情链接";
+    }
+}
+@using (Html.BeginAjaxForm("_EditTextLink", "Channel", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    <input type="hidden" name="ownerId" id="ownerId" value="" />
+    <input type="hidden" name="ownerType" id="ownerType" value="" />
+    <input type="hidden" name="linkId" value="@Model.LinkId" />
+    <div class="tn-form tn-label-right tnc-dailog-pd tnc-left-label-narrow" id="editTextLink">
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                链接名：</label>
+            @Html.TextBoxFor(n => n.LinkName, new { @class = "tn-textbox tn-border-gray", maxlength = 21 })
+            <input type="hidden" name="linkId" value="@Model.LinkId" />
+        </div>
+        <div class="tn-form-row" style="display: none">
+            <label class="tn-form-label">
+                &nbsp;</label>
+            @Html.ValidationMessageFor(n => n.LinkName)
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                链接地址：</label>
+            @Html.TextBoxFor(n => n.LinkUrl, new { @class = "tn-textbox tn-border-gray" })
+        </div>
+        <div class="tn-form-row" style="display: none">
+            <label class="tn-form-label">
+                &nbsp;</label>
+            @Html.ValidationMessageFor(n => n.LinkUrl)
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                是否启用：</label>
+            <ul class="tn-radiobutton-list">
+                <li>
+                    <input type="radio" id="enabled" name="isEnabled" value="true" @(Model.IsEnabled ? "checked=checked" : "")  class="tn-radiobutton" />
+                    <label for="enabled">
+                        是</label>
+                </li>
+                <li>
+                    <input type="radio" id="disabled" name="isEnabled" value="false" @(!Model.IsEnabled ? "checked=checked" : "") class="tn-radiobutton" />
+                    <label for="disabled">
+                        否</label>
+                </li>
+            </ul>
+        </div>
+        <div class="tn-form-row tn-form-row-button">
+            <label class="tn-form-label">
+                &nbsp;</label>
+            <button class="tn-button tn-corner-all tn-button-text-only tn-button-primary" type="submit">
+                <span class="tn-button-text">确定</span></button>
+            <button class="tn-button tn-corner-all tn-button-text-only tn-button-secondary" type="button" dialogoperation="close">
+                <span class="tn-button-text">取消</span></button>
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    this.title("@title");
+</script>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            $("#manageLinks").parent().load($("#ownerLinks a[id = 'manageLinks']")[0].href);
+            $.get($("#ownerLinks #ownerLinksUrl").val(), function (data) {
+                $("#ownerLinks").replaceWith(data);
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        $editTextLink = $("#editTextLink").parent();
+        $ownerLinks = $("#ownerLinks").parent();
+
+        //获取设置ownerId、ownerType
+        $("#ownerId", $editTextLink).val($("#ownerId", $ownerLinks).val());
+        $("#ownerType", $editTextLink).val($("#ownerType", $ownerLinks).val());
+
+        //是否启用、链接地址初始化
+        if (!$("#LinkName", $editTextLink).val()) {
+            $(":radio[value='true']", $editTextLink)[0].checked = true;
+            $("#LinkUrl", $editTextLink).val("http://");
+        }
+
+        //处理验证信息所在行的空白
+        function monitor() {
+            $(".field-validation-valid").parent().hide();
+            $(".field-validation-error").parent().show();
+            setTimeout(monitor, 100);
+        }
+        monitor();
+    });
+</script>

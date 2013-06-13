@@ -1,0 +1,45 @@
+﻿@{
+    ShareDisplayType ShareToThirdDisplayType = ViewData.Get<ShareDisplayType>("ShareToThirdDisplayType", ShareDisplayType.Word);
+    ShareDisplayIconSize ShareDisplayIconSize = ViewData.Get<ShareDisplayIconSize>("ShareDisplayIconSize", ShareDisplayIconSize.middle);
+}
+@switch (ShareToThirdDisplayType)
+{
+    case ShareDisplayType.Word:
+        <div id="bdshare" class="bdshare_t bds_tools get-codes-bdshare">
+            <span class="bds_more">分享到：</span> <a class="bds_qzone">QQ空间</a> 
+            <a class="bds_tsina">新浪微博</a> 
+            <a class="bds_tqq">腾讯微博</a> 
+            <a class="bds_renren">人人网</a> 
+            <a class="bds_t163"> 网易微博</a>
+        </div>
+        break;
+    case ShareDisplayType.Icon:
+        switch (ShareDisplayIconSize)
+        {
+            case ShareDisplayIconSize.Big:
+                @Html.Raw("<div id='bdshare' class='bdshare_t bds_tools_32 get-codes-bdshare'>")
+                break;
+            case ShareDisplayIconSize.middle:
+                @Html.Raw("<div id='bdshare' class='bdshare_t bds_tools get-codes-bdshare'>")
+                break;
+            case ShareDisplayIconSize.small:
+                @Html.Raw("<div id='bdshare' class='bdshare_t bds_tools get-codes-bdshare'>")
+                break;
+        }
+        <span class="bds_more">分享到：</span>
+        <a class="bds_qzone"></a>
+        <a class="bds_tsina"></a>
+        <a class="bds_tqq"></a>
+        <a class="bds_renren"></a>
+        <a class="bds_t163"></a>
+        @Html.Raw("</div>")
+        break;
+    case ShareDisplayType.Sidebar:
+        <script type="text/javascript" id="bdshare_js" data="type=slide&amp;img=0&amp;pos=right&amp;uid=0"></script>
+        break;
+}
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=0"></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date() / 3600000);
+</script>

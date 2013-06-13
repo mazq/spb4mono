@@ -1,0 +1,66 @@
+﻿@model IEnumerable<RecommendItem>
+@*@{
+    Dictionary<long, string> recommendNames = ViewData.Get<Dictionary<long, string>>("recommendNames", null);
+ }*@
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-thumb-carousel">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option">
+            @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BarSection()))
+            {
+                <a href="@SiteUrls.Instance()._ManageRecommendItems("10120101",false)" plugin="dialog">管理</a>
+            }
+        </div>
+        <h3 class="tn-helper-reset">
+            推荐帖吧</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model.Count() > 0)
+        { 
+            <ul class="tn-list">
+                @foreach (var item in Model)
+                {
+                    var bar = item.GetBarSection();
+                    <li class="tn-list-item ">
+                        <div class="tnc-item-wrap tn-helper-clearfix">
+                            <div class="tn-list-item-area-left">
+                                <div class="spb-smallbar-figure">
+                                    <a href="@item.ItemName" title="@item.ItemName">
+                                        @if (bar != null)
+                                        { 
+                                            <img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" width="50px" height="50px" title="@item.ItemName" alt="@item.ItemName"/>
+                                        }
+                                        else
+                                        { 
+                                            <img src="@SiteUrls.Instance().LogoUrl(null, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium())" width="50px" height="50px" title="@item.ItemName" alt="@item.ItemName"/>
+                                        }
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-list-item-heading">
+                                    <h5 class="tn-helper-reset">
+                                        <a href="@item.DetailUrl" title="@item.ItemName"><span>@item.ItemName</span></a>
+                                    </h5>
+                                </div>
+                                @if (bar != null)
+                                { 
+                                    <div class="tn-list-item-row">
+                                        <p>
+                                            <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)">帖子（@bar.ThreadAndPostCount）</a></p>
+                                        <p>
+                                            <a href="@SiteUrls.Instance().SectionMembers(bar.SectionId)">关注（@bar.FollowedCount）</a></p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        { 
+            <div class="tn-no-data">
+                暂无帖吧</div>
+        }
+    </div>
+</div>

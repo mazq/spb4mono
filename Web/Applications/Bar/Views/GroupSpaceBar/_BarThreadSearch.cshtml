@@ -1,0 +1,25 @@
+﻿<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-content-search">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @using (Html.BeginForm("Search", "GroupSpaceBar", FormMethod.Get, new { name = "barThreadSearchBox" }))
+        {
+            <div class="tn-search-box">
+                <input type="text" name="keyword" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl" value="@(Request.QueryString.Get<string>("keyword", string.Empty))" />
+                <span class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray required">
+                    <button type="submit">
+                        <span class="tn-icon tn-smallicon-find"></span>
+                    </button>
+                </span>
+            </div>
+        }
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("form[name='barThreadSearchBox']").submit(function () {
+            //如果内容是无效的，阻止提交
+            if ($(this).find("input[name='keyword']").val() == "") {
+                return false;
+            }
+        });
+    });
+</script>

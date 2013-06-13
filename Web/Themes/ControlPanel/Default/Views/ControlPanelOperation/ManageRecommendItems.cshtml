@@ -1,0 +1,151 @@
+﻿@model PagingDataSet<RecommendItem>
+@{
+    Layout = "_ControlPanel";
+    SelectList tenantList = ViewData.Get<SelectList>("tenantList", null);
+    Dictionary<string, string> tenantDic = tenantList.ToDictionary(n => n.Value, n => n.Text);
+    string tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", null);
+    SelectList typelist = ViewData.Get<SelectList>("typeList", null);
+    Dictionary<string, string> typeDic = typelist.ToDictionary(n => n.Value, n => n.Text);
+    string typeId = Request.QueryString.Get<string>("recommendTypeId", null);
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>内容推荐</span><a class="tn-action" href="@SiteUrls.Instance().ManageRecommendTypes()" >推荐类别</a></h1>
+            <div class="tnc-ctnright-list">
+                @using (Html.BeginForm("ManageRecommendItems", "ControlPanelOperation", FormMethod.Get, new { id = "ManageRecommendItemsForm" }))
+                {
+                    <div class="tnc-content-manage">
+                        <div class="tn-list-header">
+                            <div class="tn-toolbar-area tn-helper-clearfix">
+                                <div class="tn-filter tn-helper-left">
+                                    <label class="tn-form-label">
+                                        所属：</label>
+                                    @Html.DropDownList("tenantTypeId", tenantList, "全部", new {@class="tn-dropdownlist" ,id = "tenantListids" })
+                                    <label class="tn-form-label">
+                                        推荐类别：</label>
+                                    @Html.DropDownList("recommendTypeId", typelist, "全部", new {@class="tn-dropdownlist",id = "typeListids" })
+                                    <label class="tn-form-label">
+                                        站外链接：</label>
+                                    @Html.DropDownList("isLink", null, "不限", new {@class="tn-dropdownlist",id = "isLinks" })
+                                </div>
+                            </div>
+                        </div>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                                
+                            <table class="tn-table-grid">
+                                
+                                    <tr class="tn-table-grid-header">
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            推荐标题
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            推荐类别
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            所属
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            推荐人
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            推荐日期
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            过期日期
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            操作
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        </th>
+                                    </tr>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr class="tn-table-grid-row" id ="RecommendItem_@(item.Id)"  data-id="@item.Id" >
+                                            <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                                               @*@item.ItemName*@
+                                               @if (item.TenantTypeId == "100302")
+                                               { 
+                                                    @Html.Link(item.ItemName, item.DetailUrl, item.ItemName, new { plugin = "dialog" })
+                                               }
+                                               else
+                                               { 
+                                                    @Html.Link(item.ItemName, item.DetailUrl, item.ItemName, navigateTarget: HyperLinkTarget._blank)
+                                               }
+                                               </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-category tn-nowrap">
+                                                @if (typeDic.ContainsKey(item.TypeId))
+                                                {
+                                                    @typeDic[item.TypeId]
+                                                }
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-category tn-nowrap">
+                                                @if (tenantDic.ContainsKey(item.TenantTypeId))
+                                                {
+                                                    @tenantDic[item.TenantTypeId]
+                                                }
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-user-name tn-nowrap">
+                                                @Html.Link(item.ReferrerName, SiteUrls.Instance().SpaceHome(item.ReferrerId), item.ReferrerName, navigateTarget: HyperLinkTarget._blank)
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-date tn-nowrap">
+                                                @item.DateCreated.ToUserDateString()
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-date tn-nowrap">
+                                            @if ((item.ExpiredDate.Year - DateTime.UtcNow.Year) > 10)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                 @item.ExpiredDate.ToUserDateString()
+                                            }
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-icon1">
+                                                @Html.Link("上移", SiteUrls.Instance().ChangeRecommendOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "display-order-" + "up" + item.Id, name = item.Id })
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-icon1">
+                                                @Html.Link("下移", SiteUrls.Instance().ChangeRecommendOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "display-order-" + "down" + item.Id, name = item.Id })
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-action2 tn-nowrap">
+                                                @Html.Link("编辑", SiteUrls.Instance()._RecommendItem(recommendId: item.Id), "编辑", new { plugin = "dialog" })
+
+                                                @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定删除吗？").SetText("删除").SetTooltip("删除按钮")
+                                                  .SetDeleteTarget("#RecommendItem_" + item.Id)
+                                                  .SetUrl(SiteUrls.Instance()._DeleteRecommendItem(item.Id)))
+                                            </td>
+                                        </tr>
+                                    }
+                               
+                            </table>
+                            <div class="tn-pagination">
+                                @Html.PageSizeDropdownList("pageSize")
+                                @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                                @Html.PagingResults(Model) 
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="tn-no-data">
+                                搜索不到数据!</div> 
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" >
+    $(document).ready(function () {
+        $("#tenantListids,#typeListids,#isLinks").change(function (e) {
+            $("form#ManageRecommendItemsForm").submit();
+        });
+    });
+</script>

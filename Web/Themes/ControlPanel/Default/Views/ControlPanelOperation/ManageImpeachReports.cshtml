@@ -1,0 +1,263 @@
+﻿@model PagingDataSet<ImpeachReportEntity>
+@{
+    Layout = "_ControlPanel";
+    bool isDisposed = Request.QueryString.Get<Boolean>("isDisposed", false);
+    ImpeachReason? impeachReason = Request.QueryString.Get<ImpeachReason?>("impeachReason", null);
+}
+
+<div class="tn-block  tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>用户举报</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        <div class="tn-tabs">
+                            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                                <li class="tn-widget-content tn-border-gray tn-border-trl @(isDisposed == false ? "tn-tabs-selected" : "")"><a href="@SiteUrls.Instance().ManageImpeachReports(impeachReason, false)">未处理</a></li>
+                                <li class="tn-widget-content tn-border-gray tn-border-trl @(isDisposed == true ? "tn-tabs-selected" : "")"><a href="@SiteUrls.Instance().ManageImpeachReports(impeachReason, true)">已处理</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @if (isDisposed == false)
+                            {
+                                @Html.LinkButton("标识为已处理", SiteUrls.Instance()._DisposeReports(null), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "dispose-reports" })
+                            }
+                            @Html.LinkButton("删除", SiteUrls.Instance()._DeleteReports(null), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-reports" })
+                            <span class="tn-helper-right">@Html.EnumDropDownList("impeachReason", impeachReason, "举报原因", new { @class = "tn-dropdownlist" })</span>
+                        </div>
+                    </div>
+                </div>
+                @if (Model == null || Model.Count == 0)
+                {
+                    <div class="tn-no-data">
+                        没有查询到数据！</div> 
+                }
+                else
+                { 
+                    <form action="#" method="post" id="Form-BatchSet">
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header">
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    <input type="checkbox" class="tn-checkbox" id="select-all" name="checkbox" />
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    举报内容标题
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    举报人
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    举报原因
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    附加说明
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    举报时间
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    最后修改时间
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    @if (isDisposed == true)
+                                    { 
+                                        @:处理结果
+                                    }
+                                    else
+                                    {
+                                        @:操作
+                                                                        }
+                                </th>
+                            </tr>
+                            @foreach (ImpeachReportEntity report in Model)
+                            {
+                                <tr class="tn-table-grid-row">
+                                    <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                        @Html.SipmleCheckBox("reportIds", report.ReportId, isChecked: true, htmlAttributes: new { @class = "tnui-report-id" })
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @{
+                                string title = "暂无标题";
+                                if (!string.IsNullOrEmpty(report.Title.Trim()))
+                                {
+                                    title = StringUtility.Trim(report.Title.Trim(), 10);
+                                }
+                                    
+                                            <a href="@report.Url" target="_blank" title="@report.Title.Trim()">@title</a>
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @if (report.UserId > 0)
+                                        {       //登陆用户，跳转到个人主页
+                                            @Html.Link(report.Reporter, SiteUrls.Instance().SpaceHome(report.UserId), report.Reporter.Trim(), navigateTarget: HyperLinkTarget._blank)
+                                        }
+                                        else
+                                        {  //匿名用户，跳出创建时的模式框
+                                            @Html.Link(report.Reporter, SiteUrls.Instance()._AnonymityReporterInfo(report.ReportId), report.Reporter.Trim(), new { plugin = "dialog" })
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @if (report.Reason != null)
+                                        { 
+                                            @report.Reason.EnumMetadataDisplay()
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                                        @if (string.IsNullOrEmpty(report.Description))
+                                        {
+                                            <text>&nbsp;</text>
+                                        }
+                                        else
+                                        {                                            
+                                            <a href="javascript:void(0)" class="tn-action-text tnui-description-detail" description="@report.Description.Trim()">@StringUtility.Trim(report.Description, 30)</a>                                           
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @report.DateCreated.ToUserDateString(true)
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @report.LastModified.ToUserDateString(true)
+                                    </td>
+                                    @if (isDisposed == false)
+                                    { 
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @Html.Link("标记为已处理", SiteUrls.Instance()._DisposeReports(report.ReportId), "标记为已处理", new { @class = "tn-action-text tnui-dispose-report", id = "dispose-report" })
+                                            @Html.Link("删除", SiteUrls.Instance()._DeleteReports(report.ReportId), "删除", new { @class = "tn-action-text tnui-delete-report", id = "delete-report" }, navigateTarget: HyperLinkTarget._blank)
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        var user = report.Disposer;
+                                        string disposer = string.Empty;
+                                        if (user != null)
+                                        {
+                                            disposer = user.DisplayName;
+                                        }
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @if (!string.IsNullOrEmpty(disposer))
+                                            { 
+                                                @Html.Link(disposer, SiteUrls.Instance().SpaceHome(report.DisposerId), disposer, new { @class = "tn-action-text tnui-disposer-info", id = "disposer-info", target = "_blank" })
+                                            }
+                                            <span>已处理</span>
+                                        </td>
+                                    }
+                                </tr> 
+                            }
+                        </tbody>
+                    </table>
+                    </form>
+                    <div class="tn-pagination">
+                        @Html.PageSizeDropdownList("pageSize")
+                        @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                        @Html.PagingResults(Model)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removechecked();
+        function removechecked() {
+            $(".tnui-report-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+        //全选按钮
+        $("input#select-all").click(function () {
+            checkAll(this, "reportIds");
+        });
+
+        //批量处理
+        $("a[id^='dispose-reports']").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='reportIds']:checked").length) {
+                alert("至少选择一个举报操作");
+                return false;
+            }
+            var url = $(this).attr("href");
+            $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+            });
+        });
+
+        //单个处理
+        $('.tnui-dispose-report').click(function (e) {
+            e.preventDefault();     //阻止处理操作进行，转为Post
+            var url = $(this).attr("href");
+            $.post(url, function (data) {
+                if (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                }
+            });
+        });
+
+        //批量删除
+        $("#delete-reports").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='reportIds']:checked").length) {
+                alert("至少选择一个举报操作");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('确定要删除选中的举报吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                });
+                removechecked();
+            });
+        });
+
+        //单个删除
+        $('.tnui-delete-report').click(function (e) {
+            e.preventDefault();     //阻止删除操作进行，添加删除提示
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('确定要删除该举报吗？', function () {
+                $.post(url, function (data) {
+                    if (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                    }
+                });
+            });
+        });
+    });
+
+
+    //实现举报原因下拉框的即时搜索
+    $("#impeachReason").change(function (e) {
+        window.location.href = '@SiteUrls.Instance().ManageImpeachReports(isDisposed: @isDisposed)&impeachReason=' + $(this).val();
+    });
+
+    //点击描述弹出模式框
+    $(".tnui-description-detail").click(function (e) {
+        var description = $(this).attr('description');
+        art.dialog({ title: '描述', content: '<div class="tnc-dailog-pd tn-simple-text tnc-report-detail">' + description + '</div>' });
+    });
+
+</script>

@@ -1,0 +1,113 @@
+﻿
+@{
+    string experienceCoefficient = ViewData.Get<string>("ExperienceCoefficient", string.Empty);
+    string reputationCoefficient = ViewData.Get<string>("ReputationCoefficient", string.Empty);
+    string tax = ViewData.Get<string>("Tax", string.Empty);
+    string experiencePoints = ViewData.Get<string>("ExperiencePoints", string.Empty);
+    string reputationPoints = ViewData.Get<string>("ReputationPoints", string.Empty);
+
+    IEnumerable<PointCategory> pointCategories = ViewData.Get<IEnumerable<PointCategory>>("PointCategories", new List<PointCategory>());
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+}
+@Html.StatusMessage(statusMessageData)
+@using (Html.BeginAjaxForm("EditPointSettings", "ControlPanelSettings", new { }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("success"), new { id = "PointSettingsForm" }))
+{
+    
+    <div class="tnc-integral_rulesetting">
+        <div class="tn-form tn-label-right tn-border-gray">
+            <div class="tn-text-heading">
+                <strong>总体规则</strong></div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    用户综合积分：</label>
+
+                @experiencePoints×@Html.TextBox("Experience", experienceCoefficient, InputWidthTypes.Short)
+                +@reputationPoints×@Html.TextBox("Reputation", reputationCoefficient, InputWidthTypes.Short)
+            </div>
+            <div class="tn-form-row" id="taxDiv">
+                <label class="tn-form-label">
+                    积分交易税：</label>
+
+                @Html.TextBox("Tax", tax, InputWidthTypes.Short) %
+            </div>
+        </div>
+        <div class="tn-form-box  tn-border-gray">
+            <div class="tn-text-heading">
+                <strong>积分名称/单位</strong></div>
+            <table class="tn-table-grid">
+                <tbody>
+                    <tr class="tn-table-grid-header">
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            积分名称
+                        </th>
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            单位
+                        </th>
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            每人每日限额
+                        </th>
+                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                            积分说明
+                        </th>
+                    </tr>
+                    @foreach (var item in pointCategories)
+                    {
+                        <tr class="tn-table-grid-row">
+                            <td>
+                                @Html.TextBox(item.CategoryKey + "PointName", item.CategoryName, InputWidthTypes.Medium)
+                            </td>
+                            <td>
+                                @Html.TextBox(item.CategoryKey + "Unit", item.Unit, InputWidthTypes.Short)
+                            </td>
+                            <td>
+                                @Html.TextBox(item.CategoryKey + "QuotaPerDay", item.QuotaPerDay.ToString(), InputWidthTypes.Short)
+                            </td>
+                            <td>
+                                @item.Description
+                            </td>
+                        </tr>            
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, null, new { id="saveButton"})
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+  
+
+}
+<script type="text/dialog">
+    this.title("修改积分设置");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#Tax").focusout(function () {
+            var tax = $("#Tax").val();
+            if (tax > 100 || tax < 0) {
+
+                $("#taxDiv").append('<span class="tn-text-bright" generated="true" id="taxspan">税额超出限制</span>');
+                $("#saveButton").attr("disabled", "disabled");
+            }
+            else {
+                $("#taxspan").remove();
+                $("#saveButton").removeAttr("disabled");
+            }
+        });
+
+        $("#Tax").focusin(function () {
+            $("#taxspan").remove();
+        });
+
+    })
+
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+    }
+</script>

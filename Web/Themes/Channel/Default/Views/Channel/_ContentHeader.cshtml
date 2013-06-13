@@ -1,0 +1,118 @@
+﻿@model IEnumerable<Navigation>
+@{
+    ApplicationBase application = ViewData.Get<ApplicationBase>("application", null);
+    IEnumerable<ApplicationManagementOperation> managementOperations = ViewData.Get<IEnumerable<ApplicationManagementOperation>>("ManagementOperations", new List<ApplicationManagementOperation>());
+    managementOperations = managementOperations.Where(n => n.ApplicationId == application.ApplicationId);
+
+    User currentUser = (User)UserContext.CurrentUser;
+
+    int currentNavigationId = 0;
+    if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+    {
+        currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+    }
+}
+<div class="tn-section tn-helper-clearfix">
+    @if (application != null)
+    {
+        <h2 class="tn-pagename">
+            <span class="tn-icon-special tn-special-icon-@application.ApplicationKey.ToLower()">
+            </span>@Tunynet.Globalization.ResourceAccessor.GetString("ApplicationName_" + application.ApplicationId, application.ApplicationId)</h2>
+    }
+    @if (currentUser != null)
+    {
+        if (managementOperations != null && managementOperations.Count() > 0)
+        {
+            
+        <div class="tn-shortcut">
+            @foreach (var managementOperation in managementOperations)
+            {
+                if (!managementOperation.IsVisible(UserContext.CurrentUser))
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(managementOperation.IconName))
+                {
+                @Html.LinkButton(managementOperation.OperationText, managementOperation.GetUrl(Html.ViewContext.RouteData.Values), HighlightStyles.Primary, ButtonSizes.Large, (IconTypes)Enum.Parse(typeof(IconTypes), managementOperation.IconName, false), htmlAttributes: new { target = managementOperation.NavigationTarget })
+                }
+                else
+                {
+                @Html.LinkButton(managementOperation.OperationText, managementOperation.GetUrl(Html.ViewContext.RouteData.Values), HighlightStyles.Primary, ButtonSizes.Large, htmlAttributes: new { target = managementOperation.NavigationTarget })
+                }
+            }
+        </div>
+        }
+    }
+</div>
+<div class="tn-submenu-area">
+    <div class="tn-submenu-inner">
+        <ul id="tn-submenu" class="tn-submenu tn-drop-menu tn-helper-clearfix">
+            @{ 
+                int i = 1, quitCount = 1;
+                string url = string.Empty;
+                
+                
+            }
+            @foreach (Navigation navigation in Model)
+            {
+                i++;
+                if (!navigation.IsVisible(UserContext.CurrentUser))
+                {
+                    continue;
+                }
+
+                url = navigation.GetUrl(Html.ViewContext.RouteData.Values);
+                url = string.IsNullOrEmpty(url) ? SiteUrls.Instance().Login(true) : url;
+                <li class="tn-submenu-item @if (navigation.IsCurrent(currentNavigationId))
+                                           {  @("tn-selected") }"><a class="tn-submenu-link" href="@url" target="@navigation.NavigationTarget">
+                                               @navigation.Text</a></li>
+                
+                                           if (quitCount >= 7)
+                                           {
+                                               break;
+                                           }
+                                           
+                                           quitCount++;
+
+            }
+            @if (Model.Count() > 7 && Model.Count() > i)
+            {
+                <li class="tn-submenu-item"><a class="tn-submenu-link" data_menu_clicktrigger="true"
+                    href="#">更多</a>
+                    <ul class="tn-widget-content tn-border-gray" style="display: none">
+                        @foreach (var navigation in Model.Skip(i))
+                        {
+                            if (!navigation.IsVisible(UserContext.CurrentUser))
+                            {
+                                continue;
+                            }
+                            url = navigation.GetUrl(Html.ViewContext.RouteData.Values);
+                            url = string.IsNullOrEmpty(url) ? SiteUrls.Instance().Login(true) : url;
+                            <li class="tn-submenu-item @if (navigation.IsCurrent(currentNavigationId))
+                                                       {  @("tn-selected") }"><a href="@url" target="@navigation.NavigationTarget">
+                                                           @navigation.Text</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function ($) {
+        $('#tn-submenu').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+        $(".tn-submenu ul a.tn-item-link").hover(
+		function () {
+		    $(this).addClass("tn-bg-gray");
+		},
+		function () {
+		    $(this).removeClass("tn-bg-gray");
+		}
+	);
+    });
+</script>

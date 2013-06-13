@@ -1,0 +1,96 @@
+﻿@{
+    UserSettingsMenu? menu = null;
+    try
+    {
+        menu = (UserSettingsMenu)ViewData["UserSettingsMenu"];
+    }
+    catch
+    {
+    }
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-set-menu">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                    <a href="@SiteUrls.Instance().PersonalInformation(Url.SpaceKey())">预览</a></div>
+                <h4>
+                    用户资料</h4>
+            </div>
+            <ul class="tn-side-menu">
+                <li @if (menu == UserSettingsMenu.UserProfile)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("基本资料", SiteUrls.Instance().EditUserProfile(Url.SpaceKey()), "基本资料", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+                <li @if (menu == UserSettingsMenu.UserEducation)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("教育经历", SiteUrls.Instance().EditUserEducation(Url.SpaceKey()), "教育经历", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+                <li @if (menu == UserSettingsMenu.UserWork)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("工作经历", SiteUrls.Instance().EditUserWork(Url.SpaceKey()), "工作经历", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+                <li @if (menu == UserSettingsMenu.UserTag)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("个人标签", SiteUrls.Instance().EditUserTags(Url.SpaceKey()), "个人标签", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+                <li @if (menu == UserSettingsMenu.UserAvatar)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("修改头像", SiteUrls.Instance().EditAvatar(Url.SpaceKey()), "修改头像", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+            </ul>
+        </div>
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    帐号设置</h4>
+            </div>
+            <ul class="tn-side-menu">
+                <li @if (menu == UserSettingsMenu.ChangePassword)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("修改密码", SiteUrls.Instance().ChangePassword(Url.SpaceKey()), "更改密码", new { @class = "tn-menu-text" })</li>
+                @if (new AccountBindingService().GetAccountTypes(true).Count() > 0)
+                { 
+                    <li @if (menu == UserSettingsMenu.UserAccount)
+                        { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                        }><a href="@SiteUrls.Instance().ManageAccountBindings(Url.SpaceKey())" class="tn-menu-text">
+                            帐号绑定</a></li>
+                }
+            </ul>
+        </div>
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    隐私设置</h4>
+            </div>
+            <ul class="tn-side-menu">
+                <li @if (menu == UserSettingsMenu.PrivacyUniversal)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("通用", SiteUrls.Instance().UserPrivacyItemsSettings(Url.SpaceKey()), "通用", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == UserSettingsMenu.UserBlacklist)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("黑名单", SiteUrls.Instance().Blacklist(Url.SpaceKey()), "黑名单", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == UserSettingsMenu.Blocked)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("屏蔽设置", SiteUrls.Instance().BlockUsers(Url.SpaceKey()), "屏蔽设置", new { @class = "tn-menu-text" })</li>
+            </ul>
+        </div>
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    界面相关</h4>
+            </div>
+            <ul class="tn-side-menu">
+                <li @if (menu == UserSettingsMenu.ManageApplications)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("应用管理", SiteUrls.Instance().UserManageApplications(Url.SpaceKey()), "应用管理", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == UserSettingsMenu.AddApplications)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("添加应用", SiteUrls.Instance().UserAddApplication(Url.SpaceKey()), "添加应用", new { @class = "tn-menu-text" })</li>
+                <li @if (menu == UserSettingsMenu.ManageNavigations)
+                    { @Html.Raw("class=\"tn-selected  tn-bg-gray tn-border-gray tn-corner-all\"");
+                    }>@Html.Link("导航管理", SiteUrls.Instance().ManagePresentAreaNavigations(Url.SpaceKey()), "导航管理", new { @class = "tn-menu-text" })</li>
+            </ul>
+        </div>
+    </div>
+</div>

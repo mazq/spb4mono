@@ -1,0 +1,108 @@
+﻿@model PagingDataSet<InvitationCode>
+@{
+    Layout = "_Follow";
+    IInviteFriendSettingsManager inviteFriendSettingsManager = DIContainer.Resolve<IInviteFriendSettingsManager>();
+    InviteFriendSettings inviteFriendSettings = inviteFriendSettingsManager.Get();
+    StatusMessageData statusMessageData = TempData["statusMessageData"] as StatusMessageData;
+    int codeUnUsedCount = ViewData.Get<int>("CodeUnUsedCount", 0);
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.inviteFriend.js", ResourceRenderPriority.Last);
+}
+@section ContentHeader{
+    <div class="spb-po-my-profile">
+        <div class="spb-po-my-profile-wrap tn-helper-clearfix">
+            @Html.Action("_MyHomeUserInfo", "UserSpace", new { spaceKey = Url.SpaceKey() })
+            @Html.Action("_SelectMenu", "UserSpace")
+        </div>
+    </div>
+}
+@section Aside{
+    @Html.Action("_FollowUser_Menu", "Follow", new { menu = FollowUserMenu.InviteFriend })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-invite-friend">
+            <div class="tn-form tn-label-right tnc-invite-links">
+                <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                    <h4>
+                        发送邀请链接给好友</h4>
+                    @Html.Link("查看成功邀请的好友", SiteUrls.Instance().InvitedFriends(Url.SpaceKey()), "查看成功邀请的好友")
+                </div>
+                @Html.StatusMessage(statusMessageData)
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                    </label>
+                    通过QQ、MSN、电子邮件等方式发送邀请链接给您的朋友，注册成功后你们会自动相互关注。
+                </div>
+                @if (inviteFriendSettings.AllowInvitationCodeUseOnce && codeUnUsedCount > 0)
+                {
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">
+                        </label>
+                        您现在有<span class="tn-color-light">@codeUnUsedCount</span>个邀请配额 ， @Html.LinkButton("领取邀请码", SiteUrls.Instance().GetNewInvite(Url.SpaceKey()), HighlightStyles.Primary)
+                    </div>
+                    
+                }
+                @Html.Partial("_InvitationCode", Model)
+                @if (inviteFriendSettings.AllowInvitationCodeUseOnce)
+                {
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">
+                        </label>
+                        @Html.LinkButton("购买配额", SiteUrls.Instance()._BuyInviteCount(Url.SpaceKey()), HighlightStyles.Secondary, htmlAttributes: new { plugin = "dialog" })
+                    </div>
+                }
+            </div>
+            <div class="tn-form tn-label-right tnc-invite-email">
+                <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                    <h4>
+                        邀请邮箱联系人</h4>
+                </div>
+                @Html.Action("_InviteFriendByEmail", "Follow")
+                @Html.Action("_InviteFriendByCsv", "Follow")
+            </div>
+            @Html.Action("_InviteFriendByUserInput", "Follow")
+            @*@Html.Action("_InviteFriendByMsn", "Follow")*@
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    //邀请成功的回调函数
+    function InviteSuccessCallBack(data) {
+        if (data.indexOf("MessageContent") > 0)
+            data = jQuery.parseJSON(data);
+
+        if (data.MessageContent) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        } else {
+            var dialog = art.dialog({ id: 'ChoiceUser', title: false, width: '730px' });
+            dialog.content(data);
+        }
+    }
+
+    $(document).ready(function () {
+        //绑定提交按钮
+        $("#attentionButton").live("click", function () {
+            //IE9一下的版本的浏览器，需要单独处理，可能是因为IE浏览的验证导致Form标签添加不上，所以需要重新组装一个Form进行提交
+            $form = $("#choiceUserForm").length > 0 ? $("#choiceUserForm") : $(".tnc-find-someone").wrap("<form id='choiceUserForm' action='@SiteUrls.Instance()._ChoiceUser(Url.SpaceKey())' method='POST'></form>").parents("form:first");
+            $form.ajaxSubmit({
+                beforeSubmit: function (arr, $form, options) {
+                    if (!$form.valid())
+                        return false;
+                    $form.block({
+                        message: '处理中'
+                    });
+                },
+                success: function (data, statusText, xhr, $form) {
+                    $form.unblock();
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { refresh(); });
+                    var list = art.dialog.list;
+                    for (var i in list) {
+                        if ($(list[i].content()).find($form).length)
+                            list[i].close();
+                    };
+                }
+            });
+            return false;
+        });
+    });
+</script>

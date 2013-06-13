@@ -1,0 +1,213 @@
+﻿@model SimpleHomeEditModel
+@{
+    var registrationMode = DIContainer.Resolve<IUserSettingsManager>().Get().RegistrationMode;
+
+    List<string> photos = new List<string>();
+    for (int i = 0; i < 3; i++)
+    {
+        photos.Add(Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/Channel/Default/Appearances/Default/Images/spb-intro{0}-bg.jpg", i + 1)));
+    }
+    photos.RemoveAt(0);
+}
+<!DOCTYPE html>
+<html>
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+    <style type="text/css">
+        html, body
+        {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+}
+<!--[if IE 6]>
+<script type="text/javascript" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Scripts/jquery/DD_belatedPNG/jquery.DD_belatedPNG-0.0.8a.js"))"></script>
+<![endif]-->
+<body class="spb-welcome-page">
+    <div class="spb-welcome-area">
+        <div class="spb-welcome-bg" id="photoContainer" data-photos="@Json.Encode(photos)">
+            <img id="body_background_imag" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Channel/Default/Appearances/Default/Images/spb-intro1-bg.jpg"))"/></div>
+        <div class="spb-welcome-wrap" id="loginBody" style="display: none;">
+            <div class="spb-welcome-profile">
+                <div class="spb-welcome-logo">
+                    <h1>
+                        Spacebuilder</h1>
+                </div>
+                <div class="spb-welcome-slogan">
+                    <p>
+                        社会化，更简单</p>
+                </div>
+            </div>
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+            { 
+                <div class="spb-welcome-login">
+                    <div class="spb-welcome-id">
+                        <div class="spb-welcome-textbox">
+                            @Html.TextBoxFor(n => n.UserName, new { @class = "tn-textbox tn-border-gray" })
+                        </div>
+                        <div class="spb-welcome-option">
+                            @if (registrationMode == RegistrationMode.All)
+                            { 
+                                <a class="spb-welcome-link" tabindex="-1" href="@SiteUrls.Instance().Register()">注册帐户</a>
+                            }
+                            @{
+                            IEnumerable<AccountType> accountTypes = new AccountBindingService().GetAccountTypes(true);
+                            if (accountTypes != null && accountTypes.Count() > 0)
+                            {
+
+                          
+                                <div class="spb-welcome-open-id">
+                                    <span class="spb-welcome-text">第三方帐号登录：</span>
+                                    @{
+                                foreach (var accountType in accountTypes)
+                                {
+                                        <a tabindex="-1" class="spb-welcome-open-icon spb-welcome-open-@accountType.AccountTypeKey" href="javascript:;" onclick="window.open('@SiteUrls.Instance().LoginToThird(accountType.AccountTypeKey)', 'ThirdLogin', 'width=600,height=500,menubar=0,scrollbars=0, status=1,titlebar=0,toolbar=0,location=1'); return false;">
+                                        </a>
+                                }
+                                    }
+                                </div>
+                            }
+                            }
+                        </div>
+                    </div>
+                    <div class="spb-welcome-password">
+                        <div class="spb-welcome-textbox">
+                            @Html.TextBoxFor(n => n.Password, new { type = "password", @class = "tn-textbox tn-border-gray" })
+                        </div>
+                        <div class="spb-welcome-option">
+                            <span class="spb-welcome-remember">
+                                @Html.CheckBoxFor(n => n.RememberPassword, new { @class = "tn-checkbox" })
+                                <label for="RememberPassword">
+                                    记住密码</label>
+                            </span><a class="spb-welcome-link" tabindex="-1" href="@SiteUrls.Instance().FindPassword()">
+                                忘记密码</a></div>
+                    </div>
+                    <div class="spb-welcome-btn">
+                        <div class="spb-welcome-login-btn">
+                            @Html.Button("登录", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                        </div>
+                        <p class="spb-welcome-look">
+                            <a tabindex="-1" href="@SiteUrls.Instance().SiteHome()">随便看看</a></p>
+                    </div>
+                </div>
+
+            }
+            <div class="spb-welcome-footer">
+                <p>
+                    Powered by Spacebuilder v4.0 ©2005-2013 Tunynet Inc.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#loginBody").fadeIn(1000);
+        }, 800);
+
+        //点击提交按钮
+        $("button#login-button-submit").click(function () {
+            $(this).parents("form").submit();
+        });
+
+        //响应回车事件
+        $("input").keydown(function (e) {
+            if (e.keyCode == 13) {
+                $(this).parents("form").submit();
+            }
+        });
+
+        //窗口改变大小
+        $(window).resize(function () {
+            bodyReSize($("#photoContainer img:first"));
+        });
+
+        $("#body_background_imag").data("imgWidth", $("#body_background_imag").width());
+
+        $("#body_background_imag").data("imgHeight", $("#body_background_imag").height());
+
+        bodyReSize($("#photoContainer img:first"));
+        playPhoto();
+
+        $("#body_background_imag").load(function () {
+            bodyReSize($("#body_background_imag"));
+            $("#body_background_imag").data("imgWidth", $("#body_background_imag").width());
+            $("#body_background_imag").data("imgHeight", $("#body_background_imag").height());
+        });
+
+        //背景图片自适应高度
+        function bodyReSize($img, fun) {
+            var imgHeight = $img.data("imgHeight");
+            var imgWidth = $img.data("imgWidth");
+            var isHeight = (imgWidth / imgHeight) > ($(window).width() / $(window).height());
+            $img.width(isHeight ? "auto" : $(window).width());
+            $img.height(isHeight ? $(window).height() : "auto");
+
+            if (isHeight) {
+                $img.css({ "margin-top": "0px" });
+                $img.css({ "margin-left": ($(document.body).width() - $(document.body).height() / (imgHeight / imgWidth)) / 2 + "px" });
+            } else {
+                $img.css({ "margin-top": ($(document.body).height() - $(document.body).width() * (imgHeight / imgWidth)) / 2 + "px" });
+                $img.css({ "margin-left": "0px" });
+            }
+            if (fun) {
+                fun();
+            }
+        }
+
+        //背景图片的自动切换
+        var photoUrls = $("#photoContainer").data("photos");
+
+        if (photoUrls.length) {
+            //加载图片
+            $(photoUrls).each(function (i) {
+                loadPhoto(photoUrls[i]);
+            });
+        }
+
+        //加载图片
+        function loadPhoto(src) {
+            var img = $("<img>");
+
+            img.load(function () {
+                $("#photoContainer").append(img);
+                img.data("imgHeight", img.height());
+                img.data("imgWidth", img.width());
+            });
+
+            img.attr("src", src);
+        }
+
+        //尝试播放下一张图片
+        function playPhoto() {
+            if ($("#photoContainer").children().length > 1) {
+                bodyReSize($("#photoContainer img:first"), function () {
+
+                    $("#photoContainer img:first").fadeOut(700, function () {
+                        $("#photoContainer img").hide();
+                        $(this).appendTo($("#photoContainer"));
+                        setTimeout(function () {
+                            bodyReSize($("#photoContainer img:first"), function () {
+                                $("#photoContainer img:first").fadeIn(700);
+                            });
+                        }, 500);
+                    });
+
+                });
+            }
+        }
+
+        //照片切换的事件，最起码要3500+ 推荐4000以上
+        setInterval(playPhoto, 15000);
+    });
+</script>

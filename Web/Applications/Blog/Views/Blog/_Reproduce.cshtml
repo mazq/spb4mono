@@ -1,0 +1,57 @@
+﻿@model BlogThreadEditModel
+@Html.StatusMessage()
+@using (Html.BeginForm("_Reproduce", "Blog", FormMethod.Post, new { id = "form-blog-edit" }))
+{
+@Html.HiddenFor(n => n.ThreadId)
+<div class="tnc-dailog-pd">
+    <div class="tn-form-box">
+    <table>
+        <tbody>
+        <tr>
+            <th>我的分类：</th>
+            <td>
+            @Html.DropDownList("OwnerCategoryIds", ViewData["ownerCategories"] as SelectList, "请选择", new { @class = "tn-dropdownlist" })
+            <a class="tn-create" href="@SiteUrls.Instance()._CreateMyCategory(UserContext.CurrentUser.UserName,TenantTypeIds.Instance().BlogThread())&callback=CreateMyCategoryCallBack" plugin="dialog" id="secongDialogThenFirstDialogNotClose">新建分类</a>
+            </td>
+        </tr>
+        <tr>
+            <th>设置标签： </th>
+            <td>
+            @Html.TagSelector("TagNames", TenantTypeIds.Instance().BlogThread(), null)
+            @Html.ValidationMessageFor(n => n.TagNames)
+            </td>
+        </tr>
+        <tr>
+            <th>隐私设置： </th>
+            <td>
+            @Html.Action("_PrivacyStatusSetter", "Channel", new
+                {
+                    area = "Common",
+                    userId = UserContext.CurrentUser.UserId,
+                    itemName = "PrivacyStatus",
+                    itemPrivacyStatus = Model.PrivacyStatus,
+                    selectedUserIds = ViewData["userPrivacySpecifyObjects"] as string,
+                    selectedUserGroupIds = ViewData["userGroupPrivacySpecifyObjects"] as string,
+                })                              
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+<div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+    @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+</div>
+}
+<script type="text/dialog">
+    this.title("转载日志");
+</script>
+<script>
+    function CreateMyCategoryCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            $("#OwnerCategoryIds").append("<option value='" + data.CategoryId + "'>" + data.CategoryName + "</option>");
+            $("#OwnerCategoryIds").val(data.CategoryId);
+        });
+    }
+</script>

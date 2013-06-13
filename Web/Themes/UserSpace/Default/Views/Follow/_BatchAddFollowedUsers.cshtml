@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Category>
+<div id="AddFollowUserDivInForm" class="tnc-group-sort">
+    @using (Html.BeginAjaxForm("_BatchAddFollowedUsers", "Follow", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "PointSettingsForm" }))
+    {
+        @Html.Hidden("followedUserIds")
+        <div class="tnc-dailog-pd">
+            <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                设置分组</div>
+            <ul class="tn-sort tn-helper-clearfix" id="groupContainer">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    foreach (Category category in Model)
+                    {
+                        <li>
+                            <label>
+                                @Html.SipmleCheckBox("categoryIds", category.CategoryId)@StringUtility.Trim(category.CategoryName, 5)
+                            </label>
+                        </li>
+                    }
+                }
+            </ul>
+            <div class="tn-create">
+                <span id="newGroupDiv" style="display: none">
+                    @Html.TextBox("newGroup", "", new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                    @Html.LinkButton("创建", SiteUrls.Instance().CreateNewGroup(Url.SpaceKey()), htmlAttributes: new { @id = "CreateNewGroup" })
+                </span>
+                @Html.LinkButton("创建分组", "javascript:;", iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "CreateGroup" })
+                @Html.LinkButton("取消", "javascript:;", htmlAttributes: new { id = "CannelCreateGroup", style = "display: none" })
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, null, new { id = "saveButton" })
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+<script type="text/dialog">
+    this.title('关注成功');
+</script> 
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+    }
+    $(function () {
+        $("#CreateNewGroup").bind("click", function (e) {
+            e.preventDefault();
+            $this = $(this);
+            var groupName = $("#newGroup").val();
+            $.post($(this).attr("href"), { groupName: groupName }, function (data) {
+                $("#groupContainer").append('<li><label><input type="checkbox" value="' + data.Data.groupId + '" name="categoryIds" class="tn-checkbox" checked="checked">' + data.Data.groupName + '</lable></li>')
+                cannelCreateGroup();
+            });
+        });
+
+        function cannelCreateGroup() {
+            $("#newGroup").val("");
+            $("#newGroupDiv").hide();
+            $("#CannelCreateGroup").hide();
+            $("#CreateGroup").show();
+        }
+
+        $("#CreateGroup").click(function () {
+            $("#newGroupDiv").show();
+            $("#CannelCreateGroup").show();
+            $("#CreateGroup").hide();
+        });
+
+        $("#CannelCreateGroup").click(function () {
+            cannelCreateGroup();
+        });
+    });
+</script>
+</div>

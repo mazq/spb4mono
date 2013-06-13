@@ -1,0 +1,140 @@
+﻿@{
+    Layout = "_UserSpace_Common";
+    Dictionary<long, string> followedUsers = ViewData.Get<Dictionary<long, string>>("followedUsers", new Dictionary<long, string>());
+    Dictionary<long, string> followerUsers = ViewData.Get<Dictionary<long, string>>("followerUsers", new Dictionary<long, string>());
+    User user = ViewData.Get<User>("user", new User());
+    IUser currUser = UserContext.CurrentUser;
+    bool seeFollow = ViewData.Get<bool>("seeFollow", false);
+    bool seeMessage = ViewData.Get<bool>("seeMessage", false);
+
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-profile">
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            @Html.Action("_UserInfo", new { spaceKey = Url.SpaceKey(), area = "Common" })
+            <div class="tnc-user-menu">
+                @Html.Action("_SelectMenu", new { spaceKey = Url.SpaceKey(), area = "Common" })
+            </div>
+            <div class="tn-info-part">
+                @Html.Action("_UserStatus", new { spaceKey = Url.SpaceKey(), area = "Common" })
+            </div>
+        </div>
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-tags">
+        @Html.Action("_TopUserTags", new { spaceKey = Url.SpaceKey(), area = "Common" })
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-privacy-intro-box">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-privacy-intro">
+            <h1>@user.DisplayName</h1>
+            <div class="tn-cue-highlight tn-corner-all tnc-noright tn-helper-clearfix">
+                <span class="tn-icon-large tn-largeicon-lock"></span>
+                <div class="tnc-noright-tips">
+                    <div class="tn-tip">
+                        由于空间主人的隐私设置，您不能查看其空间的内容！</div>
+                    <div class="tnc-actions">
+                        @* <a class="tn-button tn-corner-all tn-button-text-icon-primary tn-button-large tn-button-primary" id = "dialog-inviteFollow" href="@SiteUrls.Instance()._InviteFollow(Url.SpaceKey())">
+                            <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">求关注</span>
+                        </a>*@
+                        @if (seeFollow)
+                        {
+                            if (currUser == null)
+                            {
+                            <a class="tn-button tn-corner-all tn-button-text-icon-primary tn-button-large tn-button-primary" plugin="dialog" href="@SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal)">
+                                <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">求关注</span>
+                            </a>
+                            }
+                            else
+                            {
+                            <a class="tn-button tn-corner-all tn-button-text-icon-primary tn-button-large tn-button-primary" id = "dialog-inviteFollow" href="@SiteUrls.Instance()._InviteFollow(Url.SpaceKey())">
+                                <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">求关注</span>
+                            </a>
+                            }
+                        }
+                        @if (new Authorizer().Message(user.UserId))
+                        {
+                            if (seeMessage)
+                            {
+                            <a class="tn-button tn-corner-all tn-button-text-only tn-button-large tn-button-primary" plugin = "dialog" href="@SiteUrls.Instance()._CreateMessage(currUser.UserName, toUserId: user.UserId)">
+                                <span class="tn-button-text">发私信</span> </a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-followed">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            他关注的人</h3>
+        <em class="tn-count">(@user.FollowedCount)</em>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (followedUsers != null && followedUsers.Count > 0)
+        {
+            <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+                @foreach (var item in followedUsers)
+                {
+                    
+                    <li class="tn-avatar-item">
+                        @Html.ShowUserAvatar(item.Key, AvatarSizeType.Small, true)
+                        @Html.Link(item.Value, SiteUrls.Instance().SpaceHome(item.Key), item.Value, new { @class = "tn-user-name" })</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="tn-no-data">
+                他还没有关注过任何人哦！
+            </div>
+        }
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-fans">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            他的粉丝</h3>
+        <em class="tn-count">(@user.FollowerCount)</em>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (followerUsers != null && followerUsers.Count > 0)
+        {
+            <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+                @foreach (var item in followerUsers)
+                {
+                    <li class="tn-avatar-item">
+                        @Html.ShowUserAvatar(item.Key, AvatarSizeType.Small, true)
+                        @Html.Link(item.Value, SiteUrls.Instance().SpaceHome(item.Key), item.Value, new { @class = "tn-user-name" })
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="tn-no-data">
+                他还没有任何粉丝哦！
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("a#dialog-inviteFollow").click(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: $(this).attr("href"),
+                success: function (data) {
+                    if (data.MessageContent) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        art.dialog(data);
+                    }
+                }
+            });
+        });
+    });
+</script>

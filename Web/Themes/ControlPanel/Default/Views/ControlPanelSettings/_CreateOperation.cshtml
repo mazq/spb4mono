@@ -1,0 +1,236 @@
+﻿@model OperationEditModel
+@{
+    ManagementOperationType? operationType = Request.QueryString.Get<ManagementOperationType?>("operationType", null);
+    string presentAreaKey = Request.QueryString.Get<string>("presentAreaKey", string.Empty);    
+}
+<div id="editNavigationDiv" class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_CreateOperation", "ControlPanelSettings", new { presentAreaKey = presentAreaKey, operationType = operationType }, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="spb-nav-editcreate tn-form tn-label-right">
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.OperationId)
+                    @Html.TextBoxFor(n => n.OperationId, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", 8 } })
+                    @Html.ValidationMessageFor(n => n.OperationId)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.AssociatedNavigationId)
+                    @Html.TextBoxFor(n => n.AssociatedNavigationId, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", 8 } })
+                    @Html.ValidationMessageFor(n => n.AssociatedNavigationId)
+                </div>
+                <div class="tn-form-row">
+                @if (presentAreaKey != "ControlPanel")
+                {
+                    <label class="tn-form-label">
+                        所属应用：
+                    </label>
+                        @Html.DropDownList("ApplicationId", null, "未设置", new { @class = "tn-dropdownlist" })
+                }
+                </div>
+                <div class="tn-form-row">
+                    <span id="nameOption">
+                        <label class="tn-form-label">
+                            名称：</label>
+                        @Html.TextBoxFor(n => n.OperationText, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", TextLengthSettings.TEXT_NAME_MAXLENGTH } })
+                    </span><span id="resourceOption" style="display: none">
+                        <label class="tn-form-label">
+                            resourceKey：</label>
+                        @Html.TextBoxFor(n => n.ResourceName, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", TextLengthSettings.TEXT_NAME_MAXLENGTH } })
+                    </span>
+                    <label>@Html.CheckBoxFor(n => n.IsUseResourceItem)使用资源项</label>
+                </div>
+                <div class="tn-form-row">
+                    @Html.ValidationMessageFor(n => n.OperationText)
+                    @Html.ValidationMessageFor(n => n.ResourceName)
+                </div>
+                <div class="tn-form-row">
+                    <span id="linkOption">
+                        <label class="tn-form-label">
+                            链接：</label>
+                        @Html.TextBoxFor(n => n.NavigationUrl, InputWidthTypes.Medium, new RouteValueDictionary { { "type", "url" }, { "maxLength", TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH} })
+                    </span><span id="routeOption" style="display: none">
+                        <label class="tn-form-label">
+                            路由名：</label>
+                        @Html.TextBoxFor(n => n.UrlRouteName, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH } })
+                    </span>
+                    <label>@Html.CheckBoxFor(n => n.IsUseRoute)使用路由</label>
+                </div>
+                <div class="tn-form-row">
+                @Html.ValidationMessageFor(n => n.NavigationUrl)                
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                            使用站内图标：</label>
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IconNameOption", "true", false, new { @id = "IconNameOption-T", @class = "tn-radiobutton" })
+                            <label for="IconNameOption-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IconNameOption", "false", true, new { @id = "IconNameOption-F", @class = "tn-radiobutton" })
+                            <label for="IconNameOption-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div id="siteInIcon" class="tn-form-row">
+                    <label class="tn-form-label">
+                        站内图标：</label>
+                    <div class="spb-station-icon">
+                        <a class="tn-action tn-action-text-icon-right" menu="#icon_list"><span class="tn-action-text" id="showIcon">
+                            @("未设置")
+                        </span>
+                            @Html.Hidden("IconName", "")
+                        </a>
+                        <div id="icon_list" class="spb-station-icon-dropdown tn-menu tn-widget-content tn-border-gray tn-corner-all" style="z-index: 999999;
+                            display: none">
+                            <ul class="tn-menu-list">
+                                @foreach (int value in Enum.GetValues(typeof(IconTypes)))
+                                {
+                                    <li class="tn-menu-item">
+                                        @{ IconTypes type = (IconTypes)value;}
+                                        @Html.Icon(type, type.ToString())</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.NavigationTarget)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("NavigationTarget", "_blank", false, new { @id = "NavigationTarget-T", @class = "tn-radiobutton" })
+                            <label for="NavigationTarget-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("NavigationTarget", "_self", true, new { @id = "NavigationTarget-F", @class = "tn-radiobutton" })
+                            <label for="NavigationTarget-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.OnlyOwnerVisible)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("OnlyOwnerVisible", true, false, new { @id = "OnlyOwnerVisible-T", @class = "tn-radiobutton" })
+                            <label for="OnlyOwnerVisible-F">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("OnlyOwnerVisible", false, true, new { @id = "OnlyOwnerVisible-T", @class = "tn-radiobutton" })
+                            <label for="OnlyOwnerVisible-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.IsEnabled)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsEnabled", true, true, new { @id = "IsEnabled-T", @class = "tn-radiobutton" })
+                            <label for="IsEnabled-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsEnabled", false, false, new { @id = "IsEnable-F", @class = "tn-radiobutton" })
+                            <label for="IsEnabled-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+       
+    }
+    <script type="text/dialog">
+    this.title("@(operationType == ManagementOperationType.Shortcut ? "创建快捷操作" : "创建管理菜单")");
+    
+    </script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            
+            //默认资源项忽略验证
+            $("#resourceOption").find("#ResourceName").addClass("ignore");
+
+            //判断是否使用资源项
+            $("#IsUseResourceItem").click(function () {
+                if ($(this).attr("checked")) {
+                    $("#nameOption").hide().find("#OperationText").addClass("ignore");
+                    $("#resourceOption").show().find("#ResourceName").removeClass("ignore");
+                } else {
+                    $("#nameOption").show().find("#OperationText").removeClass("ignore");
+                    $("#resourceOption").hide().find("#ResourceName").addClass("ignore");
+                }
+            });
+
+            //默认忽略路由名验证
+            $("#routeOption").find("#UrlRouteName").addClass("ignore");
+
+            //判断是否使用路由
+            $("#IsUseRoute").click(function () {
+                if ($(this).attr("checked")) {
+                    $("#linkOption").hide().find("#NavigationUrl").addClass("ignore");
+                    $("#routeOption").show().find("#UrlRouteName").removeClass("ignore");
+                } else {
+                    $("#linkOption").show().find("#NavigationUrl").removeClass("ignore");
+                    $("#routeOption").hide().find("#UrlRouteName").addClass("ignore");
+                }
+            });
+
+            //默认图片链接忽略验证
+            $("#imageLinkOption").find("#ImageUrl").addClass("ignore");
+
+            //判断是否使用图片链接
+            $("#IsWholeLink").click(function () {
+                if ($(this).attr("checked")) {
+                    $("#imageNameOption").hide().find("#ImageName").addClass("ignore");
+                    $("#imageLinkOption").show().find("#ImageUrl").removeClass("ignore");
+                    $("#image").hide();
+                } else {
+                    $("#imageNameOption").show().find("#ImageName").removeClass("ignore");
+                    $("#imageLinkOption").hide().find("#ImageUrl").addClass("ignore");
+                    $("#image").show();
+                }
+            });
+
+            //默认站内图标隐藏
+            $("#siteInIcon").hide();
+
+            //使用站内图标
+            $("#IconNameOption-T").click(function () {
+                $("#siteInIcon").show();
+                $("#siteOutIcon").hide();
+            })
+
+            //不使用站内图标
+            $("#IconNameOption-F").click(function () {
+                $("#siteInIcon").hide();
+                $("#siteOutIcon").show();
+            })
+            
+
+
+            //点击图标选中图标
+            $('#icon_list span.tn-icon').click(function () {
+                $('#showIcon').html($(this).parent().html());
+                $("input[name='IconName']").val($(this).attr('title'));
+            });
+        });
+
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+        }
+        function OnErrorCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+        }
+    </script>
+</div>

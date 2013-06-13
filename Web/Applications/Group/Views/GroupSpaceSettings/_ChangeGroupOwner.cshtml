@@ -1,0 +1,45 @@
+﻿@model GroupEntity
+@{
+    string returnUrl = ViewData.Get<string>("returnUrl", string.Empty);
+}
+<div id="editUserRankDialog" class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_ChangeGroupOwner", "GroupSpaceSettings", new { spaceKey = Url.SpaceKey(), returnUrl = returnUrl }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack", OnErrorCallBack = "OnErrorCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right tnc-label-short">
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        群主：
+                    </label>
+                    @Html.UserSelector("userId", Model.UserId)
+                    <br />
+                    <label class="tn-form-label">
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+    <script type="text/dialog">
+    
+      this.title("更换群主");
+    
+    </script>
+    <script type="text/javascript" language="javascript">
+
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+            function () {
+                window.location.href = '@Html.Raw(returnUrl)';
+            })
+        }
+
+        function OnErrorCallBack(response) {
+            $("#editUserRankDialog").replaceWith(response);
+        }
+    </script>
+</div>

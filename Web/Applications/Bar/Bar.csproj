@@ -1,0 +1,375 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7130CE50-0CCC-4E33-9C1B-27F04E533E90}</ProjectGuid>
+    <ProjectTypeGuids>{E53F8FEA-EAE0-44A6-8774-FFD645390401};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Spacebuilder.Bar</RootNamespace>
+    <AssemblyName>Spacebuilder.Bar</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <UseIISExpress>false</UseIISExpress>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\Spacebuilder.Bar.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\Spacebuilder.Bar.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mvc, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Autofac.Mvc3.2.6.3.862\lib\NET40\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="C5, Version=1.1.0.0, Culture=neutral, PublicKeyToken=06a1b38866503b69, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Quartz.2.0.1\lib\net40\C5.dll</HintPath>
+    </Reference>
+    <Reference Include="CodeKicker.BBCode, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\BBCode.5.0.0\lib\CodeKicker.BBCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres, Version=2.2.2.6, Culture=neutral, PublicKeyToken=1ca6b37997dd7536, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\combres.2.2.2.6\lib\net40\Combres.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres.Mvc, Version=2.2.2.6, Culture=neutral, PublicKeyToken=1ca6b37997dd7536, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\combres.mvc.2.2.2.6\lib\net40\Combres.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Common.Logging.2.0.0\lib\2.0\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching, Version=2.11.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EnyimMemcached.2.11\lib\net35\Enyim.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Fasterflect, Version=2.1.0.8328, Culture=neutral, PublicKeyToken=38d18473284c1ca7, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\fasterflect.2.1.0\lib\net40\Fasterflect.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\HtmlAgilityPack.1.4.0\lib\Net40\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\log4net.1.2.11\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=2.9.4.2, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Lucene.Net.2.9.4.2\lib\net40\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPinyin, Version=0.2.4588.20158, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NPinyin.0.2.0\lib\NPinyin.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PanGu.2.3.1.0\lib\PanGu.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.HighLight, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PanGu.2.3.1.0\lib\PanGu.HighLight.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.Lucene.Analyzer, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PanGu.2.3.1.0\lib\PanGu.Lucene.Analyzer.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz, Version=2.0.1.100, Culture=neutral, PublicKeyToken=f6b8c98a402cc8a4, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Quartz.2.0.1\lib\net40\Quartz.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine, Version=3.0.8.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RazorEngine.3.0.8\lib\net40\RazorEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Spacebuilder.Bar.Service">
+      <HintPath>..\..\..\packages\Spacebuilder.Bar.Service.4.0.0.1\Spacebuilder.Bar.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="Spacebuilder.Identifier, Version=4.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Spacebuilder.Identifier.1.0.0\Spacebuilder.Identifier.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages" />
+    <Reference Include="System.Web.Helpers" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Tunynet.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Tunynet.Infrastructure.1.0.0\lib\net40\Tunynet.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Tunynet.MvcExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Tunynet.MvcExtensions.1.0.0\lib\net40\Tunynet.MvcExtensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Attributes\BarSectionAuthorizeAttribute.cs" />
+    <Compile Include="BarApplication.cs" />
+    <Compile Include="BarConfig.cs" />
+    <Compile Include="BarEnum.cs" />
+    <Compile Include="Configuration\BarCommentUrlGetter.cs" />
+    <Compile Include="Configuration\BarOwnerDataGetter.cs" />
+    <Compile Include="Configuration\BarPostOwnerDataGetter.cs" />
+    <Compile Include="Configuration\BarTenantAuthorizationHandler.cs" />
+    <Compile Include="Configuration\BarThreadRecommendUrlGetter.cs" />
+    <Compile Include="Configuration\BarSectionRecommendUrlGetter.cs" />
+    <Compile Include="Configuration\BarThreadAtUserAssociatedUrlGetter.cs" />
+    <Compile Include="Configuration\BarTagUrlGetter.cs" />
+    <Compile Include="Configuration\BarApplicationStatisticDataGetter.cs" />
+    <Compile Include="Configuration\BarPostAtUserAssociatedUrlGetter.cs" />
+    <Compile Include="Controllers\BarActivityController.cs" />
+    <Compile Include="Controllers\BarController.cs" />
+    <Compile Include="Controllers\ControlPanelBarController.cs" />
+    <Compile Include="Controllers\GroupSpaceBarController.cs" />
+    <Compile Include="EventModules\BarOperationLogEventModule.cs" />
+    <Compile Include="EventModules\BarIndexEventModule.cs" />
+    <Compile Include="EventModules\BarSectionEventModule.cs" />
+    <Compile Include="EventModules\BarThreadEventModule.cs" />
+    <Compile Include="EventModules\BarPostEventModule.cs" />
+    <Compile Include="EventModules\BarRatingEventModule.cs" />
+    <Compile Include="Extensions\ActivityItemKeys.cs" />
+    <Compile Include="Extensions\Authorizer.cs" />
+    <Compile Include="Extensions\BarSectionActivityReceiverGetter.cs" />
+    <Compile Include="Extensions\PermissionItemKeys.cs" />
+    <Compile Include="Extensions\PointItemKeys.cs" />
+    <Compile Include="Extensions\RecommendItemExtensionByBarSection.cs" />
+    <Compile Include="Extensions\SiteUrls.cs" />
+    <Compile Include="Extensions\ActivityOwnerTypes.cs" />
+    <Compile Include="Handler\BarUrlHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Search\BarEntity.cs" />
+    <Compile Include="Search\BarFullTextQuery.cs" />
+    <Compile Include="Search\BarIndexDocument.cs" />
+    <Compile Include="Search\BarSearcher.cs" />
+    <Compile Include="Configuration\BarUrlGetter.cs" />
+    <Compile Include="Configuration\BarUrlGetterFactory.cs" />
+    <Compile Include="Configuration\GroupUrlGetter.cs" />
+    <Compile Include="Configuration\IBarUrlGetter.cs" />
+    <Compile Include="Tasks\ExpireStickyThreadsTask.cs" />
+    <Compile Include="UrlRoutingRegistration.cs" />
+    <Compile Include="ViewModels\BarPostEditModel.cs" />
+    <Compile Include="ViewModels\BarRatingEditModel.cs" />
+    <Compile Include="ViewModels\BarSectionEditModel.cs" />
+    <Compile Include="ViewModels\BarSubmenuViewModel.cs" />
+    <Compile Include="ViewModels\BarThreadEditModel.cs" />
+    <Compile Include="ViewModels\ManageBarEditModel.cs" />
+    <Compile Include="ViewModels\ManagePostsEditModel.cs" />
+    <Compile Include="ViewModels\ManageThreadEditModel.cs" />
+    <Compile Include="ViewModels\SectionSettingsEditModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\jquery.spb.bar.js" />
+    <Content Include="Setup\Install\SqlServer\01_Install_Bar_Schema.sql" />
+    <Content Include="Setup\Install\SqlServer\02_Install_Bar_InitialData.sql" />
+    <Content Include="Setup\Upgrade\SqlServer\01_upgrade_Bar_v3.2_to_v4.0.sql" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Setup\UnInstall\" />
+    <Folder Include="Views\UserSpaceBar\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Application.Config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BusinessComponents\Tunynet.BusinessComponents.csproj">
+      <Project>{D9BC9674-69DE-4742-AF24-E35C43DE84CE}</Project>
+      <Name>Tunynet.BusinessComponents</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.csproj">
+      <Project>{4FE558F7-2E94-49C3-8A8A-50F52FBFBBC6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Group\Group.csproj">
+      <Project>{2C7B182F-8ACC-4890-ACA7-532F8546FFB5}</Project>
+      <Name>Group</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Bar\Home.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Bar\Search.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Bar\Edit.cshtml" />
+    <Content Include="Views\Bar\ThreadDetail.cshtml" />
+    <Content Include="Views\Bar\_BarSubmenu.cshtml" />
+    <Content Include="Views\Bar\_GlobalSearch.cshtml" />
+    <Content Include="Views\Bar\_QuickSearch.cshtml" />
+    <Content Include="Views\Bar\_ListPost.cshtml" />
+    <Content Include="Views\Bar\_BarPost.cshtml" />
+    <Content Include="Views\Bar\_ChildPost.cshtml" />
+    <Content Include="Views\Bar\EditPost.cshtml" />
+    <Content Include="Views\BarActivity\_CreateBarThread.cshtml" />
+    <Content Include="Views\BarActivity\_CreateBarPost.cshtml" />
+    <Content Include="Views\ControlPanelBar\ManageBars.cshtml" />
+    <Content Include="Views\ControlPanelBar\_ManageBarRightMenuShortcut.cshtml" />
+    <Content Include="Views\Bar\EditSection.cshtml" />
+    <Content Include="Views\Bar\CreateSection.cshtml" />
+    <Content Include="Views\ControlPanelBar\ManageThreads.cshtml" />
+    <Content Include="Views\Bar\_SetStickyDate.cshtml" />
+    <Content Include="Views\Bar\_PagingThreads.cshtml" />
+    <Content Include="Views\Bar\ManageThreads.cshtml" />
+    <Content Include="Views\Bar\_ManageSectionLeftMenu.cshtml" />
+    <Content Include="Views\Bar\SectionDetail.cshtml" />
+    <Content Include="Views\Bar\_TopSections_Headline.cshtml" />
+    <Content Include="Views\Bar\_Tops.cshtml" />
+    <Content Include="Views\Bar\_Thread.cshtml" />
+    <Content Include="Views\Bar\SectionMembers.cshtml" />
+    <Content Include="Views\Bar\ListSections.cshtml" />
+    <Content Include="Views\Bar\UserThreads.cshtml" />
+    <Content Include="Views\Bar\UserFollowedSections.cshtml" />
+    <Content Include="Views\Bar\Rank.cshtml" />
+    <Content Include="Views\Bar\ListsByTag.cshtml" />
+    <Content Include="Views\Bar\_List.cshtml" />
+    <Content Include="Views\Bar\TagMap.cshtml" />
+    <Content Include="Views\Bar\ManageThreadCategories.cshtml" />
+    <Content Include="Views\Bar\_EditThreadCategory.cshtml" />
+    <Content Include="Views\Bar\_UserData_Side.cshtml" />
+    <Content Include="Views\Bar\_TopSections_Summary.cshtml" />
+    <Content Include="Views\Bar\_RecommendSections_Slide.cshtml" />
+    <Content Include="Views\Bar\_CategorySections.cshtml" />
+    <Content Include="Views\Bar\_RecommendSections_Summary.cshtml" />
+    <Content Include="Views\ControlPanelBar\ManagePosts.cshtml" />
+    <Content Include="Views\Bar\ManagePosts.cshtml" />
+    <Content Include="Views\ControlPanelBar\EditSection.cshtml" />
+    <Content Include="Views\Bar\_UserData_Main.cshtml" />
+    <Content Include="Views\Bar\_SubscribeSectionButton.cshtml" />
+    <Content Include="Views\ControlPanelBar\SectionSettings.cshtml" />
+    <Content Include="Views\Bar\_ListBarRatings.cshtml" />
+    <Content Include="Views\Bar\_CreatBarRating.cshtml" />
+    <Content Include="Views\Bar\MyFollowedUsers.cshtml" />
+    <Content Include="Views\Bar\_OneBarRating.cshtml" />
+    <Content Include="Views\ControlPanelBar\_ManageBarRightMenuSystemInfo.cshtml" />
+    <Content Include="Views\BarActivity\_CreateBarRating.cshtml" />
+    <Content Include="Views\Bar\_MoveThread.cshtml" />
+    <Content Include="Views\Bar\_BarSetionSelector.cshtml" />
+    <Content Include="Views\Bar\_BarSetionSelectItem.cshtml" />
+    <Content Include="Views\Bar\_HisOtherThreads.cshtml" />
+    <Content Include="Views\Bar\_RecommendThread.cshtml" />
+    <Content Include="Views\GroupSpaceBar\Edit.cshtml" />
+    <Content Include="Views\Bar\_Edit.cshtml" />
+    <Content Include="Views\GroupSpaceBar\Detail.cshtml" />
+    <Content Include="Views\Bar\_ThreadDetail.cshtml" />
+    <Content Include="Views\GroupSpaceBar\SectionDetail.cshtml" />
+    <Content Include="Views\GroupSpaceBar\ListByTag.cshtml" />
+    <Content Include="Views\GroupSpaceBar\ManagePosts.cshtml" />
+    <Content Include="Views\GroupSpaceBar\ManageThreadCategories.cshtml" />
+    <Content Include="Views\GroupSpaceBar\ManageThreads.cshtml" />
+    <Content Include="Views\GroupSpaceBar\UserThreads.cshtml" />
+    <Content Include="Views\Bar\_SectionDetail.cshtml" />
+    <Content Include="Views\Bar\_ListByTag.cshtml" />
+    <Content Include="Views\Bar\_ManagePosts.cshtml" />
+    <Content Include="Views\Bar\_ManageThreadCategories.cshtml" />
+    <Content Include="Views\Bar\_ManageThreads.cshtml" />
+    <Content Include="Views\Bar\_UserThreads.cshtml" />
+    <Content Include="Views\GroupSpaceBar\_ManageSubMenu.cshtml" />
+    <Content Include="Views\Bar\_EditPost.cshtml" />
+    <Content Include="Views\GroupSpaceBar\EditPost.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\GroupSpaceBar\_BarThreadSearch.cshtml" />
+    <Content Include="Views\GroupSpaceBar\_TagCloud.cshtml" />
+    <Content Include="Views\Bar\_ThreadCateGoriesSettings.cshtml" />
+    <Content Include="Views\Bar\_GroupTops.cshtml" />
+    <Content Include="Views\GroupSpaceBar\Search.cshtml" />
+    <Content Include="Views\Bar\_ListSearchThread.cshtml" />
+    <Content Include="Views\GroupSpaceBar\Tags.cshtml" />
+    <Content Include="Views\Bar\_TagCloud.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>35537</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

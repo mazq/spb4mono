@@ -1,0 +1,60 @@
+﻿@{
+    int orignalSize = ViewData.Get<int>("orignalSize",0);
+    var fontSize = ViewData.Get<int>("fontSize", orignalSize);
+    
+}
+<div class="tnc-dailog-pd">
+    <div class="tn-form-box">
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            字体大小：</label>
+            @Html.TextBox("fontSize", fontSize, new { @class = "tn-textbox tn-border-gray  tn-input-short" })
+            <label class="tn-form-label">
+            px</label>
+        </div>
+        <div class="tn-form-row tnui-error-msg">
+            
+        </div>        
+    </div>
+</div>
+<div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+    @Html.Button("确定", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "setFontSize", dialogOperation = "close" })
+    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+</div>
+
+
+<script type="text/dialog">
+
+this.title("字体大小设置");
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //点击确定按钮
+        $("#setFontSize").click(function () {
+            if($(".tnui-error-msg").find("span").length){
+                return false;
+            }
+            var newSize = $('#fontSize').val();
+            $("#AdvertisingTextSize").children().remove();
+            $("#AdvertisingTextSize").append("<span>" + newSize + "</span>");
+            $('#AdvertisingTextContent').css('font-size', newSize + 'px');
+            $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            $("#AdvertisingTextSize").attr("href", '@SiteUrls.Instance()._SetFontSize()&fontSize=' + newSize);
+        });
+
+        //JS验证
+        $("#fontSize").blur(function () {
+            var fontSize = $(this).val();
+            if (fontSize == "" || !$.isNumeric(fontSize)) {
+                $(".tnui-error-msg").html("<span class='field-validation-error'>必须输入数字！</span>");
+            }
+        });
+        $("#fontSize").focus(function(){
+            $(".tnui-error-msg").html("");
+        });
+
+    });
+
+</script>

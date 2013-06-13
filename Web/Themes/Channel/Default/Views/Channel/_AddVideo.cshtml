@@ -1,0 +1,91 @@
+﻿@{
+    string textAreaId = Request.QueryString.Get<string>("textAreaId", string.Empty);
+}
+<div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-mode-windows nc-mode-wid-two"
+    style="display: none;" id="videoContainer">
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+        </b>
+    </div>
+    <div class="tn-bubble-content tn-widget-content">
+        <div class=" tnc-mode-content" id="tipContainerDiv">
+            <div class="tnc-mode-icon">
+                <a class="tn-icon tn-smallicon-cross" href="javascript:void(0);" id="closeVideoContainer">
+                </a>
+            </div>
+            <h3>
+                在线视频
+            </h3>
+            <div class="tnc-mode-ctn">
+                <p>
+                    支持优酷、土豆、搜狐、新浪</p>
+                <div class="tn-form tn-form-single">
+                    <input type="text" name="" id="videoUrlValue" class="tn-textbox tn-border-gray" />
+                    @Html.Button("添加", ButtonTypes.Submit, htmlAttributes: new { id = "videoSaveButton" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    //支持 回车提交视频功能
+    $(document).ready(function () {
+
+        $('#closeVideoContainer').click(function () {
+            $('#videoContainer').hide();
+        });
+
+        $("#videoUrlValue").keypress(function (event) {
+            var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode
+            if (keyCode == 13) {
+                $("#videoSaveButton").click();
+            }
+        });
+
+        $("#videoSaveButton").click(function () {
+            $(this).attr("disabled", true).addClass("tn-button-disabled");
+            var audioParseUrl = "@SiteUrls.Instance().ParseMedia(MediaType.Video)";
+
+            $.getJSON(audioParseUrl, { url: $("#videoUrlValue").val() }, function (data) {
+
+                if (data.errorMessage) {
+                    var videoUrlValueVal = $("#videoUrlValue").val();
+                    $("#videoUrlValue").val(data.errorMessage).attr("style", "background:none repeat scroll 0 0 #FFFBDE");
+                    setTimeout(function () {
+                        $("#videoUrlValue").val(videoUrlValueVal).removeAttr("style");
+                        $("#videoSaveButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                    }, 2000);
+                    return false;
+                }
+                else if (!data.Alias || !data.ThumbnailUrl) {
+                    var videoUrlValueVal = $("#videoUrlValue").val();
+                    $("#videoUrlValue").val("解析失败了！！").attr("style", "background:none repeat scroll 0 0 #FFFBDE");
+                    setTimeout(function () {
+                        $("#videoUrlValue").val(videoUrlValueVal).removeAttr("style");
+                        $("#videoSaveButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                    }, 2000);
+                    return false;
+                }
+                else {
+
+                    $("#videoSaveButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                    $("#videoContainer").hide();
+
+                    $textArea = $('#@(textAreaId)');
+                    if ($textArea.tinymce && $textArea.attr('plugin') == 'tinymce') {
+                        var imgHtml = '<img src="' + data.ThumbnailUrl + '" alt="' + data.Alias + '" title="视频缩略图" />';
+                        $textArea.insertContentToEditor(imgHtml);
+                    }
+                    else {
+                        var content = data.Name + "-" + data.ShortUrl;
+                        var body = $textArea.val() + " " + content + " ";
+                        $textArea.val(body);
+                    }
+
+                }
+                return false;
+            });
+        });
+
+    });
+</script>

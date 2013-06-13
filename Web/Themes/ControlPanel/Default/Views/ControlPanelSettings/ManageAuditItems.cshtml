@@ -1,0 +1,303 @@
+﻿@model  IEnumerable<ApplicationBase>
+@{
+    Layout = "_ControlPanel";
+
+    Dictionary<int, IEnumerable<Role>> rolesForApplication = ViewData["roles"] as Dictionary<int, IEnumerable<Role>>;
+    Dictionary<int, IEnumerable<AuditItem>> auditItems = ViewData["auditItems"] as Dictionary<int, IEnumerable<AuditItem>>;
+    Dictionary<int, PubliclyAuditStatus> applicationStatus = ViewData["applicationStatus"] as Dictionary<int, PubliclyAuditStatus>;
+    Dictionary<int, Dictionary<string, IEnumerable<AuditItemInUserRole>>> appForAuditItemInUserRole = ViewData["appForAuditItemInUserRole"] as Dictionary<int, Dictionary<string, IEnumerable<AuditItemInUserRole>>>;
+    var userSettings = ViewData.Get<UserSettings>("userSettings", new UserSettings());
+    var allRoles = ViewData.Get<IEnumerable<Role>>("allRoles", new List<Role>());
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>审核规则</span>
+            </h1>
+            <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                <ol>
+                    <li>审核严格程度为：再审核＞创建时审核＞不审核</li>
+                    <li>“再审核”是指用户编辑后的内容也需要审核</li>
+                    <li>“未设置”相当于“弃权”，合并时不考虑该规则</li>
+                    <li>“注册会员”角色包含所有登录用户，范围最大，设置为“不审核”时需要谨慎，这样会让所有登录用户发布的内容都不需要审核</li>
+                    <li>用户可能属于多个角色，因此用户的审核规则是由对应的所有用户角色的审核规则合并得到的。审核规则合并时遵循以下原则：
+                        <ol>
+                            <li>取允许的最宽松的规则</li>
+                            <li>说明：
+                                <ol>
+                                    <li>如果有一个是“不审核”，则结果为不需要审核</li>
+                                    <li>如果用户当前操作为“创建”，规则中有“创建时审核”或“再审核”，并且没有不审核，则结果为需要审核，否则，不需要审核</li>
+                                    <li>如果用户当前操作为“编辑”，规则中有“再审核，并且没有“不审核”，则结果为需要审核，否则，不需要审核</li>
+                                    <li>如果全为“未设置”，则结果为不需要审核</li>
+                                </ol>
+                            </li>
+                        </ol>
+                    </li>
+                </ol>
+            </div>
+            <div class="tnc-ctnright-list">
+                @using (Html.BeginAjaxForm("UpdateAuditItemsInRole", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success" }))
+                {
+                    <div class="tnc-list">
+                        <h2>
+                            <span class="tnc-admin-icon tnc-icon-position-4">全局</span></h2>
+                        @Html.Hidden("applicationId", 0)
+                        <div class="tnc-list-text">
+                            <table class="tn-table-grid">
+                                <tbody>
+                                    <tr class="tn-table-grid-header">
+                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                            角色
+                                        </td>
+                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                            @foreach (var auditItem in auditItems[0])
+                                            {
+                                                @auditItem.ItemName
+                                            }
+                                        </td>
+                                    </tr>
+                                    @foreach (var role in rolesForApplication[0])
+                                    {
+                                        if (userSettings.NoAuditedRoleNames.Contains(role.RoleName))
+                                        {
+                                            continue;
+                                        }
+                                        <tr class="tn-table-grid-row">
+                                            <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                                @role.FriendlyRoleName
+                                                @Html.Hidden("RoleName", role.RoleName)
+                                            </td>
+                                            @foreach (var auditItem in auditItems[0])
+                                            {
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                    @if (appForAuditItemInUserRole[0].ContainsKey(role.RoleName))
+                                                    {
+                                                        if (appForAuditItemInUserRole[0][role.RoleName].Count() == 0)
+                                                        { 
+                                                        @Html.EnumDropDownList(role.RoleName + "-" + auditItem.ItemKey, AuditStrictDegree.NotSet, htmlAttributes: new { @class = "tn-dropdownlist" })
+                                                        }
+                                                        foreach (var auditItemInUserRole in appForAuditItemInUserRole[0][role.RoleName])
+                                                        {
+                                                            if (auditItem.ItemKey == auditItemInUserRole.ItemKey)
+                                                            {
+                                                                object htmlAttributes = new { @class = "tn-dropdownlist" };
+                                                                if (auditItemInUserRole.IsLocked)
+                                                                {
+                                                                    htmlAttributes = new { @class = "tn-dropdownlist", disabled = "disabled" };
+                                                                }
+                                                        @Html.Hidden(role.RoleName + "-" + auditItemInUserRole.ItemKey + "-IsLock", auditItemInUserRole.IsLocked)
+                                                        @Html.EnumDropDownList(role.RoleName + "-" + auditItem.ItemKey, auditItemInUserRole.StrictDegree, htmlAttributes: htmlAttributes)
+                                                            }
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="tn-form-box">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                启用人工审核：
+                                            </th>
+                                            <td>
+                                                <ul class="tn-checkbox-list">
+                                                    <li class="tn-inline-list">
+                                                        @Html.RadioButton("EnableAudit", true, userSettings.EnableAudit, new { @class = "tn-radiobutton", id = "EnableAudit" })
+                                                        <label for="EnableAudit">
+                                                            启用</label>
+                                                    </li>
+                                                    <li class="tn-inline-list">
+                                                        @Html.RadioButton("EnableAudit", false, !userSettings.EnableAudit, new { @class = "tn-radiobutton", id = "DisableAudit" })
+                                                        <label for="DisableAudit">
+                                                            不启用</label>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                公开显示内容的审核状态：
+                                            </th>
+                                            <td>
+                                                <ul class="tn-checkbox-list">
+                                                    <li class="tn-inline-list">
+                                                        @Html.RadioButton("AuditStatus_0", (int)PubliclyAuditStatus.Success, applicationStatus[0] == null || (int)applicationStatus[0] == (int)PubliclyAuditStatus.Success, new { @id = "Success_0" })
+                                                        <label for="Success_0">
+                                                            通过审核</label>
+                                                    </li>
+                                                    <li class="tn-inline-list">
+                                                        @Html.RadioButton("AuditStatus_0", (int)PubliclyAuditStatus.Again_GreaterThanOrEqual, (int)applicationStatus[0] == (int)PubliclyAuditStatus.Again_GreaterThanOrEqual, new { @id = "Again_0" })
+                                                        <label for="Again_0">
+                                                            需再次审核、通过审核</label>
+                                                    </li>
+                                                    <li class="tn-inline-list">
+                                                        @Html.RadioButton("AuditStatus_0", (int)PubliclyAuditStatus.Pending_GreaterThanOrEqual, (int)applicationStatus[0] == (int)PubliclyAuditStatus.Pending_GreaterThanOrEqual, new { @id = "Pending_0" })
+                                                        <label for="Pending_0">
+                                                            待审核、需再次审核、通过审核</label>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                不需要审核的角色：
+                                            </th>
+                                            <td>
+                                                <ul class="tn-checkbox-list">
+                                                    @foreach (var role in allRoles)
+                                                    {
+                                                        object htmlAttributes = new { id = "NoAuditedRoleNames-" + role.RoleName };
+                                                        if (role.RoleName == RoleNames.Instance().SuperAdministrator() || role.RoleName == RoleNames.Instance().ContentAdministrator())
+                                                        {
+                                                            htmlAttributes = new { id = "NoAuditedRoleNames-" + role.RoleName, disabled = "disabled" };
+                                                        @Html.Hidden("NoAuditedRoleNames", role.RoleName)
+                                                        }
+                                                        <li class="tn-inline-list">
+                                                            @Html.SipmleCheckBox("NoAuditedRoleNames", role.RoleName, userSettings.NoAuditedRoleNames.Contains(role.RoleName), htmlAttributes)
+                                                            <label for="NoAuditedRoleNames-@role.RoleName">@role.FriendlyRoleName</label>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                不需要审核的最小用户等级：
+                                            </th>
+                                            <td>
+                                                @Html.TextBox("MinNoAuditedUserRank", userSettings.MinNoAuditedUserRank.ToString(), InputWidthTypes.Short, new RouteValueDictionary { { "class", "digits" } })
+                                                级
+                                                @Html.ValidationMessage("MinNoAuditedUserRank")
+                                                <span class="tn-text-note">（仅限非管制用户）</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                &nbsp;
+                                            </th>
+                                            <td>
+                                                @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary)
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @foreach (var application in Model)
+                {
+                    if (auditItems[application.ApplicationId].Count() == 0)
+                    {
+                        continue;
+                    }
+                    using (Html.BeginAjaxForm("UpdateAuditItemsInRole", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success" }))
+                    {
+                    <div class="tnc-list">
+                        <h2>
+                            <span class="tnc-admin-icon tnc-icon-position-4">@application.Config.ApplicationName</span></h2>
+                        @Html.Hidden("applicationId", application.ApplicationId)
+                        <div class="tnc-list-text">
+                            <table class="tn-table-grid">
+                                <tbody>
+                                    <tr class="tn-table-grid-header">
+                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                            角色
+                                        </td>
+                                        @foreach (var auditItem in auditItems[application.ApplicationId])
+                                        {
+                                            <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                @auditItem.ItemName
+                                            </td>
+                                        }
+                                    </tr>
+                                    @foreach (var role in rolesForApplication[application.ApplicationId])
+                                    {
+                                        if (userSettings.NoAuditedRoleNames.Contains(role.RoleName))
+                                        {
+                                            continue;
+                                        }
+                                        <tr class="tn-table-grid-row">
+                                            <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                                @role.FriendlyRoleName
+                                                @Html.Hidden("RoleName", role.RoleName)
+                                            </td>
+                                            @foreach (var auditItem in auditItems[application.ApplicationId])
+                                            {
+                                                <td class="tn-border-gray tn-border-bottom">
+                                                    @if (appForAuditItemInUserRole[application.ApplicationId].ContainsKey(role.RoleName))
+                                                    {
+                                                        if (appForAuditItemInUserRole[application.ApplicationId][role.RoleName].Count() == 0)
+                                                        { 
+                                                        @Html.EnumDropDownList(role.RoleName + "-" + auditItem.ItemKey, AuditStrictDegree.NotSet, htmlAttributes: new { @class = "tn-dropdownlist" })
+                                                        }
+                                                        foreach (var auditItemInUserRole in appForAuditItemInUserRole[application.ApplicationId][role.RoleName])
+                                                        {
+                                                            if (auditItem.ItemKey == auditItemInUserRole.ItemKey)
+                                                            {
+                                                                object htmlAttributes = new { @class = "tn-dropdownlist" };
+                                                                if (auditItemInUserRole.IsLocked)
+                                                                {
+                                                                    htmlAttributes = new { @class = "tn-dropdownlist", disabled = "disabled" };
+                                                                }
+                                                        @Html.Hidden(role.RoleName + "-" + auditItemInUserRole.ItemKey + "-IsLock", auditItemInUserRole.IsLocked)
+                                                        @Html.EnumDropDownList(role.RoleName + "-" + auditItem.ItemKey, auditItemInUserRole.StrictDegree, htmlAttributes: htmlAttributes)
+                                                            }
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="tn-form-box">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                公开显示内容的审核状态：
+                                            </th>
+                                            <td style="line-height: 28px;">
+                                                @Html.RadioButton("AuditStatus_" + application.ApplicationId, (int)PubliclyAuditStatus.Success, applicationStatus[application.ApplicationId] == null || (int)applicationStatus[application.ApplicationId] == (int)PubliclyAuditStatus.Success, new { @id = "Success_" + application.ApplicationId })
+                                                <label for="Success_@(application.ApplicationId)">
+                                                    通过审核</label>&nbsp;&nbsp;
+                                                @Html.RadioButton("AuditStatus_" + application.ApplicationId, (int)PubliclyAuditStatus.Again_GreaterThanOrEqual, (int)applicationStatus[application.ApplicationId] == (int)PubliclyAuditStatus.Again_GreaterThanOrEqual, new { @id = "Again_" + application.ApplicationId })
+                                                <label for="Again_@(application.ApplicationId)">
+                                                    需再次审核、通过审核
+                                                </label>
+                                                &nbsp;&nbsp;
+                                                @Html.RadioButton("AuditStatus_" + application.ApplicationId, (int)PubliclyAuditStatus.Pending_GreaterThanOrEqual, (int)applicationStatus[application.ApplicationId] == (int)PubliclyAuditStatus.Pending_GreaterThanOrEqual, new { @id = "Pending_" + application.ApplicationId })
+                                                <label for="Pending_@(application.ApplicationId)">
+                                                    待审核、需再次审核、通过审核</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                &nbsp;
+                                            </th>
+                                            <td>
+                                                @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary)
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function success(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

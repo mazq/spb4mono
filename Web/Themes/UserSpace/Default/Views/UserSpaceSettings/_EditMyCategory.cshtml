@@ -1,0 +1,34 @@
+﻿@model CategoryEditModel
+@using (Html.BeginAjaxForm("_EditMyCategory", "UserSpaceSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tr id="typeCategoryName">
+                    <td>
+                        @Html.TextBox("categoryName",Model.CategoryName , htmlAttributes: new { @class = "tn-textbox tn-border-gray", id = "categoryName", maxlength = "32" })
+                        @Html.ValidationMessage("categoryName")
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+    <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+}
+<script type="text/dialog">
+    this.title("编辑分类");
+</script>
+<script>
+    $(document).ready(function () {
+        $("#categoryName").watermark("请输入分类名");
+    })
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        window.location.reload();
+    }
+</script>

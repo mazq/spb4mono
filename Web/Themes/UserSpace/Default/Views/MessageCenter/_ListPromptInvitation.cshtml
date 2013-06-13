@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Tunynet.Common.Invitation>
+@{
+    string ids = string.Empty;
+    foreach (var invitation in Model)
+    {
+        ids += (invitation.Id + ",");
+    }
+}
+<div id="promp-invitation-div" class="tnc-prompt-wrap tn-border-gray tn-border-bottom">
+    @if (Model != null && Model.Count() > 0)
+    {
+        <h3 class="tn-helper-reset tnc-prompt-header">请求</h3>
+        <ul class="tn-list">
+            @foreach (var invitation in Model)
+            {
+                <li class="tn-list-item tn-helper-clearfix"><span class="tnc-handle-mark"><span class="tn-action">@Html.Link("接受", SiteUrls.Instance().PrompSetInvitations(Url.SpaceKey(), invitation.Id.ToString()), "接受", new { id = "promp-item-" + invitation.Id })</span><span class="tn-action">@Html.Link("拒绝", SiteUrls.Instance().PrompSetInvitations(Url.SpaceKey(), invitation.Id.ToString(), Tunynet.Common.InvitationStatus.Refuse), "拒绝", new { id = "promp-item-" + invitation.Id })</span></span>
+              @Html.Raw(invitation.GetResolvedBody())</li>
+            }
+        </ul>
+        <div class="tn-actions">
+            <div class="tn-confirm">
+                @Html.LinkButton("全部接受", SiteUrls.Instance().PrompSetInvitations(Url.SpaceKey(), ids), HighlightStyles.Primary, htmlAttributes: new { id = "promp-all-invitation" })
+            </div>
+            <div class="tn-view">
+                @Html.LinkButton("查看所有", SiteUrls.Instance().ListInvitations(Url.SpaceKey()), HighlightStyles.Secondary)
+            </div>
+        </div>
+    }
+</div>

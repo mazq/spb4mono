@@ -1,0 +1,39 @@
+﻿@{
+    var sensitiveWordTypes = ViewData.Get<IEnumerable<SensitiveWordType>>("sensitiveWordTypes", null);
+    
+}
+@using (Html.BeginAjaxForm("_InputSensitiveWords", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json, OnSuccessCallBack = "success", OnErrorCallBack = "error" }, new RouteValueDictionary { { "id", "InputSensitiveWordsForm" }, { "enctype", "MULTIPART/FORM-DATA" } }))
+{ 
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short">
+            <div class="tn-form-row">
+            <input type="file" id="sensitiveWords" class="ignore" name="sensitiveWords" accept="text/plain"/>
+            </div>
+            <div class="tn-form-row">            
+                <text class="tn-text-note">选择要导入的敏感词文件</text>
+            </div>
+            <div class="tn-form-row">
+            @Html.DropDownList("typeId", new SelectList(sensitiveWordTypes, "TypeId", "Name"), "请选择类别", new { @class = "tn-dropdownlist" })
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+       this.title("导入敏感词");
+</script>
+<script type="text/javascript">
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 3, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 3, data.MessageType);
+        }
+    }
+    function error(reponse) {
+        $("#InputSensitiveWordsForm").replaceWith(reponse);
+    }
+</script>

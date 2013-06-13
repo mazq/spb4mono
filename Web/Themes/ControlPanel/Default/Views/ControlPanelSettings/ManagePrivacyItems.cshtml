@@ -1,0 +1,42 @@
+﻿@model Dictionary<PrivacyItemGroup, List<PrivacyItem>>
+@{
+    Layout = "_ControlPanel";
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+                    <h1><span>隐私设置</span></h1>
+					<div class="tnc-ctnright-list tnc-privacy-setting">
+					 @Html.StatusMessage(TempData["StatusMessageData"] as StatusMessageData)
+                    @using (Html.BeginForm("ManagePrivacyItemsPost", "ControlPanelSettings", FormMethod.Post))
+                    {
+                        <div class="tn-form tn-label-right">
+                            @foreach (var item in Model)
+                            {
+                                <div class="tn-text-heading tn-border-gray tn-bg-light tn-border-all">
+                                    <strong>@item.Key.TypeName</strong> <span class="tn-text-note">@item.Key.Description</span>
+                                </div>
+                                foreach (var privacyItem in item.Value)
+                                {
+                                <div class="tn-form-row">
+                                    <label class="tn-form-label">
+                                        @privacyItem.ItemName：</label>
+                                    @Html.DropDownList(privacyItem.ItemKey, null, new { @class = "tn-dropdownlist" })
+                                  
+                                
+                                        <span class="tn-text-note tn-tip">@privacyItem.Description</span></div>
+                                
+                                }
+                            }
+                            <div class="tn-form-row tn-form-row-button">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("保存设置", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>
+                        </div>
+                    } 
+					</div>
+        </div>
+    </div>
+</div>

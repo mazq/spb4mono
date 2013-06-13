@@ -1,0 +1,47 @@
+﻿@{
+    User user = ViewData.Get<User>("user", null);
+    int integrity = ViewData.Get<int>("integrity", 0);
+   
+}
+<div class="spb-profile-card tn-helper-clearfix">
+    @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Medium, true, HyperLinkTarget._self, enableCachingInClient: false,isShowUserCard:false)
+    <div class="tn-info">
+        <div class="spb-profile">
+            <h1 class="tn-user-name">
+                <a href="@SiteUrls.Instance().SpaceHome(user.UserId)">@user.DisplayName</a>
+                @Html.IdentificationType(user.UserId)
+            </h1>
+        </div>
+        @if (integrity > 30)
+        {
+            <div class="spb-status">
+                <a href="@SiteUrls.Instance().MyRank(Url.SpaceKey())">
+                    @Html.UserRankIcon(user.Rank)
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="spb-po-profile-bar">
+                <div class="tn-edit">
+                    <a class="tn-action tn-action-text-icon-right" href="@SiteUrls.Instance().EditUserProfile(Url.SpaceKey())"><span class="tn-icon tn-smallicon-write"></span><span class="tn-action-text">编辑资料</span></a>
+                </div>
+                <div class="spb-progress-bar-pad tn-helper-clear" title="资料完整度为@(integrity)%">
+                    <div class="tn-progress-bar tn-widget-content tn-corner-all">
+                        <div style="width: @(integrity)%;" class="tn-progress-bar-value tn-border-deep tn-bg-deep tn-corner-left tn-border-tbl" >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<ul class="spb-user-atten tn-helper-clearfix">
+    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ManageFollowedUsers(Url.SpaceKey())">
+        <strong class="tn-count">@user.FollowedCount</strong><span>关注</span></a> </li>
+    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ManageFollowers(Url.SpaceKey())">
+        <strong class="tn-count">@user.FollowerCount</strong><span>粉丝</span></a> </li>
+    <li plugin="tipsyHoverCard" data-user-card-url="@SiteUrls.Instance()._ContentPop(Url.SpaceKey())"><a href="#"  ><strong class="tn-count">@user.ContentCount</strong><span >内容</span></a>
+    </li>
+</ul>
+

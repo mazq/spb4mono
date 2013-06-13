@@ -1,0 +1,89 @@
+﻿<!--[if IE 6]>
+<script type="text/javascript" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Scripts/jquery/DD_belatedPNG/jquery.DD_belatedPNG-0.0.8a.js"))"></script>
+<![endif]-->
+<div class="tn-wrapper tnc-admin-header">
+    <div class="tnc-top-menubar">
+        @if (UserContext.CurrentUser != null)
+        {
+            <ul id="spb-user-menu" class="tnc-user-menu">
+                <li class="tn-user-name"><a href="@SiteUrls.Instance().MyHome(UserContext.CurrentUser.UserId)" target="_blank" title="@UserContext.CurrentUser.DisplayName">@Html.ShowUserDisplayName(UserContext.CurrentUser.DisplayName)</a>
+                    <ul class="tn-widget-content tn-border-gray spb-set-menu">
+                        <li><a href="@SiteUrls.Instance().SiteHome()" target="_blank" title="站点首页">站点首页</a></li>
+                        <li><a href="@SiteUrls.Instance().Logout()" title="退出">退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+        }
+        <div class="tnc-var-menu">
+            <div class="tnc-common">
+                <a href="@SiteUrls.Instance()._FunctionMap()" plugin="dialog"><span class="tn-icon tn-icon-chart">
+                </span>功能地图</a>
+            </div>
+            <div class="tnc-search">
+                <form id="searchOperationsForm" action="@SiteUrls.Instance().SearchOperations()" method="get">
+                <input type="text" id="searchOperationKeyword" name="searchOperationKeyword" value="@Request.QueryString.GetString("searchOperationKeyword", string.Empty)" class="tn-search-input" watermark="功能搜索" />
+                <a href="javascript:;" class="tnc-search-button" id="search-operations"><span class="tn-icon tn-smallicon-find">
+                </span></a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="tnc-logo">
+        <a href="@SiteUrls.Instance().SiteHome()"><em>Spacebuilder</em><strong>管理后台</strong></a>
+    </div>
+    <div class="tnc-wrapper-inner">
+        <ul class="tnc-admin-menu">
+            @{
+                IEnumerable<Navigation> navagations = ViewData.Get<IEnumerable<Navigation>>("rootnavigations", null);
+                int currentNavigationId = ViewData.Get<int>("currentNavigationId", 0);
+
+                if (navagations != null)
+                {
+                    bool fristMenu = true;
+                    foreach (var navigation in navagations)
+                    {
+
+                        if (!navigation.IsVisible(UserContext.CurrentUser) || !navigation.IsControlPanelManageable(UserContext.CurrentUser))
+                        {
+                            continue;
+                        }
+
+                        string selected = string.Empty, selectedIcon = string.Empty;
+                        if (navigation.IsCurrent(currentNavigationId))
+                        {
+                            selected = " tnc-selected";
+                            selectedIcon = "<span class=\"tnc-adminmenu-icon\"></span>";
+                        }
+
+                        string firstMenuCalss = string.Empty;
+                        if (fristMenu)
+                        {
+                            firstMenuCalss = "tnc-admin-menufirst";
+                            fristMenu = false;
+                        }
+                        
+                        
+                <li class="@(firstMenuCalss + selected)"><a href="@navigation.GetUrl()" target="@navigation.NavigationTarget">
+                    @Html.Raw(selectedIcon)
+                    @navigation.NavigationText </a></li>                
+                    }
+                }
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#spb-user-menu').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+        $("#search-operations").click(function (e) {
+            e.preventDefault();
+
+            $("#searchOperationsForm").submit();
+        });
+
+    });
+</script>

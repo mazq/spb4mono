@@ -1,0 +1,53 @@
+﻿@model ManageThreadEditModel
+@{             
+    Layout = "app-manage-2cols";
+
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    ViewData["SectionId"] = Model.SectionId;
+    PagingDataSet<BarThread> barThreads = ViewData.Get<PagingDataSet<BarThread>>("BarThreads", null);
+
+
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    ViewData["TenantTypeId"] = TenantTypeIds.Instance().Group();
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-manage">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>帖子管理</h2>
+        </div>
+        @Html.Partial("_ManageSubMenu")
+        <div class="tn-manage-lists">
+            <div class="tn-search-area tn-helper-clearfix tn-border-gray tn-border-bottom">
+                <div class="tn-form tn-label-right tn-helper-clearfix">
+                    <form action="@(SiteUrls.Instance().GroupManageThreads(Url.SpaceKey()))" method="get">
+                    @Html.Hidden("SectionId", Model.SectionId)
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.CategoryId)
+                        @Html.DropDownListFor(n => n.CategoryId, null, "全部", new { @class = "tn-dropdownlist" })
+                    </div>
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.SubjectKeyword)
+                        @Html.TextBoxFor(n => n.SubjectKeyword, InputWidthTypes.Medium)
+                    </div>
+                    <div class="tn-form-row">
+                        @Html.FormLabelFor(n => n.UserId)
+                        @{
+                            long userId = 0;
+                            long.TryParse(string.IsNullOrEmpty(Model.UserId) ? "" : Model.UserId.Replace(",", ""), out userId);
+                        }
+                        @Html.UserSelector("UserId", userId)
+                    </div>
+                    <div class="tn-form-row tn-form-row-button">
+                        <label class="tn-form-label">
+                            &nbsp
+                        </label>
+                        @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                    </div>
+                    </form>
+                </div>
+            </div>
+            @Html.Partial("~/Applications/Bar/Views/Bar/_ManageThreads.cshtml", Model)
+        </div>
+    </div>
+</div>

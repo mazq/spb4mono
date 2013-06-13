@@ -1,0 +1,31 @@
+﻿@model User
+@{
+    int points = ViewData.Get<int>("totalPoints", 0);
+    Dictionary<string, string> pointDic = ViewData.Get<Dictionary<string, string>>("pointDic", new Dictionary<string, string>());
+    IEnumerable<PointCategory> pointCategories = ViewData.Get<IEnumerable<PointCategory>>("pointCategories", new List<PointCategory>());
+
+    PointCategory traPoint = ViewData.Get<PointCategory>("traPoint", new PointCategory());
+    PointCategory expPoint = ViewData.Get<PointCategory>("expPoint", new PointCategory());
+    PointCategory prePoint = ViewData.Get<PointCategory>("prePoint", new PointCategory());
+    
+    
+}
+<div class="tn-info-part tnc-integral-prompt">
+    <div class="spb-basic-info">
+        <dl>
+            <dt>综合积分：</dt>
+            <dd>@points 个</dd>
+        </dl>
+        
+        <dl>
+            <dt>@expPoint.CategoryName ：</dt><dd>@Model.ExperiencePoints @expPoint.Unit</dd>
+        </dl>
+        <dl>
+            <dt>@prePoint.CategoryName ：</dt><dd>@Model.ReputationPoints @prePoint.Unit</dd>
+        </dl>
+        <dl>
+            <dt>@traPoint.CategoryName
+                ：</dt><dd>@Model.TradePoints @traPoint.Unit</dd>
+        </dl>
+    </div>
+</div>

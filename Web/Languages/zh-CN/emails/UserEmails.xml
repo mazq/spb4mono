@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<emails>
+
+  <!--
+======================================================
+    帐号注册成功并自动激活时发送该邮件.     
+======================================================
+-->
+  <email templateName="RegisterSuccess" priority="High">
+    <subject>帐号注册成功 (@Model.SiteName)</subject>
+    <from>AdminAddress</from>
+    <body>
+
+      <table width="550" cellspacing="0" cellpadding="0" align="center">
+        <tbody>
+          <tr>
+            <td align="left" width="480" height="26" bgcolor="#0065a2"  style="color:#FFF; font-size:22px; padding:5px 0 5px 10px;font-family:'Microsoft YaHei';">
+              <span>@Model.SiteName</span>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="border:3px solid #0065a2;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="height:60px; padding:0 19px; font-size:16px; font-family:'Microsoft YaHei';">@Model.UserDisplayName,</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style=" padding:0 40px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style="border:1px solid #d6e5f3; padding:0;">
+                              <table width="454" bgcolor="#eff5fb">
+                                <tbody>
+                                  <tr>
+                                    <td style=" padding:10px;">
+                                      <table>
+                                        <tbody>
+                                          <tr>
+                                            <td style="padding:5px 5px 10px;font-size:14px;font-family:'Microsoft YaHei';">欢迎加入 @Model.SiteName，您的用户名和密码:</td>
+                                          </tr>
+                                          <tr>
+                                            <td style=" padding:3px 5px 0 30px;font-size:14px;font-family:'Microsoft YaHei';">用户名: @Model.UserName</td>
+                                          </tr>
+                                          <tr>
+                                            <td style=" padding:3px 5px 0 30px;font-size:14px;font-family:'Microsoft YaHei';">密　码: @Model.Password</td>
+                                          </tr>
+
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style=" padding-left:18px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style=" padding:10px 0 0 22px;font-size:14px;font-family:'Microsoft YaHei';">
+                              您可以点击这里进行登录:<br/>
+                              <a href="@Model.LoginUrl" target="_blank">@Model.LoginUrl</a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style=" padding:10px 0 0 22px;font-size:14px;font-family:'Microsoft YaHei';">
+                              登录后可以在这里修改密码:<br/>
+                              <a href="@Model.ChangePasswordUrl" target="_blank">@Model.ChangePasswordUrl</a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style=" padding:10px 0 0 22px;font-size:14px;font-family:'Microsoft YaHei'; color:#999999;">本邮件包含登录信息，请勿转发他人。</td>
+                          </tr>
+                          <tr>
+                            <td style=" color:#999999; padding:20px 0;font-size:14px;font-family:'Microsoft YaHei';">@(Model.SiteName)团队</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </body>
+  </email>
+
+  <!--
+======================================================
+    帐号注册后需要Email激活时发送该邮件. 
+======================================================
+-->
+  <email templateName="RegisterValidateEmail" priority="High">
+    <subject>帐号邮箱验证 (@Model.SiteName)</subject>
+    <from>AdminAddress</from>
+    <body>
+
+      <table width="550" cellspacing="0" cellpadding="0" align="center" >
+        <tbody>
+          <tr>
+            <td align="left" width="480" height="26" bgcolor="#0065a2"  style="color:#FFF; font-size:22px; padding:5px 0 5px 10px;font-family:'Microsoft YaHei';">
+              <span>@Model.SiteName</span>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="border:3px solid #0065a2;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="height:60px; padding:0 19px; font-size:16px; font-family:'Microsoft YaHei';">@Model.UserDisplayName,</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style=" padding:0 40px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style="border:1px solid #d6e5f3; padding:0;">
+                              <table width="454" bgcolor="#eff5fb">
+                                <tbody>
+                                  <tr>
+                                    <td style=" padding:10px;">
+                                      <table>
+                                        <tbody>
+                                          <tr>
+                                            <td style="padding:5px 5px 10px;font-size:14px;font-family:'Microsoft YaHei';">欢迎加入 @Model.SiteName</td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';">
+                                              请点击以下链接完成邮箱验证：<br/>
+                                              <a href="@Model.EmailValidateUrl" target="_blank">@Model.EmailValidateUrl</a>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';color:#999999">如果链接无法点击，请将它拷贝至您的浏览器(如IE)地址栏中直接访问。</td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';">您的用户名: @Model.UserName</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style=" padding-left:18px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style=" color:#999999; padding:20px 0;font-size:14px;font-family:'Microsoft YaHei';">@(Model.SiteName)团队</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </body>
+  </email>
+
+  <!--
+======================================================
+     Email sent when user changes password.
+======================================================
+-->
+  <email templateName="ChangedPassword" priority="High">
+    <subject>密码已修改 (@Model.SiteName)</subject>
+    <from>AdminAddress</from>
+    <body>
+
+      <table width="550" cellspacing="0" cellpadding="0" align="center" >
+        <tbody>
+          <tr>
+            <td align="left" width="480" height="26" bgcolor="#0065a2"  style="color:#FFF; font-size:22px; padding:5px 0 5px 10px;font-family:'Microsoft YaHei';">
+              <span>@Model.SiteName</span>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="border:3px solid #0065a2;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="height:60px; padding:0 19px; font-size:16px; font-family:'Microsoft YaHei';">@Model.UserDisplayName,</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style=" padding:0 40px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style="border:1px solid #d6e5f3; padding:0;">
+                              <table width="454" bgcolor="#eff5fb">
+                                <tbody>
+                                  <tr>
+                                    <td style=" padding:10px;">
+                                      <table>
+                                        <tbody>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';">您在 @Model.SiteName 的密码已经修改。</td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';">
+                                              您可以点击这里登录:<br/>
+                                              <a href="@Model.LoginUrl" target="_blank">@Model.LoginUrl</a>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td style=" padding:5px;font-size:14px;font-family:'Microsoft YaHei';">
+                                              登录后可以在这里修改密码:<br/>
+                                              <a href="@Model.ChangePasswordUrl" target="_blank">@Model.ChangePasswordUrl</a>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';color:#999999">
+                                              如果您并没有要求修改密码，<br/>
+                                              请尽快和管理员联系。
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style=" padding-left:18px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style=" color:#999999; padding:20px 0;font-size:14px;font-family:'Microsoft YaHei';">@(Model.SiteName)团队</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </body>
+  </email>
+
+  <email templateName="ResetPassword" priority="High">
+    <subject>找回密码 (@Model.SiteName)</subject>
+    <from>AdminAddress</from>
+    <body>
+
+      <table width="550" cellspacing="0" cellpadding="0" align="center" >
+        <tbody>
+          <tr>
+            <td align="left" width="480" height="26" bgcolor="#0065a2"  style="color:#FFF; font-size:22px; padding:5px 0 5px 10px;font-family:'Microsoft YaHei';">
+              <span>@Model.SiteName</span>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="border:3px solid #0065a2;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="height:60px; padding:0 19px; font-size:16px; font-family:'Microsoft YaHei';">@Model.UserDisplayName,</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style=" padding:0 40px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style="border:1px solid #d6e5f3; padding:0;">
+                              <table width="454" bgcolor="#eff5fb">
+                                <tbody>
+                                  <tr>
+                                    <td style=" padding:10px;">
+                                      <table>
+                                        <tbody>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';">
+                                              收到此邮件是因为您(或是某人)在 @Model.SiteName 网站上请求系统重新设置您的帐号密码，<br/>
+                                              如非您本人，请不用理会这封邮件。
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';">
+                                              您可以点击这里重新设置密码:<br/>
+                                              <a href="@Model.ResetPassword" target="_blank">@Model.ResetPassword</a><br/>
+                                              注意：请您在 @(Model.InvitationCodeTimeLiness) 天内（@Model.ExpirationTime 前）使用，否则该链接将失效。<br/>   <!--Todo：需要确认能不能加有效期时间-->
+                                              （如果链接无法点击，请将它拷贝至您的浏览器(如IE)地址栏中直接访问。）
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td style="padding:5px;font-size:14px;font-family:'Microsoft YaHei';color:#999999">
+                                              @Model.SiteName 再一次提醒您，为了保障您帐号的安全，请勿使用太简单的密码。<br/>
+
+                                              如您认为有被盗用帐号的情况，请立即更换密码。
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style=" padding-left:18px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style=" color:#999999; padding:20px 0;font-size:14px;font-family:'Microsoft YaHei';">
+                              @(Model.SiteName)团队<br/>
+
+                              请求发送该邮件的IP地址: @Model.IP
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </body>
+  </email>
+
+  <!--
+======================================================
+     提醒
+======================================================
+-->
+  <email templateName="Reminder" priority="High">
+    <subject>有等待您处理的信息 (@Model.SiteName)</subject>
+    <from>AdminAddress</from>
+    <body>
+
+      <table width="550" cellspacing="0" cellpadding="0" align="center">
+        <tbody>
+          <tr>
+            <td align="left" width="480" height="26" bgcolor="#0065a2"  style="color:#FFF; font-size:22px; padding:5px 0 5px 10px;font-family:'Microsoft YaHei';">
+              <span>@Model.SiteName</span>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="border:3px solid #0065a2;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="height:60px; padding:0 19px; font-size:16px; font-family:'Microsoft YaHei';">@Model.UserDisplayName,</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>
+                  <tr>
+                    <td style=" padding:0 40px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style=" font-size:14px;font-family:'Microsoft YaHei';">您在 @Model.SiteName,有以下信息需要处理： </td>
+                          </tr>
+                          <tr>
+                            <td style="border:1px solid #d6e5f3; padding:0;">
+                              @foreach (Tunynet.Common.UserReminderInfo userReminderInfo in Model.UserReminderInfos)
+                              { <table width="454" bgcolor="#eff5fb">
+                                <tbody>
+                                  <tr>
+                                    <td style="padding-left:10px;font-family:'Microsoft YaHei';">
+                                      <h2 style="font-size:14px;margin:5px 0;">
+                                        <a style=" color:#0065a2;" href="@userReminderInfo.ProcessUrl">@userReminderInfo.ReminderInfoType.TypeName ( @userReminderInfo.ReminderInfos.Count() )</a>
+                                      </h2>
+                                    </td>
+                                  </tr>
+                                  @foreach (var reminderInfo in userReminderInfo.ReminderInfos)
+                                  { <tr>
+                                    <td style=" padding:5px 10px 5px 40px; margin:0;font-size:14px;font-family:'Microsoft YaHei';">
+                                      <span style=" margin:3px 0;">@Raw(reminderInfo.Title) ( @reminderInfo.DateCreated.AddHours(8) )</span>
+                                    </td>
+                                  </tr> }
+                                </tbody>
+                              </table> }
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style=" padding-left:18px;">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style=" padding:20px 0;font-size:14px;font-family:'Microsoft YaHei';">
+                              您可以点击这里登录:<br/>
+                              <a href="@Model.LoginUrl" target="_blank">@Model.LoginUrl</a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style=" color:#999999; padding-bottom:10px;font-size:14px;font-family:'Microsoft YaHei';">@(Model.SiteName)团队</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </body>
+  </email>
+
+  <!--
+======================================================
+     邀请朋友
+======================================================
+-->
+
+  <email templateName="InviteFriend" priority="High">
+    <subject>@Model.UserDisplayName 邀请您加入 @Model.SiteName</subject>
+    <from>AdminAddress</from>
+    <body>
+
+      <table width="550" cellspacing="0" cellpadding="0"  align="center">
+        <tbody>
+          <tr>
+            <td align="left" width="480" height="26" bgcolor="#0065a2"  style="color:#FFF; font-size:22px; padding:5px 0 5px 10px;font-family:'Microsoft YaHei';">
+              <span>@Model.SiteName</span>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="border:3px solid #0065a2;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td width="160" valign="top" style=" padding:12px 10px 10px 10px;">
+                      <a href="@Model.UserAvatarUrl">
+                        <img style="border: none; width:160px;" src="@Model.UserAvatarUrl"/>
+                      </a>
+                    </td>
+                    <td>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td style="padding:10px 5px;font-size:14px;font-family:'Microsoft YaHei';">
+                              Hi,　我是 @Model.UserDisplayName<br/>
+                              我正在使用 @Model.SiteName ，马上注册关注我吧！
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding:5px;font-size:12px;font-family:'Microsoft YaHei';">@Model.InvitationBody</td>
+                          </tr>
+                          <tr>
+                            <td style="padding:5px;font-size:12px;font-family:'Microsoft YaHei';">
+                              马上点击以下链接接受邀请：<br />
+                              <a target="_blank" href="@Model.InviteUrl">@Model.InviteUrl</a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding:10px 5px;font-size:12px;font-family:'Microsoft YaHei';color:#999999">
+                              此信是 @Model.UserDisplayName 发给您的个人邀请，请勿转发！ 想更多了解 @Model.UserDisplayName，请访问：<a  target="_blank"  href="@Model.ProfileUrl">@Model.ProfileUrl</a><br />想更多了解 @Model.SiteName ，请访问：<br /><a  target="_blank" href="@Model.HomeUrl">@Model.HomeUrl</a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </body>
+  </email>
+</emails>

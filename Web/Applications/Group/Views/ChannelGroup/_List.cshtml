@@ -1,0 +1,50 @@
+﻿@model PagingDataSet<GroupEntity>
+@{
+    var sortBy = Request.QueryString.Get<SortBy_Group?>("sortBy", null);
+    var categoryId = Request.QueryString.Get<long?>("categoryId", null);
+    var areaCode = Request.QueryString.Get<string>("areaCode", null);
+
+    IUser currentUser = UserContext.CurrentUser;
+    bool currentUserIsSpaceUser = false;
+    if(currentUser!=null){
+        if(currentUser.UserName==Url.SpaceKey()){
+            currentUserIsSpaceUser = true;
+        }
+    }
+    string noDataMessage = ViewData.Get<string>("noDataMessage", "搜索不到群组!");
+
+    bool isGetMore = ViewData.Get<bool>("isGetMore", false) || Request.QueryString.Get<bool>("isGetMore", false);
+}
+@if (Model != null && Model.Count() > 0)
+{
+    <div id="ListGroups">
+        <ul class="tn-list">
+            @foreach (var Group in Model)
+            {
+                @Html.Partial("_Group", Group, new ViewDataDictionary { { "showJoinButton", !currentUserIsSpaceUser } })
+            }
+        </ul>
+        @if (isGetMore)
+        {
+            if (Model.PageIndex < Model.PageCount)
+            {
+            <div plugin="GetMore" class="tn-load-more tn-border-gray tn-corner-all">
+                <a href="@SiteUrls.Instance().UserJoinedGroups(Url.SpaceKey(), Model.PageIndex + 1, true)">
+                    更多↓</a></div>
+            }
+        }
+        else
+        {
+            <div class="tn-pagination">
+                @Html.AjaxPagingButton(Model, "ListGroups")
+                @Html.PagingResults(Model)
+            </div>
+        }
+    </div> 
+}
+else
+{
+    <div class="tn-no-data">
+        @noDataMessage</div> 
+  
+}

@@ -1,0 +1,94 @@
+﻿@model long
+@{
+    long categoryId = ViewData.Get<long>("CategoryId", 0);
+}
+<div class="spb-movethread" id="div_MoveThread">
+    @using (Html.BeginForm("MoveThread", "Bar", FormMethod.Post))
+    {
+        List<Category> allParentCategories = ViewData.Get<List<Category>>("AllParentCategories", new List<Category>());
+        <div class="tn-breadcrumb">
+            <span class="tn-breadcrumb-item">@Html.Link("顶级类别", SiteUrls.Instance()._MoveThread(Model), "顶级类别", new { id = "MoveThread_Category_" + 0 })</span><span class="tn-seperator">&gt;</span>
+            @if (allParentCategories.Count > 0)
+            {
+
+                for (int i = allParentCategories.Count - 6 < 0 ? 0 : allParentCategories.Count - 6; i < allParentCategories.Count; i++)
+                {
+                    if (categoryId == allParentCategories[i].CategoryId || i == allParentCategories.Count - 1)
+                    {
+                <span class="tn-breadcrumb-item tn-selected">@allParentCategories[i].CategoryName</span>
+                    }
+                    else
+                    {
+                <span class="tn-breadcrumb-item">@Html.Link(allParentCategories[i].CategoryName, SiteUrls.Instance()._MoveThread(Model, allParentCategories[i].CategoryId), allParentCategories[i].CategoryName, new { id = "MoveThread_Category_" + allParentCategories[i].CategoryId })</span><span class="tn-seperator">&gt;</span>
+                    }
+                }
+            }
+        </div>
+            List<Category> childCategories = ViewData.Get<List<Category>>("ChildCategories", new List<Category>());
+            if (childCategories.Count > 0)
+            {
+        <div class="tn-border-gray tn-border-bottom spb-movethread-name">
+            @foreach (var childCategory in childCategories)
+            {
+                <span class="tn-directory-item @(categoryId == childCategory.CategoryId ? "tn-selected" : "")">
+                    @Html.Link(HtmlUtility.TrimHtml(childCategory.CategoryName, 10), SiteUrls.Instance()._MoveThread(Model, childCategory.CategoryId), childCategory.CategoryName, new { id = "MoveThread_Category_" + childCategory.CategoryId })
+                </span>
+            }
+        </div>
+            }
+            IEnumerable<BarSection> barSections = ViewData.Get<IEnumerable<BarSection>>("BarSections", new List<BarSection>());
+            if (barSections.Count() <= 0)
+            {
+        <div class="tn-no-data">
+            暂无帖吧
+        </div>
+            }
+            else
+            {
+        <div class="spb-movethread-avatar">
+            <ul class="tn-helper-clearfix">
+                @foreach (var barSection in barSections)
+                {
+                    <li class="tn-expand-select-item tn-widget-content tn-widget-same" id="li-BarSection-@barSection.SectionId">
+                        <input type="hidden" value="@barSection.SectionId" />
+                        <div class="tn-avatar-mini">
+                            <img src="@SiteUrls.Instance().LogoUrl(barSection.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Small())"/></div>
+                        <div class="tn-user-name-info">
+                            @HtmlUtility.TrimHtml(barSection.Name, 10)</div>
+                    </li>
+                }
+            </ul>
+        </div>
+            }
+        @Html.Hidden("threadId", Model)
+        <input type="hidden" name="toSectionId" id="toSectionId" />
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            <button type="submit" class="tn-button-primary tn-button-text-only tn-button tn-corner-all tn-button-disabled" disabled="disabled" id="Move-thread-button-submit">
+                <span class="tn-button-text">确认</span></button>
+            <button type="button" dialogoperation="close" class="tn-button-secondary tn-button-text-only tn-button tn-corner-all">
+                <span class="tn-button-text">取消</span></button>
+        </div>
+        <script type="text/javascript" language="javascript">
+            $(document).ready(function () {
+                //帖吧的点击
+                $("li[id^='li-BarSection-']").click(function () {
+                    var $isSelected = $(this).is(".tn-selected");
+                    $("li[id^='li-BarSection-']").removeClass("tn-selected");
+                    if ($isSelected) {
+                        $("input#toSectionId").val("");
+                        $("button#Move-thread-button-submit").attr("disabled", "disabled").addClass("tn-button-disabled");
+                    } else {
+                        $("input#toSectionId").val($(this).find("input").val());
+                        $(this).addClass("tn-selected");
+                        $("button#Move-thread-button-submit").removeAttr("disabled").removeClass("tn-button-disabled");
+                    }
+                });
+            });
+        </script>
+        <script type="text/dialog">
+    this.title("移动帖子");
+    this.lock();
+        </script>
+        
+    }
+</div>

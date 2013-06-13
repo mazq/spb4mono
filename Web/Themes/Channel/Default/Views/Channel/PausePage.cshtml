@@ -1,0 +1,30 @@
+﻿@model PauseSiteSettings
+@{
+    Layout = "PauseSite-layout";
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-pause-inform-box">
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <div class="tnc-pause-inform tn-helper-clearfix">
+            @if (Model.PauseAnnouncement==null)
+            { 
+                <div class="tn-img tn-widget-content tn-border-gray tn-corner-all"><img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/images/wait.png")"></div>
+                <div class="tn-info">
+                    <div class="tn-title"><strong>暂停提示信息</strong></div>
+                    <div class="tn-description">
+                        网站正在维护，请稍后再来！！
+                    </div>
+                </div>
+            }
+            else 
+            { 
+                <div class="tn-info">
+                    <div class="tn-title"><strong>暂停提示信息</strong></div>
+                    <div class="tn-description">
+                        @Html.Raw(Model.PauseAnnouncement)
+                    </div>
+                </div>
+            }            
+        </div>
+    </div>
+</div>
+

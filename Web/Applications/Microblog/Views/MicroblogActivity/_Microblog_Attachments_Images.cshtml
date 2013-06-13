@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Attachment>
+@{
+    long userId = Request.QueryString.Get<long>("userId", 0);
+    long microblogId = Request.QueryString.Get<long>("microblogId", 0);
+    long? forwardMicroblogId = ViewData.Get<long?>("ForwardMicroblogId", null);
+    microblogId = forwardMicroblogId ?? microblogId;
+    int count = 0;
+}
+<dl class="tnc-dynamic-imgbox tn-helper-clearfix">
+    <dd class="tnc-bigimg-box tn-border-gray tn-bg-gray">
+        @foreach (Attachment attachment in Model)
+        {
+            if (attachment != null)
+            {
+                count++;
+                string pStyle = "tn-state-hidden tn-in-pic";
+                if (count > 1)
+                {
+            @Html.Raw("<div class=\"tnc-img-bigbox tn-hover\" >")
+                }
+            
+            <p class="tnc-bigshow-header @if (count > 1)
+                                         { @pStyle }" style="z-index:99999">
+                @if (count < 2)
+                {
+                    <a class="tn-action tn-action-text-icon" href="javascript:;" data-microblogId="@microblogId" id="attachmentsListLiImageUnfold-@microblogId">
+                        <span class="tn-icon tn-smallicon-collapse-close"></span><span class="tn-action-text">
+                            收起</span> </a> 
+                    <span class="tn-spacer tn-text-note">|</span> 
+                }
+                <a class="tn-action tn-action-text-icon" href="javascript:;" onclick="turn90Angle(-90,'microblogListImage-@attachment.AttachmentId');">
+                    <span class="tn-icon tn-smallicon-rotate-left"></span><span class="tn-action-text">向左转</span>
+                </a><span class="tn-spacer tn-text-note">|</span> <a class="tn-action tn-action-text-icon" href="javascript:;" onclick="turn90Angle(90,'microblogListImage-@attachment.AttachmentId');">
+                    <span class="tn-icon tn-smallicon-rotate-right"></span><span class="tn-action-text">
+                        向右转</span> </a><span class="tn-spacer tn-text-note">|</span> <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance().ImageUrl(attachment, TenantTypeIds.Instance().Microblog(), ImageSizeTypeKeys.Instance().Original())" target="_blank">
+                            <span class="tn-icon tn-smallicon-enlarge"></span><span class="tn-action-text">查看大图</span>
+                        </a>
+            </p>
+            <ul class="tnc-bigphoto-list">
+                <li><a href="javascript:;">
+                    <img data-microblogId="@microblogId" id="microblogListImage-@attachment.AttachmentId" src="@SiteUrls.Instance().ImageUrl(attachment, TenantTypeIds.Instance().Microblog(), ImageSizeTypeKeys.Instance().Big())" />
+                </a></li>
+            </ul>
+                if (count > 1)
+                {
+            @Html.Raw("</div>")
+                }
+            }
+        }
+    </dd>
+</dl>
+<script type="text/javascript">
+    $("img[id^='microblogListImage-']").live("click", function (e) {
+        e.preventDefault();
+        $this = $(this);
+        var microblogId = $this.attr("data-microblogId");
+        $("#attachmentsListUl-" + microblogId).show();
+        $("#microblogAttachmentContainer-" + microblogId).html("");
+    });
+</script>

@@ -1,0 +1,55 @@
+﻿@model PointItemEditModel
+@{
+    string expName = ViewData.Get<string>("expPoint", "经验");
+    string traName = ViewData.Get<string>("traPoint", "交易");
+    string preName = ViewData.Get<string>("prePoint", "威望");    
+}
+<div id="editPointItem">
+    @using (Html.BeginAjaxForm("_EditPointRules", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack
+    ("success"), new { id = "PointRulesForm" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form">
+                @Html.HiddenFor(n => n.ItemKey)
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.ItemName)
+                    @Html.TextBoxFor(n => n.ItemName, InputWidthTypes.Long)
+                    @Html.ValidationMessageFor(n => n.ItemName)
+                </div>
+                <div class="tn-form-row">
+                    @Html.Label(expName + "：")
+                    @* //todo:zhangp,by zhengw:为什么+ "" ？下同 *@ @* 回复：已修改*@
+                    @Html.TextBoxFor(n => n.ExperiencePoints, InputWidthTypes.Long)
+                    @Html.ValidationMessageFor(n => n.ExperiencePoints)
+                </div>
+                <div class="tn-form-row">
+                    @Html.Label(preName + "：")
+                    @Html.TextBoxFor(n => n.ReputationPoints, InputWidthTypes.Long)
+                    @Html.ValidationMessageFor(n => n.ReputationPoints)
+                </div>
+                <div class="tn-form-row">
+                    @Html.Label(traName + "：")
+                    @Html.TextBoxFor(n => n.TradePoints, InputWidthTypes.Long)
+                    @Html.ValidationMessageFor(n => n.TradePoints)
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+</div>
+<script type="text/dialog">
+    this.title("编辑积分项目");
+</script>
+<script type="text/javascript">
+
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+    }
+</script>

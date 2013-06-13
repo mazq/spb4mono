@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Navigation>
+@{
+    
+    int maxDepth = ViewData.Get<int>("maxDepth", 0);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-sidebar">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-menu-item">
+            @if (Model != null && Model.Count() > 0)
+            {
+                int currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+
+                if (maxDepth > 2)
+                {
+                    foreach (var nav in Model)
+                    {
+                <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                    <h4>
+                        <span class="tn-icon-file"></span>@nav.Text</h4>
+                </div>
+                <ul class="tn-side-menu">
+                    @GetNavigation(nav.Children, currentNavigationId);
+                </ul>
+                    }
+                }
+                else
+                {               
+                <ul class="tn-side-menu">
+                    @GetNavigation(Model, currentNavigationId);
+                </ul>
+                }
+            }
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            @Html.Action("_RecentVisit", "ControlPanel")
+        </div>
+    </div>
+</div>
+@helper GetNavigation(IEnumerable<Navigation> navigations, int currentNavigationId)
+    { 
+        if (navigations == null)
+        {
+            return;
+        }
+        foreach (var navigation in navigations)
+        {
+            if (!navigation.IsVisible(UserContext.CurrentUser) || !navigation.IsControlPanelManageable(UserContext.CurrentUser))
+            {
+                continue;
+            }
+             
+            string selectCalss = string.Empty;
+            if (navigation.IsCurrent(currentNavigationId))
+            {
+                selectCalss = "class=tnc-sublist-over";
+            }
+            
+    <li @(selectCalss)><em></em><a class="tn-menu-text" href="@navigation.GetUrl()" target="@navigation.NavigationTarget">@navigation.Text</a></li>
+        }
+}

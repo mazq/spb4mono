@@ -1,0 +1,80 @@
+﻿@{
+    var tunyNetLicenses = ViewData.Get<List<Tunynet.License.TunyNetLicense>>("tunyNetLicenses", new List<Tunynet.License.TunyNetLicense>());
+    string spacebuilderVersion = ViewData.Get<string>("spacebuilderVersion", string.Empty);
+}
+<div class="tnc-list">
+    <h2>
+        <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-product"></span>
+            <span class="tn-action-text">产品信息</span></span>
+    </h2>
+    <div class="tnc-list-text">
+        <ul class="tnc-System">
+            <li><span>产品版本</span>@spacebuilderVersion</li>
+            <li id="mostRecentVersion" data-url="@SiteUrls.Instance()._GetMostRecentVersion()"><a
+                id="updateHistory" target="_blank" href="#">查看更新说明</a><span>最新版本</span></li>
+            @foreach (var license in tunyNetLicenses)
+            {
+
+                if (license.Product.Level != "Free")
+                {
+                    Tunynet.License.DomainConstraint domainConstraint = null;
+                    foreach (Tunynet.License.IConstraint constraint in license.Constraints)
+                    {
+                        if (constraint is Tunynet.License.DomainConstraint)
+                        {
+                            domainConstraint = constraint as Tunynet.License.DomainConstraint;
+                        }
+                    }
+
+                    string domainNameLicensed = string.Empty;
+                    if (domainConstraint != null && domainConstraint.Domains.Length > 0)
+                    {
+                        domainNameLicensed = string.Join(" , ", domainConstraint.Domains);
+                    }
+                    string licensedApplicationNames = string.Join(" , ", license.ApplicationConstraint.Applications.Select(n => n.Value));
+                <li><span>授权持有者</span>@license.User.Name</li>
+                <li>@*<a href="#">商业授权查询</a>*@<span>产品类型</span>
+                    @switch (license.Product.Level)
+                    {
+                        case "Standard":
+                        <text> 标准版</text>
+                            break;
+                        case "Professional":
+                        <text> 专业版</text>
+                            break;
+                        case "Source":
+                        <text> 源码版</text>
+                            break;
+                        default:
+                        <text> 标准版</text>
+                            break;
+                    }
+                </li>
+                    if (!string.IsNullOrEmpty(domainNameLicensed))
+                    { 
+                <li><span>授权站点</span>@domainNameLicensed</li>
+                    }
+                <li><span>授权应用</span>@licensedApplicationNames</li>
+                }
+                else
+                { 
+                <li><span>产品类型</span>免费版(仅限个人非盈利站点使用)</li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var url = $("#mostRecentVersion").data("url");
+        $.getJSON(url, function (data) {
+            if (data && data.hasRecentVersion) {
+                $("#mostRecentVersion").append(data.mostRecentVersionInfo + "(" + data.mostRecentVersion + ")");
+                $("#updateHistory").attr("href", data.mostRecentVersionHistoryUrl);
+            }
+            else {
+                $("#mostRecentVersion").remove();
+            }
+        });
+    });
+</script>

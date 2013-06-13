@@ -1,0 +1,41 @@
+﻿@model Identification
+@{
+    Dictionary<long, string> identificationTypesDic = ViewData.Get<Dictionary<long, string>>("identificationTypesDic", null);
+}
+<div class="tn-form tn-label-right tnc-dailog-pd">
+    <div class="tn-form-row">
+        <label class="tn-form-label">认证类型：</label>
+            @identificationTypesDic[Model.IdentificationTypeId]
+    </div>
+    <div class="tn-form-row">
+        <label class="tn-form-label">真实姓名：</label>
+            @Model.TrueName
+    </div>
+    <div class="tn-form-row">
+        <label class="tn-form-label">身份证号：</label>
+            @Model.IdNumber
+    </div>
+    <div class="tn-form-row">
+        <label class="tn-form-label">认证说明：</label>
+            @Model.Description
+    </div>
+    <div class="tn-form-row">
+        <label class="tn-form-label"> 电子邮箱：</label>
+            @Model.Email
+    </div>
+    <div class="tn-form-row">
+        <label class="tn-form-label">
+            手机：</label>
+            @Model.Mobile
+    </div>
+    <div class="tn-form-row">
+        
+            <center> <img src="@SiteUrls.Instance().LogoUrl(Model.IdentificationLogo, TenantTypeIds.Instance().Identification(), ImageSizeTypeKeys.Instance().Medium())" /></center></div>
+    <div class="tn-form-row">
+            
+           <center>@Html.Button("确定", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { dialogOperation = "close", id = "cancel" })</center> 
+        </div>
+</div>
+<script type="text/dialog">
+    this.title("查看信息");
+</script>

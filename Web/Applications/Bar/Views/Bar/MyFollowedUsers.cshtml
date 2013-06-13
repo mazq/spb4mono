@@ -1,0 +1,44 @@
+﻿@model IEnumerable<User>
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    var barSection = ViewData.Get<BarSection>("barSection", new BarSection());
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @Html.AjaxAction("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.ThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Headline })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-mypost">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading">
+            <h2>
+                关注本吧的用户</h2>
+        </div>
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().SectionMembers(barSection.SectionId)">全部</a> </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().MyFollowedUsersForSection(barSection.SectionId)">我关注的人</a></li>
+            </ul>
+            <div class="tn-tabs-panel">
+                @if (Model != null && Model.Count() > 0)
+                { <ul class="tn-avatar-list">
+                    @foreach (var user in Model)
+                    {
+                        <li class="tn-avatar-item">
+                            @Html.ShowUserAvatar(user, SiteUrls.Instance().UserThreads(user.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                            <a href="@SiteUrls.Instance().UserThreads(user.UserId)" title="@user.DisplayName" target="_blank" class="tn-user-name">@user.DisplayName</a> </li>
+                    }
+                </ul>
+                }
+                else
+                { 
+                    <div class="tn-no-data">
+                        没有你关注的人</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

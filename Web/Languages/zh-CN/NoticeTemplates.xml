@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<notices>
+    <notice templateName="NewReply">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>在“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”有了新回复
+    </notice>
+    <notice templateName="NewComment">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>评论了你的“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”
+    </notice>
+    <notice templateName="ManagerApproved">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>已被管理员批准
+    </notice>
+    <notice templateName="ManagerDisapproved">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>未被管理员批准
+    </notice>
+    <notice templateName="ManagerCancelEssential">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>已被管理员取消加精
+    </notice>
+    <notice templateName="ManagerCancelSticky">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>已被管理员取消置顶
+    </notice>
+    <notice templateName="ManagerSetEssential">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>已被管理员设置精华
+    </notice>
+    <notice templateName="ManagerSetSticky">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>已被管理员设为置顶
+    </notice>
+    <notice templateName="ManagerRecommended">
+        你的<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>已被管理员推荐
+    </notice>
+    <notice templateName="RolesChanged">
+        你的角色已被管理员更改为 @Model.RelativeObjectName
+    </notice>
+    <notice templateName="RoleAdd">
+        管理员已为你添加了新的角色 @Model.RelativeObjectName
+    </notice>
+    <notice templateName="FollowUser">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>关注了你
+    </notice>
+    <notice templateName="AtUser">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>在@(Model.Owner)：“<a href="@Model.RelativeObjectUrl">@Model.RelativeObjectName</a>”中@@了你
+    </notice>
+    <notice templateName="AutoNoModeratedUser">
+        你已被自动解除管制，去看下<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>
+    </notice>
+    <notice templateName="PhotoLabelNotice">
+      <a href="@Model.LeadingActorUrl">@Model.LeadingActor</a>圈了你的<a href="@Model.RelativeObjectUrl" plugin="dialog" >照片</a>
+    </notice>
+    <notice templateName="PhotoLabeledNotice">
+      <a href="@Model.LeadingActorUrl">@Model.LeadingActor</a>在<a href="@Model.RelativeObjectUrl" plugin="dialog" >照片</a>中圈出了你
+    </notice>
+</notices>

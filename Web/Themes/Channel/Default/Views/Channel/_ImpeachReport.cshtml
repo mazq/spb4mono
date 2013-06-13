@@ -1,0 +1,77 @@
+﻿@model ImpeachReportCreateModel
+@{
+    var url = Request.QueryString.GetString("Url", null);
+    var user = ViewData.Get<User>("user", null);
+    var reportedUserId = ViewData.Get<long>("reportedUserId", 0);
+    var title = ViewData.Get<string>("title", string.Empty);
+    var reporter = ViewData.Get<string>("reporter", string.Empty);
+    var profile = ViewData.Get<UserProfile>("profile", null);
+    string mobile = user != null && user.Profile != null ? user.Profile.Mobile : string.Empty;
+}
+@using (Html.BeginAjaxForm("_ImpeachReport", "Channel", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack", OnErrorCallBack = "OnErrorCallBack" }, new { id = "_ImpeachReportForm" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-impeach-report">
+            @Html.Hidden("Url", url)
+            @Html.Hidden("UserId", user != null ? user.UserId : 0)
+            @Html.Hidden("ReportedUserId", reportedUserId)
+            @Html.Hidden("Title", title)
+            @if (user == null)
+            { 
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(model => model.Reporter)
+                    @Html.TextBoxFor(model => model.Reporter, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                    @Html.ValidationMessageFor(model => model.Reporter)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(model => model.Email)
+                    @Html.TextBoxFor(model => model.Email, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+            }
+            else
+            { 
+                @Html.Hidden("Reporter", user.DisplayName)
+                @Html.Hidden("Email", user.AccountEmail)
+            }
+            @if (string.IsNullOrEmpty(mobile))
+            {
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(model => model.Telephone)
+                    @Html.TextBoxFor(model => model.Telephone, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                    @Html.ValidationMessageFor(model => model.Telephone)
+                </div>
+            }
+            else
+            { 
+                @Html.Hidden("Telephone", mobile)
+            }
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model => model.Reason)
+                @Html.EnumDropDownListFor(model => model.Reason, "请选择", new { @class = "tn-dropdownlist" })
+                @Html.ValidationMessageFor(model => model.Reason)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model => model.Description)
+                @Html.TextAreaFor(model => model.Description, InputWidthTypes.Long)
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+            @Html.Captcha(VerifyScenarios.Post, true)
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "edit-term-submit" })
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+  this.title("举报用户");
+</script>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    function OnErrorCallBack(data) {
+        $("#_ImpeachReportForm").replaceWith(data);
+    }
+</script>

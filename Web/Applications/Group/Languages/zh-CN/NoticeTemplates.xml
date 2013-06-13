@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<notices>
+  <notice templateName="NewMemberApply">
+    <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>申请加入群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>
+  </notice>
+  <notice templateName="SetGroupManager">
+    您被提升为群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>的管理员
+  </notice>
+  <notice templateName="CannelGroupManager">
+    您从群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>的管理员变为普通成员
+  </notice>
+  <notice templateName="MemberApplyApproved">
+    恭喜，你加入群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>的申请被接受
+  </notice>
+  <notice templateName="MemberJoin">
+    <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>加入了群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>
+  </notice>
+  <notice templateName="MemberApplyDisapproved">
+    抱歉，你加入群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>的申请被拒绝
+  </notice>
+  <notice templateName="MemberQuit">
+    <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a>退出了群组<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>
+  </notice>
+</notices>

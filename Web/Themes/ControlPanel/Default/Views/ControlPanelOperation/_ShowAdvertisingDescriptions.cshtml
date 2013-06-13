@@ -1,0 +1,16 @@
+﻿@model IEnumerable<AdvertisingPosition>
+<div class="tnc-dailog-pd">
+    <div class="tn-form-box">
+        @if (Model != null && Model.Count() != 0) {
+            foreach (var position in Model) { 
+                <div class="tn-form-row">
+                    <span>@position.Description</span>
+                </div>      
+            }
+        }
+          
+    </div>
+</div>
+<script type="text/dialog">
+this.title("广告位");
+</script>

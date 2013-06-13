@@ -1,0 +1,279 @@
+﻿@model UserSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+    var tradePointCategory = new PointService().GetPointCategory("TradePoints");
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>用户设置</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                @using (Html.BeginAjaxForm("SaveUserSettings", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "saveUserSettings" }))
+                {
+                    <div class="tn-form tn-label-right tnc-user-register">
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>用户注册 </strong>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                注册方式：</label>
+                            @Html.EnumDropDownListFor(n => n.RegistrationMode, htmlAttributes: new { @class = "tn-dropdownlist" })
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                帐号激活方式：</label>
+                            @{
+                       List<SelectListItem> selectListItems = new List<SelectListItem>();
+                       selectListItems.Add(new SelectListItem { Selected = AccountActivation.Administrator == Model.AccountActivation, Text = "管理员激活", Value = AccountActivation.Administrator.ToString() });
+                       selectListItems.Add(new SelectListItem { Selected = AccountActivation.Automatic == Model.AccountActivation, Text = "自动激活", Value = AccountActivation.Automatic.ToString() });
+                       selectListItems.Add(new SelectListItem { Selected = AccountActivation.Email == Model.AccountActivation, Text = "邮件激活", Value = AccountActivation.Email.ToString() });
+                            }
+                            @Html.DropDownListFor(n => n.AccountActivation, selectListItems, htmlAttributes: new { @class = "tn-dropdownlist" })
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                未激活帐号登陆：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("EnableNotActivatedUsersToLogin", true, Model.EnableNotActivatedUsersToLogin, new { @class = "tn-radiobutton", id = "EnableToLogin" })
+                                    <label for="EnableToLogin">
+                                        允许</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("EnableNotActivatedUsersToLogin", false, !Model.EnableNotActivatedUsersToLogin, new { @class = "tn-radiobutton", id = "DisableToLogin" })
+                                    <label for="DisableToLogin">
+                                        不允许</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                密码加密方式：</label>
+                            @Html.EnumDropDownListFor(n => n.UserPasswordFormat, htmlAttributes: new { @class = "tn-dropdownlist" })
+                        </div>
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>用户管制 </strong><span class="tn-text-note">用户管制是指用户在注册成功后，部分功能会限制使用，直到综合积分达到指定要求后才能正常使用所有功能</span>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                用户管制：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("AutomaticModerated", true, Model.AutomaticModerated, new { @class = "tn-radiobutton", id = "IsAutomaticModerated" })
+                                    <label for="IsAutomaticModerated">
+                                        是</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("AutomaticModerated", false, !Model.AutomaticModerated, new { @class = "tn-radiobutton", id = "NotAutomaticModerated" })
+                                    <label for="NotAutomaticModerated">
+                                        否</label>
+                                </li>
+                                <li id="AutomaticModeratedMessage" style="@(Model.AutomaticModerated?"":"display:none")">设置管制规则：<a href="@SiteUrls.Instance().ManagePermissionItems()" title="查看权限规则">权限规则</a>、<a href="@SiteUrls.Instance().ManageAuditItems()" title="查看审核规则">审核规则</a></li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                自动解除管制所需综合积分：</label>
+                            @Html.TextBoxFor(n => n.NoModeratedUserPoint, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                            @Html.ValidationMessageFor(n => n.NoModeratedUserPoint)
+                        </div>
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>资料完整 </strong>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                最小资料完整度：</label>
+                            @Html.TextBoxFor(n => n.MinIntegrity, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })@Html.ValidationMessageFor(n => n.MinIntegrity)
+                            <span class="tn-text-note">如果资料完整度小于当前值，则登陆时会进入到向导模式，如果设置小于0不启用向导模式</span>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                档案完整度权重：</label>
+                            <ul class="tn-form-text">
+                                <li>头像 @Html.TextBoxFor(n => n.Avatar, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                                    % @Html.ValidationMessageFor(n => n.Avatar)+ 生日 @Html.TextBoxFor(n => n.Birthday, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                                    %@Html.ValidationMessageFor(n => n.Birthday)+ 所在地区 @Html.TextBoxFor(n => n.NowArea, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })@Html.ValidationMessageFor(n => n.NowArea)%+
+                                    家乡 @Html.TextBoxFor(n => n.HomeArea, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                                    %@Html.ValidationMessageFor(n => n.HomeArea)+ 即时通讯帐号 @Html.TextBoxFor(n => n.IM, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })%@Html.ValidationMessageFor(n => n.IM)+
+                                    教育经历 @Html.TextBoxFor(n => n.EducationExperience, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })%@Html.ValidationMessageFor(n => n.EducationExperience)+
+                                    工作经历 @Html.TextBoxFor(n => n.WorkExperience, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })%@Html.ValidationMessageFor(n => n.WorkExperience)+
+                                    自我介绍 @Html.TextBoxFor(n => n.Introduction, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })%@Html.ValidationMessageFor(n => n.Introduction)
+                                </li>
+                            </ul>
+                            <span id="showError" class="field-validation-error" style="display: none"><span>请确保各项之和为100</span></span>
+                        </div>
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>在线状态 </strong>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                记录匿名用户在线状态：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("EnableTrackAnonymous", true, Model.EnableTrackAnonymous, new { @class = "tn-radiobutton", id = "EnableTrackAnonymous" })
+                                    <label for="EnableTrackAnonymous">
+                                        启用</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("EnableTrackAnonymous", false, !Model.EnableTrackAnonymous, new { @class = "tn-radiobutton", id = "DisableTrackAnonymous" })
+                                    <label for="DisableTrackAnonymous">
+                                        不启用</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                用户在线状态所需条件：</label>
+                            @Html.TextBoxFor(n => n.UserOnlineTimeWindow, new RouteValueDictionary { { "class", "tn-textbox tn-input-short tn-border-gray" } })分钟内有操作
+                            @Html.ValidationMessageFor(n => n.UserOnlineTimeWindow)
+                        </div>
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>邀请好友 </strong>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                邀请码仅能使用一次：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("AllowInvitationCodeUseOnce", true, Model.AllowInvitationCodeUseOnce, new { @class = "tn-radiobutton", id = "AllowInvitationCodeUseOnce" })
+                                    <label for="AllowInvitationCodeUseOnce">
+                                        启用</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("AllowInvitationCodeUseOnce", false, !Model.AllowInvitationCodeUseOnce, new { @class = "tn-radiobutton", id = "DisAllowInvitationCodeUseOnce" })
+                                    <label for="DisAllowInvitationCodeUseOnce">
+                                        不启用</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                用户邀请码默认配额：</label>
+                            @Html.TextBoxFor(n => n.DefaultUserInvitationCodeCount, new RouteValueDictionary { { "class", "tn-textbox tn-input-medium tn-border-gray" } })
+                            个 @Html.ValidationMessageFor(n => n.DefaultUserInvitationCodeCount)
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                邀请码有效期：</label>
+                            @Html.TextBoxFor(n => n.InvitationCodeTimeLiness, new RouteValueDictionary { { "class", "tn-textbox tn-input-medium tn-border-gray" } })
+                            天 @Html.ValidationMessageFor(n => n.InvitationCodeTimeLiness)
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                购买邀请码所需@(tradePointCategory.CategoryName)：</label>
+                            @Html.TextBoxFor(n => n.InvitationCodeUnitPrice, new RouteValueDictionary { { "class", "tn-textbox tn-input-medium tn-border-gray" } })@Html.ValidationMessageFor(n => n.InvitationCodeUnitPrice)
+                        </div>
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>其他选项 </strong>
+                        </div>
+                        @Html.Hidden("EnableNickname", true)
+                        @Html.Hidden("DisplayNameType", "NicknameFirst")
+                        @*                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                启用昵称：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("EnableNickname", true, Model.EnableNickname, new { @class = "tn-radiobutton", id = "EnableNickName" })
+                                    <label for="EnableNickName">
+                                        启用</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("EnableNickname", false, !Model.EnableNickname, new { @class = "tn-radiobutton", id = "DisableNickName" })
+                                    <label for="DisableNickName">
+                                        不启用</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                显示名称组成：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("DisplayNameType", DisplayNameType.NicknameFirst, Model.DisplayNameType == DisplayNameType.NicknameFirst, new { @class = "tn-radiobutton", id = "NickNameFirst" })
+                                    <label for="NickNameFirst">
+                                        昵称优先</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("DisplayNameType", DisplayNameType.TrueNameFirst, Model.DisplayNameType == DisplayNameType.TrueNameFirst, new { @class = "tn-radiobutton", id = "TrueNameFirst" })
+                                    <label for="TrueNameFirst">
+                                        姓名优先</label>
+                                </li>
+                            </ul>
+                        </div>
+*@
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                用户登录跳转到：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li>
+                                    @Html.RadioButton("MyHomePageAsSiteEntry", true, Model.MyHomePageAsSiteEntry, new { @class = "tn-radiobutton", id = "MyHome" })
+                                    <label for="MyHome">
+                                        我的首页</label>
+                                </li>
+                                <li>
+                                    @Html.RadioButton("MyHomePageAsSiteEntry", false, !Model.MyHomePageAsSiteEntry, new { @class = "tn-radiobutton", id = "SiteHome" })
+                                    <label for="SiteHome">
+                                        频道首页</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                不允许使用的用户名：</label>
+                            @Html.TextBoxFor(n => n.DisallowedUserNames, new RouteValueDictionary { { "class", "tn-textbox tn-input-long tn-border-gray" } })@Html.ValidationMessageFor(n => n.DisallowedUserNames)
+                            <span class="tn-text-note">多个用户名之间用逗号分割</span>
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                贴标签限制：</label>
+                            @Html.TextBoxFor(n => n.MaxPersonTag, new RouteValueDictionary { { "class", "tn-textbox tn-input-medium tn-border-gray" } })@Html.ValidationMessageFor(n => n.MaxPersonTag)
+                            <span class="tn-text-note">用户最多为自己贴的多少个标签</span>
+                        </div>
+                        <div class="tn-form-row tn-form-row-button">
+                            <label class="tn-form-label">
+                                &nbsp;</label>
+                            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType)
+    }
+
+    $(function () {
+        $("#btnSave").click(function () {
+            var avatarCount = $("#Avatar").val();
+            var birthdayCount = $("#Birthday").val();
+            var nowAreaCount = $("#NowArea").val();
+            var homeAreaCount = $("#HomeArea").val();
+            var imCount = $("#IM").val();
+            var educationExperienceCount = $("#EducationExperience").val();
+            var workExperienceCount = $("#WorkExperience").val();
+            var introductionCount = $("#Introduction").val();
+            if (parseInt(avatarCount) + parseInt(birthdayCount) + parseInt(nowAreaCount) + parseInt(homeAreaCount) + parseInt(imCount) + parseInt(educationExperienceCount) + parseInt(workExperienceCount) + parseInt(introductionCount) != 100) {
+                $("#showError").show();
+                return false;
+            }
+            else {
+                $("#showError").hide();
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#IsAutomaticModerated").click(function () {
+            $("#AutomaticModeratedMessage").show();
+        });
+        $("#NotAutomaticModerated").click(function () {
+            $("#AutomaticModeratedMessage").hide();
+        });
+    });
+</script>

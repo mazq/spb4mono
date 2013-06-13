@@ -1,0 +1,44 @@
+﻿@{
+    long userId = ViewData.Get<long>("userId", 0);
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+    string email = ViewData["email"] as string;
+}
+<div id="EditUserEmailDialog">
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                邮箱：</label>
+            @Html.TextBox("_accountEmail", email, InputWidthTypes.Long, new RouteValueDictionary { { "id ", "_aemail" } })
+        </div>
+        <div id="messgae" class="tn-form-row" style="display:none">
+            <label class="tn-form-label">
+                &nbsp;  &nbsp;  &nbsp; &nbsp;  &nbsp;  </label>
+            <span class="field-validation-error"><span>您输入的电子邮箱格式不正确</span></span>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("保存", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "saveButtonInFrom", dialogOperation = "close" })
+    </div>
+</div>
+<script type="text/dialog">
+    this.title("修改邮箱");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#saveButtonInFrom").click(function () {
+            if ($("input[name='_accountEmail']").val() == "") {
+                return false;
+            }
+            var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+            if (!myreg.test($("#_aemail").val())) {
+                $("#messgae").show();
+                return false;
+            }
+            $("#AccountEmail").val($("#_aemail").val());
+            $("#hiddenEmail").val($("#_aemail").val());
+        });
+
+    });
+
+</script>

@@ -1,0 +1,19 @@
+﻿@model BarRating
+@{
+    string reputationPoints = ViewData.Get<string>("ReputationPoints", "威望积分");
+}
+<tr class="tn-table-grid-row">
+    <td class=" tn-width-user-name tn-nowrap">
+        @Html.Link(HtmlUtility.TrimHtml(Model.UserDisplayName, 20), SiteUrls.Instance().SpaceHome(Model.UserId), Model.UserDisplayName)
+    </td>
+    <td>
+        @(Model.ReputationPoints != 0 ? reputationPoints + (Model.ReputationPoints > 0 ? "+" + Model.ReputationPoints.ToString() : Model.ReputationPoints.ToString()) : "")
+        @(Model.TradePoints > 0 ? "交易积分+" + Model.TradePoints : "")
+    </td>
+    <td>
+        理由：@Model.Reason
+    </td>
+    <td class="tn-width-date tn-nowrap">
+        @Model.DateCreated.ToFriendlyDate()
+    </td>
+</tr>

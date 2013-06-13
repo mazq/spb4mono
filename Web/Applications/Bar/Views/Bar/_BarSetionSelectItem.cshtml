@@ -1,0 +1,72 @@
+﻿@model BarSection
+@{
+    long? categoryId = ViewData.Get<long?>("CategoryId", null);
+    string name = ViewData.Get<string>("Name", "name");
+    bool isHidden = ViewData.Get<bool>("IsHidden", false);
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", string.Empty);
+    string tenantTypeName = ViewData.Get<string>("TenantTypeName", string.Empty);
+}
+<div class="spb-movethread" id="barSectionSelector-Item-@name" style="; z-index: 1; position: absolute; @(isHidden ? "display: none;" : "") ">
+    @{
+        List<Category> allParentCategories = ViewData.Get<List<Category>>("AllParentCategories", new List<Category>());
+    }
+    <div class="tn-breadcrumb tn-bg-gray tn-border-gray">
+        <span class="tn-breadcrumb-item">@Html.Link("顶级类别", SiteUrls.Instance()._BarSetionSelectItem(name, null, Model == null ? 0 : Model.SectionId, tenantTypeId), "顶级类别", new { id = "SectionSelectItem-Category-" + 0 })</span><span class="tn-seperator">&gt;</span>
+        @if (allParentCategories.Count > 0)
+        {
+
+            for (int i = allParentCategories.Count - 6 < 0 ? 0 : allParentCategories.Count - 6; i < allParentCategories.Count; i++)
+            {
+                if (categoryId == allParentCategories[i].CategoryId || i == allParentCategories.Count - 1)
+                {
+            <span class="tn-breadcrumb-item tn-selected" title="@allParentCategories[i].CategoryName">@allParentCategories[i].CategoryName</span>
+                }
+                else
+                {
+            <span class="tn-breadcrumb-item">@Html.Link(allParentCategories[i].CategoryName, SiteUrls.Instance()._BarSetionSelectItem(name, allParentCategories[i].CategoryId, Model == null ? 0 : Model.SectionId, tenantTypeId), allParentCategories[i].CategoryName, new { id = "SectionSelectItem-Category-" + allParentCategories[i].CategoryId })</span><span class="tn-seperator">&gt;</span>
+                }
+            }
+        }
+    </div>
+    @{
+        List<Category> childCategories = ViewData.Get<List<Category>>("ChildCategories", new List<Category>());    
+    }
+    @if (childCategories.Count > 0)
+    {
+        <div class="spb-movethread-name tn-widget-content tn-border-gray tn-border-rbl">
+            @foreach (var childCategory in childCategories)
+            {
+                <span class="tn-directory-item @(categoryId == childCategory.CategoryId ? "tn-selected" : "")">
+                    @Html.Link(HtmlUtility.TrimHtml(childCategory.CategoryName, 10), SiteUrls.Instance()._BarSetionSelectItem(name, childCategory.CategoryId, Model == null ? 0 : Model.SectionId, tenantTypeId), childCategory.CategoryName, new { id = "SectionSelectItem-Category-" + childCategory.CategoryId })
+                </span>
+            }
+        </div>
+    }
+    @{
+        IEnumerable<BarSection> barSections = ViewData.Get<IEnumerable<BarSection>>("BarSections", new List<BarSection>());    
+    }
+    @if (barSections.Count() <= 0)
+    {
+        <div class="tn-no-data tn-widget-content tn-border-gray tn-border-rbl">
+            <text>暂无</text>@tenantTypeName
+        </div>
+    }
+    else
+    {
+        <div class="spb-movethread-avatar tn-widget-content tn-border-gray tn-border-rbl">
+            <ul class="tn-helper-clearfix" id="section-selector-@name">
+                @foreach (var barSection in barSections)
+                {
+                    <li class="tn-expand-select-item tn-widget-content tn-widget-same" id="li-BarSection-@barSection.SectionId">
+                        <input valueType="sectionId" type="hidden" value="@barSection.SectionId" />
+                        <input valueType="sectionName" type="hidden" value="@barSection.Name" />
+                        <div class="tn-avatar-mini">
+                            <img src="@SiteUrls.Instance().LogoUrl(barSection.LogoImage, barSection.TenantTypeId, ImageSizeTypeKeys.Instance().Small())"/></div>
+                        <div class="tn-user-name-info" title="@barSection.Name">
+                            @HtmlUtility.TrimHtml(barSection.Name, 10)</div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>

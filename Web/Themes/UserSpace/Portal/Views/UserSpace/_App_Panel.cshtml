@@ -1,0 +1,121 @@
+﻿@model IEnumerable<Navigation>
+@{
+    
+    int currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+    bool showNavigation = Html.ViewContext.RouteData.Values.Get<bool>("ShowNavigation", true);
+    long count = ViewData.Get<long>("AppCount", 0);
+
+    User user = ViewData["User"] as User;
+    bool isDomainUser = UserContext.CurrentUser != null && user.UserId == UserContext.CurrentUser.UserId;
+
+    ApplicationModel app = ViewData["Application"] as ApplicationModel;
+
+    IEnumerable<ApplicationManagementOperation> applicationManagementOperations = ViewData["ApplicationManagementOperations"] as IEnumerable<ApplicationManagementOperation>;
+    Navigation parentNavigation = ViewData.Get<Navigation>("ParentNavigation", new Navigation());
+
+}
+<div class="spb-app-panel-box">
+    <div class="spb-app-panel-wrap">
+        <div class="spb-app-panel">
+            <div class="spb-profile-avatar">
+                @if (parentNavigation.UrlRouteName == "UserSpace_Blog_Home")
+                {
+                    @Html.ShowUserAvatar(user, ViewData.Get<AvatarSizeType>("AvatarSizeType", AvatarSizeType.Small), isShowUserCard: false)
+                }
+                else
+                { 
+                    @Html.ShowUserAvatar(user, ViewData.Get<AvatarSizeType>("AvatarSizeType", AvatarSizeType.Small))
+                }
+            </div>
+            <div class="tn-info">
+                <ul class="spb-user-atten">
+                    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ListFollowedUsers(user.UserName)" title="@user.DisplayName">
+                        <strong class="tn-count">@user.FollowedCount</strong><span>关注</span></a></li>
+                    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ListFollowers(user.UserName)" title="@user.DisplayName">
+                        <strong class="tn-count">@user.FollowerCount</strong><span>粉丝</span></a></li>
+                    @if (app != null)
+                    {
+                        <li><a href="@CachedUrlHelper.RouteUrl("ApplcationCount_" + app.ApplicationKey, new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } })">
+                            <strong class="tn-count">@(count)</strong><span>@Tunynet.Globalization.ResourceAccessor.GetString("CountObject_" + app.ApplicationKey, app.ApplicationId)
+                            </span></a></li>
+                    }
+                </ul>
+                <div class="spb-profile">
+                    <h1 class="tn-user-name">
+                        <a href="@SiteUrls.Instance().SpaceHome(user.UserId)" title="@user.DisplayName">@(StringUtility.Trim(user.DisplayName, 8, ""))</a></h1>@Html.IdentificationType(user.UserId)
+                </div>
+                @*<div class="tn-actions">
+                    @if ( parentNavigation != null
+                         && app != null
+                         && showNavigation)
+                    {
+                        <a href="@parentNavigation.GetUrl(Url.SpaceKey())">
+                            @(user.Profile.ThirdPerson() + "的" + parentNavigation.Text)
+                        </a>
+                    }
+                </div>*@
+            </div>
+            @Html.Action("_SelectMenu", "UserSpace", new { spaceKey = Url.SpaceKey(), Area = "Common" })
+            <div class="spb-app-nav tn-helper-clearfix tn-helper-clear">
+                @if (applicationManagementOperations != null && applicationManagementOperations.Count() > 0 && isDomainUser)
+                {
+                    <div class="tn-quick-action">
+                        @foreach (ApplicationManagementOperation applicationManagementOperation in applicationManagementOperations)
+                        {
+                            if (!applicationManagementOperation.IsVisible(UserContext.CurrentUser) || applicationManagementOperation.AssociatedNavigationId > 0)
+                            {
+                                continue;
+                            } 
+                            <a class="tn-button-primary tn-button-large tn-button-text-icon-primary tn-button tn-corner-all"
+                            href="@applicationManagementOperation.GetUrl(Url.SpaceKey())" target="@applicationManagementOperation.NavigationTarget">
+                                @if (!string.IsNullOrEmpty(applicationManagementOperation.IconName))
+                                {
+                                    @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), applicationManagementOperation.IconName, false))
+                                }
+                                <span class="tn-button-text">
+                                    @applicationManagementOperation.OperationText</span></a>
+                        }
+                    </div>
+                }
+                @if (showNavigation)
+                {
+                    <div class="tnc-user-menu">
+                        <ul class="tn-side-menu tn-border-top tn-border-gray">
+                            @if (Model != null)
+                            {
+                                foreach (Navigation nav in Model)
+                                {
+                                    if (!nav.IsVisible(UserContext.CurrentUser))
+                                    {
+                                        continue;
+                                    }
+
+                                    string selected = string.Empty;
+                                    if (nav.IsCurrent(currentNavigationId))
+                                    {
+                                        selected = "tn-border-bottom tn-border-gray tn-bg-gray tn-selected";
+                                    }
+    
+                                <li class="@(selected)">
+                                    @{
+                                    ApplicationManagementOperation applicationManagementOperation = applicationManagementOperations.Where(n => n.AssociatedNavigationId == nav.NavigationId).FirstOrDefault();
+                                    }
+                                    @if (!string.IsNullOrEmpty(nav.IconName))
+                                    {
+                                        <span class="tn-icon tn-icon-@nav.IconName"></span>
+                                    }
+                                    @if (applicationManagementOperation != null && applicationManagementOperation.IsVisible(UserContext.CurrentUser))
+                                    {
+                                        <a class="tn-action" href="@applicationManagementOperation.GetUrl(Url.SpaceKey())" target="@applicationManagementOperation.NavigationTarget">
+                                            <span class="tn-action-text">@applicationManagementOperation.OperationText</span></a>
+                                    }
+                                    <a class="tn-menu-text" target="@(nav.NavigationTarget)" href="@nav.GetUrl(Url.SpaceKey())">@(string.Format(nav.Text, user.Profile.ThirdPerson()))</a></li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

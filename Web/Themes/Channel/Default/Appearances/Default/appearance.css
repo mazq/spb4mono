@@ -1,0 +1,131 @@
+/* 
+Offical Style for Spacebuilder
+(c) Tunynet Inc.
+*/ 
+
+/* Theme
+----------------------------------*/
+body{ color: #555; }
+a{ color:#0065a2; }
+a:hover{ color:#0065a2;} 
+.spb-top-menubar{ background: url(images/spb-page-bg.png) repeat-x 0px 0px;}
+.spb-app-page .tn-content-bg{ background: url(images/spb-page-bg.png) repeat-x 0px -36px; }
+.spb-search-page .tn-content-bg{ background: url(images/tn-channel-searchbg.png) repeat-x 0px 0px; }
+/*.spb-bar-page .tn-content-bg .tn-wrapper { background: url(images/spb-channel-headimg.png) no-repeat 330px 0px; }*/
+.spb-square-page .tn-content-bg{ background-image: none; }
+a{ color:#0065a2; }
+a:hover{ color:#0065a2;} 
+.tn-box .tn-box-content { background: none ;border:0;}
+
+/* Separation line
+----------------------------------*/
+.tnc-aside,
+.spb-app-page .tnc-aside-second { background-color:#fafafa;}
+
+.tn-dropdownlist,
+.tn-textbox{color:#666;}
+ 
+
+/* Font color
+----------------------------------*/
+.spb-status a:hover{ color: #0065a2; text-decoration: none; }
+.tn-secondary-text a,
+.tn-text-note{ color: #bbb;}
+
+
+/* Component containers
+----------------------------------*/
+.tn-widget-content, 
+.ui-widget-content { border-color: #ccc; }
+.tn-widget-bubble,
+.tn-widget-same { border-color: #fff; }
+.tn-widget-header, 
+.ui-widget-header { border-color: #ddd; background: #f8f8f8; }
+
+/* Background 
+----------------------------------*/
+.tn-bg-light { background-color: #f8f8f8; }
+.tn-bubble-light { border-color: #f2f7fa; }
+.tn-bg-gray { background-color: #f5f5f5; }
+.tn-bubble-gray { border-color: #f5f5f5; }
+.tn-bg-deep { background-color: #0065a2; }
+.tn-bubble-deep { border-color: #0065a2; }
+
+/* Border
+----------------------------------*/
+.tn-border-deep { border-color: #0065a2; }
+.tn-border-light { border-color: #eaeaea ; }
+.tn-button-default{ border-color: #eaeaea; }
+
+/* tabs
+----------------------------------*/
+.tn-tabs .tn-tabs-nav li a{ color:#666;}
+.tn-tabs .tn-tabs-nav li.tn-tabs-selected a{color: #0065A2;}
+
+/* Interaction states
+----------------------------------*/
+.tn-state-default, .tn-widget-content .tn-state-default,
+.ui-state-default, .ui-widget-content .ui-state-default { border: 1px solid #ccc; background: #f8f8f8; }
+.tn-state-default a, .tn-state-default a:link, .tn-state-default a:visited, .tn-state-hover a, .tn-state-hover a:hover, 
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited, .ui-state-hover a, .ui-state-hover a:hover { color: #666; }
+.tn-state-hover, .tn-widget-content .tn-state-hover, .tn-state-focus, .tn-widget-content .tn-state-focus,  
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus { border: 1px solid #ccc; background: #e8e8e8; }
+.ui-tabs-nav li.ui-tabs-selected a{ color: #0065A2;}
+.tn-state-active, .tn-widget-content .tn-state-active,  
+.ui-state-active, .ui-widget-content .ui-state-active { border: 1px solid #ccc; background: #fff; color: #999; }
+
+/* Box
+----------------------------------*/
+.tn-box,
+.tn-box-content,
+.ui-tabs { background: none ; border-width:0; }
+.tn-box .tn-box-header{ background:none; }
+
+/* Header
+----------------------------------*/
+.spb-top-menubar a.spb-menu-link,
+.spb-top-menubar a.spb-menu-link:hover { color: #333; }
+.spb-top-menubar .spb-menu .tn-selected a.spb-menu-link,
+.spb-top-menubar .spb-menu a.spb-menu-link:hover { background: #eee; }
+.spb-top-menubar .spb-menu .tn-icon,
+.spb-top-menubar .spb-user-menu .tn-icon { background-image: url(../../../../Shared/Styles/icons/50gray/tn-icon-small.png); }
+.spb-top-menubar .spb-user-menu .tn-icon:hover { background-image: url(../../../../Shared/Styles/icons/75gray/tn-icon-small.png); }
+.spb-user-menu .tn-user-name:hover { padding: 0 2px; line-height: 23px; text-decoration: none; background: #eee; border: #d4d4d4 solid 1px; }
+.spb-user-menu .tn-icon-menu.tn-hover { background: #d4d4d4; }
+
+/* Submenu
+----------------------------------*/
+.tnc-content-header .tn-submenu a { color: #666; }
+.tnc-content-header .tn-submenu a:hover { text-decoration: none; color: #333; }
+.tnc-content-header .tn-submenu-link { border-color: #ddd;  }
+.tnc-content-header .tn-submenu-link:hover { background: #eee; }
+.tnc-content-header .tn-selected .tn-submenu-link,
+.tnc-content-header .tn-selected .tn-submenu-link:hover { background: #fff; }
+
+/* Footer
+----------------------------------*/
+#tn-footer{ border-top:1px solid #dddddd; color: #666; }
+
+/* tags
+----------------------------------*/
+.tn-tags a { border: #d3dfec solid 1px; background: #e7eff8;color: #0065A2; }
+.tn-tags a:hover { text-decoration: none; color: #333; background: #eee; border-color: #ccc; }
+.tn-tags .tn-more a { border-width: 0; background: none; }
+.tn-tags .tn-more a:hover { text-decoration: underline; background: none; }
+
+/* Dynamic
+----------------------------------*/
+.tnc-dynamic .tnc-down-blkarrow { background: none repeat scroll 0 0 #e9e9e9; }
+.tnc-down-blkarrow a.tn-icon { background-color: #d4d4d4; background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png);  }
+.tnc-down-blkarrow a.tn-icon:hover { background-color: #0065a2; background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png); }
+
+/* Ask */
+.spb-answer-list .tn-list-header .tn-selected{ font-weight: normal; color:#999; }
+
+/* intro
+--------------------------------------------------------------------*/
+
+.spb-intro-other{color:#c85507;}
+.spb-intro-other em{ color:#FF0;}
+.spb-intro-other a{ color:#fff;}
+.spb-intro-other a:hover{color:#FF0;}

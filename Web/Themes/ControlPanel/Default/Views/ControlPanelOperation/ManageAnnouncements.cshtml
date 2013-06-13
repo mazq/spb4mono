@@ -1,0 +1,281 @@
+﻿@model PagingDataSet<Announcement>
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+    var presentTime = DateTime.UtcNow.ToLocalTime();
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>公告管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-shortsearch-adminform">
+                        @using (Html.BeginForm("ManageAnnouncements", "ControlPanelOperation", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    主题关键字：</label>
+                                @Html.TextBox("keyword", Request.QueryString.Get<string>("keyword", string.Empty), new { maxlength = "32", @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                               <label class="tn-form-label">
+                                    过期时间：</label>
+                                @Html.DatePicker("startExpiredDate", Request.QueryString.Get<DateTime>("startExpiredDate"), null, null)
+                                到 @Html.DatePicker("endExpiredDate", Request.QueryString.Get<DateTime>("endExpiredDate"), null, null)
+                            </div>  
+                            <div class="tn-form-row">
+                              <label class="tn-form-label">
+                                    更新时间：</label>
+                                @Html.DatePicker("startModifiedDate", Request.QueryString.Get<DateTime>("startModifiedDate"), null, null)
+                                到 @Html.DatePicker("endModifiedDate", Request.QueryString.Get<DateTime>("endModifiedDate"), null, null)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    状态：</label>
+                                @Html.EnumDropDownList("status", Request.QueryString.Get<Announcement_Status?>("status"), "不限", new { @class = "tn-dropdownlist" })
+                            </div> 
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    展示区域：</label>
+                                @Html.EnumDropDownList("displayArea", Request.QueryString.Get<Announcement_DisplayArea?>("displayArea"), "不限", new { @class = "tn-dropdownlist" })
+                            </div>           
+                            <div class="tn-form-row">
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>      
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加公告", SiteUrls.Instance().EditAnnouncement(), iconType: IconTypes.SmallAdd)
+                            @Html.LinkButton("设为过期", SiteUrls.Instance().ChangeStatusToExpired(), htmlAttributes: new { id = "change-announcements" })
+                            @Html.LinkButton("删除", SiteUrls.Instance().DeleteAnnouncements(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-announcements" })
+                        </div>
+                    </div>
+                    @if (Model == null && Model.Count() == 0)
+                    {
+                        <div class="tn-no-data">
+                            暂无公告</div>
+                    }
+                    else
+                    {
+                        <form id="batchform" method="post">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input id="select-all" type="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        公告标题
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        创建人
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        展示区域
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        发布日期
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        过期日期
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        更新日期
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        排序
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var announcement in Model)
+                                {
+                                    <tr class="tn-table-grid-row" id="searched_@(announcement.Id)" data-id="@announcement.Id" >
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("ids", announcement.Id, false, new { @class = "announcement-id", value = @announcement.Id })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        @if (announcement.IsHyperLink)
+                                        {
+                                             <a href="@announcement.HyperLinkUrl" title="@announcement.Subject" style="@announcement.SubjectStyle" target="_blank">@announcement.Subject</a>
+                                        }
+                                        else
+                                        {
+                                            if (announcement.EnabledDescription)
+                                            { 
+                                             <a href="@SiteUrls.Instance().AnnouncementDetail(announcement.Id)" title="@announcement.Subject" style="@announcement.SubjectStyle" target="_blank">@announcement.Subject</a>
+                                            }
+                                            else
+                                            {
+                                                <div title="@announcement.Subject" style="@announcement.SubjectStyle">@announcement.Subject</div>
+                                            }
+                                        }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name">
+                                            <a href="@SiteUrls.Instance().SpaceHome(announcement.UserId)" target="_blank">@UserIdToUserNameDictionary.GetUserName(announcement.UserId)</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                            @if (announcement.ReleaseDate > presentTime && announcement.ExpiredDate > presentTime)
+                                            { 
+                                                @:未发布
+                                            }
+                                            @if (announcement.ReleaseDate <= presentTime && announcement.ExpiredDate >= presentTime)
+                                            { 
+                                                @:已发布
+                                            }
+                                            @if (announcement.ExpiredDate <= presentTime)
+                                            { 
+                                                @:已过期
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @if (announcement.DisplayArea == "Home,")
+                                            { 
+                                                @:频道首页
+                                            }
+                                            @if (announcement.DisplayArea == ",UserSpace")
+                                            { 
+                                                @:用户空间首页
+                                            }
+                                            @if (announcement.DisplayArea == "Home,UserSpace")
+                                            { 
+                                                @:频道首页，用户空间首页
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime  tn-nowrap">
+                                            @announcement.ReleaseDate
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime  tn-nowrap">
+                                            @announcement.ExpiredDate
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime  tn-nowrap">
+                                            @announcement.LastModified.ToFriendlyDate()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("上移", SiteUrls.Instance().ChangeAnnouncementDisplayOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "display-order-up" + announcement.Id, name = announcement.Id })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("下移", SiteUrls.Instance().ChangeAnnouncementDisplayOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "display-order-down" + announcement.Id, name = announcement.Id })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance().EditAnnouncement(announcement.Id), "编辑")
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetText("删除").SetTooltip("删除敏感词").SetDeleteTarget("#searched_" + announcement.Id).SetUrl(SiteUrls.Instance().DeleteAnnouncements(announcement.Id)).SetOnErrorCallBack("error").SetOnSuccessCallBack("success"))
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                       </form>  
+                        <div class="tn-pagination">
+                                @Html.PageSizeDropdownList("pageSize")
+                                @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                                @Html.PagingResults(Model) 
+                        </div>
+                                           
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(function () {
+        removeChecked();
+        //处理火狐下浏览器刷新后复选框仍然选中
+        function removeChecked() {
+            $(".announcement-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".announcement-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".announcement-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+
+        //点批量删除
+        $("#delete-announcements").click(function (e) {
+            e.preventDefault();
+            if (!$("form input[name='ids']:checked").length) {
+                alert("请至少选择一个公告！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $("#batchform").ajaxSubmit({
+                    success: function (data) {
+                        window.location.reload(true);
+                    },
+                    url: url,
+                    error: function (XMLResponse) {
+                        alert('操作失败！');
+                    }
+                });
+            });
+        });
+
+        //点批量过期
+        $("#change-announcements").click(function (e) {
+            e.preventDefault();
+            if (!$("form input[name='ids']:checked").length) {
+                alert("请至少选择一个公告！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要过期这些公告吗？', function () {
+                $("#batchform").ajaxSubmit({
+                    success: function (data) {
+                        window.location.reload(true);
+                    },
+                    url: url,
+                    error: function (XMLResponse) {                        
+                        alert('操作失败！');
+                    }
+                });
+            });
+        });
+
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+    });
+    function error() {
+        art.dialog.tips("删除失败！", 2, -1);
+    }
+
+    function success() {
+        art.dialog.tips("删除成功！", 2, 1);
+    }
+</script>

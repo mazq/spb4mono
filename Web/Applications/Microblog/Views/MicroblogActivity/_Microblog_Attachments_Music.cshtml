@@ -1,0 +1,42 @@
+﻿@model ParsedMedia
+@if (Model != null)
+{
+    long microblogId = Request.QueryString.Get<long>("microblogId", 0);
+    long? forwardMicroblogId = ViewData.Get<long?>("ForwardMicroblogId", null);
+    microblogId = forwardMicroblogId ?? microblogId;
+    
+    string musicPlayer = Tunynet.Utilities.WebUtility.ResolveUrl("~/Scripts/audio-player.swf");
+    string musicObjValue = string.Empty;
+
+    if (Model.PlayerUrl.Contains(".swf"))
+    {
+        musicObjValue = Model.PlayerUrl;
+    }
+    else
+    {
+        musicObjValue = string.Format("{0}?audioUrl={1}&autoPlay=true", musicPlayer, Model.PlayerUrl);
+    }
+    
+    <dl class="tnc-dynamic-imgbox tn-helper-clearfix">
+        <dd class="tnc-bigimg-box tn-border-gray tn-bg-gray">
+            <p class="tnc-bigshow-header ">
+                <a class="tn-action tn-action-text-icon" href="javascript:;" data-microblogId="@microblogId" id="attachmentsListLiMusicUnfold-@microblogId">
+                    <span class="tn-icon tn-smallicon-collapse-close"></span><span class="tn-action-text">
+                        收起</span> </a>
+            </p>
+            <ul class="tnc-bigphoto-list">
+                <li>
+                    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="400" codebase=" http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">
+                        <param name="bgcolor" value="#ffffff" />
+                        <param name="flashvars" value="playerMode=embedded" />
+                        <param name="src" value="@musicObjValue" />
+                        <param name="wmode" value="window" />
+                        <param name="quality" value="best" />
+                        <embed type="application/x-shockwave-flash" width="400" src="@musicObjValue"
+                            quality="best" bgcolor="#ffffff" wmode="window" flashvars="playerMode=embedded"></embed>
+                    </object>
+                </li>
+            </ul>
+        </dd>
+    </dl>
+}

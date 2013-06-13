@@ -1,0 +1,77 @@
+﻿@model IEnumerable<GroupEntity>
+@{
+    
+    Layout = "app-list-2cols";
+    User spaceUser = ViewData.Get<User>("spaceUser", null);
+    User currentUser = ViewData.Get<User>("currentUser", new User());
+    bool isfollowed = currentUser.IsFollowed(spaceUser.UserId);
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    bool currentUserIsSpaceUser = false;
+    if (spaceUser.UserId == currentUser.UserId)
+    {
+        currentUserIsSpaceUser = true;
+    }    
+}
+@section Aside{
+      <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-count-box">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <ul class="spb-group-count tn-helper-clearfix">
+                <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().UserCreatedGroups(spaceUser.UserName)"><strong class="tn-count">@spaceUser.CreatedGroupCount()</strong></a><span>创建的群组</span></li>
+                <li><a href="@SiteUrls.Instance().UserJoinedGroups(spaceUser.UserName)"><strong class="tn-count">@spaceUser.JoinedGroupCount()</strong></a><span>加入的群组</span></li>
+            </ul>
+        </div>
+    </div>
+    @Html.Action("_TopGroups", "ChannelGroup", new { topNumber = 5, sortBy = SortBy_Group.StageHitTimes, viewName = "_TopGroups_ListForMyGroup" })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-mygroup">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-card tn-helper-clearfix">
+            <div class="tn-avatar-medium">@Html.ShowUserAvatar(spaceUser.UserId, avatarSizeType: AvatarSizeType.Medium, navigateTarget: HyperLinkTarget._blank)</div>
+            <div class="tn-info">
+                <p class="tn-user-name">
+                    <a href="@SiteUrls.Instance().SpaceHome(spaceUser.UserId)" title="@spaceUser.DisplayName" target="_blank">
+                        <strong>@spaceUser.DisplayName</strong></a>
+                </p>
+                <p class="tn-user-data">
+                    <a href="@SiteUrls.Instance().SpaceHome(spaceUser.UserId)" target="_blank">
+                        @if (currentUserIsSpaceUser)
+                        {
+                            @:查看我的空间»
+                    }
+                        else
+                        {
+                            @:查看TA的空间»
+                        }</a></p>
+                <span class="tn-actions">
+                    @if (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != spaceUser.UserId)
+                    { 
+                        @Html.FollowUser(spaceUser.UserId, "关注")                        
+                    }
+                </span>
+            </div>
+        </div>
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().UserJoinedGroups(Url.SpaceKey())" title="@spaceUser.UserName">
+                    加入的群组</a> </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().UserCreatedGroups(Url.SpaceKey())" title="@spaceUser.UserName">
+                    创建的群组</a> </li>
+            </ul>
+        </div>
+        @if (Model != null && Model.Count() > 0)
+        {
+            <ul class="tn-list">
+                @foreach (var Group in Model)
+                {
+                    @Html.Partial("_Group", Group, new ViewDataDictionary { { "showJoinButton", currentUserIsSpaceUser } })
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="tn-no-data">
+        目前还没有创建群组!</div> 
+        }
+    </div>
+</div>
+@*@Html.Partial("_List", Model, new ViewDataDictionary { { "showJoinButton", currentUserIsSpaceUser } })*@

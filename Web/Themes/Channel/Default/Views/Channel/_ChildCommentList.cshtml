@@ -1,0 +1,93 @@
+﻿@model PagingDataSet<Comment>
+@{
+    long parentId = ViewData.Get<long>("parentId", 0);
+    long commentedObjectId = ViewData.Get<long>("commentedObjectId", 0);
+    bool showBefor = ViewData.Get<bool>("ShowBefor", true);
+    bool showAfter = ViewData.Get<bool>("ShowAfter", false);
+    TenantCommentSettings settings = TenantCommentSettings.GetRegisteredSettings(ViewData.Get<string>("TenantTypeId", string.Empty));
+
+
+    bool enableComment = ViewData.Get<bool>("enableComment", true);
+}
+@*//这个时间段之前发布的*@
+@if (showBefor && Model.PageIndex < Model.PageCount)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        @Html.Link("更多↑", SiteUrls.Instance()._ChildCommentList(parentId, Model.PageIndex + 1), "更多↑")
+    </div>
+}
+<ul class="tn-comments" id="commentList-@commentedObjectId-@parentId">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        var comment = Model[Model.Count - i - 1];
+        if (new Authorizer().Comment_Show(comment))
+        {
+        <li class="tn-comment-item tn-border-gray tn-border-top" id="li-comment-@comment.Id">
+            <a name="@comment.Id"></a>
+            <div class="tn-comment tn-helper-clearfix">
+                <div class="tn-comment-avatar">
+                    @Html.ShowUserAvatar(comment.IsAnonymous ? 0 : comment.UserId, AvatarSizeType.Small)
+                </div>
+                <div class="tn-comment-info tn-hover">
+                    <div class="tn-comment-act tn-state-hidden">
+                        @if (new Authorizer().Comment_Delete(comment))
+                        {
+                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetDeleteTarget("#li-comment-" + comment.Id).SetText("删除").SetUrl(SiteUrls.Instance()._DeleteComment(comment.Id)))
+                        }
+                        <a id="impeach-report-"+@comment.Id href="@SiteUrls.Instance()._ImpeachReport(comment.UserId, Request.RawUrl, HtmlUtility.TrimHtml(comment.Body, 50))" plugin="dialog" class="tn-report">
+                            举报</a></div>
+                    <div class="tn-commentator">
+                        <h5>
+                            @if (comment.IsAnonymous || comment.UserId == 0)
+                            {
+                                <text>@comment.Author</text>
+                            }
+                            else
+                            {
+                                @Html.Link(comment.Author, SiteUrls.Instance().SpaceHome(comment.UserId), comment.Author, new { @class = "tn-author" })
+                            }
+                        </h5>
+                        <em class="tn-text-note tn-date">@comment.DateCreated.ToFriendlyDate()</em>
+                        @if (comment.IsPrivate)
+                        {
+                            <span class="tn-explain-icon"><span class="tn-icon tn-icon-colorful tn-icon-colorful-private">
+                            </span><span class="tn-icon-text">悄悄话</span></span>
+                        }
+                    </div>
+                    <p>
+                        @Html.Raw(comment.Body)</p>
+                    <div class="tn-comment-feed tn-helper-clearfix">
+                        @if (settings.EnableSupportOppose)
+                        {
+                            @Html.SupportOppose(TenantTypeIds.Instance().Comment(), comment.Id, comment.UserId, AttitudeMode.Bidirection)
+                        }
+                        @if (enableComment && !comment.IsAnonymous && comment.UserId != 0 && new Authorizer().Comment_Create(comment.TenantTypeId, comment.ToUserId))
+                        {
+                            <span class="tn-reply"><a id="three-level-comment-@comment.Id" href="javascript:;"  foruser="@UserIdToNickNameDictionary.GetNickName(comment.UserId)" class="tn-action tn-action-text-icon-right">
+                                <span class="tn-action-text">回复</span></a></span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </li>
+        }
+    }
+</ul>
+@if (showAfter && showBefor && Model.PageIndex > 1)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        @Html.Link("更多↓", SiteUrls.Instance()._ChildCommentList(parentId, Model.PageIndex - 1, SortBy_Comment.DateCreatedDesc, false, true), "更多↓")
+    </div>
+}
+<script>
+    $(document).ready(function(){
+        @if (showAfter && showBefor)
+        {
+            <text>
+            if(window.location.hash != ""){
+                window.location.href = window.location.hash ;
+            }
+            </text>
+        }
+    });
+</script>

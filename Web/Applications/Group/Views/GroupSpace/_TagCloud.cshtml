@@ -1,0 +1,30 @@
+﻿@model  Dictionary<TagInOwner, int>
+@{
+    bool showInNewPage = ViewData.Get<bool>("showInNewPage", false);
+    long ownerId = ViewData.Get<long>("ownerId", 0);
+    ITagUrlGetter urlGetter = null;
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-tag-cloud">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <p id="hot-tags" class="tn-tags-cloud">
+            @if (Model != null)
+            {
+                string url = null;
+        
+                foreach (var tag in Model)
+                {
+                    if (urlGetter == null)
+                    {
+                        urlGetter = TagUrlGetterManager.GetRegisteredGetter(tag.Key.TenantTypeId);
+                    }
+        
+                    url = urlGetter != null ? urlGetter.GetUrl(tag.Key.TagName,ownerId) : string.Empty;
+                   
+                <span class="tn-font-size-@tag.Value">
+                <a href="@url" title="共有@(tag.Key.ItemCount)个内容" @if (showInNewPage){ @Html.Raw("target=\"_blank\"") }>@tag.Key.TagName</a>
+                </span>
+                }
+            }
+        </p>  
+    </div>
+</div>

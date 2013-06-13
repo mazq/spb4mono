@@ -1,0 +1,197 @@
+﻿@{
+    
+    Dictionary<string, bool> directoryPermissions = ViewData.Get<Dictionary<string, bool>>("DirectoryPermissions", new Dictionary<string, bool>());
+
+    SystemInfo sysInfo = new SystemInfo();
+
+    string iconClass = "cross";
+    bool sussess = true;
+}
+<div class="spb-detections">
+    <div class="spb-th spb-first">
+        <div class="spb-td">
+            数据库配置要求</div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            Sql Server 2005及以上</div>
+        <div class="spb-td">
+        </div>
+        <div class="spb-td">
+        </div>
+    </div>
+    <div class="spb-th spb-first">
+        <div class="spb-td">
+            环境检测</div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            项目</div>
+        <div class="spb-td">
+            所需配置</div>
+        <div class="spb-td">
+            当前配置</div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            操作系统</div>
+        <div class="spb-td">
+            WindowsXP及以上</div>
+        <div class="spb-td">
+            @sysInfo.PCName
+        </div>
+        @{
+            iconClass = "cross";
+            if (sysInfo.OSVersion >= 2600)
+            {
+                iconClass = "accept";
+            }
+            else
+            {
+                sussess = false;
+            }
+        }
+        <div class="spb-bg spb-icon spb-icon-@iconClass">
+        </div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            .Net Freamwork</div>
+        <div class="spb-td">
+            4.0
+        </div>
+        <div class="spb-td">
+            @sysInfo.Framework
+        </div>
+        @{
+            iconClass = "cross";
+            if (Convert.ToInt32(sysInfo.Framework.Substring(0, 1)) >= 4)
+            {
+                iconClass = "accept";
+            }
+            else
+            {
+                sussess = false;
+            }
+        }
+        <div class="spb-bg spb-icon spb-icon-@iconClass">
+        </div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            IIS</div>
+        <div class="spb-td">
+            IIS5.1及以上</div>
+        <div class="spb-td">
+            @sysInfo.IIS
+        </div>
+        @{
+            iconClass = "cross";
+            if (Convert.ToInt32(sysInfo.IIS.Substring(3, 1)) >= 5)
+            {
+                iconClass = "accept";
+            }
+            else
+            {
+                sussess = false;
+            }
+        }
+        <div class="spb-bg spb-icon spb-icon-@iconClass">
+        </div>
+    </div>
+    <div class="spb-th">
+        <div class="spb-td">
+            目录检测</div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            目录/文件
+        </div>
+        <div class="spb-td">
+            所需权限
+        </div>
+        <div class="spb-td">
+            当前权限
+        </div>
+    </div>
+    <div class="spb-tr">
+        <div class="spb-td">
+            ./App_Data
+        </div>
+        <div class="spb-td">
+            读写
+        </div>
+        <div class="spb-td">
+            @if (directoryPermissions["App_Data"])
+            {
+                <text>读写</text>
+                iconClass = "accept";
+            }
+            else
+            {
+                <text>只读</text>
+                iconClass = "cross";
+                sussess = false;
+            }
+        </div>
+        <div class="spb-bg spb-icon spb-icon-@iconClass">
+        </div>
+    </div>
+    <div class="spb-tr spb-last">
+        <div class="spb-td">
+            ./Themes
+        </div>
+        <div class="spb-td">
+            读写
+        </div>
+        <div class="spb-td">
+            @if (directoryPermissions["Themes"])
+            {
+                <text>读写</text>
+                iconClass = "accept";
+            }
+            else
+            {
+                <text>只读</text>
+                iconClass = "cross";
+                sussess = false;
+            }
+        </div>
+        <div class="spb-bg spb-icon spb-icon-@iconClass">
+        </div>
+    </div>
+    <div class="spb-tr spb-last">
+        <div class="spb-td">
+            ./Web.config
+        </div>
+        <div class="spb-td">
+            读写
+        </div>
+        <div class="spb-td">
+            @if (directoryPermissions["Webconfig"])
+            {
+                <text>读写</text>
+                iconClass = "accept";
+            }
+            else
+            {
+                <text>只读或不存在</text>
+                iconClass = "cross";
+                sussess = false;
+            }
+        </div>
+        <div class="spb-bg spb-icon spb-icon-@iconClass">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ('@(sussess)' == 'True') {
+            $('#next').attr('href', '@Url.Action("Step2_DatabaseInfo", "Install")');
+        }
+        else if ('@(sussess)' == 'False') {
+            $('#reTested').show();
+            $('#next').hide();
+        }
+    });
+</script>

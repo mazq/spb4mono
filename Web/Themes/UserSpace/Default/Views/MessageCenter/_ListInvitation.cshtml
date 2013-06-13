@@ -1,0 +1,106 @@
+﻿@model PagingDataSet<Invitation>
+@{
+    int unhandledCount = ViewData.Get<int>("UnhandledCount", 0);
+}
+<div id="invitions-paging">
+    <div class="tn-main-heading tn-border-gray tn-border-bottom">
+        <div class="tn-option">
+            <a class="tn-action" href="@SiteUrls.Instance()._UserInvitationSettings(Url.SpaceKey())"  plugin = "dialog"><span class="tn-action-text">请求设置</span> </a>
+        </div>
+        <h2>
+            请求</h2>
+        <span class="tn-count tn-text-note" id="invitation-unhandledCount">
+            @if (unhandledCount > 0)
+            {<text>（ @unhandledCount 条未处理）</text>}
+        </span>
+    </div>
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="tnc-select-btn">
+            @Html.CheckBox("invitations", new { name = "invitations", @class = "tn-checkbox", id = "invitations-checkall" })
+            全选
+            @Html.LinkButton("批量接受", SiteUrls.Instance().BatchSetStatus(Url.SpaceKey(), null, Tunynet.Common.InvitationStatus.Accept, Model.PageIndex), HighlightStyles.Default, ButtonSizes.Default, null, TextIconLayout.IconText, new { id = "batch-button-setstatus" })
+            @Html.LinkButton("批量删除", SiteUrls.Instance().DeleteInvitation(Url.SpaceKey(), null, Model.PageIndex), HighlightStyles.Default, ButtonSizes.Default, null, TextIconLayout.IconText, new { id = "batch-button-DeleteInvitation" })
+        </div>
+        <form id="form-invitations" method="post" action="">
+        <ul class="tn-list">
+            @foreach (var invitation in Model)
+            {
+                <li id="invitation-div-@invitation.Id" class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom @GetClassByInvitationStatus(invitation.Status)">
+                    <div class="tn-list-item-area-left">
+                        @Html.CheckBox("invitationIds", new { @class = "tn-checkbox", value = invitation.Id, id = invitation.Id })
+                    </div>
+                    <div class="tn-list-item-area-main">
+                        <p class="tnc-info-content">
+                            @Html.Raw(invitation.GetResolvedBody())</p>
+                        <div class="tn-list-item-row tn-helper-align-right tn-helper-clearfix">
+                            <em class="tn-date tn-text-note tn-helper-left">@invitation.DateCreated.ToFriendlyDate()</em> 
+                            @GetDisposeLink(invitation)
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+        </form>
+    }
+    else
+    {
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <div class="tn-no-data">
+                暂无请求</div>
+        </div>
+    }
+    <div class="tn-pagination tn-helper-align-center">@Html.AjaxPagingButton(Model, "invitions-paging")</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //点击调教按钮 
+        $("a[id^='batch-button-']").click(function (e) {
+            if ($("input[name='invitationIds']:checked").length <= 0) {
+                alert("至少选择一条请求！");
+                return false;
+            }
+            $this = $(this);
+            art.dialog.confirm("确定要" + $(this).children("span").html() + "?", function () {
+                var url = $this.attr("href");
+                $("#form-invitations").ajaxSubmit({
+                    url: url,
+                    target: "#invitions-paging",
+                    replaceTarget: true
+                });
+            });
+            return false;
+        });
+    });
+</script>
+@helper GetClassByInvitationStatus(InvitationStatus invitationStatus)
+    {
+        if (invitationStatus == InvitationStatus.Unhandled)
+        {    
+    @:tnc-unrequest tn-bg-gray
+        }
+        else
+        {   
+    @:tnc-requested
+        }
+}
+@helper GetDisposeLink(Invitation invitation)
+    {
+        if (invitation.Status == InvitationStatus.Unhandled)
+        {
+    <span class="tn-action">
+        @Html.Link("接受", SiteUrls.Instance()._InvitationSetStatus(Url.SpaceKey(), invitation.Id, InvitationStatus.Accept), "接受", new { id = "invitation-setstatus-" + invitation.Id })
+    </span><span class="tn-action">
+        @Html.Link("拒绝", SiteUrls.Instance()._InvitationSetStatus(Url.SpaceKey(), invitation.Id, InvitationStatus.Refuse), "拒绝", new { id = "invitation-setstatus-" + invitation.Id })
+    </span>
+        }
+        else if (invitation.Status == InvitationStatus.Accept)
+        {
+    <span class="tn-text-note tn-action"> 已接受 </span>
+        }
+        else
+        {
+    <span class="tn-text-note tn-action">已拒绝 </span>
+        }
+}

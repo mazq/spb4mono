@@ -1,0 +1,77 @@
+﻿@model IEnumerable<BarSection>
+@{
+    SortBy_BarSection sortBy = ViewData.Get<SortBy_BarSection>("SortBy", SortBy_BarSection.DateCreated_Desc);
+    BarSection fristSection = Model.FirstOrDefault();
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-subhot-bar">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option"><a href="@SiteUrls.Instance().ListSections(null,sortBy)">更多</a></div>
+    <h3 class="tn-helper-reset">
+            @switch (sortBy)
+            {
+                case SortBy_BarSection.DateCreated_Desc:
+                @:最新帖吧
+        break;
+                case SortBy_BarSection.ThreadCount:
+                @:热门帖吧
+        break;
+                case SortBy_BarSection.ThreadAndPostCount:
+                @:热门帖吧
+        break;
+                case SortBy_BarSection.StageThreadAndPostCount:
+                @:热门帖吧
+        break;
+                case SortBy_BarSection.FollowedCount:
+                @:热门帖吧
+        break;
+                @:热门帖吧
+            default:
+                @:热门帖吧
+                                break;
+            }</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-list">
+            @foreach (var bar in Model)
+            {      
+                <li class="tn-list-item">
+                    <div class="tnc-item-wrap tn-helper-clearfix">
+                        <div class="tn-list-item-area-left">
+                            <div class="spb-smallbar-figure">
+                                <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">
+                                    <img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" width="50px" height="50px" title="@bar.Name" alt="@bar.Name"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="tn-list-item-area-main">
+                            <div class="tn-list-item-row tn-list-item-heading">
+                                <h5 class="tn-helper-reset">
+                                    <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">@bar.Name</a></h5>
+                            </div>
+                            <div class="tn-list-item-row">
+                                <p><a class="tn-secondary-text tn-count" href="@SiteUrls.Instance().SectionDetail(bar.SectionId)">帖子(@bar.ThreadAndPostCount)</a> <a class="tn-secondary-text tn-count" href="@SiteUrls.Instance().SectionMembers(bar.SectionId)">关注(@bar.FollowedCount)</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    @if (bar.SectionId == fristSection.SectionId)
+                    { 
+                        <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+                            <div class="tn-bubble-arrow">
+                                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                            </div>
+                            <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                                <ul class="tn-list tn-list-level">
+                                    @foreach (var thread in ViewData.Get<IEnumerable<BarThread>>("TopThreads", new List<BarThread>()))
+                                    {                 
+                                        <li><em class="tn-text-note tn-date tn-helper-right">@thread.DateCreated.ToFriendlyDate(false)</em><a href="@SiteUrls.Instance().ThreadDetail(thread.ThreadId)" title="@thread.Subject">
+                                            @thread.Subject</a></li>                    
+                                    }
+                                </ul>
+                            </div>
+                        </div>            
+                    }
+                </li>       
+            }
+        </ul>
+    </div>
+</div>

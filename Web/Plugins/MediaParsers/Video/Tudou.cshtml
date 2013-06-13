@@ -1,0 +1,74 @@
+@{
+    string appKey = "7d5e3d31b07af63b";
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+    ParsedMedia entity = ParsedMedia.New();
+    entity.MediaType = MediaType.Video;
+    entity.Url = url;
+    string specialRegexString = @"^http://www.tudou.com/albumplay/(?<specialId>[^/]*?).html";
+    Regex specialRegex = new Regex(specialRegexString, RegexOptions.IgnoreCase);
+    Match specialMatch = specialRegex.Match(url);
+
+    Regex special2Regex = new Regex("http://www.tudou.com/listplay/(?<specialId>[^/]*?).html", RegexOptions.IgnoreCase);
+    Match special2Match = special2Regex.Match(url);
+
+    if (specialMatch.Success)
+    {
+        string specialId = specialMatch.Groups["specialId"].Value;
+        string webMatter = HttpCollects.GetHTMLContent(url);
+        string getVideoIdRegexString = @"icode:""(?<videoId>[\s\S]*?)""";
+        Regex getVideoIdRegex = new Regex(getVideoIdRegexString, RegexOptions.IgnoreCase);
+        Match getVideoIdMatch = getVideoIdRegex.Match(webMatter);
+        if (getVideoIdMatch.Success)
+        {
+            url = string.Format("http://www.tudou.com/oplay/{0}/{1}.html", specialId, getVideoIdMatch.Groups["videoId"].Value);
+        }
+    }
+    else if (special2Match.Success)
+    {
+        string specialId = specialMatch.Groups["specialId"].Value;
+        string webMatter = HttpCollects.GetHTMLContent(url);
+        string getVideoIdRegexString = @"icode:""(?<videoId>[\s\S]*?)""";
+        Regex getVideoIdRegex = new Regex(getVideoIdRegexString, RegexOptions.IgnoreCase);
+        Match getVideoIdMatch = getVideoIdRegex.Match(webMatter);
+        if (getVideoIdMatch.Success)
+        {
+            url = string.Format("http://www.tudou.com/listplay/{0}/{1}.html", specialId, getVideoIdMatch.Groups["videoId"].Value);
+        }
+    }
+
+    List<string> regexStrings = new List<string>();
+    regexStrings.Add(@"http://www.tudou.com/albumplay/(?<proId>[\s\S]*?)/(?<videoId>[\s\S]*?).html");
+    regexStrings.Add(@"http://www.tudou.com/listplay/(?<proId>[\s\S]*?)/(?<videoId>[\s\S]*?).html");
+    regexStrings.Add(@"http://www.tudou.com/oplay/(?<proId>[\s\S]*?)/(?<videoId>[\s\S]*?).html");
+    regexStrings.Add(@"http://www.tudou.com/programs/view/(?<videoId>[\s\S]*?)/");
+    regexStrings.Add(@"http://www.tudou.com/v/(?<videoId>[\s\S]*?)/&resourceId=(?<resourceId>[\s\S]*?)/v.swf");
+
+    string urlRegexString = string.Join("|", regexStrings);
+    Regex urlRegex = new Regex(urlRegexString, RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+    string videoId = string.Empty;
+
+    if (urlMatch.Success)
+    {
+        videoId = urlMatch.Groups["videoId"].Value;
+    }
+    if (!string.IsNullOrEmpty(videoId))
+    {
+        string webMatter = HttpCollects.GetHTMLContent(string.Format(@"http://api.tudou.com/v3/gw?method=item.info.get&appKey={0}&format=json&itemCodes={1}", appKey, videoId));
+        if (!string.IsNullOrEmpty(webMatter))
+        {
+            dynamic videoInfo = new System.Dynamic.ExpandoObject();
+            videoInfo = Json.Decode(webMatter);
+            if (videoInfo != null && videoInfo.multiResult != null && videoInfo.multiResult.results != null && videoInfo.multiResult.results.Length > 0)
+            {
+                entity.Description = videoInfo.multiResult.results[0].description;
+                entity.Name = videoInfo.multiResult.results[0].title;
+                entity.PlayerUrl = videoInfo.multiResult.results[0].outerPlayerUrl;
+                entity.ThumbnailUrl = videoInfo.multiResult.results[0].picUrl;
+            }
+        } 
+        ParsedMediaService parsedMediaService = new ParsedMediaService();
+        parsedMediaService.Create(entity);
+    }
+}
+@Html.Raw(Json.Encode(entity))

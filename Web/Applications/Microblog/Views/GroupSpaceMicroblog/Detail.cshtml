@@ -1,0 +1,50 @@
+﻿@model MicroblogEntity
+@{
+    Layout = "app-list-2cols";
+
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+
+    var group = ViewData.Get<GroupEntity>("group", null);
+
+}
+@section Aside{
+    @Html.AjaxAction("_TopGroupTopics", "GroupSpaceMicroblog", new { spaceKey = Url.SpaceKey(), topNumber = 16, sortBy = SortBy_Tag.PreWeekItemCountDesc })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog-crumbs">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-breadcrumb tn-helper-clearfix">
+            <div class="tn-avatar-mini">
+                <a href="@SiteUrls.Instance().GroupHome(group.GroupKey)" title="@group.GroupName">
+                    <img width="25" src="@SiteUrls.Instance().LogoUrl(group.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Small())"/></a>
+            </div>
+            <span class="tn-breadcrumb-item"><a title="@group.GroupName" href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())">@StringUtility.Trim(group.GroupName, 5)</a></span><span
+                class="tn-seperator">&gt;</span><span class="tn-selected">"@StringUtility.Trim(Model.Author, 5)"的公开发言</span></div>
+    </div>
+</div>
+@if (Model != null)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microdetail">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="spb-microdetail-wrap">
+                @Html.Action("_Detail", "Microblog", new { spaceKey = Model.User.UserName, microblogId = Model.MicroblogId })
+                <div class="tnc-Comment-on" id="comment">
+                    @Html.Action("_Comment", "ChannelMicroblog", new { Area = "Microblog", commentedObjectId = Model.MicroblogId, ownerId = Model.UserId, tenantTypeId = TenantTypeIds.Instance().Group(), originalAuthor = Model.OriginalMicroblog != null ? Model.OriginalMicroblog.Author : string.Empty })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#commontAction').click(function () {
+            var href = $(this).attr("href");
+            var pos = $(href).offset().top;
+            $("html,body").animate({ scrollTop: pos }, 400);
+            $('textarea[id^=Body-comment]').focus();
+            return false;
+        });
+    });
+</script>

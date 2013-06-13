@@ -1,0 +1,92 @@
+﻿@model PagingDataSet<Tunynet.Common.PointRecord>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["HonourMenu"] = HonourMenu.PointRecord;
+    string expName = ViewData.Get<string>("expPoint", "经验");
+    string traName = ViewData.Get<string>("traPoint", "交易");
+    string preName = ViewData.Get<string>("prePoint", "威望");
+}
+@section Aside
+{
+    @Html.Partial("_HonourMenus", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-point-record">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-integral-record">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>积分记录</h2>
+            </div>
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="tn-no-data">
+                    您暂时没有积分纪录</div>
+            }
+            else
+            {
+                <table class="tn-table-grid">
+                    <tbody>
+                        <tr class="tn-table-grid-header">
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                日期
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                操作
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                @expName
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                @preName
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                @traName
+                            </th>
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                描述
+                            </th>
+                        </tr>
+                        @foreach (var pointRecord in Model)
+                        {
+                            <tr class="tn-table-grid-row">
+                                <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                    @pointRecord.DateCreated.ToUserDateString()
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-auto tn-nowrap">
+                                    @pointRecord.PointItemName
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                    @pointRecord.ExperiencePoints
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                    @pointRecord.ReputationPoints
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                    @pointRecord.TradePoints
+                                </td>
+                                <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                    @Html.Raw(pointRecord.Description)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div id="ManageUsersId" class="tn-pagination tn-helper-align-center">
+                    @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                 
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+    })
+</script>

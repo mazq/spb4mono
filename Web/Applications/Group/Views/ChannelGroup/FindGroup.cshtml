@@ -1,0 +1,217 @@
+﻿@model PagingDataSet<GroupEntity>
+@{
+    Layout = "app-list-2cols";
+    SortBy_Group? sortBy = Request.QueryString.Get<SortBy_Group?>("sortBy", SortBy_Group.DateCreated_Desc);
+    long? categoryId = Request.QueryString.Get<long?>("categoryId", null);
+    var areaCode = Request.QueryString.Get<string>("areaCode", null);
+    //var nameKeyword = Tunynet.Utilities.WebUtility.UrlDecode(Request.QueryString.Get<string>("nameKeyword", string.Empty));
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    var allParentCategories = ViewData.Get<List<Category>>("allParentCategories", new List<Category>());
+    var childCategories = ViewData.Get<IEnumerable<Category>>("childCategories", new List<Category>());
+    var currentCategory = ViewData.Get<Category>("currentCategory", null);
+
+
+
+    var childArea = ViewData.Get<IEnumerable<Area>>("childArea", new List<Area>());
+    var allParentAreas = ViewData.Get<List<Area>>("allParentAreas", new List<Area>());
+    var currentArea = ViewData.Get<Area>("currentArea", Area.New());
+}
+@section Aside{
+    @Html.AjaxAction("_TopGroups", "ChannelGroup", new { topNumber = 10, sortBy = SortBy_Group.StageHitTimes, viewName = "_TopGroups_Rank" })
+    @Html.AjaxAction("_RecommendedGroupOwners", "ChannelGroup", new { topNumber = 5, recommendTypeId = "00001111" })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option">
+                <a href="@SiteUrls.Instance().GroupTagMap()" title="标签" target="_blank">更多</a>
+            </div>
+            <h3 class="tn-helper-reset">
+                热门标签
+            </h3>
+        </div>
+        @Html.Action("_TagCloud", "Channel", new { area = "Common", tenantTypeId = TenantTypeIds.Instance().Group() })
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-list">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-directory">
+            <h5 class="tn-directory-path">
+                <a href="@SiteUrls.Instance().FindGroup(areaCode, null, sortBy)">所有类别</a>
+                @foreach (var category in allParentCategories)
+                { 
+                    <text> &gt;</text>
+                    <a href="@SiteUrls.Instance().FindGroup(areaCode, category.CategoryId, sortBy)">@category.CategoryName</a>
+                }
+            </h5>
+            @if (childCategories.Count() > 0)
+            { 
+                <div id="category" class="tn-directory-level tn-border-gray tn-border-bottom tn-border-dashed">
+                    @if (currentCategory == null || currentCategory.ChildCount > 0)
+                    {                         
+                        <span class="tn-directory-item tn-text-note tn-selected"><a href="@SiteUrls.Instance().FindGroup(areaCode, categoryId, sortBy)">
+                            全部</a></span>
+                    }
+                    else if (currentCategory.ParentId > 0)
+                    { 
+                        <span class="tn-directory-item tn-text-note"><a href="@SiteUrls.Instance().FindGroup(areaCode, currentCategory.ParentId, sortBy)">
+                            全部</a></span>
+                    }
+                    @foreach (var category in childCategories)
+                    {
+                        string selectedClass = string.Empty;
+                        if (currentCategory != null && currentCategory.ChildCount == 0 && category.CategoryId == currentCategory.CategoryId)
+                        {
+                            selectedClass = "tn-text-note tn-selected";
+                        }
+                        <span class="tn-directory-item @selectedClass"><a href="@SiteUrls.Instance().FindGroup(areaCode, category.CategoryId, sortBy)">@category.CategoryName</a></span>
+                    }
+                    @if (childCategories.Count() > 15)
+                    {<span class="tn-directory-item" id="moreCategoryButton"><span class="tn-action tn-action-text-icon-right">@Html.Icon(IconTypes.SmallTriangleDown)
+                        <a class="tn-action-text" href="javascript:void(0)">更多</a> </span></span>
+                    }
+                </div>
+            }
+            <h5 class="tn-directory-path">
+                <a href="@SiteUrls.Instance().FindGroup("", categoryId, sortBy)">所有地区</a>
+                @foreach (var area in allParentAreas)
+                { 
+                    <text> &gt;</text>
+                    <a href="@SiteUrls.Instance().FindGroup(area.AreaCode, categoryId, sortBy)">@area.Name</a>
+                }
+            </h5>
+            @if (childArea.Count() > 0)
+            {
+                <div id="area" class="tn-directory-level tn-border-gray tn-border-bottom tn-border-dashed">
+                    @if (currentArea == null || currentArea.ChildCount > 0)
+                    {                         
+                        <span class="tn-directory-item tn-text-note tn-selected"><a href="@SiteUrls.Instance().FindGroup(currentArea.ParentCode, categoryId, sortBy)">
+                            全部</a></span>
+                    }
+                    @foreach (var area in childArea)
+                    {
+                        string selectedClass = string.Empty;
+                        if (currentArea != null && currentArea.ChildCount == 0 && area.AreaCode == currentArea.AreaCode)
+                        {
+                            selectedClass = "tn-text-note tn-selected";
+                        }
+                        <span class="tn-directory-item @selectedClass"><a href="@SiteUrls.Instance().FindGroup(area.AreaCode, categoryId, sortBy)">@area.Name</a></span>
+                    }
+                    @if (childArea.Count() > 15)
+                    {
+                        <span class="tn-directory-item" id="moreAreaButton"><span class="tn-action tn-action-text-icon-right">@Html.Icon(IconTypes.SmallTriangleDown)<a class="tn-action-text" href="javascript:void(0)">更多</a> </span></span>
+                    }
+                </div>  
+            }
+            <div class="tn-directory-search tn-helper-clearfix">
+                <div class="tn-search-box">
+                    <form id="searchSectionForm" action="@Html.Raw(SiteUrls.Instance().GroupPageSearch("", ""))" method="get">
+                    @if (currentArea.AreaCode == "A1560000")
+                    {
+                        @Html.Hidden("NowAreaCode", "")
+                    }
+                    else
+                    {
+                    @Html.Hidden("NowAreaCode", currentArea.AreaCode)
+                    }
+                    <input class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl" type="text" watermark="请输入群组名称" name="Keyword" value="" />
+                    <span class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray">
+                        <button type="submit">@Html.Icon(IconTypes.SmallFind)</button>
+                    </span>
+                    </form>
+                </div>
+                <div class="tn-directory-selected">
+                    @if (currentCategory != null)
+                    {
+                        <span class="tn-directory-selected-item tn-border-gray tn-bg-gray"><a class="tn-icon tn-smallicon-cross" href="@SiteUrls.Instance().FindGroup(areaCode, currentCategory.ParentId, sortBy)">
+                        </a>@currentCategory.CategoryName</span> 
+                    }
+                    @if (currentArea != null && !string.IsNullOrEmpty(currentArea.AreaCode) && currentArea.AreaCode != "A1560000")
+                    {
+                        if (currentArea.ParentCode != "A1560000")
+                        {
+                        <span class="tn-directory-selected-item tn-border-gray tn-bg-gray"><a class="tn-icon tn-smallicon-cross" href="@SiteUrls.Instance().FindGroup(currentArea.ParentCode, categoryId, sortBy)">
+                        </a>@currentArea.Name</span>
+                        }
+                        else
+                        {
+                        <span class="tn-directory-selected-item tn-border-gray tn-bg-gray"><a class="tn-icon tn-smallicon-cross" href="@SiteUrls.Instance().FindGroup("", categoryId, sortBy)">
+                        </a>@currentArea.Name</span>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="spb-group-list-box">
+            <div class="tn-filter tn-helper-align-right tn-sort tn-border-gray tn-border-bottom">
+                排序方式： <a class="tn-action @(sortBy == SortBy_Group.DateCreated_Desc ? "tn-selected" : "")" href="@SiteUrls.Instance().FindGroup(areaCode, categoryId)">
+                    <span class="tn-action-text">最新</span></a><span class="tn-spacer tn-text-note">|</span>
+                <a class="tn-action @(sortBy == SortBy_Group.MemberCount_Desc ? "tn-selected" : "")" href="@SiteUrls.Instance().FindGroup(areaCode, categoryId, SortBy_Group.MemberCount_Desc)">
+                    <span class="tn-action-text">成员数</span></a> <span class="tn-spacer tn-text-note">|</span>
+                <a class="tn-action @(sortBy == SortBy_Group.GrowthValue_Desc ? "tn-selected" : "")" href="@SiteUrls.Instance().FindGroup(areaCode, categoryId, SortBy_Group.GrowthValue_Desc)">
+                    <span class="tn-action-text">成长值</span></a> <a class="tn-action @(sortBy == SortBy_Group.StageHitTimes ? "tn-selected" : "")" href="@SiteUrls.Instance().FindGroup(areaCode, categoryId, SortBy_Group.StageHitTimes)">
+                        <span class="tn-action-text">浏览数</span></a>
+            </div>
+            @Html.Partial("_List", Model)
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#moreCategoryButton").click(function () {
+            if ($(this).find(".tn-smallicon-triangle-down").length > 0)//更多
+            {
+                $.cookie('ListGroupsMoreCategoryButtonIsOpen', true);
+                $(this).find(".tn-smallicon-triangle-down").addClass("tn-smallicon-triangle-up").removeClass("tn-smallicon-triangle-down");
+                $(this).find("a").attr("title", "收起").text("收起");
+                $("#category").find("span.tn-directory-item:gt(15)").show();
+            }
+            else {
+                $.cookie('ListGroupsMoreCategoryButtonIsOpen', false);
+                $(this).find(".tn-smallicon-triangle-up").addClass("tn-smallicon-triangle-down").removeClass("tn-smallicon-triangle-up");
+                $(this).find("a").attr("title", "更多").text("更多");
+                $("#category").find("span.tn-directory-item:gt(15):not(:last)").hide();
+            }
+        });
+        if ($.cookie('ListGroupsMoreCategoryButtonIsOpen') == "true") {
+            $("#moreCategoryButton").find(".tn-smallicon-triangle-down").addClass("tn-smallicon-triangle-up").removeClass("tn-smallicon-triangle-down");
+            $("#moreCategoryButton").find("a").attr("title", "收起").text("收起");
+            $("#category").find("span.tn-directory-item:gt(15)").show();
+        }
+        else {
+            $("#moreCategoryButton").find(".tn-smallicon-triangle-up").addClass("tn-smallicon-triangle-down").removeClass("tn-smallicon-triangle-up");
+            $("#moreCategoryButton").find("a").attr("title", "更多").text("更多");
+            $("#category").find("span.tn-directory-item:gt(15):not(:last)").hide();
+        }
+        $("#moreAreaButton").click(function () {
+            if ($(this).find(".tn-smallicon-triangle-down").length > 0)//更多
+            {
+                $.cookie('ListGroupsMoreAreaButtonIsOpen', true);
+                $(this).find(".tn-smallicon-triangle-down").addClass("tn-smallicon-triangle-up").removeClass("tn-smallicon-triangle-down");
+                $(this).find("a").attr("title", "收起").text("收起");
+                $("#area").find("span.tn-directory-item:gt(15)").show();
+            }
+            else {
+                $.cookie('ListGroupsMoreAreaButtonIsOpen', false);
+                $(this).find(".tn-smallicon-triangle-up").addClass("tn-smallicon-triangle-down").removeClass("tn-smallicon-triangle-up");
+                $(this).find("a").attr("title", "更多").text("更多");
+                $("#area").find("span.tn-directory-item:gt(15):not(:last)").hide();
+            }
+        });
+        if ($.cookie('ListGroupsMoreAreaButtonIsOpen') == "true") {
+            $("#moreAreaButton").find(".tn-smallicon-triangle-down").addClass("tn-smallicon-triangle-up").removeClass("tn-smallicon-triangle-down");
+            $("#moreAreaButton").find("a").attr("title", "收起").text("收起");
+            $("#area").find("span.tn-directory-item:gt(15)").show();
+        }
+        else {
+            $("#moreAreaButton").find(".tn-smallicon-triangle-up").addClass("tn-smallicon-triangle-down").removeClass("tn-smallicon-triangle-up");
+            $("#moreAreaButton").find("a").attr("title", "更多").text("更多");
+            $("#area").find("span.tn-directory-item:gt(15):not(:last)").hide();
+        }
+    });
+</script>
+<script>
+    $(function () {
+        $("#searchGroup").click(function () {
+            var url = ""
+        })
+    })
+</script>

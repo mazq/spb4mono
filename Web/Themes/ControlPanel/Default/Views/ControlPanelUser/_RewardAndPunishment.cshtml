@@ -1,0 +1,130 @@
+﻿@{
+    long userId = ViewData.Get<long>("userId", 0);
+    string userName = ViewData.Get("userName", string.Empty);
+    PointCategory experiencePoints = ViewData.Get<PointCategory>("experiencePoints", null);
+    PointCategory reputationPoints = ViewData.Get<PointCategory>("reputationPoints", null);
+    PointCategory tradePoints = ViewData.Get<PointCategory>("tradePoints", null);
+
+}
+<div class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_RewardAndPunishment", "ControlPanelUser", null, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }, new RouteValueDictionary { { "Id", "rewardAndPunishment" } }))
+    {
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right spb-accountbinding-edit">
+            @Html.Hidden("userId", userId)
+
+            <div class="tn-form-row">
+                    <div class="tn-explain">
+                        <span class="tn-text-note">请选择奖励或者处罚,@(userName)就会增加或者扣除相应分数。</span>
+                    </div>
+            </div>
+
+            <div class="tn-form-row">
+                <label class="tn-form-label">操作：</label>
+                <ul class="tn-radiobutton-list">
+                    <li>
+                    <input class="tn-radiobutton" type="radio" value="true" checked="checked" name="isIncome" id="isIncome"/>
+                    <label for="isIncome"> 奖励</label>
+                    </li>
+                    <li>
+                    <input class="tn-radiobutton" type="radio" value="false" name="isIncome" id="notIncome"/>
+                    <label for="notIncome"> 处罚</label>
+                    </li>
+                </ul>
+             </div>
+
+             <div class="tn-form-row">
+                <label class="tn-form-label">@experiencePoints.CategoryName：</label>
+                <input class="tn-textbox tn-border-gray" type="text" value="0" name="experiencePoints" id="experiencePoints"/>
+             </div>
+
+             <div class="tn-form-row">
+                <label class="tn-form-label">@reputationPoints.CategoryName：</label>
+                <input class="tn-textbox tn-border-gray" type="text" value="0" name="reputationPoints" id="reputationPoints"/>
+             </div>
+
+             <div class="tn-form-row">
+                <label class="tn-form-label">@tradePoints.CategoryName：</label>
+                <input class="tn-textbox tn-border-gray" type="text" value="0" name="tradePoints" id="tradePoints"/>
+             </div>
+
+             <div class="tn-form-row">
+                <label class="tn-form-label">理由：</label>
+                <input class="tn-textbox tn-border-gray" type="text" name="description"/>
+             </div>
+
+        </div>
+    </div>
+
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id="rewardAndPunishmentButton"})
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+    }
+</div>
+<script type="text/dialog">    
+      this.title("奖惩用户");    
+    </script>
+ <script type="text/javascript" language="javascript">
+     function OnSuccessCallBack(data) {
+         art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+     }
+     $(document).ready(function () {
+         $("#rewardAndPunishmentButton").click(function () {
+             if (!$("#rewardAndPunishment").valid())
+                 return false;
+         });
+
+         $("#rewardAndPunishment").validate({
+             rules: {
+                 experiencePoints: {
+                     required: true,
+                     digits: true,
+                     maxlength:5,
+                     min: 0
+                 },
+                 reputationPoints: {
+                     required: true,
+                     digits: true,
+                     maxlength:5,
+                     min: 0
+                 },
+                 tradePoints: {
+                     required: true,
+                     digits: true,
+                     maxlength:5,
+                     min: 0
+                 }
+             },
+             messages: {
+                 experiencePoints: {
+                     required: "请填写数值",
+                     digits: "请填写0-99999之间的整数",
+                     maxlength: "请填写0-99999之间的整数",
+                     min: "请填写0-99999之间的整数"
+                 },
+                 reputationPoints: {
+                     required: "请填写数值",
+                     digits: "请填写0-99999之间的整数",
+                     maxlength: "请填写0-99999之间的整数",
+                     min: "请填写0-99999之间的整数"
+                 },
+                 tradePoints: {
+                     required: "请填写数值",
+                     digits: "请填写0-99999之间的整数",
+                     maxlength: "请填写0-99999之间的整数",
+                     min: "请填写0-99999之间的整数"
+                 }
+
+             }
+
+         });
+
+     });
+
+
+ </script>
+
+
+

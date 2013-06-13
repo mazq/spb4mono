@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<invitations>
+    <invitation invitationTypeKey="InviteJoinGroup">
+        <unhandledBody>
+            <a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>邀请您加入群组“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”@Model.Remark
+        </unhandledBody>
+        <acceptBody>
+            您接受了<a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>邀请加入群组“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”的请求
+        </acceptBody>
+        <refuseBody>
+            您拒绝了<a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>邀请加入群组“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”的请求
+        </refuseBody>
+    </invitation>
+  <invitation invitationTypeKey="ApplyJoinGroup">
+    <unhandledBody>
+      <a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>申请加入群组“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”@Model.Remark
+    </unhandledBody>
+    <acceptBody>
+      您接受了<a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>申请加入群组“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”的请求
+    </acceptBody>
+    <refuseBody>
+      您拒绝了<a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>申请加入群组“<a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>”的请求
+    </refuseBody>
+  </invitation>
+</invitations>

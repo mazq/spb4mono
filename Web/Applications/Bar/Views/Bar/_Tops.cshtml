@@ -1,0 +1,82 @@
+﻿@model IEnumerable<BarThread>
+@{
+    SortBy_BarThread sortBy = ViewData.Get<SortBy_BarThread>("SortBy", SortBy_BarThread.DateCreated_Desc);
+    bool? isEssential = ViewData.Get<bool?>("isEssential", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-topic-tops">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option"><a href="@SiteUrls.Instance().BarThreadRank(sortBy, isEssential)">更多</a></div>
+        <h3 class="tn-helper-reset">
+            @if (isEssential.HasValue && isEssential.Value)
+            {
+                @:精华帖子
+            }
+            else
+            {
+                switch (sortBy)
+                {
+                    case SortBy_BarThread.DateCreated_Desc:
+                @:最新帖子
+                    break;
+                    case SortBy_BarThread.HitTimes:
+                @:热点帖子
+                    break;
+                    case SortBy_BarThread.StageHitTimes:
+                @:近期热点
+                    break;
+                    case SortBy_BarThread.PostCount:
+                @:热门帖子
+                    break;
+                    default:
+                @:最新帖子
+                                break;
+                }
+            }
+        </h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model.Count() > 0)
+        {         
+            <ul class="tn-list tn-list-level">
+                @foreach (var thread in Model)
+                {
+                    <li>
+                        @if (isEssential.HasValue && isEssential.Value)
+                        {
+                            if (thread.User != null)
+                            { 
+                                <a href="@SiteUrls.Instance().UserThreads(thread.UserId)" class="tn-secondary-text tn-user-name tn-helper-right" title="@thread.User.DisplayName">
+                                    @Tunynet.Utilities.HtmlUtility.TrimHtml(thread.User.DisplayName,5)
+                                </a>
+                            }
+                        }
+                        else
+                        {
+                            switch (sortBy)
+                            {
+                                case SortBy_BarThread.DateCreated_Desc:
+                            <em class="tn-text-note tn-date tn-helper-right">@thread.DateCreated.ToFriendlyDate()</em> 
+                       break;
+                                case SortBy_BarThread.HitTimes:
+                            <em class="tn-text-note tn-count tn-helper-right">@thread.HitTimes</em>
+                       break;
+                                case SortBy_BarThread.StageHitTimes:
+                            <em class="tn-text-note tn-count tn-helper-right">@thread.Last7DaysHitTimes</em>
+                       break;
+                                case SortBy_BarThread.PostCount:
+                            <em class="tn-text-note tn-count tn-helper-right">@thread.PostCount</em>
+                       break;
+                                default:
+                            <em class="tn-text-note tn-date tn-helper-right">@thread.DateCreated.ToFriendlyDate()</em>
+                       break;
+                            }
+                        } <a href="@SiteUrls.Instance().ThreadDetail(thread.ThreadId)" title="@thread.Subject">@thread.Subject</a> </li>
+                }
+            </ul>
+        }
+        else
+        { 
+            <div class="tn-no-data">暂无帖子</div>
+        }
+    </div>
+</div>

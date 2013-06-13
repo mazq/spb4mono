@@ -1,0 +1,19 @@
+﻿@model IEnumerable<GroupEntity>
+@{
+    Layout = "app-home-3cols";
+}
+
+@section AsideSecond{
+    @Html.Action("_AreaGroups", "ChannelGroup", new { topNumber = 5 })
+    @Html.Action("_TopGroups", "ChannelGroup", new { topNumber = 5, sortBy = SortBy_Group.DateCreated_Desc, viewName = "_TopGroups_List" })
+}
+@section Aside{
+    @Html.Action("_CategoryGroups", "ChannelGroup", new { })
+    @Html.AdvertisingPosition("10101100002")
+    @Html.Action("_RecommendedGroupOwners", "ChannelGroup", new { topNumber = 5, recommendTypeId = "00001111" })
+}
+@Html.AdvertisingPosition("10101100001")
+@Html.Action("_RecommendedGroup", "ChannelGroup", new { area="Group" })
+@Html.Action("_TopGroups", "ChannelGroup", new { topNumber = 12, sortBy = SortBy_Group.StageHitTimes, viewName = "_TopGroups_Flow" })
+@Html.Action("_InterestGroup", "ChannelGroup")
+@Html.Action("_GroupTops", "Bar", new { area = "Bar", topNumber = 10})

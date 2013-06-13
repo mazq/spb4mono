@@ -1,0 +1,85 @@
+﻿@using (Html.BeginAjaxForm("_ManageOperationLogs", "ControlPanelOperation", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack", OnErrorCallBack = "OnErrorCallBack" }, new { id = "delete-form" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form">
+            <div class="tn-form-row">
+                    @Html.DateTimePicker("startDate", new DateTimePicker()
+                            .SetMaxDate("0")
+                            .SetMinDate("-10Y")
+                            .SetSelectedDate(DateTime.Now.AddMonths(-4))
+                            .SetDateFormat("yyyy-MM-dd ")
+                            .SetOnSelectCallBack("onDateChange"))
+                            到
+                    @Html.DateTimePicker("endDate", new DateTimePicker()
+                            .SetMaxDate("0")
+                            .SetMinDate("-10Y")
+                            .SetSelectedDate(DateTime.Now.AddMonths(-1))
+                            .SetDateFormat("yyyy-MM-dd ")
+                            .SetOnSelectCallBack("onDateChange"))
+            </div>
+            <div class="tn-form-row tn-helper-flowfix">
+                <label class="tn-form-label">@Html.CheckBox("confirm-delete", false, new { id = "confirm-delete"}) 确认删除</label>
+            </div>  
+            <div class="tn-form-row tn-form-row-button tn-helper-clear">
+                @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { disabled = "false", @class = "tn-button tn-corner-all tn-button-text-only tn-button-disabled",id="submit" })
+                @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close", id = "cancel" })
+            </div>
+        </div>
+    </div>
+}
+    
+<script type="text/dialog">
+         this.title("确认信息");
+</script>
+<script type="text/javascript" language="javascript">
+        //删除成功返回函数
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+        }
+
+        //删除错误返回函数
+        function OnErrorCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+
+        //当日期选择框改变时取消复选框勾选状态及禁止提交按钮
+        var onDateChange = function (dateText, inst) {
+            $("#confirm-delete").removeAttr("checked", "checked");
+            $("#submit").attr("disabled", "false");
+            $("#submit").removeAttr("class");
+            $("#submit").attr("class", "tn-button tn-corner-all tn-button-text-only tn-button-disabled");
+
+            //当第二个日期选择框改变时判断是否小于第一个日期,小于则对换日期
+            var startdate = $("#startDate").val();
+            var enddate = $(this).val();
+            if (startdate > enddate) {
+                $(this).val(startdate);
+                $("#startDate").val(enddate);
+            }
+        }
+
+        $(document).ready(function () {
+            //如果复选框没勾选上则禁止提交
+            $("form#delete-form").submit(function () {
+                if ($("#confirm-delete").attr("checked") == "checked") {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            //如果复选框没勾选上则禁止点击提交按钮
+            $("#confirm-delete").click(function () {
+                if ($("#confirm-delete").attr("checked") == "checked") {
+                    $("#submit").removeAttr("disabled");
+                    $("#submit").removeAttr("class");
+                    $("#submit").attr("class", "tn-button tn-corner-all tn-button-text-only tn-button-primary");
+                } else {
+                    $("#confirm-delete").removeAttr("checked", "checked");
+                    $("#submit").attr("disabled", "false");
+                    $("#submit").removeAttr("class");
+                    $("#submit").attr("class", "tn-button tn-corner-all tn-button-text-only tn-button-disabled");
+                }
+            });
+        });
+</script>

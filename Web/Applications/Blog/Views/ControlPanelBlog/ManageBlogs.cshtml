@@ -1,0 +1,374 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    Layout = "_ControlPanel";
+    
+    AuditStatus? auditStatus = Request.QueryString.Get<AuditStatus?>("auditStatus", null);
+    var userId = ViewData.Get<long?>("userId",null);
+    SelectList categoryList = ViewData.Get<SelectList>("categoryList", null);
+    SelectList isEssentialList = ViewData.Get<SelectList>("isEssential", null);
+    SelectList tenants = ViewData.Get<SelectList>("tenants", null);
+    int tenantscount = ViewData.Get<int>("tenantscount", 0);
+    
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+                <div class="tnc-settings">
+                    @Html.AjaxAction("_ManageableDataDetail", "ControlPanel", new { area = "Common", applicationKey = BlogConfig.Instance().ApplicationKey })
+                    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+                        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+                            <h3 class="tn-helper-reset">便捷操作</h3>
+                        </div>
+                        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                            <ul class="tn-side-menu tnc-operation">
+                                <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().ManageSiteCategories(TenantTypeIds.Instance().BlogThread())">
+                                    <span class="tn-icon tn-smallicon-slide-next" title="日志类别管理"></span>日志类别管理</a>
+                                </li>
+                                <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().ManageTags(TenantTypeIds.Instance().BlogThread())">
+                                    <span class="tn-icon tn-smallicon-slide-next" title="日志标签管理"></span>日志标签管理</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    @Html.AjaxAction("_StatisticDataDetail", "ControlPanel", new { area = "Common", applicationKey = BlogConfig.Instance().ApplicationKey })
+                </div>
+            </div>
+        </div>
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>日志管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageBlogs", "ControlPanelBlog", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    标题关键字：</label>
+                                @Html.TextBox("subjectKeywords", "", new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    作者：</label>
+                                 @Html.UserSelector("userId",userId)
+                            </div>
+                            
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    审核状态：</label>
+                                @(Html.EnumDropDownList<AuditStatus?>("auditStatus", auditStatus, "全部", new { @class = "tn-dropdownlist" }))
+                            </div>
+                             <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否加精：</label>
+                                    @Html.DropDownList("isEssential", isEssentialList, "全部", new { @class = "tn-dropdownlist" })
+                            </div>
+                             <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    类别：</label>
+                                @Html.DropDownList("categoryId", categoryList, "全部", new { @class = "tn-dropdownlist" })
+                            </div>
+                            if (tenantscount>1)
+                            {
+                                <text>
+                                  <div class="tn-form-row" id="tenants">
+                                    <label class="tn-form-label">
+                                        所属：</label>
+                                    @Html.DropDownList("tenantTypeId", tenants, "所有", new { @class = "tn-dropdownlist" })
+                                </div>
+                                </text>
+                            }
+                            
+                          
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "searchBlog" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("通过审核", SiteUrls.Instance()._BlogControlPanelUpdateAuditStatus(true), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "audit-success" })
+                            @Html.LinkButton("不通过审核", SiteUrls.Instance()._BlogControlPanelUpdateAuditStatus(false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "audit-fail" })
+                            @Html.LinkButton("删除", SiteUrls.Instance()._BlogControlPanelDelete(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-blogs" })
+                            @Html.LinkButton("加精", SiteUrls.Instance()._BlogControlPanelSetEssential(isEssential: true), iconType: IconTypes.SmallElite, htmlAttributes: new { id = "set-essential-true" })
+                            @Html.LinkButton("取消精华", SiteUrls.Instance()._BlogControlPanelSetEssential(isEssential: false), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "set-essential-false" })
+                            @Html.LinkButton("设置分类", SiteUrls.Instance()._BlogControlPanelSetCategory(), iconType: IconTypes.SmallSet, htmlAttributes: new { id = "set-category" })
+                        </div>
+                    </div>
+                    @if (Model != null && Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else if (Model != null)
+                    {
+                       <form action="#" method="post" id="Form-Blog">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" class="tn-checkbox" id="select-all" name="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        标题
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                       审核状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                       类别
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        作者
+                                    </th>
+                                     <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                       发布时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (BlogThread blog in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("threadIds", blog.ThreadId, htmlAttributes: new { @class = "tnui-blog-id" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <a href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(blog.UserId), blog.ThreadId)" target="_blank">@blog.ResolvedSubject</a>
+                                            @if (blog.IsEssential)
+                                            {
+                                            <span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>
+                                            }
+                                        </td>
+                                          <td class="tn-border-gray tn-border-bottom tn-width-icon1 tn-nowrap">
+                                            @Html.AuditStatusIcon(blog.AuditStatus)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @blog.SiteCategoryName
+                                        </td>
+                                          <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @Html.Link(StringUtility.Trim(blog.Author, 8), SiteUrls.Instance().SpaceHome(blog.UserId), blog.Author, htmlAttributes: new { @class = "tn-user-name" }, navigateTarget: HyperLinkTarget._blank)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @blog.DateCreated.ToUserDateString(true)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance().BlogEdit(UserIdToUserNameDictionary.GetUserName(blog.UserId), blog.ThreadId, null), "编辑分类", htmlAttributes: new { id = "edit-blog", target = "_blank", @class = "tn-item-link" })
+                                             <span class="tn-action tn-action-text-icon-right tn-action-has-drop-menu tn-border-trl" menu="#moreOptions@(blog.ThreadId)">
+                                                <span class="tn-icon tn-smallicon-triangle-down"></span>
+                                                    <a href="javascript:;" class="tn-action-text">更多</a> 
+                                                </span>
+                                            <div id="moreOptions@(blog.ThreadId)" class="tn-more-options tn-widget-content tn-border-gray" style="display:none">
+                                                <ul class="tn-more-list">
+                                                   <li>@Html.Link("设置分类", SiteUrls.Instance()._BlogControlPanelSetCategory(blog.ThreadId.ToString()), "设置分类", new { @class = "tn-item-link tnui-set-category" })</li>
+                                                   
+                                                   @if (!blog.IsEssential)
+                                                   {
+                                                    <li>@Html.Link("加精", SiteUrls.Instance()._BlogControlPanelSetEssential(blog.ThreadId, true), "设置精华", new { @class = "tn-item-link tnui-set-essential" })</li>
+                                                   }
+                                                   else
+                                                   {
+                                                    <li>@Html.Link("取消精华", SiteUrls.Instance()._BlogControlPanelSetEssential(blog.ThreadId, false), "取消精华", new { @class = "tn-item-link tnui-set-essential" })</li>
+                                                   }
+                                                   <li>@Html.Link("删除", SiteUrls.Instance()._BlogControlPanelDelete(blog.ThreadId), "删除日志", new { @class = "tn-item-link tnui-delete-blogid" })</li>
+                                                   @if (blog.AuditStatus == AuditStatus.Success)
+                                                   {
+                                                   <li>@Html.Link("推荐", SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().BlogThread(), blog.ThreadId, blog.Subject, userId: blog.UserId), "推荐", new { @class = "tn-item-link tnui-set-category", plugin = "dialog" })</li>
+                                                   }
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("PageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removeChecked();
+        function removeChecked() {
+            $(".tnui-blog-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+
+        $(".tn-more-options ul a.tn-item-link").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".tnui-blog-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".tnui-blog-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+
+        //点通过审核
+        $("a[id^='audit-']").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("请至少选择一条日志进行操作！");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            $.post(url, $("form#Form-Blog").serialize(), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    window.location.reload(true);
+                });
+            })
+        });
+
+
+        //点批量删除
+        $("#delete-blogs").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("请至少选择一条日志进行操作！");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, $("form#Form-Blog").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        window.location.reload(true);
+                    });
+                });
+                removeChecked();
+            });
+        });
+
+        //单个删除
+        $('.tnui-delete-blogid').click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(url, function (data) {
+                    art.dialog.tips("删除成功！", 1.5, 1, function () {
+                        window.location.reload(true);
+                    });
+
+                });
+            });
+        });
+        //设置精华
+        $("a[id^='set-essential']").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("请至少选择一条日志进行操作！");
+                return false;
+            }
+
+            var url = $(this).attr("href");
+            $.post(url, $("form#Form-Blog").serialize(), function (data) {
+                if (data.MessageType != -1) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                } else {
+                    alert(data.MessageContent, function () { window.location.reload(true); });
+                }
+            });
+        });
+
+        //单个设置精华
+        $('.tnui-set-essential').click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            $.post(url, function (data) {
+                if (data.MessageType != -1) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                } else {
+                    alert(data.MessageContent, function () { window.location.reload(true); });
+                }
+            });
+        });
+
+
+        //点设置分组
+        $("#set-category").click(function (e) {
+            e.preventDefault();
+            var blogIds = getCheckedIds();
+            if (blogIds == null || blogIds == "") {
+                $(this).removeAttr("plugin");
+                alert("请至少选择一条日志进行操作！");
+                return;
+            }
+            else {
+                $(this).attr("href", '@SiteUrls.Instance()._BlogControlPanelSetCategory()' + "?threadIds=" + blogIds);
+                $(this).attr("plugin", "dialog")
+            }
+        });
+
+        //单个设置分组
+        $('.tnui-set-category').click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            $(this).attr("plugin", "dialog");
+            $.get(url, function (data) {
+
+            });
+        });
+
+        function getCheckedIds() {
+            var blogIds = "";
+            $(".tnui-blog-id").each(function () {
+                if ($(this).attr("checked")) {
+                    blogIds += $(this).val() + ",";
+                }
+            });
+            return blogIds;
+        }
+
+    });
+</script>

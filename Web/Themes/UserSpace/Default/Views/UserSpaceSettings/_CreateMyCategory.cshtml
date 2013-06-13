@@ -1,0 +1,40 @@
+﻿@{
+    string callback = Request.QueryString.Get<string>("callback", "OnSuccessCallback");
+    string tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", null); 
+}
+@using (Html.BeginAjaxForm("_CreateMyCategory", "UserSpaceSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = callback }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tr id="typeCategoryName">
+                    <td>
+                        @Html.TextBox("categoryName", "", htmlAttributes: new { @class = "tn-textbox tn-border-gray", id = "categoryName", maxlength = "64" })
+                        @Html.ValidationMessage("categoryName")
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+    <input type="hidden" name="tenantTypeId" value="@tenantTypeId" />
+}
+<script type="text/dialog">
+    this.title("添加分类");
+</script>
+<script type="text/javascript">
+    function OnSuccessCallback(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            var categoryName = $("#categoryName").val(); ;
+            //            $("#OwnerCategoryIds").children("option").text(categoryName).attr("selected", "selected");
+            $("#OwnerCategoryIds").append("<option value='" + data.CategoryId + "'>" + data.CategoryName + "</option>");
+            $("#OwnerCategoryIds").val(data.CategoryId);
+        });
+    }
+    $(document).ready(function () {
+        $("#categoryName").watermark("请输入分类名");
+    })
+</script>

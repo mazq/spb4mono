@@ -1,0 +1,68 @@
+﻿@model User
+@{
+    IEnumerable<BarSection> barSections = ViewData.Get<IEnumerable<BarSection>>("barSections", new List<BarSection>());
+    long userThreadCount = ViewData.Get<long>("userThreadCount", 0);
+    long userPostCount = ViewData.Get<long>("userPostCount", 0);
+    long userFollowSectionCount = ViewData.Get<long>("userFollowSectionCount", 0);
+
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-user-panel">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-user-panel-wrap">
+            <div class="tn-card tn-helper-clearfix">
+                @Html.ShowUserAvatar(Model.UserId, AvatarSizeType.Small, true)
+                <div class="tn-info">
+                    <p class="tn-user-name">
+                        <a href="@SiteUrls.Instance().SpaceHome(Model.UserId)"><strong>@Model.DisplayName</strong></a></p>
+                    @if (Model.Profile != null)
+                    { 
+                        <p class="tn-user-data">
+                            @if (Model.Profile.Gender == GenderType.Male)
+                            { 
+                                @Html.Icon(IconTypes.Male, "男")
+                            }
+                            else if (Model.Profile.Gender == GenderType.FeMale)
+                            { 
+                                @Html.Icon(IconTypes.Female, "女")
+                            }
+                            <span class="tn-location">@Formatter.FormatArea(Model.Profile.NowAreaCode)</span></p>
+                    }
+                </div>
+            </div>
+            <ul class="tn-side-menu">
+                <li><a class="tn-menu-text" href="@SiteUrls.Instance().UserThreads(Model.UserId)">我的帖子(@userThreadCount)</a></li>
+                <li><a class="tn-menu-text" href="@SiteUrls.Instance().UserThreads(Model.UserId, true)">我的回帖(@userPostCount)</a></li>
+                <li><a class="tn-menu-text" menu="#userFollowedSectionsDiv" href="@SiteUrls.Instance().UserFollowedSections(Model.UserId)">关注帖吧(@userFollowSectionCount)
+                @Html.Icon(IconTypes.SmallTriangleDown)</a></li>
+            </ul>
+            @if (barSections != null && barSections.Count() > 0)
+            {
+                <div id="userFollowedSectionsDiv" class="spb-follow-bar-list" style="display: none">
+                    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+                        <div class="tn-bubble-arrow">
+                            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                        </div>
+                        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                            <ul class="tn-avatar-list">
+                                @foreach (var bar in barSections.Take(9))
+                                {
+                             
+                                    <li class="tn-avatar-item">
+                                        <div class="spb-smallbar-figure">
+                                            <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">
+                                                <img width="50px" height="50px" src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" title="@bar.Name" alt="@bar.Name"/>
+                                            </a>
+                                        </div>
+                                        <a class="tn-name" href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">@bar.Name</a> </li>
+                                }
+                            </ul>
+                            <div class="tn-helper-right">
+                                    <a href="@SiteUrls.Instance().UserFollowedSections(Model.UserId)">更多</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

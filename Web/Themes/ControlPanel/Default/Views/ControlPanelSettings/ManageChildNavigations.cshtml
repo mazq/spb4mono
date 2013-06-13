@@ -1,0 +1,346 @@
+﻿@model IEnumerable<InitialNavigation>
+@{
+    Layout = "_ControlPanel";
+    int applicationId = ViewData.Get<int>("applicationId",0);
+    int parentNavigationId = ViewData.Get<int>("parentNavigationId", 0);
+    string currentPresentAreaKey = ViewData.Get<string>("presentAreaKey", string.Empty);
+    string navigationName = ViewData.Get<string>("navigationName", string.Empty);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main spb-nav-manage-wrap">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>导航管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            @Html.LinkButton("删除", SiteUrls.Instance()._BatchRemoveNavigation(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "BatchRemoveNavigation", plugin = "dialog" })
+                            @Html.LinkButton("添加导航", SiteUrls.Instance()._CreateNavigation(parentNavigationId,applicationId, currentPresentAreaKey), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                        </div>
+						<div class="tn-list-header-row tn-helper-clearfix">
+						 <span class="tn-filter tn-helper-right">
+                        @Html.Link("快捷操作管理", SiteUrls.Instance().ManageQuickOperations(ManagementOperationType.Shortcut,currentPresentAreaKey), "快捷操作管理")
+                        </span>
+						@Html.Link("顶级", SiteUrls.Instance().ManageNavigations(currentPresentAreaKey), "顶级")<span class="tn-pipe tn-text-note">&nbsp;-&nbsp;</span><a href="#" id="goBack">@navigationName</a>
+						</div>
+                    </div>
+                    
+                    @if (Model != null && Model.Count() > 0)
+                    { 
+                        <form action="#" method="post" id="Form-BatchSet">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                        @Html.CheckBox("navigationIds-checkAll", false)
+                                    </td>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        链接
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        类型
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        启用
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        排序
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (InitialNavigation navigation in Model)
+                                {
+                                    <tr class="tn-table-grid-row @navigation.ParentNavigationId-@navigation.Depth" name="@navigation.ParentNavigationId-@navigation.Depth" id="@navigation.NavigationId">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @*@Html.SipmleCheckBox("NavigationId", navigation.NavigationId)*@
+                                            <input type="checkbox" value="@navigation.NavigationId" name="navigationIds" id="navigationIds-@navigation.NavigationId" @if(navigation.IsLocked==true){<text>disabled="true"</text>} />
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @navigation.NavigationId
+                                            <span class="tnc-empty-c"></span>
+                                            @if (!string.IsNullOrEmpty(navigation.IconName))
+                                            {
+                                                @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), navigation.IconName, false))
+                                            }
+                                            else if (!string.IsNullOrEmpty(navigation.ImageUrl) && navigation.ImageUrl.StartsWith("http://"))
+                                            {
+                                                <img src="@navigation.ImageUrl" alt="" />
+                                            }
+                                            else if (!string.IsNullOrEmpty(navigation.ImageUrl) && !navigation.ImageUrl.StartsWith("http://"))
+                                            { 
+                                                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl(navigation.ImageUrl)"  alt="" />
+                                            }
+                                            @if (!string.IsNullOrEmpty(navigation.NavigationText))
+                                            { 
+                                                @navigation.NavigationText
+                                            }
+                                            else
+                                            {
+                                                @Tunynet.Globalization.ResourceAccessor.GetString(navigation.ResourceName)
+                                            }&nbsp
+                                            @Html.LinkButton("", SiteUrls.Instance()._CreateNavigation(navigation.NavigationId,navigation.ApplicationId, currentPresentAreaKey), highlightStyle: HighlightStyles.Lite, iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog", title = "添加子导航" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @if (!string.IsNullOrWhiteSpace(navigation.NavigationUrl))
+                                            {
+                                                @navigation.NavigationUrl
+                                            }
+                                            else if(!string.IsNullOrEmpty(navigation.UrlRouteName))
+                                            {
+                                                @CachedUrlHelper.RouteUrl(navigation.UrlRouteName)                                                    
+                                            }                                            
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @switch (navigation.NavigationType)
+                                            {
+                                                case NavigationType.AddedByOwner:
+                                                @:Owner新增导航
+                                                            break;
+                                                case NavigationType.Application:
+                                                @:来源于应用
+                                                            break;
+                                                case NavigationType.PresentAreaInitial:
+                                                default:
+                                                @:呈现区域初始
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        break;
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("NavigationId-IsEnabled", navigation.IsEnabled ? "true" : "", navigation.IsEnabled)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">                                           
+                                            @if (Model.Where(n => n.ParentNavigationId == navigation.ParentNavigationId && n.Depth == navigation.Depth && navigation.DisplayOrder > n.DisplayOrder).Count() > 0)
+                                            { 
+                                                @Html.Link("上移", SiteUrls.Instance().ChangeNavigationOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @if (Model.Where(n => n.ParentNavigationId == navigation.ParentNavigationId && n.Depth == navigation.Depth && navigation.DisplayOrder < n.DisplayOrder).Count() > 0)
+                                            {
+                                                @Html.Link("下移", SiteUrls.Instance().ChangeNavigationOrder(), "下移", new { @class = "tn-icon tn-smallicon-download" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditNavigation(navigation.NavigationId), "编辑", htmlAttributes: new { plugin = "dialog", @class = "tn-action" })
+                                            @if (!navigation.IsLocked)
+                                            {
+                                                @Html.Link("删除", SiteUrls.Instance()._DeleteNavigation(navigation.NavigationId), "删除", htmlAttributes: new { plugin = "dialog", @class = "tn-action" })
+                                            }
+                                        </td>
+                                    </tr>      
+                                            if (navigation.Children.Count() > 0)
+                                            {
+                                                foreach (InitialNavigation child in navigation.Children)
+                                                {
+                                    <tr class="tn-table-grid-row @child.ParentNavigationId-@child.Depth" name="@child.ParentNavigationId-@child.Depth" id="@child.NavigationId">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                          
+                                            <input type="checkbox" value="@child.NavigationId" name="navigationIds" id="navigationIds-@child.NavigationId" @if(child.IsLocked==true){<text>disabled="true"</text>} />
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <span class="tnc-empty-c"></span><span class="tn-text-note">├─</span> <span class="tnc-empty-c"></span>
+                                            @child.NavigationId
+                                            <span class="tnc-empty-c"></span>
+                                            @if (!string.IsNullOrEmpty(child.IconName))
+                                            {
+                                                @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), child.IconName, false))
+                                            }
+                                            else if (!string.IsNullOrEmpty(child.ImageUrl) && child.ImageUrl.StartsWith("http://"))
+                                            {
+                                                <img src="@child.ImageUrl" alt="" style="height: 35px;"/>
+                                            }
+                                            else if (!string.IsNullOrEmpty(child.ImageUrl) && !child.ImageUrl.StartsWith("http://"))
+                                            { 
+                                                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl(child.ImageUrl)"  alt="" style="height: 35px;"/>
+                                            }
+                                            @if (!string.IsNullOrEmpty(child.NavigationText))
+                                            { 
+                                                @child.NavigationText
+                                            }
+                                            else
+                                            {
+                                                @Tunynet.Globalization.ResourceAccessor.GetString(child.ResourceName)
+                                            }&nbsp
+                                            @if (child.Children.Count() > 0)
+                                            { 
+                                                @Html.Link("子导航", SiteUrls.Instance().ManageChildNavigations(child.NavigationId), "子导航", HighlightStyles.Primary)
+                                            }
+                                            else
+                                            {
+                                                @Html.LinkButton("", SiteUrls.Instance()._CreateNavigation(child.NavigationId,child.ApplicationId, currentPresentAreaKey), highlightStyle: HighlightStyles.Lite, iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog", title = "添加子导航" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @if (!string.IsNullOrWhiteSpace(child.NavigationUrl))
+                                            {
+                                                    @child.NavigationUrl
+                                            }
+                                            else
+                                            {
+                                                    @CachedUrlHelper.RouteUrl(child.UrlRouteName)                                                    
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @switch (child.NavigationType)
+                                            {
+                                                case NavigationType.AddedByOwner:
+                                                @:Owner新增导航
+                                                                                        break;
+                                                case NavigationType.Application:
+                                                @:来源于应用
+                                                                                        break;
+                                                case NavigationType.PresentAreaInitial:
+                                                default:
+                                                @:呈现区域初始
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    break;
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("NavigationId-IsEnabled", child.IsEnabled ? "true" : "", child.IsEnabled ? true : false)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @if (navigation.Children.Where(n => n.ParentNavigationId == child.ParentNavigationId && n.Depth == child.Depth && child.DisplayOrder > n.DisplayOrder).Count() > 0)
+                                            { 
+                                                @Html.Link("上移", SiteUrls.Instance().ChangeNavigationOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @if (navigation.Children.Where(n => n.ParentNavigationId == child.ParentNavigationId && n.Depth == child.Depth && child.DisplayOrder < n.DisplayOrder).Count() > 0)
+                                            {
+                                                @Html.Link("下移", SiteUrls.Instance().ChangeNavigationOrder(), "下移", new { @class = "tn-icon tn-smallicon-download" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditNavigation(child.NavigationId), "编辑", htmlAttributes: new { plugin = "dialog", @class = "tn-action" })
+                                            @if (!child.IsLocked)
+                                            { 
+                                                @Html.Link("删除", SiteUrls.Instance()._DeleteNavigation(child.NavigationId), "删除", htmlAttributes: new { plugin = "dialog", @class = "tn-action" })
+                                            }
+                                        </td>
+                                    </tr> 
+                                                }
+                                            }
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                    }
+                    else
+                    { 
+                        <div class="tn-no-data">
+                            搜索不到数据</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var manageUrl = '@(SiteUrls.Instance().ManageNavigations())';
+
+        //点击后退
+        $("#goBack").click(function (e) {
+            e.preventDefault();
+            window.history.go(-1);
+        });
+
+
+        //全选按钮
+        $("input#navigationIds-checkAll").click(function () {
+            var items = $("input[type='checkbox'][name='navigationIds']:enabled");
+            for (var i = 0; i < items.length; i++) {
+                items[i].checked = document.getElementById("navigationIds-checkAll").checked;
+            }
+
+        });
+
+        //批量删除
+        $("#BatchRemoveNavigation").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='navigationIds']:checked").length) {
+                alert("至少选择一条导航操作");
+                return false;
+            }
+        });
+
+        //启用禁用
+        var isEnabledUrl = '@(SiteUrls.Instance().setNavigationStatus())';
+        $("input[name='NavigationId-IsEnabled']").click(function () {
+            var self = $(this).closest('tr').attr("id");
+            var value = $(this).attr("value");
+            $this = $(this);
+            var val = "";
+            if (!value) {
+                val = "true";
+            } else {
+                val = "";
+            }
+            $.post(isEnabledUrl, { navigationId: self, isEnabled: !value }, function (data) {
+                $this.attr("value", val);
+                art.dialog.tips(data.MessageContent, 2, data.MessageType);
+            })
+        });
+
+        //点击上移按钮
+        $(".tn-smallicon-upload").click(function (e) {
+            e.preventDefault();
+
+            var tr = $(this).closest('tr');
+            var name = tr.attr("name");
+            var fromNavigationId = tr.attr("id");
+            var toNavigationId;
+            var trs = $('.' + name);
+            for (var i = 0; i < trs.length; i++) {
+                if ($(trs[i]).attr("id") === fromNavigationId) {
+                    toNavigationId = $(trs[i - 1]).attr("id")
+                    break;
+                }
+            }
+
+            $.ajax({
+                type: "POST",
+                url: $(this).attr("href"),
+                data: { fromNavigationId: fromNavigationId, toNavigationId: toNavigationId },
+                success: function () {
+                    window.location.reload(true);
+                }
+            })
+
+        });
+        //点击下移按钮
+        $(".tn-smallicon-download").click(function (e) {
+            e.preventDefault();
+
+            var tr = $(this).closest('tr');
+            var name = tr.attr("name");
+            var fromNavigationId = tr.attr("id");
+            var toNavigationId;
+            var trs = $('.' + name);
+            for (var i = 0; i < trs.length; i++) {
+                if ($(trs[i]).attr("id") == fromNavigationId) {
+                    toNavigationId = $(trs[i + 1]).attr("id")
+                    break;
+                }
+            }
+
+            $.ajax({
+                type: "POST",
+                url: $(this).attr("href"),
+                data: { fromNavigationId: fromNavigationId, toNavigationId: toNavigationId },
+                success: function () {
+                    window.location.reload(true);
+                }
+            })
+        });
+    })
+</script>

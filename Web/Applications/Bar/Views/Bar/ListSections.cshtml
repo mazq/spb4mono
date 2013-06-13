@@ -1,0 +1,181 @@
+﻿@model PagingDataSet<BarSection>
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    SortBy_BarSection? sortBy = ViewData.Get<SortBy_BarSection?>("sortBy", null);
+    long? categoryId = ViewData.Get<long?>("categoryId", null);
+    var allParentCategories = ViewData.Get<List<Category>>("allParentCategories", new List<Category>());
+    var childCategories = ViewData.Get<IEnumerable<Category>>("childCategories", new List<Category>());
+    var currentCategory = ViewData.Get<Category>("currentCategory", null);
+    var nameKeyword = Request.QueryString.Get<string>("nameKeyword", string.Empty);
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @if (UserContext.CurrentUser != null)
+    { 
+        @Html.Action("_UserData", new { userId = UserContext.CurrentUser.UserId })
+    }
+    @Html.AjaxAction("_Tops", "Bar", new { topNumber = 10, sortBy = SortBy_BarThread.DateCreated_Desc })
+    @Html.AjaxAction("_Tops", "Bar", new { topNumber = 10, sortBy = SortBy_BarThread.PostCount })
+    @Html.AjaxAction("_Tops", "Bar", new { topNumber = 10, isEssential = true })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-category">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-directory">
+            <h5 class="tn-directory-path">
+                <a href="@SiteUrls.Instance().ListSections(null, sortBy)">所有类别</a>
+                @foreach (var category in allParentCategories)
+                { 
+                    <text> &gt;</text>
+                    <a href="@SiteUrls.Instance().ListSections(category.CategoryId, sortBy)">@category.CategoryName</a>
+                }
+            </h5>
+            @if (childCategories.Count() > 0)
+            { 
+                <div class="tn-directory-level tn-border-gray tn-border-bottom tn-border-dashed">
+                    @if (currentCategory == null || currentCategory.ChildCount > 0)
+                    {
+                                         
+                        <span class="tn-directory-item tn-text-note tn-selected"><a href="@SiteUrls.Instance().ListSections(categoryId, sortBy)">
+                            全部</a></span>
+                    }
+                    else if (currentCategory.ParentId > 0)
+                    { 
+                        <span class="tn-directory-item tn-text-note"><a href="@SiteUrls.Instance().ListSections(currentCategory.ParentId, sortBy)">
+                            全部</a></span>
+                    }
+                    @foreach (var category in childCategories)
+                    {
+                        string selectedClass = string.Empty;
+                        if (currentCategory != null && currentCategory.ChildCount == 0 && category.CategoryId == currentCategory.CategoryId)
+                        {
+                            selectedClass = "tn-text-note tn-selected";
+                        }
+                        <span class="tn-directory-item @selectedClass"><a href="@SiteUrls.Instance().ListSections(category.CategoryId, sortBy)">@category.CategoryName</a></span>
+                    }
+                    @if (childCategories.Count() > 15)
+                    { 
+                        <span class="tn-directory-item" id="moreCategoryButton"><span class="tn-action tn-action-text-icon-right">@Html.Icon(IconTypes.SmallTriangleDown)
+                            <a class="tn-action-text" href="javascript:void(0)">更多</a> </span></span>
+                    }
+                </div>
+            }
+            <div class="tn-border-gray tn-border-bottom">
+                <div class="tn-directory-search tn-helper-clearfix">
+                    <div class="tn-search-box">
+                        <form id="searchSectionForm" action="@Html.Raw(SiteUrls.Instance().ListSections())" method="get">
+                        @Html.Hidden("sortBy", sortBy.ToString())
+                        @Html.Hidden("categoryId", categoryId.ToString())
+                        <input class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl" type="text" watermark="请输入帖吧名称" name="nameKeyword" value="@nameKeyword" />
+                        <span class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray">
+                            <button type="submit">@Html.Icon(IconTypes.SmallFind)</button>
+                        </span>
+                        </form>
+                    </div>
+                    @if (currentCategory != null)
+                    { 
+                        <div class="tn-directory-selected">
+                            <span class="tn-directory-selected-item tn-border-gray tn-bg-gray"><a class="tn-icon tn-smallicon-cross" href="@SiteUrls.Instance().ListSections(null, sortBy, nameKeyword)">
+                            </a>@currentCategory.CategoryName</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-tabs">
+            <ul id="sectionTabNavs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li name="@SortBy_BarSection.ThreadAndPostCount" class="tn-widget-content tn-border-gray tn-border-trl">
+                    <a href="@SiteUrls.Instance().ListSections(categoryId, null, nameKeyword)">帖子最多</a>
+                </li>
+                <li name="@SortBy_BarSection.FollowedCount" class="tn-widget-content tn-border-gray tn-border-trl">
+                    <a href="@SiteUrls.Instance().ListSections(categoryId, SortBy_BarSection.FollowedCount, nameKeyword)">
+                        关注最多</a> </li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="spb-bar-category-list">
+                    @if (Model != null && Model.Count > 0)
+                    {   
+                        <ul class="tn-list">
+                            @foreach (var bar in Model)
+                            {  
+                                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                                    <div class="tn-list-item-area-left">
+                                        <div class="spb-bar-figure">
+                                            <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">
+                                                <img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" width="100px" title="@bar.Name" alt="@bar.Name"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="tn-list-item-area-main tn-helper-clearfix">
+                                        <div class="tn-list-item-row tn-list-item-heading">
+                                            <div class="tn-helper-right">
+                                                @Html.Action("_SubscribeSectionButton", new { sectionId = bar.SectionId })
+                                            </div>
+                                            <div class="tn-title">
+                                                <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">@bar.Name</a></div>
+                                        </div>
+                                        <div class="tn-list-item-row">
+                                            <span>帖子：<a href="@SiteUrls.Instance().SectionDetail(bar.SectionId) ">@bar.ThreadAndPostCount</a></span><span
+                                                class="tn-spacer tn-text-note">|</span><span>关注：<a href="@SiteUrls.Instance().SectionMembers(bar.SectionId)">@bar.FollowedCount</a></span>
+                                        </div>
+                                        <div class="tn-list-item-row tn-list-item-summary">
+                                            <p>
+                                                @HtmlUtility.TrimHtml(bar.Description, 120)</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                        <div class="tn-pagination">
+                            @Html.PagingButton(Model)
+                        </div>
+                    }
+                    else
+                    { 
+                        <div class="tn-no-data">
+                            暂无帖吧
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sectionTabNavs").find("li[name='@(sortBy== SortBy_BarSection.FollowedCount? SortBy_BarSection.FollowedCount:SortBy_BarSection.ThreadAndPostCount)']").addClass("tn-tabs-selected");
+        $("#moreCategoryButton").click(function () {
+            if ($(this).find(".tn-smallicon-triangle-down").length > 0)//更多
+            {
+                $.cookie('ListSectionsMoreCategoryButtonIsOpen', true);
+                $(this).find(".tn-smallicon-triangle-down").addClass("tn-smallicon-triangle-up").removeClass("tn-smallicon-triangle-down");
+                $(this).find("a").attr("title", "收起").text("收起");
+                $("div.tn-directory-level").find("span.tn-directory-item:gt(15)").show();
+            }
+            else {
+                $.cookie('ListSectionsMoreCategoryButtonIsOpen', false);
+                $(this).find(".tn-smallicon-triangle-up").addClass("tn-smallicon-triangle-down").removeClass("tn-smallicon-triangle-up");
+                $(this).find("a").attr("title", "更多").text("更多");
+                $("div.tn-directory-level").find("span.tn-directory-item:gt(15):not(:last)").hide();
+            }
+        });
+        if ($.cookie('ListSectionsMoreCategoryButtonIsOpen') == "true") {
+            $("#moreCategoryButton").find(".tn-smallicon-triangle-down").addClass("tn-smallicon-triangle-up").removeClass("tn-smallicon-triangle-down");
+            $("#moreCategoryButton").find("a").attr("title", "收起").text("收起");
+            $("div.tn-directory-level").find("span.tn-directory-item:gt(15)").show();
+        }
+        else {
+            $("#moreCategoryButton").find(".tn-smallicon-triangle-up").addClass("tn-smallicon-triangle-down").removeClass("tn-smallicon-triangle-up");
+            $("#moreCategoryButton").find("a").attr("title", "更多").text("更多");
+            $("div.tn-directory-level").find("span.tn-directory-item:gt(15):not(:last)").hide();
+        }
+    });
+</script>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<License Version="2.0">
+    <ValidationKey>4YafYfKYsE2IYPr9pyhd9cvL0BzqMzhOUHmf8Smoc53C5JUHPYOsXkNqHi4eEkNYc7teJno71PlnfpvyYSYN8w==</ValidationKey>
+<User>
+    <Name>免费用户</Name>
+    <Email />
+    <Organization />
+    <UserType>Person</UserType>
+</User>
+<Product>
+    <LicenseID>6d1c2a5d-1d5c-41e4-9cdb-54fe81387e38</LicenseID>
+    <Level>Free</Level>
+    <Version>v4.0</Version>
+    <ShortName>Spacebuilder</ShortName>
+    <FullName>Spacebuilder</FullName>
+    <Developer>青岛拓宇网络科技有限公司</Developer>
+    <Description>基于asp.net mvc业内领先的一站式web2.0建站平台</Description>
+</Product>
+<Issuer>
+    <Name>青岛拓宇网络科技有限公司</Name>
+    <Email>support@tunynet.com</Email>
+    <Url>http://www.spacebuilder.cn</Url>
+</Issuer>
+<Constraints>eDMp71iv0zfplKruUXfGQXTDyt3RYMuR6/TOobblCMu+AtsPM+qKNa9Sdc2rasqGd3kyqKJ/Rl4SsSDgpLpkqUNUHOMrIYlLAOlLxWcwUe4nQPtX9YpR6n3UHYR/IZm+0rL3ZNqAF6rxqt1AaZp+eg69r5N9ob7e1eRYw+sz0aecOKUj2U1BcUSkQ1Bd9gbva2meQOIBlcQ6V/esgLTm0zJxI8ozDTs3JREgp8P+T4q2ttPs7bDJfoMhV7DqV7W6el3SQKizxWm3esdZeszTqHOgXs0mFE68z1k+0XyQ3E3Zq2wuEnD5VyILkfCiJ2e28o6wMyajXB3c9e34nK2/FksKUGInJcD+MFmlL2vA5BKAOUGFxKSlNuHiS++WUf6ulQ+Yj8DYL3Wd3eKiK7TB2boy62ylCuHtvP8InQpWIRMZg0Uj2QGESZY7lWI56LyNHZPOmWAZ/kPLCVLOhYRY9g4dXn7ftd+SCqezUCQ0HjcAplnXLLfYtf+j7omUlW8+TyYj4ek2ppcEOCirzvLB0A==</Constraints>
+</License>

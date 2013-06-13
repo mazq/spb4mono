@@ -1,0 +1,67 @@
+﻿@model  Dictionary<PrivacyItemGroup, List<PrivacyItem>>
+@{ 
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.PrivacyUniversal;
+    long userId = ViewData.Get<long>("UserId", 0);
+}
+@section Aside {
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-privacy-set-box">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-privacy-set">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>隐私设置</h2>
+            </div>
+            @Html.StatusMessage(ViewData["StatusMessageData"] as StatusMessageData)
+            @using (Html.BeginForm("UserPrivacyItemsSettingsPost", "UserSpaceSettings", FormMethod.Post)) 
+            {
+                <div class="tn-form tn-label-right">
+                    @foreach (var item in Model)
+                    {
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom"><strong>@item.Key.TypeName</strong> <span class="tn-text-note">@item.Key.Description</span></div>
+                        if (item.Key.TypeId == PrivacyItemGroupIds.Instance().Profile())
+                        {
+                            <div class="tn-form-row"><span class="tn-text-note">您可以在 @Html.Link("编辑基本资料", SiteUrls.Instance().EditUserProfile(Url.SpaceKey()), "编辑资料") 时，同时设置隐私</span></div>
+                            continue;
+                        } foreach (var privacyItem in item.Value)
+                        { 
+                            <div class="tn-form-row tnc-space-purview tn-helper-clearfix">
+                                <label class="tn-form-label">@privacyItem.ItemName：</label>
+                                @Html.Action("_PrivacyStatusSetter", "Channel", new
+                                    {
+                                        area = "Common",
+                                        userId = userId,
+                                        itemName = privacyItem.ItemKey,
+                                        itemPrivacyStatus = (TempData[privacyItem.ItemKey] as SelectList).SelectedValue,
+                                        selectedUserIds = ViewData[privacyItem.ItemKey + "_" + SpecifyObjectTypeIds.Instance().User()] as string,
+                                        selectedUserGroupIds = ViewData[privacyItem.ItemKey + "_" + SpecifyObjectTypeIds.Instance().UserGroup()] as string,
+                                        isTwoSelectItem = ViewData[privacyItem.ItemKey]
+                                    })
+                                <div class="tn-explain"><span class="tn-text-note">@privacyItem.Description</span></div>
+                            </div>
+                        }
+                    }
+                <div class="tn-form-row tn-form-row-button">
+                    <label class="tn-form-label">&nbsp;</label>
+                    @Html.Button("保存设置", ButtonTypes.Submit, HighlightStyles.Primary)
+                    @Html.Button("恢复默认设置", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { id = "RestoreUserPrivacySettings" })
+                </div>
+            </div> 
+            }
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("RestoreUserPrivacySettings", "UserSpaceSettings", FormMethod.Post, new { id = "RestoreUserPrivacySettings-from" }))
+{
+
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("button#RestoreUserPrivacySettings").click(function (e) {
+            art.dialog.confirm('你确定要重置所有设置？', function () {
+                $("form#RestoreUserPrivacySettings-from").submit();
+            });
+        });
+    });
+</script>

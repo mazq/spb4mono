@@ -1,0 +1,190 @@
+﻿@{
+    
+}
+<div class="tnc-location-mode" style="display: none; position: absolute;">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top tn-location">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+            <div class="tn-text-heading tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <div class="tn-helper-right">
+                    <span id="user-area" class="tn-valign">所在地：<a id="register-parent-area" href="#"></a>-<a id="register-area" href="#"></a></span> <a style="cursor:pointer;" id="area-close" class="tn-icon tn-smallicon-cross tn-icon-inline">删除</a>
+                </div>
+                <span><a id="area-all" href="#">地区</a></span><span id="area-choose"></span>
+            </div>
+            <ul class="tnc-location-list tn-helper-clearfix">
+                <li><a href="#" id="select-all-area"><strong>所有</strong></a></li>
+                <dl>
+                </dl>
+            </ul>
+        </div>
+    </div>
+</div>
+<script id="areaTemplate" type="text/x-jquery-tmpl">
+    <li data-area-code='${areaCode}' data-parent-area-code='${parentAreaCode}' data-parent-area-name='${parentAreaName}' data-depth='${depth}' data-area-name='${areaName}'><a href='#'>${areaName}</a></li>
+</script>
+<script type="text/javascript">
+   $(function(){
+     var AreaSelector = function (topAreaCode,parentAreaCode,currentAreaCode,depth,callback) {
+        this.topAreaCode = topAreaCode; //地区编码
+        this.parentAreaCode=parentAreaCode; //父节点地区编码
+        this.currentAreaCode=currentAreaCode; //子节点地区编码
+        this.depth = depth; //深度
+        this.callback = callback; //回调函数
+        
+        this.init();
+    };
+
+    AreaSelector.fn = AreaSelector.prototype = {
+        init: function() {
+            var self = this; //提前保存当前对象AreaSelector
+
+            //利用冒泡机制为a标签绑定单击事件
+            $(".tnc-location-list dl").delegate("a","click",function(e){
+                e.preventDefault(); 
+                var areaCode=$(this).closest('li').data('areaCode');
+                var areaName=$(this).closest('li').data('areaName');
+                var parentAreaName=$(this).closest('li').data('parentAreaName');
+                var parentAreaCode=$(this).closest('li').data('parentAreaCode');
+                var depth=$(this).closest('li').data('depth');
+
+                //如果当前节点深度小于指定的深度就继续读取下一级节点
+                if (depth < self.depth) {                 
+                    self.getAreas(areaCode); 
+                }else{
+                    self.selected(areaCode,areaName,parentAreaCode,parentAreaName);
+                }                   
+            });
+
+            //点击父所在地
+            $("#register-parent-area").click(function(e){
+               e.preventDefault();
+               self.selected($(this).data("areaCode"),$(this).data("areaName"),$(this).data("areaCode"),$(this).data("areaName"));
+            })
+
+            //点击子所在地
+             $("#register-area").click(function(e){
+                e.preventDefault();
+                self.selected($(this).data("areaCode"),$(this).data("areaName"),$(this).data("parentAreaCode"),$(this).data("parentAreaName"));
+            })
+
+            //点击顶级“地区”
+            $("#area-all").click(function(e){
+                e.preventDefault();
+                self.getAreas(self.topAreaCode);
+            });
+
+            //点击关闭
+            $("#area-close").click(function(){
+                $(".tnc-location-mode").hide();
+            });
+
+            //点击“所有”
+            $("#select-all-area").click(function(e){
+                e.preventDefault();
+
+                var code=$("#select-all-area").data("areaCode");                  
+                var name=$("#select-all-area").data("areaName");
+                self.selected(code,name,code,name);
+            });
+
+            if (this.parentAreaCode) {
+               this.getAreas(this.parentAreaCode);
+            }else{
+               this.getAreas(this.topAreaCode);
+            }
+            
+            //获取所在地
+            if (@(ViewData["login"])==false) {
+               $("#user-area").empty();
+            }else{
+               $("#register-parent-area").text('@(ViewData["registerParentAreaName"])').data("areaCode",'@(ViewData["registerParentAreaCode"])').data("areaName",'@(ViewData["registerParentAreaName"])');
+               $("#register-area").text('@(ViewData["registerAreaName"])').data("areaCode",'@(ViewData["registerAreaCode"])').data("areaName",'@(ViewData["registerAreaName"])').data("parentAreaCode",'@(ViewData["registerParentAreaCode"])').data("parentAreaName",'@(ViewData["registerParentAreaName"])');
+            }
+        },
+
+        /*显示隐藏控件*/
+        toggle: function() { 
+            $(".tnc-location-mode").toggle();
+        },
+
+        /*隐藏控件*/
+        hide: function() { 
+            $(".tnc-location-mode").hide();
+        },
+
+        /*显示控件*/
+        show: function() { 
+            $(".tnc-location-mode").show();
+        },
+
+        /*获取子级地区*/
+        getAreas: function(areaCode){
+            var self = this;
+            var param = new Object();
+            param.parentCode = areaCode;
+            $.getJSON('@SiteUrls.Instance().GetAreasByParentCode()',param,function(data){
+                if(data[0].haveChild=="yes"){
+                    //设置地区
+                    if(self.topAreaCode == data[0].parentAreaCode){
+                        $("#area-choose").text("");
+                    }else{
+                        $("#area-choose").text(">"+data[0].parentAreaName);
+                    }
+
+                    //根据是否选择顶级区域显示或隐藏“所有”
+                    if (data[0].parentAreaCode === self.topAreaCode && '@(ViewData["selectTop"])'.toLowerCase() === 'false') { 
+                        $("#select-all-area").hide();
+                    }else{ //设置"所有"a标签属性
+                        $("#select-all-area").show();
+                        $("#select-all-area").data("areaCode",data[0].parentAreaCode);
+                        $("#select-all-area").data("areaName",data[0].parentAreaName);
+                    }
+
+                    //设置子地区列表
+                    $('.tnc-location-list dl').empty();
+                    if(data){
+                        $("#areaTemplate").tmpl(data).appendTo(".tn-location dl");
+                    }
+
+                    $('a','.tnc-location-list dl li[data-area-code="'+self.currentAreaCode+'"]').addClass('tn-bg-deep tn-selected');
+                }else{
+                    self.selected(data[0].areaCode,data[0].areaName,data[0].parentAreaCode,data[0].parentAreaName);
+                }
+            });    
+        },
+
+        /*选定一个搜索地区*/
+        selected: function (areaCode, areaName,parentAreaCode,parentAreaName) {
+            var data = new Object();
+            if(areaCode == this.topAreaCode){
+                data.areaCode='';
+            }else{
+                data.areaCode=areaCode;
+            }
+            data.areaName=areaName;
+            data.parentAreaCode=parentAreaCode;
+            data.parentAreaName=parentAreaName;
+            data.topAreaCode=this.topAreaCode;
+        
+            if (this.callback) {
+               this.callback(data);
+            }
+        },
+
+       /*控件定位*/
+       position:function(left,top){
+           $(".tnc-location-mode").css("z-index","99").offset({left:left-6,top:top+16});
+       }
+
+    };
+
+    @(ViewData["id"]) = new AreaSelector('@(ViewData["topAreaCode"])','@(ViewData["parentAreaCode"])','@(ViewData["currentAreaCode"])',@(ViewData["depth"]), function (data) {    
+        @(ViewData["callback"])(data);
+    });
+
+ });
+    
+    
+</script>

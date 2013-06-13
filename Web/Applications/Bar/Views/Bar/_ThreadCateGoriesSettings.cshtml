@@ -1,0 +1,32 @@
+﻿@model BarSection
+@using (Html.BeginAjaxForm("_ThreadCateGoriesSettings", "Bar", FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("SuccessCallBack")))
+{
+    @Html.HiddenFor(n => n.SectionId)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form">
+            <div class="tn-form-row">
+                @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.ForceEnabled, new { id = "ForceEnabled", @class = "tn-radiobutton" })
+                <label for="ForceEnabled">
+                    强制分类</label>
+                @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.NotForceEnabled, new { id = "NotForceEnabled", @class = "tn-radiobutton" })
+                <label for="NotForceEnabled">
+                    允许分类</label>
+                @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.Disabled, new { id = "Disabled", @class = "tn-radiobutton" })
+                <label for="Disabled">
+                    禁用</label>
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogoperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+    this.title("类别设置");
+</script>
+<script language="javascript" type="text/javascript">
+    function SuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

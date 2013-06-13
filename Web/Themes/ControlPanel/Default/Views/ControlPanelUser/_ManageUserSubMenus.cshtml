@@ -1,0 +1,38 @@
+﻿@{
+    ManageUserMenu menu = ManageUserMenu.ManageUser;
+    menu = ViewData["ManageUserMenu"] == null ? ManageUserMenu.ManageUser : (ManageUserMenu)ViewData["ManageUserMenu"];
+}
+<div class="tn-block">
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-sidebar">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="tnc-menu-item">
+                <ul class="tn-side-menu">
+                    <li @if (menu == ManageUserMenu.ManageUser)
+                        {@Html.Raw("class=\"tnc-sublist-over\"");
+                        } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageUsers())">用户管理</a></li>
+                    <li @if (menu == ManageUserMenu.ManageUserRole)
+                        {@Html.Raw("class=\"tnc-sublist-over\"");
+                        }><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageUserRoles())">用户角色</a></li>
+                    <li @if (menu == ManageUserMenu.ManageUserRank)
+                        {@Html.Raw("class=\"tnc-sublist-over\"");
+                        }><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageRanks())">用户等级</a></li>
+                    <li @if (menu == ManageUserMenu.ManageUserValidate)
+                        {@Html.Raw("class=\"tnc-sublist-over\"");
+                        }><em></em><a class="tn-menu-text" href="@SiteUrls.Instance().ManageIdentifications()">
+                            身份认证</a></li>
+                </ul>
+            </div>
+            <div class="tnc-menu-item">
+                <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                    <h4>
+                        <span class="tn-icon-file"></span>最近访问</h4>
+                </div>
+                <ul class="tn-side-menu">
+                    <li><em></em><a class="tn-menu-text" href="#">问答管理</a></li>
+                    <li><em></em><a class="tn-menu-text" href="#">日志管理</a></li>
+                    <li><em></em><a class="tn-menu-text" href="#">投票管理</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

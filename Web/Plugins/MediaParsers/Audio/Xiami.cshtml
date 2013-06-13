@@ -1,0 +1,26 @@
+@{
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+    Regex urlRegex = new Regex(@"http://www.xiami.com/song/(?<songId>[\s\S]*?)$", RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+    ParsedMedia entity = ParsedMedia.New();
+
+    entity.MediaType = MediaType.Audio;
+    entity.Url = url;
+    if (urlMatch.Success)
+    {
+        string songId = urlMatch.Groups["songId"].Value;
+        string songJosn = HttpCollects.GetHTMLContent(string.Format("http://www.xiami.com/app/iphone/song/id/{0}", songId));
+        if (!string.IsNullOrEmpty(songJosn))
+        {
+            dynamic songInfo = Json.Decode(songJosn);
+            entity.Description = "";
+            entity.Name = songInfo.name;
+            entity.PlayerUrl = string.Format("http://www.xiami.com/res/app/img/swf/weibo.swf?dataUrl=http://www.xiami.com/app/player/song/id/{0}/type/7", songId);
+            entity.SourceFileUrl = songInfo.location.Replace("\\", "");
+            entity.ThumbnailUrl = songInfo.album_logo.Replace("\\", "");
+            ParsedMediaService parsedMediaService = new ParsedMediaService();
+            parsedMediaService.Create(entity);
+        }
+    }
+}
+@Html.Raw(Json.Encode(entity))

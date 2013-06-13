@@ -1,0 +1,70 @@
+﻿@{
+    User currentUser = (User)UserContext.CurrentUser;
+    User spaceUser = ViewData.Get<User>("user", null);
+
+    var userId = "";
+    var num = "0";
+    var loginId = "0";
+    //搜索如果没有登录，只显示"当前空间主人的日志"，并且选中"当前空间主人的日志"
+    if (currentUser == null)
+    {
+        userId = spaceUser.UserId.ToString();
+        num = "2";
+    }
+    else
+    {
+        //如果当前登录用户是当前空间的用户，搜索只显示我的日志，并且选中我的日志
+        if (currentUser.UserId == spaceUser.UserId)
+        {
+            num = "1";
+            loginId = currentUser.UserId.ToString();
+        }
+        //如果当前登录用户不是当前空间的用户，搜索显示我的日志和"当前空间主人的日志"，并且选中"当前空间主人的日志"
+        else
+        {
+            userId = spaceUser.UserId.ToString();
+            num = "2";
+        }
+    }
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-content-search">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-search-box">
+            <input type="text" id="blog-keyword" name="keyword" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl"/>
+            <span id="blog-search" class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray required">
+            <button><span class="tn-icon tn-smallicon-find"></span></button>
+            </span>
+        </div>
+    </div>
+</div>
+@*如果不是空间主人*@
+@if (currentUser == null || currentUser.UserId != spaceUser.UserId)
+{
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-subscribe">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <ul class="tn-subscribe tn-list">
+            <li><a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance().BlogRss(Url.SpaceKey())"><span class="tn-icon tn-icon-feed"></span><span class="tn-action-text">订阅日志</span></a></li>
+        </ul>
+    </div>
+</div>
+}
+<script type="text/javascript">
+    $("#blog-keyword").watermark("搜索日志");
+    $(function () {
+        $("#blog-search").click(function () {
+            searchblog();
+        })
+        $("#blog-keyword").keydown(function (e) {
+            if (e.keyCode == 13) {
+                searchblog();
+            }
+        })
+        function searchblog() {
+            var keyword = $("#blog-keyword").val();
+            if (keyword == "") {
+                return;
+            }
+            window.location = '@(SiteUrls.Instance().BlogPageSearch())?keyword=' + keyword + "&userId=@(userId)&selectNum=@(num)&loginId=@(loginId)&allId=-1";
+        }
+    })
+</script>

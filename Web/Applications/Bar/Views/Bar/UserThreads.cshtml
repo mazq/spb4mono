@@ -1,0 +1,53 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    long userId = ViewData.Get<long>("userId", 0);
+    bool? isPosted = Request.QueryString.Get<bool?>("isPosted", null);
+    bool isOwner = ViewData.Get<bool>("isOwner", false);
+    string myThreadsSelectedClass = string.Empty; //我的帖子是否选中样式
+    string myPostsSelectedClass = string.Empty;//我的回帖是否选中样式
+    if (isPosted == true)
+    {
+        myPostsSelectedClass = "tn-tabs-selected";
+    }
+    else
+    {
+        myThreadsSelectedClass = "tn-tabs-selected";
+    }
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @Html.AjaxAction("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.ThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Headline })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom tn-border-gray">
+            <div class="tn-option">
+                <a href="@SiteUrls.Instance().TagMap()">更多</a>
+            </div>
+            <h3 class="tn-helper-reset">
+                热门标签
+            </h3>
+        </div>
+        @Html.Action("_TagCloud", "Channel", new { area = "Common", tenantTypeId = TenantTypeIds.Instance().BarThread() })
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-mypost">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_UserData", new { userId = userId, displayTemplate = DisplayTemplate_UserData.Main })
+        <div class="tn-tabs">
+            <ul id="userThreadTabNavs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl @myThreadsSelectedClass"><a href="@SiteUrls.Instance().UserThreads(userId)">@(isOwner ? "我的帖子" : "TA的帖子")</a>
+                </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl @myPostsSelectedClass"><a href="@Html.Raw(SiteUrls.Instance().UserThreads(userId, true))">@(isOwner ? "我的回复" : "TA的回复")</a></li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@Html.Raw(SiteUrls.Instance().UserFollowedSections(userId))">
+                    关注的帖吧</a> </li>
+            </ul>
+            <div class="tn-tabs-panel">
+                @Html.Partial("_List", Model)
+            </div>
+        </div>
+    </div>
+</div>

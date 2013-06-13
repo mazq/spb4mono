@@ -1,0 +1,38 @@
+@{
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+    Regex urlRegex = new Regex(@"^http://www.kuwo.cn/yinyue/(?<songId>[\s\S]*?)/", RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+    ParsedMedia entity = ParsedMedia.New();
+    entity.MediaType = MediaType.Audio;
+    entity.Url = url;
+    if (urlMatch.Success)
+    {
+        string songId = urlMatch.Groups["songId"].Value;
+        entity.PlayerUrl = string.Format("http://www.kuwo.cn/yy/dqplayer/dqplay.swf?11.swf&rid=MUSIC_{0}&initplay=1", songId);
+
+        string webMetter = HttpCollects.GetHTMLContent(url);
+
+        Regex descriptionRegex = new Regex(@"'comment':'(?<des>[\s\S]*?)',", RegexOptions.IgnoreCase);
+        Match descriptionMatch = descriptionRegex.Match(webMetter);
+        if (descriptionMatch.Success)
+        {
+            entity.Description = descriptionMatch.Groups["des"].Value;
+        }
+
+        Regex nameRegex = new Regex(@"<h1 class=""unDis"">(?<songId>[\s\S]*?)</h1>", RegexOptions.IgnoreCase);
+        Match nameMatch = nameRegex.Match(webMetter);
+        if (nameMatch.Success)
+        {
+            entity.Name = nameMatch.Groups["songId"].Value;
+        }
+
+        Regex picRegex = new Regex(@"rel=""lazypic"" id=""musicpic"" title=""[^""]*?"" sr=""(?<pic>[^""|\s]*?)""", RegexOptions.IgnoreCase);
+        Match picMatch = picRegex.Match(webMetter);
+        if (picMatch.Success)
+        {
+            entity.ThumbnailUrl = picMatch.Groups["pic"].Value;
+        }
+        ParsedMediaService parsedMediaService = new ParsedMediaService(); parsedMediaService.Create(entity);
+    }
+}
+@Html.Raw(Json.Encode(entity))

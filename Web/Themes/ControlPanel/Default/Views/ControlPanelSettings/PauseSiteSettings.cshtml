@@ -1,0 +1,98 @@
+﻿@model PauseSiteSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>暂停站点</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                @using (Html.BeginAjaxForm("SavePauseSiteSettings", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "savePauseSiteSettings" }))
+                {
+                    <div class="tn-form tn-label-right tnc-reminder-settings">
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n=>n.IsEnable)
+                            <ul class="tn-radiobutton-list">
+                                <li class="tn-inline-list">
+                                    @Html.RadioButton("IsEnable", true, Model.IsEnable, new { @id = "IsEnable-true", @class = "tn-radiobutton" })
+                                    <label for="IsSync-true">运行中</label>
+                                </li>
+                                <li class="tn-inline-list">
+                                    @Html.RadioButton("IsEnable", false, !Model.IsEnable, new { @id = "IsEnable-false", @class = "tn-radiobutton" })
+                                    <label for="IsSync-false">暂停</label>
+                                </li>
+                            </ul>
+                          
+                        </div>
+                        <div id="isPause" style="@(Model.IsEnable ? "display:none" : "")">
+
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n=>n.PausePageType)
+                                <ul class="tn-radiobutton-list">
+                                    <li class="tn-inline-list">
+                                        @Html.RadioButton("PausePageType", true, Model.PausePageType, new { @id = "PausePageType-true", @class = "tn-radiobutton" })
+                                        <label for="PausePageType-true">站内页面</label>
+                                    </li>
+                                    <li class="tn-inline-list">
+                                        @Html.RadioButton("PausePageType", false, !Model.PausePageType, new { @id = "PausePageType-false", @class = "tn-radiobutton" })
+                                        <label for="PausePageType-false">外链</label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="tn-form-row" id="PauseAnnouncement" style="@(Model.PausePageType ? "" : "display:none")">
+                                @Html.FormLabelFor(n=>n.PauseAnnouncement)
+                                @Html.TextAreaFor(n => n.PauseAnnouncement,InputWidthTypes.Long,10,40, new RouteValueDictionary { { "class", Model.PausePageType ? "" : "ignore" } })
+                               
+                            </div>
+                            <div class="tn-form-row" id="htmltag">
+                                 <label class="tn-form-label">&nbsp;</label>
+                                <div class="tn-explain"><span class="tn-text-note">可以输入Html标签</span></div>
+                            </div>
+                            
+                            <div class="tn-form-row" id="PauseLink" style="@(Model.PausePageType?"display:none":"")">
+                                @Html.FormLabelFor(n=>n.PauseLink)
+                                @Html.TextBoxFor(n => n.PauseLink, InputWidthTypes.Long, new RouteValueDictionary { { "class", Model.PausePageType ? "ignore" : "" } })
+                            </div>
+                        </div>
+
+                        <div class="tn-form-row tn-form-row-button">
+                            <label class="tn-form-label">&nbsp;</label>
+                            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "" })
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+    }
+    $(document).ready(function () {
+        $("#PausePageType-false").click(function () {
+            $("#PauseAnnouncement").hide();
+            $("#htmltag").hide();
+            $("#PauseLink").show();
+
+        });
+        $("#PausePageType-true").click(function () {
+            $("#PauseAnnouncement").show();
+            $("#htmltag").show();
+            $("#PauseLink").hide();
+        });
+        $("#IsEnable-false").click(function () {
+            $("#isPause").show();
+        });
+        $("#IsEnable-true").click(function () {
+            $("#isPause").hide();
+        });
+
+
+    });
+
+</script>

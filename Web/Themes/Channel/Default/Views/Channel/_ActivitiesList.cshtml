@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Activity>
+@{
+    bool haveData = ViewData.Get<bool>("haveData", true);
+    var applicationService = new ApplicationService();
+}
+<input type="hidden" class="tnui-havedata" value="@(haveData)" />
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var item in Model)
+    {
+        string areaName = "Common";
+        if (item.ApplicationId > 0)
+        {
+            var application = applicationService.Get(item.ApplicationId);
+            if (application == null || !application.IsEnabled)
+            {
+                continue;
+            }
+            areaName = application.ApplicationKey;
+        }
+
+        string tenantTypeIdPart = "";
+        if (!string.IsNullOrEmpty(item.TenantTypeId))
+        {
+            tenantTypeIdPart = "ActivityDetail_" + item.TenantTypeId;
+        }
+    @Html.AjaxRouteAction(string.Format("{0}_{1}", tenantTypeIdPart, item.ActivityItemKey), new { ActivityId = item.ActivityId, area = areaName, isSiteActivity = true })
+    }
+}

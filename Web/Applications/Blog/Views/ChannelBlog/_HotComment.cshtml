@@ -1,0 +1,24 @@
+﻿@{
+    
+    IEnumerable<BlogThread> blogs = ViewData.Get<IEnumerable<BlogThread>>("blogs", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-textbox-list">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <div class="tn-option"><a href="@SiteUrls.Instance().BlogListByRank("comment")">更多</a></div>
+    <h3 class="tn-helper-reset">热评日志</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-list">
+            @foreach (BlogThread blog in blogs)
+            { 
+            <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+                <em class="tn-text-note tn-date tn-helper-right">@blog.CommentCount</em>
+                <a href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(blog.UserId), blog.ThreadId)" target="_blank">@blog.ResolvedSubject</a> 
+            </li>
+            }
+                 
+        </ul>
+    </div>
+</div>
+
+         

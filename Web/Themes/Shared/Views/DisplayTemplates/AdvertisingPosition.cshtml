@@ -1,0 +1,23 @@
+﻿@{
+    IEnumerable<Advertising> advertisingsInPosition = ViewData.Get<IEnumerable<Advertising>>("advertisingsInPosition", new List<Advertising>());
+    AdvertisingPosition position = ViewData.Get<AdvertisingPosition>("position", null);
+}
+@if (position != null && advertisingsInPosition.Where(n => n.EndDate > DateTime.Now).Count() > 0 && position.IsEnable)
+{
+    <div class="spb-biz-cont">
+        @foreach (var advertising in advertisingsInPosition)
+        {
+            if (advertising.EndDate > DateTime.Now)
+            {
+                if (advertising.AdvertisingType == AdvertisingType.Script && !string.IsNullOrEmpty(advertising.Body))
+                {
+                @Html.Raw(advertising.Body)
+                }
+                else
+                { 
+                @Html.AjaxAction("_AdvertisingPosition", "Channel", new { advertisingId = advertising.AdvertisingId, area = "Common" })
+                }
+            }
+        }
+    </div>
+}

@@ -1,0 +1,254 @@
+﻿@{
+    long associateId = ViewData.Get<long>("associateId", 0);
+    string htmlFieldName = ViewData.Get<string>("htmlFieldName", "");
+    bool isMultiSelect = ViewData.Get<bool>("isMultiSelect", false);
+    string attachmentIds = ViewData.Get<string>("attachmentIds", "");
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", "");
+    int maxSelect = ViewData.Get<int>("maxSelect", 5);
+}
+<div id="title-image-dialog" class="tnc-title-image-set">
+    <div class="tnc-dailog-pd">
+        <div class="tnc-titleimg-list">
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        <div class="tnc-uploadify-wrap tn-helper-clearfix">
+            @Html.Uploadify("setTitleImage", tenantTypeId, "jpg,jpeg,gif,png", buttonOptions: new ButtonOptions().SetText("选择图片").SetWidth(90),
+                 uploadFileOptions: new UploadFileOptions()
+                       .SetAssociateId(associateId)
+                       .SetAutoUpload(true)
+                       .SetMultiple(true)
+                       .SetPreventCaching(true)
+                       .SetQueueId("queueManage")
+                       .SetRemoveCompleted(true)
+                       .SetUploadLimit(100)
+                       .SetQueueSizeLimit(5)
+                       .MergeUploadifyFormData("CurrentUserIdToken", Utility.EncryptTokenForUploadfile(0.1, UserContext.CurrentUser.UserId))
+                       .MergeUploadifyFormData("resize", true)
+                       .MergeUploadifyCallBack("onUploadSuccess", "onUploadSuccess")
+                 )
+            <div id="queueManage"></div>            
+        </div>
+        @Html.Button("保存", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "save", dialogOperation = "close" })
+        @Html.Button("关闭", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { id = "cancel", dialogOperation = "close" })
+    </div>    
+</div>
+<script type="text/dialog">
+    this.position(450, 100);
+    this.title('设置标题图');
+</script>
+<script type="text/javascript">
+    var titleImageListUrl = "@Html.Raw(SiteUrls.Instance()._TitleImageList(tenantTypeId,attachmentIds,associateId))";
+
+    //成功上传图片后的回调函数
+    function onUploadSuccess(file, data, response) {
+        $(".tnc-titleimg-list").load(titleImageListUrl);
+    }
+
+    //设置图片选中(待设置的li，是否选中，是否全部移除（false则只移除选中按钮）)
+    function selectImage(obj_li, selected) {
+        if (selected) {
+            obj_li.addClass("tn-hover");
+            //显示勾选按钮
+            $("div.tn-edit", obj_li).children("span.tn-set").children(".tn-icon").show();
+            //显示删除按钮
+            $("div.tn-edit", obj_li).children("span.tn-manage").children(".tn-icon").show();
+            $("p.tn-photo-wrap", obj_li).addClass("tn-border-deep tn-bg-light").removeClass("tn-border-gray");
+        } else {
+            obj_li.removeClass("tn-hover");
+            //去除勾选按钮
+            $("div.tn-edit", obj_li).children("span.tn-set").children(".tn-icon").hide();
+            //去除删除按钮
+            $("div.tn-edit", obj_li).children("span.tn-manage").children(".tn-icon").hide();
+            $("p.tn-photo-wrap", obj_li).removeClass("tn-border-deep tn-bg-light").addClass("tn-border-gray");
+        }
+    }
+
+    //单独隐藏删除按钮
+    function hideDeleteOnly(obj_li) {
+        $("div.tn-edit", obj_li).children("span.tn-manage").children(".tn-icon").hide();
+    }
+
+    //保存以前选中的展示图片的Id(设置字符串)
+    function saveOriginalBigImage(imageIds, bigImageId) {
+        var oldIds = imageIds.split(',');
+        var newIds = '';
+        //取出以前选中为展示图片的图片Id
+        for (i = 0; i < oldIds.length; i++) {
+            if (oldIds[i] == bigImageId) {
+                newIds = oldIds[i] + ',';
+            }
+        }
+        for (i = 0; i < oldIds.length; i++) {
+            if (oldIds[i] != bigImageId) {
+                newIds += oldIds[i] + ',';
+            }
+        }
+        return newIds;
+    }
+
+    //设置展示图片样式（能够保存以前的选中信息）
+    function save_setBigImage(bigImageId){
+        //若以前设置的标题图仍然被选中则为其设置选中样式，否则设置第一张图片为选中样式
+        var setFlag = false;
+        $("img", "#title-image-list").each(function (i) {
+            var originalId = $(this).attr('Id');
+            if (originalId.indexOf(bigImageId) > 0) {
+                var span = $(this).siblings().find("span");
+                span.addClass("big-Image");
+                $("span.tn-set").addClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-primary").addClass("tn-button-secondary");
+                span.removeClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-secondary").addClass("tn-button-primary");
+                setFlag = true;
+                return false;
+            }
+        });
+        //当以前的展示图片被取消时，设置列表中第一个图片为展示图片
+        if (!$("span.tn-set.big-image").length && !setFlag &&($("span.tn-set:first").parent().siblings("img").data("imageId") != '0')) {
+            $("span.tn-set:first").addClass("big-image");
+            $("span.tn-set").addClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-primary").addClass("tn-button-secondary");
+            $("span.tn-set.big-image:first").removeClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-secondary").addClass("tn-button-primary");
+        }
+    }
+
+    $(document).ready(function () {
+        $(".tnc-titleimg-list").load(titleImageListUrl);
+        var imageList = $("#title-image-list");
+        var imageDialog = $("#title-image-dialog");
+
+        //点击保存按钮
+        $("#save", imageDialog).click(function () {
+            var imgTemplate = '<img id="title-image-{0}" data-image-id="{1}" src="{2}" width="50" height="50" />';
+
+            //去除原先列表中已选中的图片
+            $(".tnc-titleimg-add", imageList).remove();
+            $("img", imageList).remove();
+            var imageIds = "";
+            var images = $("li.tn-hover", imageDialog);
+            if (!images.length) {
+                //dialog中没有选中的图片，则显示默认图
+                var img = imgTemplate.format("0", "0", "@SiteUrls.Instance().ImageUrl(0, tenantTypeId, ImageSizeTypeKeys.Instance().Small())");
+
+                $("a#select-title-image", imageList).before(img);
+            } else {
+                //获取之前选中的展示图片Id
+                var bigImageId = $("input#@(htmlFieldName)", "#title-image-list").val().split(',')[0];
+                images.each(function (i) {
+                    var imageId = $(this).data("imageId");
+                    var imageUrl = $("img", $(this)).attr("src");
+                    var img = imgTemplate.format(imageId, imageId, imageUrl);
+                    //多选并且不是默认图片则添加设置展示图按钮
+                    if ("@isMultiSelect" == "True" && imageId != '0') {
+                        //列表为空或该元素位于列表中的第一个，设置选中
+                        if (images.length == 1||i==0) {
+                            img = "<div class='tnc-titleimg-add tn-hover'>" + img + "<div class='tn-edit'><span class='tn-set big-image'><a class='tn-button tn-corner-all tn-button-icon-only tn-button-secondary-hover tn-button-primary' title='设为展示图' href='javascript:void(0)'><span class='tn-icon tn-smallicon-album'></span><span class='tn-button-text'>设为展示图</span></a></span></div>";
+                        } else {
+                            img = "<div class='tnc-titleimg-add tn-hover'>" + img + "<div class='tn-edit'><span class='tn-set  tn-state-hidden'><a class='tn-button tn-corner-all  tn-button-secondary tn-button-icon-only' href='javascript:void(0)' title='设为展示图'><span class='tn-icon tn-smallicon-album'></span><span class='tn-button-text'>设为展示图</span></a></span></div></div>";
+                        }
+
+                    }
+                    $("a#select-title-image", imageList).before(img);
+                    imageIds += imageId + ",";
+                });
+
+                if (imageIds.lastIndexOf(',') > 0) {
+                    imageIds = imageIds.substring(0, imageIds.length - 1);
+                }
+
+                imageIds = saveOriginalBigImage(imageIds, bigImageId);
+
+                if (imageIds.lastIndexOf(',') > 0) {
+                    imageIds = imageIds.substring(0, imageIds.length - 1);
+                }
+            }
+            //调用函数设置样式
+            save_setBigImage(bigImageId);
+
+            //给隐藏域赋值
+            $("input#@(htmlFieldName)", imageList).val(imageIds);
+            //修改Url中的参数
+            $("a#select-title-image", imageList).attr("href", "@(Html.Raw(SiteUrls.Instance()._SetTitleImage(tenantTypeId, associateId, htmlFieldName, isMultiSelect,maxSelect)))&attachmentIds=" + imageIds);
+        });
+
+        //设置鼠标进入图片区域的显示效果
+        $("li", imageDialog).livequery("mouseenter", function () {
+            selectImage($(this), true);
+        });
+
+        //设置鼠标离开图片区域的显示效果
+        $("li", imageDialog).livequery("mouseleave", function () {
+            if ($(this).data("selected") != true) {
+                selectImage($(this), false);
+            } else {
+                //只移除删除按钮（待实现）
+                hideDeleteOnly($(this));
+            }
+        });
+
+        //设置鼠标点击效果
+        $("li", imageDialog).livequery("click", function () {
+            var _this = $("li", imageDialog);
+            //如果是单选
+            if ("@(isMultiSelect.ToString().ToLower())" === "false") {
+                //先遍历取消所有图片的选中状态
+                $(_this).siblings("li").data("selected", false);
+                selectImage($(_this).siblings("li"), false);
+            }
+            //然后选中当前点击的图片
+            if ($(this).data("selected") == true) {
+                $(this).data("selected", false);
+                selectImage($(this), false);
+            } else {
+                if ('@isMultiSelect' == 'True') {
+                    //计算当前选中数量
+                    var length = 0;
+                    $("li", imageDialog).each(function () {
+                        if ($(this).data("selected") == true) {
+                            length += 1;
+                        }
+                    });
+                    if (length >= '@maxSelect') {
+                        alert("最多可以选择" + '@maxSelect' + "张图片！");
+                        return false;
+                    }
+                }
+                $(this).data("selected", true);
+                selectImage($(this), true);
+            }
+        });
+
+        //点击删除按钮删除组件
+        $(".tn-smallicon-cross").livequery("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            var _this = $(this);
+            art.dialog.confirm("确定要删除该图片吗？", function () {
+                $.post(url, function (data) {
+                    if (data.MessageType == 1) {
+                        //移除该图片所在的li
+                        var li = _this.parent().parent().parent();
+                        li.remove();
+                        var deletedImageId = li.data('imageId');
+                        var imageIds = $("#@htmlFieldName").val();
+                        if (imageIds.indexOf(deletedImageId) >= 0) {
+                            //如果删除的图片Id已选中，从imageIds字符串中移除删除项的Id并给隐藏域赋值
+                            var newImageIds = "";
+                            var subImageIds = imageIds.split(',');
+                            for (i = 0; i < subImageIds.length; i++) {
+                                var subImageId = subImageIds[i];
+                                if (subImageId != "" && subImageId != deletedImageId) {
+                                    newImageIds = newImageIds + subImageId + ",";
+                                }
+                            }
+                            //去掉末尾多余的逗号
+                            if (newImageIds.lastIndexOf(',') >= 0) {
+                                newImageIds = newImageIds.substring(0, newImageIds.length - 1);
+                            }
+                            //给隐藏域赋值
+                            $("#@htmlFieldName").val(newImageIds);
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>

@@ -1,0 +1,66 @@
+﻿@model  IEnumerable<MicroblogEntity>
+@{
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    int imgW = 0;
+}
+@if (Model.Count() > 0)
+{
+    foreach (var microBlog in Model)
+    {
+        if (microBlog.User == null)
+        {
+            continue;
+        }
+        
+
+        
+    <div id="@microBlog.MicroblogId" class="water-fall-box tn-waterfall-list">
+        <div class="tn-inner tn-widget-content tn-border-gray tn-corner-all">
+            @if (!string.IsNullOrEmpty(microBlog.ImageUrl))
+            {
+                <a class="tn-fall-huge tn-helper-clearfix tn-bg-gray" href="@SiteUrls.Instance().ShowMicroblog(microBlog.User.UserName, microBlog.MicroblogId)">
+                    @{imgW = microBlog.ImageWidth > 208 ? 208 : microBlog.ImageWidth;}
+                    <img class="tnui-waterfall-img" width="@(imgW)px" alt="" src="@microBlog.ImageUrl"/>
+                </a>
+                <div class="aaa">
+                </div>
+            }
+            <div class="tn-fall-con">
+                <div class="tn-fall-box tn-helper-clearfix">
+                    @{
+            HyperLinkTarget hyperLinkTarget;
+            if (microBlog.User == UserContext.CurrentUser)
+            {
+                hyperLinkTarget = HyperLinkTarget._self;
+            }
+            else
+            {
+                hyperLinkTarget = HyperLinkTarget._blank;
+            }
+                    }
+                    @Html.ShowUserAvatar(microBlog.User, AvatarSizeType.Micro, true, hyperLinkTarget)
+                    <div class="tn-fall-text">
+                        <a @(microBlog.User == UserContext.CurrentUser ? "target=_self" : "target=_blank ") href="@SiteUrls.Instance().SpaceHome(microBlog.User.UserId)" class="tn-user-name">@microBlog.Author
+                            @Html.IdentificationType(microBlog.UserId)</a>：@Html.Raw(microBlog.GetResolvedBody())
+                    </div>
+                </div>
+                <div class="tn-fall-trans tn-helper-clearfix tn-border-gray tn-border-dotted tn-border-top">
+                    @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != microBlog.UserId)))
+                    {
+                        @Html.FollowUser(microBlog.UserId, "加关注") 
+                    }
+                    <a href="@SiteUrls.Instance()._ForwardMicroblog(microBlog.User.UserName, microBlog.MicroblogId)" plugin="dialog">
+                        转发(@microBlog.ForwardedCount)</a><span class="tn-spacer tn-text-note">|</span>
+                    <a href="@SiteUrls.Instance().ShowMicroblog(microBlog.User.UserName, microBlog.MicroblogId)" name="ShowMicroblog">
+                        详情</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("a[id^='attachmentsListLiVideo-'],a[id^='attachmentsListLiMusic-']").die('click');
+        });
+    </script>
+}

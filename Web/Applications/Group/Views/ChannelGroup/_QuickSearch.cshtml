@@ -1,0 +1,42 @@
+﻿@model PagingDataSet<GroupEntity>
+@{
+    GroupSearcher groupSearcher = (GroupSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(GroupSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@if (Model.TotalRecords > 0)
+{
+    <input type="hidden" class="app-count" />
+    <div class="tn-section tn-border-gray tn-border-bottom">
+        <div class="tn-title tn-border-bottom tn-border-gray tnui-option" data-appname="Group" data-search-url="@groupSearcher.PageSearchActionUrl(keyword)">
+            <a href="@groupSearcher.PageSearchActionUrl(keyword)">搜“<span class="tn-text-bright">@keyword</span>”相关群组（@Model.TotalRecords）</a>
+        </div>
+        <ul class="tn-list">
+            @foreach (GroupEntity group in Model)
+            {
+                string groupUrl = SiteUrls.Instance().GroupHome(group.GroupKey);
+                <li class="tn-list-item tnui-option" data-search-url="@groupUrl" data-search-key="@group.GroupName">
+                    <div class="tn-list-item-area-main">
+                        <div class="tn-list-item-row tn-list-item-heading">
+                            <a title="@group.GroupName" href="@groupUrl">
+                                @if (group.GroupName.Length > 13)
+                                {
+                                    @Html.Raw(string.Join("", Tunynet.Search.SearchEngine.Highlight(keyword, group.GroupName, 100).Take(13)) + "...")
+                                }
+                                else
+                                {
+                                    @Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, group.GroupName, 100))
+                                }
+                            </a>群主：<a href="#">@group.User.DisplayName</a>
+                        </div>
+                        <div class="tn-list-item-row tn-list-item-summary">
+                            <p>
+                                <span>地区：<a href="#">@Formatter.FormatArea(group.AreaCode, 2, "-")</a></span>&nbsp;
+                                <span>成员：@group.MemberCount</span>
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+}

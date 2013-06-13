@@ -1,0 +1,128 @@
+﻿@model MicroblogCommentEditModel
+@{
+    int randomNum = new Random().Next(100000, 999999);
+}
+<div class="tn-comment-wrap tn-comment-full">
+    @if (UserContext.CurrentUser != null)
+    {
+        <div class="tn-comment-form tn-comment-expand">
+            @using (Html.BeginAjaxForm("Comment", "ChannelMicroblog", new { Area = "Microblog", }, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "commentOnErrorCallBack", OnSuccessCallBack = "commentOnSuccessCallBack", ClearForm = true }, new { id = Model.Id, forulid = "ul-comment-" + Model.CommentedObjectId + "-0" }))
+            {
+                <div class="tn-comment-form-head">
+                </div>
+                <a name="Body-comment-@Model.CommentedObjectId"></a>
+                <div class="tn-comment-text-wrap">
+                    <div class="tn-comment-form-avatar">
+                        @Html.ShowUserAvatar(UserContext.CurrentUser == null ? 0 : UserContext.CurrentUser.UserId, AvatarSizeType.Small)
+                    </div>
+                    <div class="tn-comment-text-inner tn-border-gray">
+                        @Html.TextArea("Body", new { id = "Body-comment-" + Model.CommentedObjectId, plugin = "ShortcutSubmit", @class = "tn-comment-text-area" })
+                    </div>
+                </div>
+                @Html.Hidden("ForwardMicrobo", false, new { id = "ForwardMicrobo-0" })
+                @Html.Hidden("commentOriginalAuthor", false, new { id = "commentOriginalAuthor-0" })
+                @Html.Hidden("IsPrivate", false, new { id = "IsPrivate-0" })
+                @Html.Hidden("IsAnonymous", false, new { id = "IsAnonymous-0" })
+                @Html.Hidden("Subject", false, new { id = "Subject-0" })
+                <div id="moareOperate-0" class="tn-menu-button-position tn-menu tn-helper-reset tn-widget-content"
+                    style="display: none;">
+                    <ul class="tn-menu-list">
+                        <li class="tn-menu-item">
+                            @Html.CheckBox("ForwardMicrobo", false, new { id = "moareOperate-ForwardMicrobo-" + Model.ParentId })
+                            @Html.Label("moareOperate-ForwardMicrobo-" + Model.ParentId, "转发此微博")
+                        </li>
+                        @if (!string.IsNullOrEmpty(Model.OriginalAuthor))
+                        {
+                            <li class="tn-menu-item">
+                                @Html.CheckBox("commentOriginalAuthor", false, new { id = "moareOperate-commentOriginalAuthor-" + Model.ParentId })
+                                @Html.Label("moareOperate-commentOriginalAuthor-" + Model.ParentId, "同时评论" + Model.OriginalAuthor)
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="tn-comment-form-act tn-helper-clearfix" id="publisher-@(randomNum.ToString())">
+                    @Html.EmotionSelector()<span class="tn-count tn-text-note" id="comment-count-@Model.CommentedObjectId">0/140</span>
+                   @* <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-at"></span>
+                        <a id="atFriend" class="tn-action-text" href="javascript:;">朋友</a> </span>
+                    @Html.AtUser("#Body-comment-" + Model.CommentedObjectId, "#publisher-" + randomNum.ToString() + " #atFriend")*@
+                    @Html.AtUser("#Body-comment-" + Model.CommentedObjectId)
+                    <a id="menu-0" class="tn-action tn-action-text-icon-right" href="javascript:;"><span
+                        class="tn-icon tn-smallicon-triangle-down"></span><span class="tn-action-text">同时发送：</span></a>
+                    @Html.Button("评论", ButtonTypes.Submit, HighlightStyles.Primary)
+                </div>
+                @Html.HiddenFor(n => n.CommentedObjectId)
+                @Html.HiddenFor(n => n.TenantTypeId)
+                @Html.HiddenFor(n => n.OwnerId)
+            
+            }
+        </div>
+    }
+    @Html.Action("_CommentList", "ChannelMicroblog", new { tenantType = Model.TenantTypeId, commentedObjectId = Model.CommentedObjectId })
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        //微博中点击回复
+        $("a[textfor^='Body-comment-']").live("click", function (e) {
+            e.preventDefault();
+
+            $textarea = $("textarea#" + $(this).attr("textfor"));
+            if ($textarea.length) {
+                $textarea.val("@@" + $(this).attr("foruser") + " " + $textarea.val().replace(/@@[^' ']*? /g, ""));
+                $textarea.click().focusEnd();
+            }
+        });
+
+        //        $("a[id^='three-level-comment-']").live("click", function (e) {
+        //            e.preventDefault();
+        //            $link = $(this);
+        //            $textarea = $(this).parents(".tn-replies").find("textarea");
+        //            $textarea.val("@@" + $link.attr("foruser") + " " + $textarea.val().replace(/@@[^' ']*? /g, ""));
+        //            $textarea.focusEnd();
+        //        });
+
+        //首级评论录入框的截字方法
+        $("#Body-comment-@Model.CommentedObjectId").GetTextCount('comment-count-@Model.CommentedObjectId', 140, true, true);
+
+        //        //首级回复框上绑定menuButton
+        $("a#menu-0").menuButton({
+            clickTrigger: true,
+            menu: "#moareOperate-0"
+        });
+
+        $("input[id^='moareOperate-']").live("click", function () {
+            //todo:bianchx,by zhengw:没有必要判断有没有元素被选中，直接.val(this.checked)。另外，要注意使用$("").length判断是否有元素被选中
+            //回复：已经处理
+            $checked = $("#" + $(this).attr("name") + "-" + $(this).attr("id").replace(/[^0-9]/g, ''));
+            if ($checked.length) {
+                $checked.val(this.checked);
+            }
+        });
+    });
+
+
+    //回复失败的回调函数
+    function commentOnErrorCallBack(data) {
+        if (!data.MessageContent) {
+            data = $.parseJSON(data);
+        }
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+
+    //回复成功的回调函数
+    function commentOnSuccessCallBack(data, status, webStatus, form) {
+        form.find("[id^='comment-count']").html('0/140');
+        $isPrivate = form.find("[disabled='disabled']");
+        if ($isPrivate && $isPrivate.is(".tn-checkbox")) {
+            $isPrivate[0].checked = true;
+        }
+        if (data.commentid) {
+            $.get('@SiteUrls.Instance()._MicroblogOneComment()', { id: data.commentid }, function (data) {
+                $('#' + form.attr("forulid")).prepend(data);
+            });
+        }
+        else
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    
+</script>

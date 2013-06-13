@@ -1,0 +1,214 @@
+﻿@model ManageBarEditModel
+@{
+    Layout = "_ControlPanel";
+    PagingDataSet<BarSection> sections = ViewData.Get<PagingDataSet<BarSection>>("BarSections", null);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        @Html.Partial("_ManageBarRightMenuSystemInfo")
+        <div class="tnc-ctn-center">
+            <h1>
+                @Html.Link("帖吧", SiteUrls.Instance().ManageThreads(), "帖吧")<span class="tn-pipe tn-text-note">&gt;</span><span
+                    class="tn-selected">帖吧管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    @using (Html.BeginForm("ManageBars", "ControlPanelBar", FormMethod.Get))
+                    { 
+                        <div class="tnc-search-adminform">
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.KeyWord)
+                                @Html.TextBoxFor(n => n.KeyWord, InputWidthTypes.Medium)
+                            </div>
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.UserId)
+                                @{
+                           //todo:bianchx,by zhengw:“吧主”表单项应叫UserId，不要用Owner，BarSection中的Owner是特殊含义的，在群组应用的帖吧，其Owner是群组；吧主UserId直接通过ViewData传递过来不行吗？觉得没必要在这里再转换一遍
+                           //回复：已经处理
+                           //zhengw回复：不要再转换了
+                           //回复：已经处理
+                           long userId = ViewData.Get<long>("UserId", 0);
+                                }
+                                @Html.UserSelector("UserId", userId)
+                            </div>
+                            <div class="tn-blank1 tn-helper-clear">
+                            </div>
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.AuditStatus)
+                                @Html.EnumDropDownListFor(n => n.AuditStatus, "全部", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.Enabled)
+                                @Html.DropDownList("Enabled", null, "请选择", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row tn-form-row-clear">
+                                @Html.FormLabelFor(n => n.CategoryId)
+                                @Html.CategoryDropDownListFor(n => n.CategoryId, TenantTypeIds.Instance().BarSection(), 2)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tnc-content-manage">
+                    <form method="post">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            @Html.LinkButton("添加帖吧", SiteUrls.Instance().EditSection(), iconType: IconTypes.SmallAdd, htmlAttributes: new { @title = "添加帖吧" })
+                            @Html.LinkButton("通过审核", SiteUrls.Instance().BatchUpdateSectionAuditStatus(), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus" })
+                            @Html.LinkButton("不通过审核", SiteUrls.Instance().BatchUpdateSectionAuditStatus(false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus-false" })
+                        </div>
+                    </div>
+                    @if (sections != null && sections.TotalRecords > 0)
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header ">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" id="checkAll" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        帖吧名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        帖吧类别
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        吧主
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        审核状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        创建时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var item in sections)
+                                {
+                                    <tr class="tn-table-grid-row" id="sectionId-@item.SectionId">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("sectionIds", item.SectionId, false, new { @class = "tn-checkbox" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @Html.Link(item.Name, SiteUrls.Instance().SectionDetail(item.SectionId), item.Name, null, HyperLinkTarget._blank)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @{
+                                       //todo:bianchx,by zhengw:建议使用Formatter.FormatCategory方法格式化输出分类，该方法需要你来实现
+                                       //回复：已经添加
+                                       //zhengw回复：没有调用
+                                       //回复：已经添加调用
+                                       string categoryName = Formatter.FormatCategory(item.Category == null ? 0 : item.Category.CategoryId);
+                                            }
+                                            @categoryName
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            @(item.User == null ? null : Html.Link(item.User.DisplayName, SiteUrls.Instance().UserThreads(item.UserId), item.User.DisplayName, null, HyperLinkTarget._blank))
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.AuditStatusIcon(item.AuditStatus)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @item.DateCreated.ToFriendlyDate()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance().EditSection(item.SectionId), "编辑", null, HyperLinkTarget._blank)
+                                            @Html.Link("更多", string.Empty, "", new { menu = "#Manager-" + item.SectionId })
+                                            @*<div id="Manager-@item.SectionId" style="display: none;" class="tn-privacy-set-box tn-widget-content tn-border-gray">
+                                                <div class="tn-form">
+                                                    <div class="tn-form-row">
+                                                        <ul class="tn-radiobutton-list">
+                                                            <li>
+                                                                @Html.Link("管理类别", SiteUrls.Instance().ManageThreadCategoriesForSection(item.SectionId), "管理类别", null, HyperLinkTarget._blank)
+                                                            </li>
+                                                            <li>@*//todo:bianchx,by zhengw:为什么不用Html.AjaxDeleteButton？
+                                                                    //回复：应为这是在menuButton控件中。
+                                                                    //zhengw回复：在menuButton中就不行吗？是什么原因？能否改动下AjaxDeleteButton进行解决？
+                                                                    //回复：郑伟已经处理对应的问题
+                                                            
+                                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("删除").SetDeleteTarget("#sectionId-" + item.SectionId).SetUrl(SiteUrls.Instance().DeleteSection(item.SectionId)).SetConfirm("您确实要删除这个帖吧吗？"))
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>*@
+                                            <div id="Manager-@item.SectionId" style="display: none;" class="tn-privacy-set-box tn-widget-content tn-border-gray">
+                                                <div class="tn-form">
+                                                    <div class="tn-form-row">
+                                                         @Html.Link("管理类别", SiteUrls.Instance().ManageThreadCategoriesForSection(item.SectionId), "管理类别", null, HyperLinkTarget._blank)
+                                                    </div>
+                                                    <div class="tn-form-row">
+                                                         @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("删除").SetDeleteTarget("#sectionId-" + item.SectionId).SetUrl(SiteUrls.Instance().DeleteSection(item.SectionId)).SetConfirm("您确实要删除这个帖吧吗？"))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownListFor(n => n.PageSize)
+                            @Html.PagingButton(sections)
+                            @Html.PagingResults(sections)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tn-no-data">
+                            搜索不到数据</div>
+                    }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("a[id^='BatchSet-UpdateAuditStatus']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='sectionIds']:checked").length) {
+                alert("至少选择一个帖吧操作");
+                return false;
+            }
+
+            //提交
+            $(this).parents("form").first().ajaxSubmit({
+                url: $(this).attr("href"),
+                success: function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                }
+            });
+        });
+
+        //全选按钮
+        $("input#checkAll").click(function () {
+            checkAll(this, "sectionIds");
+        });
+
+        //        //删除帖吧调用的js
+        //        $("a[id^='a-DeleteSection-']").click(function (e) {
+        //            e.preventDefault();
+        //            $link = $(this);
+        //            art.dialog.confirm('您确认要删除吗？', function () {
+        //                $.ajax({
+        //                    type: "POST",
+        //                    url: $link.attr("linkTo"),
+        //                    success: function (data) {
+        //                        $link.parents("tr").slideUp("slow").remove();
+        //                    },
+        //                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //                        data = $.parseJSON(XMLHttpRequest.responseText);
+        //                        alert(data.MessageContent);
+        //                    }
+        //                });
+        //            });
+        //        });
+    });
+</script>

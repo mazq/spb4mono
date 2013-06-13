@@ -1,0 +1,49 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    long userId = ViewData.Get<long>("userId", 0);
+    bool? isPosted = Request.QueryString.Get<bool?>("isPosted", null);
+    bool isOwner = ViewData.Get<bool>("isOwner", true);
+    string myThreadsSelectedClass = string.Empty; //我的帖子是否选中样式
+    string myPostsSelectedClass = string.Empty;//我的回帖是否选中样式
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+
+    if (isPosted == true)
+    {
+        myPostsSelectedClass = "tn-tabs-selected";
+    }
+    else
+    {
+        myThreadsSelectedClass = "tn-tabs-selected";
+    }
+    long? sectionId = null;
+    if (Url.SpaceKey() != null)
+    {
+        sectionId = GroupIdToGroupKeyDictionary.GetGroupId(Url.SpaceKey());
+    }
+    ViewData["SectionId"] = sectionId;
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-mypost">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if (tenantTypeId == TenantTypeIds.Instance().Bar())
+        {
+            @Html.Action("_UserData", "Bar", new { userId = userId, displayTemplate = DisplayTemplate_UserData.Main })
+        }
+        <div class="tn-tabs">
+            <ul id="userThreadTabNavs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl @myThreadsSelectedClass"><a href="@urlGetter.UserThreads(userId, sectionId)">@(isOwner ? "我的帖子" : "TA的帖子")</a>
+                </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl @myPostsSelectedClass"><a href="@Html.Raw(urlGetter.UserPosts(userId, sectionId))">@(isOwner ? "我的回复" : "TA的回复")</a></li>
+                @if (ViewData.Get<bool>("ShowFollowBar", true))
+                {
+                    <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@Html.Raw(SiteUrls.Instance().UserFollowedSections(userId))">
+                        关注的帖吧</a> </li>
+                }
+            </ul>
+            <div class="tn-tabs-panel">
+                @Html.Partial("~/Applications/Bar/Views/Bar/_List.cshtml", Model)
+            </div>
+        </div>
+    </div>
+</div>

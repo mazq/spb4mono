@@ -1,0 +1,185 @@
+﻿@model MessageEditModel
+@{
+    Layout = "_MessageCenter";
+
+    string displayName = ViewData["displayName"].ToString();
+
+    IList<Tunynet.Common.Message> messages = ViewData["messages"] as IList<Tunynet.Common.Message>;
+    Tunynet.Common.MessageSession session = ViewData["session"] as Tunynet.Common.MessageSession;
+}
+@section Aside{
+    @Html.Action("_MessageCenter_Menu", "MessageCenter", new { subMenu = MessageCenterMenu.Message })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-pivate-msglist">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-letter-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                    @Html.LinkButton("发私信", SiteUrls.Instance()._CreateMessage(Url.SpaceKey()), HighlightStyles.Primary, htmlAttributes: new { id = "messageUserIdLink", plugin = "dialog" })
+                </div>
+                <h2>
+                    @if (!string.IsNullOrEmpty(displayName))
+                    {
+                        @Html.Raw("我 和 " + displayName + " 的对话")
+                    }
+                    else
+                    {
+                        @:我的对话
+                                                                                                                                                                                                                                                   }
+                </h2>
+                <span class="tn-count tn-text-note">共有<span id="messagesCount">@(session.MessageCount)</span>条私信
+                </span>
+                @Html.Link("返回所有私信", SiteUrls.Instance().ListMessageSessions(Url.SpaceKey(), null), "返回所有私信", new { @class = "tnc-return-letter" })
+            </div>
+            <div class="tnc-private-letter-list">
+                <div class="tnc-handle-btn">
+                    @Html.LinkButton("删除会话", SiteUrls.Instance().DeleteMessageSession(Url.SpaceKey(), session.SessionId), HighlightStyles.Default, htmlAttributes: new { id = "deleteSession" })
+                </div>
+                <div  class="tnc-letter" id ="msg_session_@(session.SessionId)" >
+                    @if (!string.IsNullOrEmpty(displayName))
+                    {
+                        <dl class="tnc-letter-replay">
+                            <dt>
+                                @Html.ShowUserAvatar(session.UserId, AvatarSizeType.Small, true)
+                            </dt>
+                            @using (Html.BeginAjaxForm("_CreateMessage", "MessageCenter", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("ReplaySuccess")))
+                            {
+                                <dd class="tnc-sender-content">
+                                    <div class="tn-widget tn-bubble tn-bubble-arrow-right">
+                                        <div class="tn-bubble-arrow">
+                                            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                                            </b>
+                                        </div>
+                                        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-top">
+                                            <div>
+                                                @Html.Hidden("ToUserIds", session.OtherUserId)
+                                                @Html.TextAreaFor(model => model.Body, InputWidthTypes.Long, htmlAttributes: new RouteValueDictionary { { "id", "ReplayMessageBody" } })</div>
+                                        </div>
+                                    </div>
+                                    <div class="tnc-send-handle tn-border-gray tn-border-rbl tn-corner-buttom tn-helper-clearfix">
+                                        <div class="tnc-but-resend">
+                                            <span id="Note" class="tn-text-note tn-action">0/300</span>
+                                            @Html.Button("发送", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "submitMessage" })
+                                        </div>
+                                    </div>
+                                </dd> }
+                        </dl>
+                    }
+                    else
+                    {
+                        <div class="tn-blank20">
+                        </div>
+                    }
+                    <div id="session_@(session.SessionId)">
+                        @{
+
+                            Html.RenderAction("_ListMessages", new { sessionId = session.SessionId, userId = session.UserId });
+
+                        }
+                    </div>
+                    @if (session.MessageCount > 50)
+                    {
+                        <div name="showAll" class="tn-load-more tn-bg-gray tn-border-gray">
+                            <a href="javascript:;" class="tn-action tn-action-text-icon-right"><span class="tn-action-text">
+                                显示全部 </span>@Html.Icon(IconTypes.SmallCollapseOpen)</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var countInterval;
+        function blength(value) {
+            return parseInt((value.replace(/[^\x00-\xff]/g, "**").length + 1) / 2);
+        }
+               var length = blength($("#ReplayMessageBody").val());
+        function count() {
+            length = blength($("#ReplayMessageBody").val());
+            var $ps = $('#Note');
+
+            $("#Note").html(length + "/300");
+        }
+        $("#Note").html(blength($("#ReplayMessageBody").val()) + "/300");
+
+        $("#ReplayMessageBody").focus(function () {
+            countInterval = setInterval(function () { count(); }, 360);
+        }).blur(function () {
+            clearInterval(countInterval);
+            count();
+        });
+        count();
+        $("#deleteSession").click(function (event) {
+            event.preventDefault();
+
+            $deleteSession = $(this);
+            $.dialog.confirm('确认删除当前会话？', function () {
+                    window.location = $deleteSession.attr("href");
+                });
+
+        });
+
+         $("#submitMessage").click(function () {
+            if (length > 300) {
+            art.dialog.tips("内容超出字数限制！", 1.5, 2);
+                return false;
+            }
+
+        })
+
+        $("div[name='showAll']").click(function (event) {
+            event.preventDefault();
+            $.get('@Html.Raw(@SiteUrls.Instance()._ListMessages(Url.SpaceKey(), session.SessionId, session.UserId, true))',
+            function(data){
+                 $("#session_@(session.SessionId)").children().last().after(data);
+            });
+
+            $("div[name='showAll']").hide();
+        });
+
+        
+        $("a[name='replay']").livequery(function () {
+            $(this).click(function () {
+                $("#ReplayMessageBody").focus();
+            });
+        });
+
+        $("div[id^='msg_message_']",$('#session_@(session.SessionId)')).livequery(function () {
+            $(this).hover(function () {
+                $("span[name='operate_" + $(this).attr("id").replace(/[^0-9]/ig, "") + "']").show();
+            }, function () {
+                $("span[name='operate_" + $(this).attr("id").replace(/[^0-9]/ig, "") + "']").hide();
+            });
+        });
+
+
+    });
+    
+    function DeleteMessageSuccess() {
+        var count = $("#messagesCount").html();
+        $("#messagesCount").html(count - 1);
+
+    }
+
+    function ReplaySuccess(response) {
+    if(response.hint){
+            art.dialog.tips(response.hint.MessageContent, 2, response.hint.MessageType);}
+            $("#ReplayMessageBody").attr("value", '');
+        if ($("#session_@(session.SessionId)").children('dl').first().hasClass('tnc-letter-from')) {
+            //有边框
+            $.get('@Html.Raw(SiteUrls.Instance()._Message(Url.SpaceKey(), null, null, true))', { messageId: response.messageId,sessionId:@session.SessionId }, function (data) {
+                $("#session_@(session.SessionId)").children('dl.tnc-letter-from').first().before(data);
+            });
+        }
+        else {
+            $.get('@Html.Raw(SiteUrls.Instance()._Message(Url.SpaceKey(), null, null, null))', { messageId: response.messageId,sessionId:@session.SessionId }, function (data) {
+                $("#session_@(session.SessionId)").children("dl.tnc-letter-to").first().find('div[id^=msg_message_]').first().before(data);
+            });
+            
+        }
+
+    }
+
+</script>

@@ -1,0 +1,93 @@
+﻿@{
+    Layout = null;
+    List<IUser> listFollowUsers = ViewData["FollowUsers"] as List<IUser>;
+    Dictionary<string, string> dictionarySendEmails = ViewData["SendEmails"] as Dictionary<string, string>;
+    StatusMessageData statusMessageData = ViewData["StatusMessageData"] as StatusMessageData;
+    string presetMessage = ViewData["presetMessage"] as string;
+    string buttonText = string.Empty;
+    if (listFollowUsers != null && listFollowUsers.Count > 0 && dictionarySendEmails != null && dictionarySendEmails.Count > 0)
+    {
+        buttonText = "邀请/关注";
+    }
+    else if (listFollowUsers != null && listFollowUsers.Count > 0)
+    {
+        buttonText = "关注";
+    }
+    else
+    {
+        buttonText = "邀请";
+    }
+}
+<div class="tnc-find-acquaintance">
+    @using (Html.BeginForm("_ChoiceUser", "Follow", FormMethod.Post, new { id = "choiceUserForm" }))
+    {
+        <div class="tnc-find-someone">
+            @*  @if (ViewData["PresetMessage"] != null)
+            {
+                @Html.PresetMessage(ViewData["PresetMessage"] as string, true)
+            }*@ @*@Html.StatusMessage(statusMessageData)*@
+            @if (listFollowUsers != null && listFollowUsers.Count > 0)
+            {
+                <ul class="tn-list tn-helper-clearfix">
+                    @*//todo:bianchx by libsh,listFollowUsers==null怎么办*@ @*//回复添加了判断*@
+                    @foreach (var user in listFollowUsers)
+                    {
+                        <li class="tn-list-item tn-helper-clearfix tn-bg-deep tn-border-deep tn-corner-all" id="follow-user-@user.UserId">
+                            <div id="change-user-click-@user.UserId">
+                                <div class="tn-list-item-area-left">
+                                    @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small, false)
+                                    @Html.SipmleCheckBox("followUsers", user.UserId, true, new { style = "display: none;", id = "checkbox-followUsers-" + user.UserId })
+                                </div>
+                                <div class="tn-list-item-area-main">
+                                    <div class="tn-list-item-row">
+                                        @Html.Link(StringUtility.Trim(user.DisplayName, 10), SiteUrls.Instance().SpaceHome(user.UserName), user.DisplayName, new { @class = "tn-user-name", target = "_blank" })
+                                    </div>
+                                    <div class="tn-list-item-row">
+                                        <span class="tn-text-note">@StringUtility.Trim(user.AccountEmail, 10)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            <div class="tnc-unregister-someone">
+                @if (dictionarySendEmails != null && dictionarySendEmails.Count > 0)
+                {
+                    <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                        未注册联系人
+                    </div>
+                    <ul class="tn-list">
+                        @foreach (var name2Email in dictionarySendEmails)
+                        {
+                            <li class="tn-list-item">
+                                <div class="tnc-select-name">
+                                    @Html.SipmleCheckBox("SendEmails", name2Email.Key.ToString(), true, new { @class = "tn-checkbox", id = "checkbox-email-" + name2Email.Value })
+                                    <span class="tn-user-name">
+                                        <label for="checkbox-email-@name2Email.Value">@name2Email.Value</label></span>
+                                </div>
+                                <span class="tn-text-note tnc-email">(@name2Email.Key)</span> </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            <span class="tn-helper-left">
+                @Html.CheckBox("sendEmails-checkbox-checkall", true, new { @class = "tn-checkbox", id = "sendEmails-checkbox-checkall" })
+                <label for="sendEmails-checkbox-checkall">
+                    全选</label></span> <span class="tnc-selected-someone">已选中<em class="tn-text-bright"
+                        id="em-SelectNum">@((listFollowUsers == null ? 0 : listFollowUsers.Count) + (dictionarySendEmails == null ? 0 : dictionarySendEmails.Count))</em>位联系人</span>
+            @Html.Button(buttonText, ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "attentionButton" })
+        </div>
+    }
+</div>
+<script type="text/dialog">
+@if (statusMessageData != null && statusMessageData.MessageType == StatusMessageType.Error)
+{
+<text>
+this.close();
+</text>
+}
+    this.title("共找到 @((listFollowUsers == null ? 0 : listFollowUsers.Count) + (dictionarySendEmails == null ? 0 : dictionarySendEmails.Count)) 位联系人，其中有 @(listFollowUsers == null ? 0 : listFollowUsers.Count) 位注册联系人，@(dictionarySendEmails == null ? 0 : dictionarySendEmails.Count) 位未注册联系人");
+</script>

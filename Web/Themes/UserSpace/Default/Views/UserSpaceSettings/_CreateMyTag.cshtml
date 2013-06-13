@@ -1,0 +1,39 @@
+﻿@model TagEditModel
+@{
+    string tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", null);
+    string callBack = Request.QueryString.Get<string>("callback", "OnSuccessCallBack");
+}
+@using (Html.BeginAjaxForm("_CreateMyTag", "UserSpaceSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = callBack }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tr id="typeCategoryName">
+                    <td>
+                        @Html.TextBox("tagName", "", htmlAttributes: new { @class = "tn-textbox tn-border-gray", id = "tagName", maxlength = "32" })
+                        @Html.ValidationMessage("tagName")
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+     <input type="hidden" name="tenantTypeId" value="@tenantTypeId" />
+}
+<script type="text/dialog">
+    this.title("添加标签");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tagName").watermark("请输入标签名");
+    })
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            window.location.reload();
+        });
+    }      
+</script>

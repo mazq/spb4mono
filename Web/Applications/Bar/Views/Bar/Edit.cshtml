@@ -1,0 +1,10 @@
+﻿@model BarThreadEditModel
+@{
+    Layout = "app-1col";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar", new { SectionId = Model.SectionId })
+}
+@Html.Partial("~/Applications/Bar/Views/Bar/_Edit.cshtml", Model)

@@ -1,0 +1,24 @@
+﻿@{
+    SelectList topicGroups = ViewData.Get<SelectList>("topicGroups", null);
+}
+@using (Html.BeginAjaxForm("_SetTopicGroup", "ControlPanelMicroblog", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.Hidden("topicIds")
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                @Html.DropDownList("groupId", topicGroups, new { @class = "tn-dropdownlist tn-input-medium" })
+                @Html.Button("确定", ButtonTypes.Submit)
+            </div>
+        </div>
+    </div>
+}
+<script type="text/dialog">
+this.title("设置分组");
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        setTimeout(function () { window.location.reload(); }, 500);
+    }
+</script>

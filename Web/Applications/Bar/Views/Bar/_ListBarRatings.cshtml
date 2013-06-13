@@ -1,0 +1,62 @@
+﻿@model PagingDataSet<BarRating>
+@{
+    string reputationPointsName = ViewData.Get<string>("ReputationPoints", "威望积分");
+    var tradePointCategory = new PointService().GetPointCategory("TradePoints");
+}
+<div class="spb-topic-score tn-helper-clearfix" id="ajax-pagingbutton-bar-rating" style="display:@(Model.Count <= 0 ? " none;" : "")" >
+    <div class="spb-score-table">
+        <div class="tn-collapsible tn-collapsible-closed">
+            <div class="tn-border-bottom tn-border-gray tn-collapsible-header tn-switch-right">
+                <h4 class="tn-helper-reset">
+                    共 @Model.TotalRecords 条评分</h4>
+                <span class="tn-icon tn-switch tn-smallicon-collapse-open" id="barRating-span-button">
+                </span>
+            </div>
+        </div>
+        <table class="tn-table-grid" id="content-ranting-data">
+            <tbody id="bar-rating">
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                    <tr class="tn-table-grid-row">
+                        <td class=" tn-width-user-name tn-nowrap">
+                            @Html.Link(HtmlUtility.TrimHtml(item.UserDisplayName, 20), SiteUrls.Instance().SpaceHome(item.UserId), item.UserDisplayName)
+                        </td>
+                        <td>
+                            @(item.ReputationPoints != 0 ? reputationPointsName + (item.ReputationPoints > 0 ? "+" + item.ReputationPoints.ToString() : item.ReputationPoints.ToString()) : "")
+                            @(item.TradePoints > 0 ? tradePointCategory.CategoryName+"+" + item.TradePoints : "")
+                        </td>
+                        <td>
+                            理由：@HtmlUtility.TrimHtml(item.Reason, 50)
+                        </td>
+                        <td class="tn-width-date tn-nowrap">
+                            @item.DateCreated.ToFriendlyDate()
+                        </td>
+                    </tr>
+                    }
+
+                }
+            </tbody>
+        </table>
+        @if (Model == null && Model.Count <= 0)
+        {
+            <div class="tn-no-data" id="content-ranting-nodata">
+                暂时没有人对此帖评分哦</div>
+        }
+        <div class="tn-pagination">
+            @Html.AjaxPagingButton(Model, "ajax-pagingbutton-bar-rating")
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        //        $(".tn-collapsible").collapsibleBox();
+        //菜单的控制
+        $("#barRating-span-button").click(function () {
+            $(this).toggleClass("tn-smallicon-collapse-close");
+            $(this).toggleClass("tn-smallicon-collapse-open");
+            $("[id^='content-ranting-']").slideToggle("fast");
+        });
+    });
+</script>

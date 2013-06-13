@@ -1,0 +1,117 @@
+﻿@model  IEnumerable<RecommendItemType>
+@{
+    Layout = "_ControlPanel";
+    SelectList tenantList = ViewData.Get<SelectList>("tenantList", null);
+    Dictionary<string, string> tenantsDic = tenantList.ToDictionary(n => n.Value, n => n.Text);
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000032;
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>推荐类别</span></h1>
+            <div class="tnc-ctnright-list">
+
+                @using (Html.BeginForm("ManageRecommendTypes", "ControlPanelOperation", FormMethod.Get, new { id = "ManageRecommendTypesForm" }))
+                {
+                    <div class="tnc-content-manage">
+                        <div class="tn-list-header">
+                            <div class="tn-toolbar-area">
+                                <label class="tn-form-label">
+                                    所属：</label>
+
+                                @Html.DropDownList("tenantTypeId", tenantList, "全部", new { @class = "tn-dropdownlist", id = "tenantIds" })
+                                @Html.LinkButton("添加类别", SiteUrls.Instance()._CreateRecommendType(), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                            </div>
+                        </div>
+                        @if (Model != null && Model.Count() > 0)
+                        {
+                            <table class="tn-table-grid">
+                                <tbody>
+                                    <tr class="tn-table-grid-header">
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            类别Id
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            类别名称
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            描述
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            所属
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            标题图
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            操作
+                                        </th>
+                                    </tr>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr class="tn-table-grid-row" id="RecommentType_@(item.TypeId)">
+                                            <td class="tn-border-bottom tn-border-gray tn-width-number tn-nowrap">
+                                                @item.TypeId
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-category tn-nowrap">
+                                                @item.Name
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                                                @item.Description
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-category tn-nowrap">
+                                                @if (tenantsDic.ContainsKey(item.TenantTypeId))
+                                                {
+                                                    @(tenantsDic[item.TenantTypeId])
+                                                }
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-status tn-nowrap">
+                                                @if (item.HasFeaturedImage)
+                                                {
+                                                    @:使用
+                                      }
+                                                else
+                                                { 
+                                                    @:不使用
+                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+                                            </td>
+                                            <td class="tn-border-bottom tn-border-gray tn-width-action2 tn-nowrap">
+                                                @Html.Link("编辑", SiteUrls.Instance()._EditRecommendType(item.TenantTypeId, true, item.TypeId), "编辑", new { plugin = "dialog" })
+
+                                                @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除此推荐类别吗？")
+                                                 .SetText("删除")
+                                                 .SetTooltip("删除推荐类别")
+                                                  .SetDeleteTarget("#RecommentType_" + item.TypeId)
+                                                 .SetUrl(SiteUrls.Instance().DeleteRecommendType(item.TypeId)))
+                                                @if (item.TenantTypeId == TenantTypeIds.Instance().User())
+                                                { 
+                                                    @Html.Link("查看推荐内容", SiteUrls.Instance().ManageRecommendUsers(item.TenantTypeId, item.TypeId), "查看推荐内容", navigateTarget: HyperLinkTarget._blank)
+                                                }
+                                                else
+                                                {
+                                                    @Html.Link("查看推荐内容", SiteUrls.Instance().ManageRecommendItems(item.TenantTypeId, item.TypeId), "查看推荐内容", navigateTarget: HyperLinkTarget._blank)
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("#tenantIds").change(function (e) {
+
+            $("form#ManageRecommendTypesForm").submit();
+        });
+
+    });
+
+</script>

@@ -1,0 +1,48 @@
+﻿@model InviteFriendByEmailEditMode
+@{
+    Layout = null;
+    ISiteSettingsManager siteSettingsManager = DIContainer.Resolve<ISiteSettingsManager>();
+    SiteSettings siteSettings = siteSettingsManager.Get();
+}
+@using (Html.BeginAjaxForm("_InviteFriendByEmail", "Follow", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "InviteSuccessCallBack", OnErrorCallBack = "errorCallBack", ClearForm = false }))
+{
+    <div class="tnc-invite-email-row" id="tnc-invite-email-row">
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            <span class="tn-text-note">支持163、126、Gmail3种邮箱，@siteSettings.SiteName 不会存储您的邮箱密码，请放心使用。</span>
+        </div>
+        <div class="tn-form-row tnc-email-logo">
+            <label class="tn-form-label">
+            </label>
+            <span>
+                <img id="click-mail-gmail" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/images/gmail.png")" alt="Gmail.com" /></span>
+            <span>
+                <img id="click-mail-126" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/images/126.png")"
+                    alt="126.com" /></span> <span>
+                        <img id="click-mail-163" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/images/163.png")"
+                            class="tn-border-gray" alt="163.com" /></span>
+        </div>
+        <div class="tn-form-row">
+            @Html.FormLabelFor(n => n.userName)
+            @Html.TextBoxFor(n => n.userName, new { autocomplete = "off", @class = "tn-textbox tn-input-long tn-border-gray" })
+            @@
+            @Html.DropDownList("emailDomainName", null, new { id = "dropdown-emals" })
+            @Html.ValidationMessageFor(n => n.userName)
+            @Html.ValidationMessageFor(n => n.emailDomainName)
+        </div>
+        <div class="tn-form-row">
+            @*//todo:bianchx by libsh,应该用labelfor*@ @*//回复：正在改*@
+            @Html.FormLabelFor(n => n.password)
+            @Html.TextBoxFor(n => n.password, new { autocomplete = "off", type = "password", @class = "tn-textbox tn-input-long tn-border-gray" })
+            @Html.ValidationMessageFor(n => n.password)
+        </div>
+        <div class="tn-form-row tn-form-row-button">
+            <label class="tn-form-label">
+            </label>
+            @Html.LinkButton("找人", string.Empty, HighlightStyles.Primary, htmlAttributes: new { id = "button-submit-email" })
+            <span class="tn-action">@*//todo;bianchx by libsh,href里最好不要用#*@ @*//回复修改*@<a href="javascript:;"
+                id="show-tnc-invite-csv" name="tnc-invite-csv">读取CSV文件中的联系人</a></span>
+        </div>
+    </div>
+}

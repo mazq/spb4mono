@@ -1,0 +1,173 @@
+/* 
+Offical Style for Spacebuilder
+(c) 2007-2012 Tunynet Inc.
+*/ 
+
+/* Page Layout
+----------------------------------*/
+html { overflow-x: hidden; }
+#tn-content .tn-wrapper,
+#tn-footer .tn-wrapper { width: 950px; margin: 0 auto; }
+
+/* Global navigation */
+.spb-top-menubar .tn-inner { width: 950px; margin: 0 auto 10px; }
+.spb-top-menubar .spb-user-menu { float: none; padding: 0 30px 0 0; height: 34px; width: auto; }
+.spb-top-menubar .spb-user-act,
+.spb-top-menubar .spb-sign-menu  { float: right; padding: 8px 0 0 20px; z-index: 20; *width: 180px; }
+.spb-top-menubar .tn-icon-menu { float: right; height: 20px; }
+.spb-top-menubar li.tn-icon-menu a.tn-icon { float: right; margin-bottom: 0; }
+.spb-top-menubar .spb-current-user { float: right; width: auto; position: relative; }
+.spb-top-menubar .spb-current-user .tn-user-name { line-height: 16px; margin: 0; padding: 4px 0 0; }
+.spb-top-menubar .spb-logo a { width: 170px; height:68px; }
+.spb-top-menubar .spb-menu { padding: 0 20px 19px; margin: 19px 0 0; z-index: 10; }
+.spb-top-menubar .spb-menu a { font-size: 16px; padding: 0 10px; line-height: 30px; }
+.spb-top-menubar .spb-sign-menu { float: right; padding: 8px 0 0 10px }
+.spb-top-menubar .tn-search-box { float: right; padding: 22px 20px 0 0; }
+
+/* App Panel */
+.spb-app-panel-box .spb-app-panel { width: 950px; /*height: 163px;*/ margin: 0 auto; padding: 10px 0 0; }
+.spb-app-panel-box .spb-profile-card { width: 710px; float: left; }
+.spb-app-panel-box .spb-profile-avatar { width: 104px; height: 105px; padding: 0 30px; float: left; }
+.spb-app-panel-box .tn-avatar-medium { padding: 1px; border-width: 1px 1px 2px; }
+.spb-app-panel-box .tn-info { margin: 0 20px 8px 164px; overflow: hidden; zoom:1; }
+.spb-app-panel-box .spb-profile,
+.spb-app-panel-box .spb-profile h1 { float: left; margin-right: 20px; }
+.spb-app-panel-box .spb-profile img { float: left; margin: 7px 0 0 5px; _display: inline; }
+.spb-app-panel-box .tn-actions { float: left; line-height: 20px; padding: 10px 0 0; }
+.spb-app-panel-box .spb-profile h1 { font-size: 24px; height: 30px; font-weight: normal; margin: 0; }
+.spb-app-panel-box .spb-user-atten { width: 145px; padding: 3px 5px 2px; float: right; margin: 0; }
+.spb-app-panel-box .spb-user-atten li { line-height: 15px; }
+.spb-app-panel-box .spb-user-atten strong { font-size: 12px; }
+.spb-app-panel-box .spb-app-nav { padding-top: 20px; }
+.spb-app-panel-box .tn-quick-action { float: right; margin: 0; }
+.spb-app-panel-box .tn-quick-action .tn-button { margin: 0; border-width: 0; }
+.spb-app-panel-box .tnc-user-menu { clear: left; margin-right: 200px; padding: 0 0 0 28px; }
+.spb-app-panel-box .tnc-user-menu .tn-side-menu { height: 38px; border-width: 0; }
+.spb-app-panel-box .tnc-user-menu .tn-side-menu li { float: left; padding: 0 0 0 20px; margin-right: 3px; }
+.spb-app-panel-box .tnc-user-menu .tn-side-menu li .tn-action { display: none; }
+.spb-app-panel-box .tn-side-menu li .tn-menu-text { display: block; padding: 11px 20px 11px 0; font-size: 12px; float: left; }
+.spb-app-panel-box .tn-side-menu .tn-icon { display: none; }
+
+.spb-app-panel .tnc-user-nav-area { margin-left: 164px; }
+.tnc-user-nav-wrap { height: 40px; padding-left: 20px; }
+.tnc-user-nav-wrap .tnc-user-nav { float: left; height: 40px; padding-right: 20px; }
+.tnc-user-nav-wrap .tnc-user-nav .tnc-user-nav-item { float: left; padding: 0; margin: 6px 0 0; position: static; }
+.tnc-user-nav-wrap .tnc-user-nav .tnc-user-nav-link { float: left; display: block; font-size: 12px; float: left; display: block; padding: 0 10px; }
+.tnc-user-nav-wrap .tnc-user-nav li .tn-drop-link { padding-right: 20px; }
+.tnc-user-nav-wrap .tnc-user-nav li .tn-drop-link .tn-icon { left: auto; right: 3px; }
+.tnc-user-nav-wrap .tnc-user-nav ul { display: none; }
+.tnc-user-nav-wrap .tnc-user-nav ul li { float: none; margin: 0; }
+.tnc-user-nav-wrap .tnc-user-nav ul li a { white-space: nowrap; }
+
+/* Content Layout */
+#tn-content { margin-bottom: 30px; }
+.spb-layout-5-19 .tn-unit { float: left; }
+.spb-layout-5-19 div.tn-first { float: right; width: 200px; }
+#UserSpace_PersonalInformation div.tn-first,
+#UserSpace_PrivacyHome div.tn-first { float: left; }
+
+#UserSpace_SpaceHome #tn-content,
+#UserSpace_PersonalInformation #tn-content,
+#UserSpace_PrivacyHome #tn-content,
+.spb-follow-page #tn-content { padding-top: 20px; }
+#UserSpace_SpaceHome .tn-unit { float: right; }
+#UserSpace_SpaceHome div.tn-first { float: left; }
+#UserSpace_SpaceHome .tnc-aside,
+#UserSpace_PersonalInformation .tnc-aside,
+#UserSpace_PrivacyHome .tnc-aside,
+#Follow_ListFollowers .tnc-aside,
+#Follow_ListFollowedUsers .tnc-aside { padding-top: 40px; }
+#UserSpace_SpaceHome .tn-grid-5-19 .tn-grid-14-5 { width: 750px; }
+#UserSpace_PersonalInformation .tn-grid-5-19 .tn-grid-14-5 { width: 750px; overflow: hidden; zoom:1; }
+#UserSpace_SpaceHome .tn-grid-5-19 .tn-grid-14-5 .tn-unit { width: 190px; }
+#UserSpace_SpaceHome .tn-grid-5-19 .tn-grid-14-5 div.tn-first { width: 560px; }
+#UserSpace_MyHome .tn-grid-3-13 .tn-grid-9-4 div.tn-first .tn-box,
+#UserSpace_SpaceHome .tn-grid-5-19 .tn-grid-14-5 div.tn-first .tn-box { margin-bottom: 0; }
+#UserSpace_MyHome .tn-grid-3-13 .tn-grid-9-4 div.tn-first .tn-box-content { padding: 5px 20px 10px; }
+#UserSpace_SpaceHome .tn-grid-5-19 .tn-grid-14-5 div.tn-first .tn-box-content { padding: 20px 20px 30px; }
+#UserSpace_MyHome .tnc-main { padding-top: 5px; }
+#UserSpace_MyHome .tnc-aside-second { padding-top: 0; position: static; }
+.tnc-main .tn-box-content { padding: 20px; }
+#UserSpace_MyHome .tnc-aside-second .tn-box-content,
+#UserSpace_SpaceHome .tnc-myhome-proside .tn-box-content { padding: 10px 0 10px 10px; }
+
+/* Box */
+.tn-box { border-width: 0; }
+.tn-box .tn-box-header { margin: 0; padding-bottom: 10px; border-width: 0; }
+
+/* My Home Style */
+.spb-po-my-profile .spb-po-my-profile-wrap { width: 950px; margin: 0 auto; padding-top: 10px; position: relative; }
+
+#UserSpace_MyHome .tnc-aside-first .tn-box-content { padding-right: 0; }
+#UserSpace_MyHome .tn-grid-3-13 .tn-grid-9-4 { width: 780px; }
+#UserSpace_MyHome .tn-grid-3-13 .tn-grid-9-4 .tn-unit { width: 220px; }
+#UserSpace_MyHome .tn-grid-3-13 .tn-grid-9-4 div.tn-first { width: 560px; }
+
+.spb-po-my-profile .tn-avatar-medium { float: left; width: 104px; height: 104px; padding: 0 5px; margin: 0 25px 0 35px; _display: inline; }
+.spb-po-my-profile .tn-avatar-medium a { padding: 1px; display: block; overflow: hidden; width: 100px; height: 100px; }
+.spb-po-my-profile .spb-profile-card { width: 780px; float: left; }
+.spb-po-my-profile .spb-profile-card .spb-profile { float: left; }
+.spb-po-my-profile .spb-profile-card h1 { float: left; font-size: 24px; line-height: 30px; font-weight: normal; padding-right: 20px; }
+.spb-po-my-profile .spb-profile-card .spb-status { float: left; padding: 7px 0 0; }
+.spb-po-my-profile .spb-user-atten { width: 145px; padding: 3px 5px 2px; float: right; margin: 0; }
+.spb-po-my-profile .spb-user-atten li { line-height: 15px; }
+.spb-po-my-profile .spb-user-atten strong { font-size: 12px; }
+.spb-po-my-profile .spb-po-profile-bar { width: 120px; float: right; }
+.spb-po-my-profile .spb-po-profile-bar .tn-edit { padding: 5px 0 0; height: 20px; }
+.spb-po-my-profile .spb-po-profile-bar .tn-progress-bar { height: 8px; }
+
+.spb-po-my-profile .tnc-user-nav-area { position: absolute; left: 170px; top: 61px; }
+
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card .tn-info { margin-left: 160px; padding-top: 10px; }
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card .spb-profile { width: 600px; float: left; }
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card h1.tn-user-name { font-size: 22px; font-weight: normal; }
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card .spb-po-profile { width: 138px; float: right; padding-top: 5px; }
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card .spb-po-profile .tn-button { float: right; margin: 0; }
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card .spb-status { float: left; width: 100px; height: 17px; }
+#UserSpace_MyHome .spb-user-panel-wrap .spb-profile-card .spb-progress-bar-pad { float: left; width: 100px; }
+
+#UserSpace_MyHome .tnc-app-menu { position: absolute; left: 160px; top: -69px; _top: -67px; padding: 0 0 0 20px; border-width: 0; width: 750px; }
+#UserSpace_MyHome .tnc-app-menu .tn-side-menu { float: left; padding-right: 20px; }
+#UserSpace_MyHome .tnc-app-menu .tn-side-menu li { float: left; padding: 0; margin: 6px 0 0; position: static; }
+#UserSpace_MyHome .tnc-app-menu .tn-side-menu li .tn-menu-text { float: left; display: block; font-size: 12px; float: left; display: block; padding: 0 10px; }
+#UserSpace_MyHome .tnc-app-menu .tn-side-menu li .tn-drop-link { padding-right: 20px; }
+#UserSpace_MyHome .tnc-app-menu .tn-side-menu li .tn-drop-link .tn-icon { left: auto; right: 3px; }
+#UserSpace_MyHome .tnc-app-menu .tn-side-menu ul li { float: none; margin: 0; }
+
+/* Space Home Style */
+.spb-po-user-profile .spb-po-profile-wrap { width: 950px; margin: 0 auto; }
+.spb-po-user-profile .spb-po-face-info { width: 184px; float: left; position: relative; }
+.spb-po-user-profile .spb-po-face-info .tn-avatar-wrap { width: 164px; height: 165px; padding: 0 10px; position: relative; }
+.spb-po-user-profile .spb-po-face-info .tn-avatar-big { border-width: 1px 1px 2px; padding: 1px; }
+.spb-po-user-profile .spb-po-face-info .tn-avatar-wrap .tn-action { position: absolute; left: 11px; right: 6px; bottom: 2px; height: 20px; }
+.spb-po-user-profile .spb-po-face-info .tn-avatar-wrap .tn-action-text { line-height: 20px; }
+.spb-po-user-profile .spb-po-face-info .spb-user-atten { width: 184px; position: absolute; left: 0; top: 175px; }
+.spb-po-user-profile .spb-po-user-info { width: 730px; float: right; padding: 20px 20px 0 0; }
+.spb-po-user-profile .spb-po-user-info .tnc-perall-info { border-bottom-width: 0;  }
+.spb-po-user-profile .spb-po-user-info .tn-info { height: 40px; }
+.spb-po-user-profile .spb-po-user-info h1 { font-size: 24px; line-height: 30px; font-weight: normal; margin: 0; padding-right: 20px; float: left; }
+.spb-po-user-profile .spb-po-user-info .spb-user-type { float: left; line-height: 30px; }
+.spb-po-user-profile .spb-po-user-info .tn-button { float: right; margin: 0 0 0 10px; }
+.spb-po-user-profile .spb-po-user-info .tn-instructions { width: 120px; float: right; padding: 0; }
+.spb-po-user-profile .spb-po-user-info .tn-instructions .tn-progress-text { padding: 0; line-height: 22px; }
+.spb-po-user-profile .spb-po-user-info .tn-instructions .tn-progress-bar { height: 8px; }
+.spb-po-user-profile .spb-po-user-info .tn-introduction { line-height: 20px; height: 40px; margin-bottom: 8px; overflow: hidden; zoom:1; position: relative; }
+.spb-po-user-profile .spb-po-user-info .tn-introduction p { float: left; padding-right: 30px; position: relative; }
+.spb-po-user-profile .spb-po-user-info .tn-introduction .tn-edit { position: absolute; top: 0; right: 0; }
+
+/* Adjust the Layout UI elements
+----------------------------------*/
+.spb-layout-5-19 .spb-photo-waterfall .spb-photo-unit { width: 170px; }
+.spb-layout-5-19 .spb-photo-waterfall .spb-photo-unit .tn-img { width: 148px; }
+.spb-layout-5-19 .spb-thumbnail-falls { margin-left: -10px; }
+.spb-layout-5-19 .spb-thumbnail-falls .spb-photo-unit { margin:  }
+.spb-layout-5-19 .tnc-main .tn-album-list { margin-left: -25px; }
+.spb-layout-5-19 .tnc-main .tn-album-item { padding: 0 0 5px 35px; }
+.spb-layout-5-19 .tnc-main .tn-photo-list { margin-left: -22px; }
+.spb-layout-5-19 .tnc-main .tn-photo-item { padding: 0 0 15px 33px; }
+.spb-layout-5-19 .tnc-aside .tn-avatar-item { width: 60px; }
+.spb-layout-5-19 .tnc-myhome-proside .tn-avatar-item { width: 60px; }
+
+/* Footer */
+#tn-footer { padding: 10px 0 60px; }
+#tn-footer .tn-footer-legal { text-align: center; line-height: 25px; }

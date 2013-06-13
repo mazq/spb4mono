@@ -1,0 +1,159 @@
+﻿@model List<string>
+@{
+    Layout = "~/Applications/Setup/Layouts/Upgrade.cshtml";
+}
+<div class="spb-form">
+    <div class="spb-title">
+        <strong>选择要升级的应用：</strong>
+    </div>
+    <ul class="spb-app-box">
+        @using (Html.BeginForm("UpgradeData", "Upgrade", FormMethod.Post, new { id = "startUpgradeForm" }))
+        { 
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-icon-home"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Common" id="common" checked="checked" />
+                        <label for="common">
+                            平台</label>
+                    </p>
+                </div>
+            </li>
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-micro-blog"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Microblog" id="microblog" checked="checked" />
+                        <label for="microblog">
+                            微博</label>
+                    </p>
+                </div>
+            </li>
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-icon-blog"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Blog" id="blog" checked="checked" />
+                        <label for="blog">
+                            日志</label>
+                    </p>
+                </div>
+            </li>
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-icon-bar"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Bar" id="bar" checked="checked" />
+                        <label for="bar">
+                            贴吧</label>
+                    </p>
+                </div>
+            </li>
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-user-group"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Group" id="group" checked="checked" />
+                        <label for="group">
+                            群组</label>
+                    </p>
+                </div>
+            </li>
+            if (Model.Contains("Photo"))
+            { 
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-icon-photo"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Photo" id="photo" checked="checked" />
+                        <label for="photo">
+                            相册</label>
+                    </p>
+                </div>
+            </li>
+            }
+            if (Model.Contains("Ask"))
+            { 
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-icon-ask"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="Ask" id="ask" checked="checked" />
+                        <label for="ask">
+                            问答</label>
+                    </p>
+                </div>
+            </li>
+            }
+            if (Model.Contains("PointMall"))
+            { 
+            <li class="tn-selected">
+                <div class="spb-app-left">
+                    <span class="tn-icon tn-icon-mall"></span>
+                </div>
+                <div class="spb-app-right">
+                    <p class="tn-title">
+                        <input type="checkbox" name="applicationKeys" value="PointMall" id="pointMall" checked="checked" />
+                        <label for="pointMall">
+                            积分商城</label>
+                    </p>
+                </div>
+            </li>
+            }
+        }
+    </ul>
+</div>
+@section Footer{
+    <div class="spb-ft">
+        <a class="spb-btn" href="@Url.Action("Ready", "Upgrade")">上一步</a><a class="spb-btn"
+            href="javascript:;" id="startUpgrade">开始升级</a>
+    </div>
+}
+<script type="text/javascript">
+    $(function () {
+        //关闭火狐浏览器下radioButton和checkBox的自动完成。
+        if ($.browser.mozilla) {
+            $("input[type='radio']").attr("autocomplete", "off");
+            $("input[type='checkbox']").attr("autocomplete", "off");
+        }
+        $("ul.spb-app-box li div.spb-app-left").click(function () {
+            var closestLi = $(this).closest("li").find("input[type='checkbox']");
+            if (closestLi.attr("checked")) {
+                closestLi.attr("checked", false);
+                $(this).closest("li").removeClass("tn-selected");
+            }
+            else {
+                closestLi.attr("checked", true);
+                $(this).closest("li").addClass("tn-selected");
+            }
+        });
+
+        $("input[type='checkbox']").click(function () {
+            var $this = $(this);
+            if ($this.closest("p").find("input[type='checkbox']:checked").length <= 0) {
+                $this.closest("li").removeClass("tn-selected");
+            }
+            else {
+                $this.closest("li").addClass("tn-selected");
+            }
+        });
+
+        $("#startUpgrade").click(function () {
+            $("form#startUpgradeForm").submit();
+        });
+    });
+</script>

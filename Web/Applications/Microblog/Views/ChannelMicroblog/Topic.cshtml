@@ -1,0 +1,124 @@
+﻿@model  Tag
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+}
+@section ContentHeader{
+    @Html.Action("_Header", "ChannelMicroblog")
+}
+@section Aside{
+    @Html.AjaxAction("_RelevantMicroblog", "ChannelMicroblog", new { topNum = 9, tagName = Model.TagName })
+    @Html.AjaxAction("_RecommendTopic", "ChannelMicroblog", new { topNum = 10, recommendTypeId = "10010101" })
+    @Html.AjaxAction("_TopTopics", "ChannelMicroblog", new { topNum = 10 })
+    @Html.AjaxAction("_HotFollower", "ChannelMicroblog", new { topNum = 10 })
+}
+@{
+    bool isFavorited = ViewData.Get<bool>("isFavorited", false);
+    IUser currentUser = UserContext.CurrentUser;
+    
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog-hotdetail">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if (Model.IsFeatured)
+        {
+            <div class="tn-bg-light tn-border-light tn-corner-all spb-microtopic-intro">
+                <div class="tn-inner tn-helper-clearfix">
+                    <div class="tn-figure">
+                        @if (!string.IsNullOrEmpty(Model.FeaturedImage))
+                        {
+                            <img alt="@Model.TagName" title="@Model.TagName" src="@SiteUrls.Instance().LogoUrl(Model.FeaturedImage, TenantTypeIds.Instance().Tag(), ImageSizeTypeKeys.Instance().Medium())" />
+                        }
+                    </div>
+                    <div class="tn-info">
+                        <div class="tn-title">
+                            <div class="tn-actions">
+                                @if (new Authorizer().RecommendItem_Manage(Model.TenantTypeId))
+                                { 
+                                    <a class="tn-action tn-action-text-icon" plugin="dialog" href="@SiteUrls.Instance()._RecommendItem(Model.TenantTypeId, Model.TagId, Model.TagName, userId: Model.OwnerId)">
+                                        <span class="tn-icon tn-icon-flag"></span><span class="tn-action-text">推荐</span></a>
+                                }
+                                @if (currentUser != null)
+                                {                    
+                                    <a id="add-follow-topic" class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._CancelFollowedTopic(currentUser.UserName, Model.TagId)" @if (!(bool)isFavorited)
+                                                                                                                                                                                       {<text>style="display:none"</text>}>
+                                        <span class="tn-icon tn-icon-topic"></span><span class="tn-action-text">取消关注</span>
+                                    </a>
+                                    <a id="cancel-follow-topic" class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._AddFollowedTopic(currentUser.UserName, Model.TagId)" @if ((bool)isFavorited)
+                                                                                                                                                                                       {<text>style="display:none"</text>}>
+                                        <span class="tn-icon tn-icon-topic"></span><span class="tn-action-text">关注话题</span>
+                                    </a>
+                                }
+                            </div>
+                            <h2>@Model.TagName</h2>
+                        </div>
+                        <div class="tn-brief">@Html.Raw(Model.Description)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tn-content-heading">
+                <h4>
+                    参与讨论</h4>
+            </div>
+        }
+        else
+        { 
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                    @if (new Authorizer().RecommendItem_Manage(Model.TenantTypeId))
+                    {
+                        <a class="tn-action tn-action-text-icon" plugin="dialog" href="@SiteUrls.Instance()._RecommendItem(Model.TenantTypeId, Model.TagId, Model.TagName, userId: Model.OwnerId)">
+                            <span class="tn-icon tn-icon-flag"></span><span class="tn-action-text">推荐</span></a>
+                    }
+                    @if (currentUser != null)
+                    {                    
+                        <a id="add-follow-topic" class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._CancelFollowedTopic(currentUser.UserName, Model.TagId)" @if (!(bool)isFavorited)
+                                                                                                                                                                           {<text>style="display:none"</text>}>
+                            <span class="tn-icon tn-icon-topic"></span><span class="tn-action-text">取消关注</span>
+                        </a>
+                        <a id="cancel-follow-topic" class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._AddFollowedTopic(currentUser.UserName, Model.TagId)" @if ((bool)isFavorited)
+                                                                                                                                                                           {<text>style="display:none"</text>}>
+                            <span class="tn-icon tn-icon-topic"></span><span class="tn-action-text">关注话题</span>
+                        </a>
+                    }
+                </div>
+                <h2>@Model.TagName</h2>
+            </div>
+        }
+        @Html.Action("_Create", "Microblog", new RouteValueDictionary { { "spaceKey", UserContext.CurrentUser.UserName } })
+        @Html.Partial("_Topic", Model)
+    </div>
+</div>
+<script type="text/javascript">
+    //发布微博 表单提交成功 调用函数
+    var microblogCreateSuccess = function (data) {
+        if (data.status == 'hint') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-cross-circle").addClass("tn-bigicon-exclamation");
+        } else if (data.status == 'error') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-exclamation").addClass("tn-bigicon-cross-circle");
+        } else {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-exclamation tn-bigicon-cross-circle").addClass("tn-bigicon-accept-circle");
+        }
+
+        if (data.MessageType == -1) {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-exclamation").addClass("tn-bigicon-cross-circle");
+            $('#msg-sussess').children('strong').html(data.MessageContent);
+            $('#msg-sussess').show();
+
+            setTimeout(function () { $('#msg-sussess').hide(); }, 1500);
+        }
+        else {
+            $('#msg-sussess').children('strong').html(data.message);
+            $('#msg-sussess').show();
+
+            setTimeout(function () { $('#msg-sussess').hide(); }, 1500);
+            $.get('@SiteUrls.Instance()._Microblog()', { microblogId: data.id }, function (data) {
+                var first = $(data).first();
+                $("ul#microblog-list-container").children(':first').before(first);
+            });
+        }
+        
+        $("#microblogBody").val("#" + "@Model.TagName" + "#");
+    }
+</script>

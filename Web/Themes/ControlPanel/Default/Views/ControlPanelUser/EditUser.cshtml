@@ -1,0 +1,131 @@
+﻿@model ManageUsersEditModel
+@{
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000022;
+    string[] reasons = ViewData.Get<string[]>("reasons", null);
+}
+
+@using (Html.BeginAjaxForm("EditUser", "ControlPanelUser", null, FormMethod.Post, new AjaxFormOptions {DataType=AjaxDataType.Json, OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "EditUserForm" }))
+{
+    @Html.HiddenFor(m => m.UserId)
+    <div class="tnc-dailog-pd">
+    @Html.StatusMessage(statusMessageData)
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.AccountEmail) 
+                @Html.TextBoxFor(m => m.AccountEmail, InputWidthTypes.Long, new RouteValueDictionary { { "maxLength", 64 } })
+                @Html.CheckBoxFor(m => m.IsEmailVerified) 通过邮箱验证
+                @Html.ValidationMessageFor(m => m.AccountEmail)
+            </div>
+
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.Mobile)
+                @Html.TextBoxFor(m => m.Mobile, InputWidthTypes.Long)
+                @Html.ValidationMessageFor(m => m.Mobile)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.TrueName)
+                @Html.TextBoxFor(m => m.TrueName, InputWidthTypes.Long, new RouteValueDictionary { { "maxLength", 30 } })
+                @Html.ValidationMessageFor(m => m.TrueName)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.NickName)
+                @Html.TextBoxFor(m => m.NickName, InputWidthTypes.Long, new RouteValueDictionary { { "maxLength", 30 } })
+                @Html.ValidationMessageFor(m => m.NickName)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.ForceLogin)
+                @Html.RadioButton("ForceLogin", true, Model.ForceLogin == true, new { @id = "ForceLogin1" })
+                <label for="ForceLogin1">
+                    是</label>
+                @Html.RadioButton("ForceLogin", false, Model.ForceLogin == false, new { @id = "ForceLogin2" })
+                <label for="ForceLogin2">
+                    否</label>
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.IsActivated)
+                @Html.RadioButton("IsActivated", true, Model.IsActivated == true, new { @id = "IsActivated1" })
+                <label for="IsActivated1">
+                    是</label>
+                @Html.RadioButton("IsActivated", false, Model.IsActivated == false, new { @id = "IsActivated2" })
+                <label for="IsActivated2">
+                    否</label>
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.Moderated)
+                @Html.RadioButton("Moderated", 0, Model.Moderated == 0, new { @id = "IsNoModerated" })
+                <label for="IsNoModerated">
+                    否</label>
+                @Html.RadioButton("Moderated", 1, Model.Moderated == 1, new { @id = "IsModerated" })
+                <label for="IsModerated">
+                    管制</label>
+                @Html.RadioButton("Moderated", 2, Model.Moderated == 2, new { @id = "IsForceModerated" })
+                <label for="IsForceModerated">
+                    永久管制</label>
+            </div>
+            @*todo:ful by libsh,缺少功能和原型图上不一致*@
+            <div class="tn-form-row">
+                @Html.FormLabelFor(m => m.IsBanned) @*todo:ful by libsh,id不要起IsBanned1，IsBanned2这样的名字 【已修复】*@
+                @Html.RadioButton("IsBanned", true, Model.IsBanned == true, new { @id = "IsBanned" })
+                <label for="IsBanned">
+                    是</label>
+                @Html.RadioButton("IsBanned", false, Model.IsBanned == false, new { @id = "IsNoBanned" })
+                <label for="IsNoBanned">
+                    否</label>
+                @{string style = "";
+                  string canIgnore = "";
+                    if (Model.IsBanned) { style = ""; }
+                    else { style = "style=display:none"; canIgnore = "ignore"; }}
+            </div>
+            <div id="banShow" class="tn-form-row" @style>
+                    @Html.FormLabelFor(m => m.BanDeadline)
+                    @Html.DatePicker("BanDeadline",Model.BanDeadline)
+                    @Html.ValidationMessageFor(m => m.BanDeadline)
+            </div>
+            <div id="banReasonList" class="tn-form-row" @style>
+                <label class="tn-form-label">封禁原因：</label>
+                @Html.DropDownList("reasons")
+            </div>
+            <div id="banReasonShow" class="tn-form-row" @style>
+                <label class="tn-form-label"></label>
+                @Html.TextAreaFor(m => m.BanReason, InputWidthTypes.Long,htmlAttributes: new RouteValueDictionary{ {"class",canIgnore}})
+                @Html.ValidationMessageFor(m => m.BanReason)
+            </div>
+            <div class="tn-form-row tn-form-row-button">
+                <label class="tn-form-label">
+                    &nbsp;</label>
+                @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "createButton" })
+                @*todo:ful by libsh,点提交应该返回到跳转过来的页面 【已修复】*@
+                @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+            </div>
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    this.title("修改资料");
+</script>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+    }
+    $(document).ready(function () {
+
+        $("#IsBanned").click(function () {
+            $("#banShow").show();
+            $("#banReasonShow").show();
+            $("#banReasonList").show();
+            $("#BanReason").removeClass("ignore");
+        });
+        $("#IsNoBanned").click(function () {
+            $("#banShow").hide();
+            $("#banReasonShow").hide();
+            $("#banReasonList").hide();
+            $("#BanReason").addClass("ignore");
+        });
+
+        $("#reasons").change(function () {
+            $('#BanReason').html(this.options[this.selectedIndex].text);
+        });
+
+    });
+</script>

@@ -1,0 +1,44 @@
+﻿@model MicroblogEntity
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-microblog-item">
+    <div class="tn-list-item-area-left">
+        @Html.ShowUserAvatar(Model.UserId, AvatarSizeType.Small,true, HyperLinkTarget._blank)
+    </div>
+    <div class="tn-list-item-area-main ">
+        <div class="tnc-down-blkarrow tn-bg-deep">
+            <a href="#" class="tn-icon tn-smallicon-triangle-down"></a>
+        </div>
+        <div class="tnc-dynamic-title">
+            <a href="#" class="tn-user-name">@Model.Author</a>：
+            @Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), Model.Body, 100))
+            @*@Html.Raw(Model.DetailBody)*@
+        </div>
+        <div class="tn-list-item-row tn-helper-align-right tn-helper-clearfix ">
+            <span class="tn-helper-left">
+                <em class="tn-date tn-text-note">@*@SiteUrls.Instance().ShowMicroblog()*@
+                    <a class="tn-secondary-text" href="#">2012-06-16 6:30</a> 
+                </em>
+                <em class="tn-report">
+                    <span class="tn-spacer tn-text-note">|</span> 
+                    <a class="tn-action" href="@SiteUrls.Instance()._ImpeachReport(Model.UserId, SiteUrls.Instance().ShowMicroblog(Model.User.UserName,Model.MicroblogId), StringUtility.Trim(Model.Body,64))" plugin="dialog">
+                        <span class="tn-action-text">举报</span>
+                    </a> 
+                </em>
+            </span>
+            <em class="tn-delete">
+                <a class="tn-action" href="#"><span class="tn-action-text">删除</span></a> 
+                <span class="tn-spacer tn-text-note">|</span>
+            </em>
+            <a class="tn-action" href="#">
+                <span class="tn-action-text">转发(55)</span>
+            </a> 
+            <span class="tn-spacer tn-text-note">|</span> 
+            <a class="tn-action" href="#">
+                <span class="tn-action-text">收藏</span>
+            </a> 
+            <span class="tn-spacer tn-text-note">|</span> 
+            <a class="tn-action" href="#">
+                <span class="tn-action-text">评论(55)</span>
+            </a>
+        </div>
+    </div>
+</li>

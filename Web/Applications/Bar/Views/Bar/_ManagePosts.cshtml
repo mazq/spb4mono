@@ -1,0 +1,133 @@
+﻿@model ManagePostsEditModel
+@{
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    ViewData["SectionId"] = Model.SectionId;
+    PagingDataSet<BarPost> barPosts = ViewData.Get<PagingDataSet<BarPost>>("BarPosts", null);
+    ViewData["ManageSectionSubMenu"] = ManageSectionSubMenu.ManagePost;
+
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+}
+<div class="tn-toolbar-area tn-helper-clearfix tn-border-gray tn-border-bottom">
+    @Html.LinkButton("通过审核", SiteUrls.Instance().BatchUpdatePostAuditStatus(), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus" })
+    @Html.LinkButton("不通过审核", SiteUrls.Instance().BatchUpdatePostAuditStatus(false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus-false" })
+    @Html.LinkButton("删除", SiteUrls.Instance().BatchDeletePosts(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "BatchDeleteThread" })
+</div>
+@if (barPosts != null && barPosts.Count > 0)
+{
+    <form action="#" method="post" id="Form-BatchSet">
+    <table class="tn-table-grid">
+        <tbody>
+            <tr class="tn-table-grid-header">
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    <input type="checkbox" id="check-All" class="tn-checkbox" />
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    回帖
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    作者
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    审核状态
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    创建时间
+                </th>
+                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                    操作
+                </th>
+            </tr>
+            @foreach (var post in barPosts)
+            {
+                <tr class="tn-table-grid-row" id="ajax-del-tr-@post.PostId">
+                    <td class="tn-border-gray tn-border-bottom tn-width-check">
+                        <input type="checkbox" name="postIds" class="tn-checkbox" value="@post.PostId" />
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                        @if (post.Thread != null)
+                        {
+                            @Html.Link(HtmlUtility.TrimHtml(post.Thread.Subject, 20), urlGetter.ThreadDetail(post.ThreadId), post.Thread.Subject, null, HyperLinkTarget._blank)
+                        }
+                        <div id="post-body-@post.PostId" class="spb-reply-topic">
+                            @{
+                                      string body = HtmlUtility.TrimHtml(post.GetResolvedBody(), 140);
+                                      string smBody = HtmlUtility.TrimHtml(post.GetResolvedBody(), 40);
+                                      if (string.IsNullOrEmpty(body))
+                                      {
+                                          body = "[图片或者表情，没有文字]";
+                                          smBody = body;
+                                      }
+                            }
+                            @Html.Link(smBody, SiteUrls.Instance().ThreadDetailGotoPost(post.PostId), body, new { @class = "tn-secondary-text" }, HyperLinkTarget._blank)</div>
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                        @Html.Link(post.User.DisplayName, urlGetter.UserSpaceHome(post.UserId, post.SectionId), post.User.DisplayName, null, HyperLinkTarget._blank)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                        @Html.AuditStatusIcon(post.AuditStatus)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                        @post.DateCreated.ToFriendlyDate()
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("删除").SetUrl(SiteUrls.Instance().BatchDeletePosts(post.PostId)).SetDeleteTarget("#ajax-del-tr-" + post.PostId).SetConfirm("确定要删除此回帖？"))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </form>
+    <div class="tn-pagination">
+        @Html.PageSizeDropdownListFor(n => n.PageSize)
+        @Html.PagingButton(barPosts)
+        @Html.PagingResults(barPosts)
+    </div>
+}
+else
+{
+    <div class="tn-no-data">
+        没有搜索到任何数据
+    </div>
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+
+        //批量删除
+        $("a#BatchDeleteThread").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='postIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $link = $(this);
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    setTimeout(function () { window.location.reload(); }, 1000);
+                });
+            });
+        });
+
+        //批量操作
+        $("a[id^='BatchSet-']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='postIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $link = $(this);
+            $.post($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                setTimeout(function () { window.location.reload(); }, 1000);
+            });
+        });
+
+        //全选按钮
+        $("input#check-All").click(function () {
+            checkAll(this, "postIds");
+        });
+    });
+</script>

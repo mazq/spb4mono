@@ -1,0 +1,103 @@
+﻿@model  List<ApplicationStatisticItem>
+@{
+    Layout = "_ControlPanel";
+    List<ApplicationStatisticData> statisticDatas = ViewData.Get<List<ApplicationStatisticData>>("allManageableDatas", null);
+    SystemInfo systemInfo = ViewData.Get<SystemInfo>("systemInfo", null);
+    long commentsCount = ViewData.Get<long>("commentsCount",0);
+    int customMessageCount = ViewData.Get<int>("customMessageCount",0);
+    long impeachCount = ViewData.Get<long>("impeachCount",0);
+    long activatedUserCount = ViewData.Get<long>("activatedUserCount",0);
+    int userCount24H = ViewData.Get<int>("userCount24H",0);
+    long userCount = ViewData.Get<long>("userCount",0);
+}
+@section Aside
+{
+    @Html.Action("_CommonOperationMenu", "ControlPanel")
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>后台首页</span></h1>
+            <div class="tnc-ctnright-list">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td valign="top">
+                            <div class="tnc-list">
+                                <h2>
+                                    <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-pending"></span>
+                                        <span class="tn-action-text">待处理事项</span></span>
+                                </h2>
+                                <div class="tnc-list-text">
+                                    <ul class="tnc-pending">
+                                        <li>
+                                            @for (int i = 0; i < statisticDatas.Count; i++)
+                                            {
+                                                <span>
+                                                    @Html.Raw(string.Format(statisticDatas[i].DescriptionPattern, Html.Link(statisticDatas[i].Value.ToString(), statisticDatas[i].Url, string.Empty)))
+                                                </span>
+                                               if (i != 0 && i != (statisticDatas.Count - 1) && i % 2 == 1)
+                                               {
+                                                @Html.Raw("</li><li>")
+                                               }
+                                            }
+                                            
+                                        </li>
+                                        <li>
+                                            <span><a href="@SiteUrls.Instance().ManageComments()">@commentsCount</a>个评论待审核
+                                            </span>
+                                            <span><a href="@SiteUrls.Instance().ManageCustomMessage()">@customMessageCount</a>个未读的客服消息
+                                            </span>
+                                        </li>
+                                        <li>
+                                            <span><a href="@SiteUrls.Instance().ManageImpeachReports()">@impeachCount</a>个待处理用户举报
+                                            </span>
+                                            <span><a href="@SiteUrls.Instance().ManageUsers()">@activatedUserCount</a>个待激活用户
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tnc-list">
+                                <h2>
+                                    <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-system"></span>
+                                        <span class="tn-action-text">系统信息</span></span>
+                                </h2>
+                                <div class="tnc-list-text">
+                                    <ul class="tnc-System">
+                                        <li><span>操作系统</span>@systemInfo.PCName</li>
+                                        <li><span>IIS版本</span>@systemInfo.IIS</li>
+                                        <li><span>.NET Framework版本</span>@systemInfo.Framework</li>
+                                        <li><span>.NET信任级别</span>@systemInfo.NetTrustLevel</li>
+                                        <li><span>数据库版本</span>@systemInfo.DataBaseVersion</li>
+                                        <li><span>数据库占用</span>@systemInfo.GetDBSize</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td valign="top">
+                            <div class="tnc-list">
+                                <h2>
+                                    <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-datasheet">
+                                    </span><span class="tn-action-text">数据统计</span></span>
+                                </h2>
+                                <div class="tnc-list-text">
+                                    <ul class="tnc-date">
+                                        <li class="tnc-date-bom"><span>项目</span><span>总数</span><span>24小时新增</span></li>
+                                        @foreach (var application in Model)
+                                        {
+                                            <li><span><a href="@application.Url">@application.ShortName</a></span><span>@application.TotalCount</span><span>@application.Last24HCount</span></li>
+                                        }
+                                        <li><span><a href="@SiteUrls.Instance().ManageUsers()">用户</a></span><span>@userCount</span><span>@userCount24H</span></li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                            @Html.Action("_VersionInfo", "ControlPanel", new { area = "Common" })
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

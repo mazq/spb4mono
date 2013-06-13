@@ -1,0 +1,70 @@
+﻿@{  
+    IEnumerable<Navigation> navigations = ViewData.Get<IEnumerable<Navigation>>("Navigations", null);
+    var currentUser = UserContext.CurrentUser;
+    string search = ViewData.Get<string>("search", null);
+    var registrationMode = DIContainer.Resolve<IUserSettingsManager>().Get().RegistrationMode;
+}
+<!--[if IE 6]>
+<script type="text/javascript" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Scripts/jquery/DD_belatedPNG/jquery.DD_belatedPNG-0.0.8a.js"))"></script>
+<![endif]-->
+<div class="spb-top-menubar">
+    <div class="tn-inner tn-helper-clearfix">
+        <div class="spb-logo">
+            <h1>
+                <a href="@SiteUrls.Instance().SiteHome()">spacebuilder</a></h1>
+        </div>
+        <ul id="spb-global-nav" class="spb-menu tn-drop-menu">
+            @{
+                var homeUrl = currentUser != null ? SiteUrls.Instance().MyHome(currentUser.UserId) : SiteUrls.Instance().SimpleHome();
+                string currentNavigationId = string.Empty;
+                if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+                {
+                    currentNavigationId = Html.ViewContext.RouteData.Values["CurrentNavigationId"].ToString();
+                }
+            }
+            <li><a class="spb-menu-link" href="#">首页</a></li>
+            <li><a class="spb-menu-link" href="#">广场</a> </li>
+            <li><a class="spb-menu-link" href="#">找人</a></li>
+            <li><a class="spb-menu-link" href="#">群组</a></li>
+            <li><a class="spb-menu-link" href="#">应用</a></li>
+        </ul>
+        <div class="tn-search-box">
+@*            @using (Html.BeginForm("GlobalSearch", "Channel", FormMethod.Get, new { id = "quickSearchForm" }))
+            {*@
+                <input type="text" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl required"
+                    id="keyword" name="keyword" autocomplete="off" />                
+                <span id="button-search-header" class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray required">
+                    <button>
+                        <span class="tn-icon tn-smallicon-find">搜索</span></button>
+                </span>
+@*            }*@
+        </div>
+
+    </div>
+</div>
+@Html.Action("_QuickSearch", "Channel", new { area = "Common" })
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#spb-global-nav').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+
+        $('#spb-user-menu').dcMegaMenu({
+            rowItems: '2',
+            speed: 'fast',
+            effect: 'fade',
+            fullWidth: true
+        });
+
+        $(".tn-drop-menu ul a.tn-item-link").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            });
+    });
+</script>

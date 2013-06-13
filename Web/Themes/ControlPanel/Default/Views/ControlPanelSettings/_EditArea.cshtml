@@ -1,0 +1,100 @@
+﻿@model AreaEditModel
+@{
+    Area parentArea = ViewData.Get<Area>("parentEditArea", null);
+    string areaCode = Request.QueryString.Get<string>("areaCode", string.Empty);
+    string parentCode = null;
+    string parentName = null;
+    if (parentArea != null)
+    {
+        parentCode = parentArea.AreaCode;
+        parentName = parentArea.Name;
+    }
+
+
+
+    if (parentArea == null)
+    {
+        parentName = "无";
+    }
+    int depth = ViewData.Get<int>("depth", 0);
+}
+@using (Html.BeginAjaxForm("_EditArea", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "success" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short tnc-tips-location">
+            @Html.HiddenFor(model => model.AreaCode)
+            <input id="parentCode" type="hidden" name="parentCode" value="@parentCode" />
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model => model.AreaCode)
+                <label id="submit_areaCode">@Model.AreaCode</label>
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model => model.AreaName) @Html.TextBoxFor(model => model.AreaName, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(model => model.AreaName)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model => model.PostCode) @Html.TextBoxFor(model => model.PostCode, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(model => model.PostCode)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model => model.ParentCode) <a href="javascript:void(0)" id="area-selector">@parentName</a>
+                @Html.AreaSelector("groupArea", "A1560000", parentCode, areaCode, 3, "areaGroup.AreaSelected")
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "edit-term-submit" })
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+
+       
+}
+<script type="text/dialog">
+  this.title("编辑地区");
+</script>
+<script type="text/javascript">
+    function success(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+    }   
+</script>
+<script type="text/javascript">
+    $(function () {
+        var AreaGroup = function () {
+            this.init();
+        };
+        AreaGroup.fn = AreaGroup.prototype = {
+            init: function () {
+                //注册选择地区事件
+                $('#area-selector').click(function (e) {
+                    e.preventDefault();
+                    groupArea.toggle();
+                    var left = $("#area-selector").offset().left;
+                    var top = $("#area-selector").offset().top;
+                    groupArea.position(left, top); //定位
+                    $("#user-area").hide();
+                });
+            },
+            /*
+            * 地区选择器回调函数
+            */
+            AreaSelected: function (data) {
+                groupArea.hide();
+                var nowAreaName = data.areaName;
+                $("#area-selector").text(data.areaName);
+                $("#parentCode").val(data.areaCode);
+            }
+        }
+        areaGroup = new AreaGroup();
+    })
+</script>
+<script type="text/javascript">
+    function beforeSubmit() {
+        var _areaCode = $("#submit_areaCode").text();
+        var _parentCode = $("#parentCode").val();
+        if (_areaCode == _parentCode) {
+            alert("父地区不能和地区编码相同");
+            debugger;
+            return false;
+        }
+    }
+</script>

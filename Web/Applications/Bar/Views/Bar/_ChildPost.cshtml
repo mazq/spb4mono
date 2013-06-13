@@ -1,0 +1,79 @@
+﻿@model BarPost
+@{
+    long? childPostIndex = Request.QueryString.Get<long?>("childPostIndex", 1);
+    bool showAfterPage = Request.QueryString.Get<bool>("showAfterPage", true);
+    bool showBeforPage = Request.QueryString.Get<bool>("showBeforPage", false);
+    bool ReAnchor = Request.QueryString.Get<bool>("ReAnchor", false);
+    int postBodyMaxLength = TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH;
+}
+@if (new Authorizer().BarPost_Create(Model.SectionId))
+{
+    @(Html.Action("_ListPost", "Bar", new { ThreadId = Model.ThreadId, ParentId = Model.PostId, pageIndex = childPostIndex, showBeforPage = showBeforPage, showAfterPage = showAfterPage }))
+using (Html.BeginAjaxForm("EditPost", "Bar", null, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "postOnErrorCallBack", OnSuccessCallBack = "postOnSuccessCallBack", ClearForm = true }, new { ulfor = "comments-parent-" + Model.PostId }))
+{
+    <div class="tn-comment-form" id="comment-postId-@Model.PostId">
+        <div class="tn-comment-text-wrap">
+            <div class="tn-comment-form-avatar">
+                @Html.ShowUserAvatar(UserContext.CurrentUser == null ? 0 : UserContext.CurrentUser.UserId, AvatarSizeType.Small)
+            </div>
+            <div class="tn-comment-text-inner tn-border-gray">
+                @Html.TextArea("MultilineBody", string.Empty, new { maxlength = postBodyMaxLength, @class = "tn-comment-text-area required", plugin = "ShortcutSubmit", id = "post-id-" + Model.PostId })
+            </div>
+        </div>
+        <div class="tn-comment-form-act tn-helper-clearfix">
+            @Html.EmotionSelector()
+             @*<span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-at"></span>
+               <a id="atFriend" class="tn-action-text" href="javascript:;">朋友</a> </span>
+            @Html.AtUser("#post-id-" + Model.PostId, "#comment-postId-" + Model.PostId + " #atFriend")*@
+            @Html.AtUser("#post-id-" + Model.PostId) <span id="subjectCount-@Model.PostId" class="tn-count tn-text-note">
+                0/@postBodyMaxLength</span>
+            @Html.Button("回复", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "submit-" + Model.PostId })
+        </div>
+    </div>
+    @Html.HiddenFor(n => n.ThreadId)
+    @Html.Hidden("ParentId", Model.PostId)
+}
+    <script language="javascript" type="text/javascript">
+        $(document).ready(function () {
+            //点击提交的时候
+            $("button#submit-@Model.PostId").click(function () {
+                $comment = $("textarea#post-id-@Model.PostId").parents(".tn-comment-form");
+                $(document).click();
+            });
+
+            //是否显示大评论
+            $("textarea#post-id-@Model.PostId").click(function () {
+                $comment = $(this).parents(".tn-comment-form");
+                $comment.addClass("tn-comment-expand");
+                $(document).bind("click", function (evt) {
+                    $comment = $("textarea#post-id-@Model.PostId").parents(".tn-comment-form");
+                    if ($(evt.target).closest($comment).length > 0 || $(evt.target).is("a[id^='three-level-post-']")) {
+                        return;
+                    }
+                    $(document).unbind("click", arguments.callee);
+                    $comment.removeClass("tn-comment-expand");
+                });
+            });
+
+            //水印
+            $("textarea#post-id-@Model.PostId").watermark('请输入回复');
+
+            //截字
+            $("#post-id-@Model.PostId").GetTextCount('subjectCount-@Model.PostId', @postBodyMaxLength, true, true);
+        });
+    </script>
+}
+else
+{
+    @Html.Action("_ListPost", "Bar", new { ThreadId = Model.ThreadId, ParentId = Model.PostId, pageIndex = childPostIndex, showBeforPage = true, showAfterPage = showAfterPage })
+}
+@if (ReAnchor)
+{
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            if (window.location.hash != "") {
+                window.location.href = window.location.hash;
+            }
+        });
+    </script>
+}

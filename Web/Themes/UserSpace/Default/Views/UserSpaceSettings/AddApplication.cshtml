@@ -1,0 +1,72 @@
+﻿@model IEnumerable<ApplicationBase>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.AddApplications;
+    User currentSpaceUser = ViewData.Get<User>("currentSpaceUser", null);
+    Dictionary<int, bool> installed = ViewData.Get<Dictionary<int, bool>>("dictionary", null);
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-add-app">
+    <div class="tn-box-content tn-widget-content tn-corner-all">                          
+        <div class="tn-main-heading tn-border-gray tn-border-bottom"><h2>添加应用 </h2><a href="@SiteUrls.Instance().UserManageApplications(currentSpaceUser.UserName)">返回应用管理>></a></div>                      
+            @if (Model.Count() != 0)
+            {
+            <table class="tn-table-grid">
+                <tbody>
+                    <tr class="tn-table-grid-header">
+                        <td class="tn-border-gray tn-border-bottom tn-text-note"></td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">应用名</td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">应用描述</td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">操作</td>
+                    </tr>                        
+                    @foreach (var application in Model)
+                    {
+                        <tr class="tn-table-grid-row">
+                            <td class="tn-border-gray tn-border-bottom tn-width-icon1">                                
+                            <span class="tn-icon tn-icon-@application.ApplicationKey.ToLower()"></span>                             
+                            </td>
+                            <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">@application.Config.ApplicationName</td>
+                            <td class="tn-border-gray tn-border-bottom tn-width-auto">@application.Description</td>
+                            @if (!installed[application.ApplicationId])
+                            {
+                            <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">                          
+                            <a id="subscribe-@application.ApplicationId" class="tn-action" href="@SiteUrls.Instance().InstallApplication(currentSpaceUser.UserName, application.ApplicationId)"><span class="tn-action-text">安装</span></a></td>
+                            }
+                            else
+                            {
+                            <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap"><span class="tn-text-note">已安装</span></td>
+                            }
+                        </tr>
+                    }                       
+                </tbody>
+            </table>
+            }     
+            else
+            {
+                <div class="tn-no-data">还没有可以添加的应用</div>
+            }                   
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("a[id^='subscribe-']").click(function (e) {
+            var self = $(this);
+            $.ajaxSetup({ cache: false });
+            $.ajax({
+                type: "POST",
+                url: self.attr("href"),
+                success: function (data) {
+                    if (data.MessageType == '1') {
+                        self.replaceWith('<span class="tn-text-note">已安装</span>');
+                        self.removeProp("a");
+                    }
+                    art.dialog.tips(data.MessageContent, 2, data.MessageType);
+                }
+            });
+            return false;
+        });
+    });
+</script>

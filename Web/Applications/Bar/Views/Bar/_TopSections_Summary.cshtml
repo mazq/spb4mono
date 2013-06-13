@@ -1,0 +1,66 @@
+﻿@model IEnumerable<BarSection>
+@{
+    SortBy_BarSection sortBy = ViewData.Get<SortBy_BarSection>("SortBy", SortBy_BarSection.DateCreated_Desc);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-hot-bar">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option">
+            <a href="@SiteUrls.Instance().ListSections(null, sortBy)">更多</a></div>
+        <h3 class="tn-helper-reset">
+            @switch (sortBy)
+            {
+                case SortBy_BarSection.DateCreated_Desc:
+                @:最新帖吧
+        break;
+                case SortBy_BarSection.ThreadCount:
+                @:热门帖吧
+        break;
+                case SortBy_BarSection.ThreadAndPostCount:
+                @:热门帖吧
+        break;
+                case SortBy_BarSection.StageThreadAndPostCount:
+                @:热门帖吧
+        break;
+                case SortBy_BarSection.FollowedCount:
+                @:热门帖吧
+        break;
+                @:热门帖吧
+            default:
+                @:热门帖吧
+                                                                    break;
+            }
+        </h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <div class="spb-top-bar-list">
+            @if (Model.Count() > 0)
+            { 
+                <ul class="tn-list tn-helper-clearfix">
+                    @foreach (var bar in Model)
+                    {
+                        <li class="tn-list-item">
+                            <div class="tn-list-item-area-left">
+                                <div class="spb-smallbar-figure">
+                                    <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">
+                                        <img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" width="50px" height="50px" title="@bar.Name" alt="@bar.Name"/>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-text-heading">
+                                    <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name"><span>@(bar.Name)</span></a></div>
+                                <div class="tn-list-item-row">
+                                    <em>今日(@bar.ToDayThreadAndPostCount)</em><em>帖子(@bar.ThreadAndPostCount)</em><em>关注(@bar.FollowedCount)</em></div>
+                            </div>
+                        </li>                       
+                    }
+                </ul>
+            }
+            else
+            { 
+                <div class="tn-no-data">
+                    暂无帖吧</div>
+            }
+        </div>
+    </div>
+</div>

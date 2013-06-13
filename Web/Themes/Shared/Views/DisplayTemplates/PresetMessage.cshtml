@@ -1,0 +1,31 @@
+﻿@{
+    bool isHighlight = ViewData.Get<bool>("IsHighlight", false);
+    string messageContent = ViewData.Get<string>("MessageContent", string.Empty);
+}
+@if (isHighlight)
+{ 
+    <div name="PresetMessage" class="tn-cue-highlight tn-corner-all tn-message-box">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right"></a><span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>注意：</strong>
+            @Html.Raw(messageContent)
+        </div>
+    </div>
+}
+else
+{ 
+    <div name="PresetMessage" class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right"></a><span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>
+            @Html.Raw(messageContent)
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("div[name='PresetMessage'] a.tn-smallicon-cross").click(function () {
+            $(this).parents("div[name='PresetMessage']").fadeOut("normal");
+        });
+    });
+</script>

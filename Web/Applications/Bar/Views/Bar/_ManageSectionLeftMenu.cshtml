@@ -1,0 +1,26 @@
+﻿@{
+    long sectionId = ViewData.Get<long>("SectionId", 0);
+    ManageSectionSubMenu leftEnum = ViewData.Get<ManageSectionSubMenu>("ManageSectionSubMenu", ManageSectionSubMenu.EditSectionInfo);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            帖吧管理</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-side-menu">
+            <li class="@(leftEnum == ManageSectionSubMenu.ManageThread ? "tn-selected tn-border-gray tn-bg-gray tn-corner-all" : "") ">
+                @Html.Link("帖子管理", SiteUrls.Instance().ManageThreadsForSection(sectionId), "帖子管理", new { @class = "tn-menu-text" })
+            </li>
+            <li class="@(leftEnum == ManageSectionSubMenu.ManagePost ? "tn-selected tn-border-gray tn-bg-gray tn-corner-all" : "") ">
+                @Html.Link("回帖管理", SiteUrls.Instance().ManagePostsForSection(sectionId), "回帖管理", new { @class = "tn-menu-text" })
+            </li>
+            <li class="@(leftEnum == ManageSectionSubMenu.ManageThreadCategories ? "tn-selected tn-border-gray tn-bg-gray tn-corner-all" : "") ">
+                @Html.Link("帖子类别", SiteUrls.Instance().ManageThreadCategoriesForSection(sectionId), "帖子类别", new { @class = "tn-menu-text" })
+            </li>
+            <li class="@(leftEnum == ManageSectionSubMenu.EditSectionInfo ? "tn-selected tn-border-gray tn-bg-gray tn-corner-all" : "") ">
+                @Html.Link("编辑帖吧", SiteUrls.Instance().EditSectionInfo(sectionId), "编辑帖吧", new { @class = "tn-menu-text" })
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,130 @@
+﻿@{
+    IEnumerable<Category> userCategoriesAddDic = ViewData.Get<IEnumerable<Category>>("userCategoriesAddDic", null);
+    IEnumerable<Category> userCategories = ViewData.Get<IEnumerable<Category>>("userCategories", null);
+
+    long userId = ViewData.Get<long>("userId", 0);
+    long followId = ViewData.Get<long>("followId", 0);
+    long checkGroupId = ViewData.Get<long>("CheckedGroup", 0);
+    string newShow = ViewData.Get<string>("newShow", string.Empty);
+    string newGroupName = ViewData.Get<string>("newGroupName", string.Empty);
+    long? groupId = ViewData.Get<long?>("groupId", -100);
+}
+<div class="tnc-set-user-group" id="FollowMenuList_@(userId)">
+    <ul class="tn-menu-list" id="divLiAppend_@(userId)">
+        @foreach (var item in userCategoriesAddDic)
+        {
+            bool isCheck = false;    
+            <li class="tn-menu-item">
+                @foreach (var userCategory in userCategories)
+                {
+                    if (userCategory.CategoryId == item.CategoryId)
+                    { isCheck = true; }
+                }
+                @if (item.CategoryId == checkGroupId)
+                { isCheck = true; }
+                @Html.CheckBox("check-" + item.CategoryId + "_" + userId, isCheck, new { onclick = "SetUserGroup(" + item.CategoryId + "," + userId + "," + groupId + "," + item.CategoryId + ")" })
+                <a class="tn-menu-text tn-corner-all" href="javascript:;">
+                    <label for="check-@(item.CategoryId)_@(userId)">@StringUtility.Trim(item.CategoryName, 5)</label></a>
+            </li>
+        }
+    </ul>
+    <div class="tn-create tn-border-gray tn-border-top" id="createli_@(userId)">
+    </div>
+</div>
+<script type="text/javascript">
+
+        $(document).ready(function () {
+
+             $("#createli_"+@userId).append('<a id="CreateGroupInPage_@(userId)" class="tn-action tn-action-text-icon"   href="javascript:;"><span class="tn-icon tn-smallicon-add"></span><span class="tn-action-text">创建分组</span></a>');
+
+             $("#CreateNewGroupInPage_"+@userId).die("click").live("click",function (e) {
+                e.preventDefault();
+                $this = $(this);
+                var groupName = $("#newGroupInPage_"+@userId).val();
+                $.ajax({
+                          type: "Post",
+                          url: $(this).attr("href"),
+                          data:{ groupName: groupName},
+                          success: function (data) {
+                               if(@groupId==0)
+                    {
+                        $("#Follower_" + data.Data.userId).fadeOut();
+                        $("#FollowMenuList_" + data.Data.userId).fadeOut();
+                    }
+                                $("#divLiAppend_"+@userId).append('<li class="tn-menu-item"><input type="checkbox" value="true" onclick="SetUserGroup('+data.Data.CheckedGroup+','+data.Data.userId+',@groupId,'+data.Data.CheckedGroup+')"   name="check-'+data.Data.CheckedGroup+'_'+data.Data.userId+'"  id="check-'+data.Data.CheckedGroup+'_'+data.Data.userId+'" checked="checked"><a href="javascript:;" class="tn-menu-text tn-corner-all"> <label for="check-'+data.Data.CheckedGroup+'_'+data.Data.userId+'">'+data.Data.newGroupName+'</label></a></li>');
+                                $("#divRemove_"+@userId).remove();
+                                $("#createli_"+@userId).append('<a id="CreateGroupInPage_@(userId)" class="tn-action tn-action-text-icon"   href="javascript:;"><span class="tn-icon tn-smallicon-add"></span><span class="tn-action-text">创建分组</span></a>');
+                                $("span[name=\'group_list_" + "@userId" + "\']").text(data.Data.newShow);
+
+                                if(data.Data.count <= 4)
+       {
+           
+            $("li[name^='group-']").last().after('<li class="tn-widget-content tn-border-gray tn-border-trl" name="group-@checkGroupId"><a href=\"' + data.Data.url + '\">' + data.Data.newGroupName + '</a></li>');
+       }
+        else
+        {
+              $("#moreLi").show();
+              $("#moreUl").append('<li><a href="' + data.Data.url + '" class="tn-item-link"> '+ data.Data.newGroupName +'</a></li>');
+        }
+                          },
+                          error: function () {
+                          }
+                  });
+            });
+
+            $("#CreateGroupInPage_"+@userId).live("click",function () {
+                 $(this).remove();
+                 $("#divRemove_"+@userId).remove();
+                $("#createli_"+@userId).append('<div id="divRemove_@(userId)"><input type="text" value="" name="newGroupInPage_@(userId)" id="newGroupInPage_@(userId)" class="tn-textbox tn-input-short tn-border-gray">&nbsp;&nbsp;<a id="CreateNewGroupInPage_@(userId)"  href="@Html.Raw(SiteUrls.Instance().CreateNewGroupInList(Url.SpaceKey(), null, userId))" class="tn-button-default tn-button-text-only tn-button tn-corner-all"><span class="tn-button-text">创建</span></a><a id="CannelCreateGroupInPage_@(userId)"  href="javascript:;"> 取消</a></div> ');
+            });
+
+            $("#CannelCreateGroupInPage_"+@userId).live("click",function () {
+                $("#divRemove_"+@userId).remove();
+                $("#CreateGroupInPage_"+@userId).remove();
+               $("#createli_"+@userId).append('<a id="CreateGroupInPage_@(userId)" class="tn-action tn-action-text-icon"   href="javascript:;"><span class="tn-icon tn-smallicon-add"></span><span class="tn-action-text">创建分组</span></a>');
+            });
+
+        });//ready结束
+
+     function SetUserGroup(categoryId,followUserId,groupId,currentGroupId) {
+        if ($("input[id=\'check-"+categoryId+'_'+followUserId+"\']:checked").length > 0) {
+        $.ajax({
+                type: "Post",
+                url: "@Html.Raw(SiteUrls.Instance().SetGroupForFollowedUser(Url.SpaceKey(), true))",
+                data:{ userGroupId: categoryId, followedUserId:followUserId,followId:@followId},
+                success: function (data) {
+                if(groupId==0)
+                    {
+                        $("#Follower_" + followUserId).fadeOut();
+                         $("#FollowMenuList_" + data.Data.userId).fadeOut();
+                    }
+
+                 else{
+                  $("span[name=\'group_list_" + data.Data.userId + "\']").text(data.Data.newShow);
+                }
+                }
+                
+         });
+    }
+    else{
+            $.ajax({
+                type: "Post",
+                url: "@Html.Raw(SiteUrls.Instance().SetGroupForFollowedUser(Url.SpaceKey(), false))",
+                data:{ userGroupId: categoryId, followedUserId:followUserId,followId:@followId},
+                success: function (data) {
+                 if(groupId==currentGroupId)
+                    {
+                        $("#Follower_" + followUserId).fadeOut();
+                         $("#FollowMenuList_" + data.Data.userId).fadeOut();
+                        var num = parseInt($("#groupFollowedUsersNum").text()) - 1;
+                        $("#groupFollowedUsersNum").text(num);
+                    }
+                    else{
+                  $("span[name=\'group_list_" +  data.Data.userId + "\']").text(data.Data.newShow);
+                }
+                }
+         });
+    }    
+   }
+    
+</script>

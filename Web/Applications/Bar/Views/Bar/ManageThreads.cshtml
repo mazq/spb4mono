@@ -1,0 +1,144 @@
+﻿@model ManageThreadEditModel
+@{
+    ViewData["ManageSectionSubMenu"] = ManageSectionSubMenu.ManageThread;
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    Layout = "app-manage-2cols";
+    ViewData["SectionId"] = Model.SectionId;
+    PagingDataSet<BarThread> barThreads = ViewData.Get<PagingDataSet<BarThread>>("BarThreads", null);
+}
+@section Aside{
+    @Html.Partial("_ManageSectionLeftMenu")
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar", new { SectionId = Model.SectionId })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-manage">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                帖子管理</h2>
+        </div>
+        <div class="tn-manage-lists">
+            <div class="tn-search-area tn-helper-clearfix tn-border-gray tn-border-bottom">
+                <div class="tn-form tn-label-right tn-helper-clearfix">
+                    @using (Html.BeginForm("ManageThreads", "Bar", FormMethod.Get))
+                    { 
+                        @Html.Hidden("SectionId", Model.SectionId)
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.SubjectKeyword)
+                            @Html.TextBoxFor(n => n.SubjectKeyword, InputWidthTypes.Medium)
+                        </div>
+                        
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.UserId)
+                            @{
+                        long userId = 0;
+                        long.TryParse(string.IsNullOrEmpty(Model.UserId) ? "" : Model.UserId.Replace(",", ""), out userId);
+                            }
+                            @Html.UserSelector("UserId", userId)
+                        </div>
+                        
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.AuditStatus)
+                            @Html.EnumDropDownListFor(n => n.AuditStatus, "全部", new { @class = "tn-dropdownlist" })
+                        </div>
+                        
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.IsEssential)
+                            @Html.DropDownListFor(n => n.IsEssential, null, "全部", new { @class = "tn-dropdownlist" })
+                        </div>
+                        
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.IsSticky)
+                            @Html.DropDownListFor(n => n.IsSticky, null, "全部", new { @class = "tn-dropdownlist" })
+                        </div>
+                        
+                        <div class="tn-form-row">
+                            @Html.FormLabelFor(n => n.CategoryId)
+                            @Html.DropDownListFor(n => n.CategoryId, null, "全部", new { @class = "tn-dropdownlist" })
+                        </div>
+                        
+                        <div class="tn-form-row tn-date">
+                            <label class="tn-form-label">
+                                发布时间：
+                            </label>
+                            @Html.DateTimePicker("StartDate", new DateTimePicker().SetDateFormat("yyyy-MM-dd").SetMaxDate("0").SetMinDate("-10Y")) 到
+                            @Html.DateTimePicker("EndDate", new DateTimePicker().SetDateFormat("yyyy-MM-dd").SetMaxDate("0").SetMinDate("-10Y"))
+                        </div>
+                        
+                        <div class="tn-form-row tn-form-row-button">
+                            <label class="tn-form-label">
+                                &nbsp
+                            </label>
+                            @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="tn-toolbar-area tn-helper-clearfix tn-border-gray tn-border-bottom">
+                @Html.LinkButton("通过审核", SiteUrls.Instance().BatchUpdateThreadAuditStatusForSection(Model.SectionId ?? 0), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "Thread-Batch-UpdateAuditStatus" })
+                @Html.LinkButton("不通过审核", SiteUrls.Instance().BatchUpdateThreadAuditStatusForSection(Model.SectionId ?? 0, false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "Thread-Batch-UpdateAuditStatus-false" })
+                @Html.LinkButton("精华", SiteUrls.Instance().BatchSetEssentialForSection(Model.SectionId ?? 0), iconType: IconTypes.SmallElite, htmlAttributes: new { id = "Thread-Batch-SetEssential" })
+                @Html.LinkButton("取消精华", SiteUrls.Instance().BatchSetEssentialForSection(Model.SectionId ?? 0, false), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "Thread-Batch-UpdateAuditStatus-SetEssential-false" })
+                @Html.LinkButton("置顶", SiteUrls.Instance()._SetStickyDate(), iconType: IconTypes.SmallTop, htmlAttributes: new { id = "link-SetSticky" })
+                @Html.LinkButton("取消置顶", SiteUrls.Instance().BatchSetStickyForSection(false, DateTime.UtcNow), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "Thread-Batch-SetSticky-false" })
+                @Html.LinkButton("删除", SiteUrls.Instance().BatchDeleteThreadForSection(Model.SectionId ?? 0), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "Batch-DeleteThread" })
+            </div>
+            @Html.Action("_PagingThreads", new { threads = barThreads })
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //批量删除操作
+        $("a#Batch-DeleteThread").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $link = $(this);
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                    if (data.MessageType != -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                        setTimeout(function () { window.location.reload(); }, 1000);
+                    } else {
+                        alert(data.MessageContent, function () { window.location.reload(); });
+                    }
+                });
+            });
+        });
+
+        //除置顶外、删除的其他批量操作
+        $("a[id^='Thread-Batch-']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $link = $(this);
+            $.post($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                if (data.MessageType != -1) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+                } else {
+                    alert(data.MessageContent, function () { window.location.reload(); });
+                }
+            });
+        });
+
+        //link-SetSticky 置顶操作
+        $("a#link-SetSticky").click(function (e) {
+            e.preventDefault();
+            $link = $(this);
+            if (!$("input[name='threadIds']:checked").length) {
+                alert("至少选择一条帖子操作");
+                return false;
+            }
+            $.get($link.attr("href"), $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog(data);
+            });
+        });
+    });
+</script>

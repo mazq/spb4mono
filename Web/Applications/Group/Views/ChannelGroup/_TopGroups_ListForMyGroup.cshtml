@@ -1,0 +1,46 @@
+﻿@model IEnumerable<GroupEntity>
+@{ 
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-hots">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            热门群组</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model.Count() <= 0)
+        {
+            <div class="tn-no-data">
+                搜索不到数据!</div> 
+        }
+        else
+        {
+            <ul class="tn-list">
+                @foreach (var item in Model)
+                {
+                    <li class="tn-list-item tn-helper-clearfix">
+                        <div class="tn-list-item-area-left">
+                            <div class="tn-avatar">
+                                <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" target="_blank" title="@item.GroupName">
+                                    <img src="@SiteUrls.Instance().LogoUrl(item.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" width="50px" alt="@item.GroupName"/></a></div>
+                        </div>
+                        <div class="tn-list-item-area-main">
+                            <div class="tn-list-item-row tn-list-item-heading">
+                                <h5 class="tn-helper-reset">
+                                    <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" target="_blank" title="@item.GroupName">@item.GroupName</a>
+                                </h5>
+                                <span class="tn-actions">
+                                    @Html.Action("_ApplyJoinButton", "ChannelGroup", new { groupId = item.GroupId })
+                                </span>
+                            </div>
+                            <div class="tn-list-item-row">
+                                <p>
+                                    成员：@item.MemberCount</p>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

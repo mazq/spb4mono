@@ -1,0 +1,175 @@
+﻿@using Spacebuilder.Common.Configuration
+@{
+    IUserProfileSettingsManager userProfileSettingsManager = DIContainer.Resolve<IUserProfileSettingsManager>();
+    UserProfileSettings userProfileSettings = userProfileSettingsManager.GetUserProfileSettings();
+    var avatarHeight = userProfileSettings.AvatarHeight;
+    var avatarWidth = userProfileSettings.AvatarWidth;
+    var mediumAvatarHeight = userProfileSettings.MediumAvatarHeight;
+    var mediumAvatarWidth = userProfileSettings.MediumAvatarWidth;
+    var microAvatarHeight = userProfileSettings.MicroAvatarHeight;
+    var microAvatarWidth = userProfileSettings.MicroAvatarWidth;
+    var smallAvatarHeight = userProfileSettings.SmallAvatarHeight;
+    var smallAvatarWidth = userProfileSettings.SmallAvatarWidth;
+}
+<div class="tnc-cut-avatar">
+    <div class="tn-avatar-original tn-border-gray tn-bg-gray">
+        @{
+            if (ViewData["originalImageUrl"] == null)
+            {
+            <span class="tnc-no-avatar tn-text-note">请选择您要上传的图片</span>
+            }
+            else
+            {
+            <img id="xuwanting" src="@(Html.Raw(ViewData["originalImageUrl"].ToString()))" />
+            }
+        }
+    </div>
+    @{
+        if (ViewData["originalImageUrl"] != null)
+        {
+        <div class="tnc-avatar-btn">
+            @Html.Button("保存头像", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "saveImage" })
+            @Html.Button("取消", ButtonTypes.Submit, HighlightStyles.Secondary, htmlAttributes: new { id = "cancelImage" })
+        </div>
+        }
+    }
+</div>
+<div class="tnc-avatar-size">
+    @{
+        <div style="width: @(avatarWidth)px; height: @(avatarHeight)px; overflow: hidden;" class="tn-avatar-big">
+            @if (ViewData["originalImageUrl"] != null)
+            {
+                <img align="middle" style="width: @(avatarWidth)px; height: @(avatarHeight)px;" id="crop_preview_160" src="@(Html.Raw(ViewData["originalImageUrl"].ToString()))" />
+            }
+            else
+            {
+                <img align="middle" style="width: @(avatarWidth)px; height: @(avatarHeight)px;" id="crop_preview_160" src="@(Html.Raw(ViewData["bigImageUrl"].ToString()))" />
+            }
+        </div>
+        <div class="tnc-avatar-col2">
+            <div style="width: @(mediumAvatarWidth)px; height: @(mediumAvatarHeight)px; overflow: hidden;" class="tn-avatar-medium">
+                @if (ViewData["originalImageUrl"] != null)
+                {
+                    <img align="middle" style="width: @(mediumAvatarWidth)px; height: @(mediumAvatarHeight)px;" id="crop_preview_100" src="@(Html.Raw(ViewData["originalImageUrl"].ToString()))" />
+                }
+                else
+                {
+                    <img align="middle" style="width: @(mediumAvatarWidth)px; height: @(mediumAvatarHeight)px;" id="crop_preview_100" src="@(Html.Raw(ViewData["bigImageUrl"].ToString()))" />
+                }
+            </div>
+            <div style="width: @(smallAvatarWidth)px; height: @(smallAvatarHeight)px; overflow: hidden;" class="tn-avatar">
+                @if (ViewData["originalImageUrl"] != null)
+                {
+                    <img align="middle" id="crop_preview_50" src="@(Html.Raw(ViewData["originalImageUrl"].ToString()))" />
+                }
+                else
+                {    
+                    <img align="middle" id="crop_preview_50" src="@(Html.Raw(ViewData["SmallImageUrl"].ToString()))" />
+                }
+            </div>
+            <div style="width: @(microAvatarWidth)px; height: @(microAvatarHeight)px; overflow: hidden;" class="tn-avatar-mini">
+                @if (ViewData["originalImageUrl"] != null)
+                {    
+                    <img align="middle" id="crop_preview_25" src="@(Html.Raw(ViewData["originalImageUrl"].ToString()))" />
+                }
+                else
+                { 
+                    <img align="middle" id="crop_preview_25" src="@(Html.Raw(ViewData["SmallImageUrl"].ToString()))" />
+                }
+            </div>
+        </div>
+    }
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //记得放在jQuery(window).load(...)内调用，否则Jcrop无法正确初始化
+        $("#xuwanting").Jcrop({
+            onChange: showPreview,
+            onChange: showCoords,
+            onSelect: showPreview,
+            setSelect: [0, 0, @(avatarHeight), @(avatarWidth)],
+            minSize: [@(avatarHeight), @(avatarWidth)],
+            maxSize: [350, 350],
+            aspectRatio: 1
+        });
+
+        //简单的事件处理程序，响应自onChange,onSelect事件，按照上面的Jcrop调用
+        function showCoords(obj) {
+            $("#x1").val(obj.x);
+            $("#y1").val(obj.y);
+            $("#w").val(obj.w);
+            $("#h").val(obj.h);
+        }
+
+        function showPreview(coords) {
+            if (parseInt(coords.w) > 0) {
+                //计算预览区域图片缩放的比例，通过计算显示区域的宽度(与高度)与剪裁的宽度(与高度)之比得到
+                var rx_160 = @(avatarHeight) / coords.w;
+                var ry_160 = @(avatarWidth) / coords.h;
+                //通过比例值控制图片的样式与显示
+                $("#crop_preview_160").css({ width: Math.round(rx_160 * $("#xuwanting").width()) + "px",
+                    //预览图片宽度为计算比例值与原图片宽度的乘积
+                    height: Math.round(rx_160 * $("#xuwanting").height()) + "px",
+                    //预览图片高度为计算比例值与原图片高度的乘积
+                    marginLeft: "-" + Math.round(rx_160 * coords.x) + "px", marginTop: "-" + Math.round(ry_160 * coords.y) + "px"
+                });
+                var rx_100 = @(mediumAvatarHeight) / coords.w;
+                var ry_100 = @(mediumAvatarWidth) / coords.h;
+                //通过比例值控制图片的样式与显示
+                $("#crop_preview_100").css({ width: Math.round(rx_100 * $("#xuwanting").width()) + "px",
+                    //预览图片宽度为计算比例值与原图片宽度的乘积
+                    height: Math.round(rx_100 * $("#xuwanting").height()) + "px",
+                    //预览图片高度为计算比例值与原图片高度的乘积
+                    marginLeft: "-" + Math.round(rx_100 * coords.x) + "px", marginTop: "-" + Math.round(ry_100 * coords.y) + "px"
+                });
+                var rx_50 = @(smallAvatarHeight) / coords.w;
+                var ry_50 = @(smallAvatarWidth) / coords.h;
+                //通过比例值控制图片的样式与显示
+                $("#crop_preview_50").css({ width: Math.round(rx_50 * $("#xuwanting").width()) + "px",
+                    //预览图片宽度为计算比例值与原图片宽度的乘积
+                    height: Math.round(rx_50 * $("#xuwanting").height()) + "px",
+                    //预览图片高度为计算比例值与原图片高度的乘积
+                    marginLeft: "-" + Math.round(rx_50 * coords.x) + "px", marginTop: "-" + Math.round(ry_50 * coords.y) + "px"
+                });
+                var rx_25 = @(smallAvatarHeight) / coords.w;
+                var ry_25 = @(smallAvatarWidth) / coords.h;
+                //通过比例值控制图片的样式与显示
+                $("#crop_preview_25").css({ width: Math.round(rx_25 * $("#xuwanting").width()) + "px",
+                    //预览图片宽度为计算比例值与原图片宽度的乘积
+                    height: Math.round(rx_25 * $("#xuwanting").height()) + "px",
+                    //预览图片高度为计算比例值与原图片高度的乘积
+                    marginLeft: "-" + Math.round(rx_25 * coords.x) + "px", marginTop: "-" + Math.round(ry_25 * coords.y) + "px"
+                });
+            }
+        }
+
+    });
+
+    $("#saveImage").click(function () {
+        var x1 = $("#x1").attr("value");
+        var y1 = $("#y1").attr("value");
+        var w = $("#w").attr("value");
+        var h = $("#h").attr("value");
+        $.get('@(Html.Raw(SiteUrls.Instance()._CropAvatar(Url.SpaceKey(), null, null, null, null)))?srcWidth=' + w + '&srcHeight=' + h + '&srcX=' + x1 + '&srcY=' + y1,
+            function (data) {
+                $.dialog.tips("保存成功", 1.5, 1);
+                refreshImage();
+
+                //点击保存后需要跳转的地址，传一个隐藏域即可，zhaok加
+                var returnUrl_need = $("#returnUrl-need").val();
+                if (returnUrl_need) {
+                    art.dialog.tips("保存成功", 1.5, 1);
+                    refreshImage();
+                    window.location = $("#returnUrl-need").val();
+                }
+            });
+    });
+
+    $("#cancelImage").click(function () {
+        $.get('@(Html.Raw(SiteUrls.Instance()._CancelAvatar(Url.SpaceKey())))',
+        function (data) {
+            refreshImage();
+        });
+    });
+</script>

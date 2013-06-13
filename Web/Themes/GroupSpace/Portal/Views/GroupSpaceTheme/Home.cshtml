@@ -1,0 +1,25 @@
+﻿@model GroupEntity
+@{
+    Layout = "home-2cols";
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+}
+@section ContentHeader{
+     @Html.Action("_GroupHeader", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), showManageButton = true })
+}
+@section Aside{
+    @if (new Authorizer().Group_View(Model))
+    {
+        @Html.AjaxAction("_GroupProfile", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.AjaxAction("_ListMembers", "GroupSpace", new { spaceKey = Url.SpaceKey(), topNumber = 6 })
+        @Html.AjaxAction("_LastGroupVisitors", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.AjaxAction("_OnlineGroupMembers", "GroupSpace", new { spaceKey = Url.SpaceKey(), topNumber = 12 })
+        @Html.AjaxAction("_GroupMemberAlsoJoinedGroups", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.AjaxAction("_OwnerLinks", "Channel", new { ownerId = Model.GroupId, area = "Common", ownerType = OwnerTypes.Instance().Group() })
+    }
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-space">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_Announcement", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.Action("_Activities", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+    </div>
+</div>

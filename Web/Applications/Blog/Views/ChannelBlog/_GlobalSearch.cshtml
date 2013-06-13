@@ -1,0 +1,44 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    BlogSearcher blogSearcher = (BlogSearcher)SearcherFactory.GetSearcher(BlogSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@if (Model.TotalRecords > 0)
+{
+    <input type="hidden" class="totalRecords" value="@Model.TotalRecords" />
+    <input type="hidden" class="queryDuration" value="@Model.QueryDuration" />
+    <div class="tn-content-heading tn-border-light tn-border-bottom">
+        <div class="tn-option">
+            <a href="@blogSearcher.PageSearchActionUrl(keyword)">更多</a>
+        </div>
+        <h4>
+            日志</h4>
+    </div>
+    <div class="tnc-search-article">
+        <ul class="tn-list">
+            @foreach (BlogThread blog in Model)
+            {
+                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                    <div class="tn-list-item-area-main">
+                        <div class="tn-list-item-row tn-list-item-heading">
+                            <h5 class="tn-helper-reset">
+                                <a target="_blank" href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(blog.UserId),blog.ThreadId)">
+                                @Html.Raw(SearchEngine.Highlight(keyword, blog.Subject, 100))</a>
+                            </h5>
+                        </div>
+                        <div class="tn-list-item-row tn-list-item-summary">
+                            <p>@Html.Raw(SearchEngine.Highlight(keyword, HtmlUtility.TrimHtml(blog.Body, 100), 100))</p>
+                        </div>
+                        <div class="tn-list-item-row tn-list-info">
+                            <p>
+                                <a target="_blank" href="@SiteUrls.Instance().Blog(UserIdToUserNameDictionary.GetUserName(blog.UserId))" class="tn-user-name">
+                                @Html.Raw(SearchEngine.Highlight(keyword, blog.Author, 100))</a>
+                                <em class="tn-date tn-text-note">@blog.DateCreated.ToUserDateString(true)</em>
+                            </p>
+                        </div>
+                    </div>
+                </li> 
+            }
+        </ul>
+    </div>
+}

@@ -1,0 +1,68 @@
+﻿@model PagingDataSet<Spacebuilder.Bar.Search.BarEntity>
+@{
+    Spacebuilder.Bar.Search.BarSearcher barSearcher = (Spacebuilder.Bar.Search.BarSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(Spacebuilder.Bar.Search.BarSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@if (Model.TotalRecords > 0)
+{
+    <input type="hidden" class="totalRecords" value="@Model.TotalRecords" />
+    <input type="hidden" class="queryDuration" value="@Model.QueryDuration" />
+    <div class="tn-content-heading tn-border-light tn-border-bottom">
+        <div class="tn-option">
+            <a href="@barSearcher.PageSearchActionUrl(keyword)">更多</a>
+        </div>
+        <h4>
+            帖子</h4>
+    </div>
+    <div class="tnc-search-article">
+        <ul class="tn-list">
+            @foreach (Spacebuilder.Bar.Search.BarEntity bar in Model)
+            {
+                if (!bar.IsPost)
+                {
+                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                    <div class="tn-list-item-area-main">
+                        <div class="tn-list-item-row tn-list-item-heading">
+                            <h5 class="tn-helper-reset">
+                                <a target="_blank" href="@SiteUrls.Instance().ThreadDetail(bar.ThreadId)">
+                                @Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), bar.Subject, 100))</a>
+                            </h5>
+                        </div>
+                        <div class="tn-list-item-row tn-list-item-summary">
+                            <p>@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), HtmlUtility.TrimHtml(bar.Body, 100), 100))</p>
+                        </div>
+                        <div class="tn-list-item-row tn-list-info">
+                            <p>
+                                <a target="_blank" href="@SiteUrls.Instance().UserThreads(bar.UserId)" class="tn-user-name">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), bar.Author, 100))</a>
+                                <em class="tn-date tn-text-note">@bar.DateCreated.ToUserDateString(true)</em>
+                            </p>
+                        </div>
+                    </div>
+                </li> 
+                }
+                else
+                {
+               <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                  <div class="tn-list-item-area-main">
+                    <div class="tn-list-item-row tn-list-item-heading">
+                        <h5 class="tn-helper-reset">
+                            <a target="_blank" href="@SiteUrls.Instance().ThreadDetailGotoPost(bar.PostId)">
+                                回复:@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), bar.Subject, 100))</a>
+                        </h5>
+                    </div>
+                    <div class="tn-list-item-row tn-list-item-summary">
+                        <p>@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), HtmlUtility.TrimHtml(bar.Body, 100), 100))</p>
+                    </div>
+                    <div class="tn-list-item-row tn-info">
+                        <p>
+                            <a target="_blank" href="@SiteUrls.Instance().UserThreads(bar.UserId)" class="tn-user-name">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), bar.Author, 100))</a>
+                            <em class="tn-date tn-text-note">@bar.DateCreated.ToUserDateString(true)</em>
+                        </p>
+                    </div>
+                    </div>
+                </li>
+                }
+            }
+        </ul>
+    </div>
+}

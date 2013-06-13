@@ -1,0 +1,75 @@
+﻿@model WorkExperienceEditModel
+@{ 
+    SelectList StartDate = ViewData["StartDate"] as SelectList;
+    SelectList EndDate = ViewData["EndDate"] as SelectList;
+    string action = "CreateWork";
+    if (Model != null && Model.Id > 0)
+    {
+        action = "UpdateWork";
+    }
+}
+<div class="tn-content-heading tn-border-gray tn-border-bottom">
+    <h4>
+        @if (Model != null && Model.Id > 0)
+        {
+            @Html.Raw("编辑工作经历")
+        }
+        else
+        {
+            @Html.Raw("添加工作经历")
+        }
+    </h4>
+</div>
+@using (Html.BeginAjaxForm(action, "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("createWork"), htmlAttributes: new { id = "CreateWork" }))
+{
+    @Html.Hidden("Id", Model.Id)
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.CompanyName)
+        @Html.TextBoxFor(model => model.CompanyName, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.CompanyName)
+    </div>
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.CompanyAreaCode)
+        @Html.AreaDropDownListFor(model => model.CompanyAreaCode, 3)
+        @Html.ValidationMessageFor(model => model.CompanyAreaCode)
+    </div>
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.StartDate)
+        @{
+   ViewData["StartDate"] = Model.StartDate;
+   ViewData["EndDate"] = Model.EndDate;
+        }
+        @Html.DropDownList("StartDate", StartDate)-@Html.DropDownList("EndDate", EndDate)
+    </div>
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.JobDescription)
+        @Html.TextBoxFor(model => model.JobDescription, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.JobDescription)
+    </div>
+    <div class="tn-form-row tn-form-row-button">
+        <label class="tn-form-label">
+            &nbsp;</label>
+        @if (Model != null && Model.Id > 0)
+        {
+            @Html.Button("更新", ButtonTypes.Submit, HighlightStyles.Primary)
+        }
+        else
+        {
+            @Html.Button("添加", ButtonTypes.Submit, HighlightStyles.Primary)
+        }
+        @if (Model != null && Model.Id > 0)
+        {
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { onClick = "ClearFrom()" })
+        }
+    </div>
+}
+<script type="text/javascript">
+    function ClearFrom() {
+        $("#UserWorkInfo").load('@(Url.Action("_EditUserWorkInfo", "UserSpaceSettings"))?spaceKey=@(Url.SpaceKey())');
+    }
+    function createWork(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        $("#UserWorks").load('@(Url.Action("_UserWorks", "UserSpaceSettings"))?spaceKey=@(Url.SpaceKey())');
+        $("#UserWorkInfo").load('@(Url.Action("_EditUserWorkInfo", "UserSpaceSettings"))?spaceKey=@(Url.SpaceKey())');
+    }
+</script>

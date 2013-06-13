@@ -1,0 +1,33 @@
+﻿@model  PagingDataSet<User>
+@{
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, IEnumerable<string>> companyNameDic = ViewData["companyNameDic"] as Dictionary<long, IEnumerable<string>>;
+    long pageCount = ViewData.Get<long>("pageCount",0);
+}
+ 
+@foreach (var user in Model)
+{
+    <li class="tn-list-item tnui-user-id" data-user-id="@user.UserId">
+        <div class="tn-inner tn-border-gray tn-helper-clearfix">
+            <div class="tn-list-item-area-left">
+                @Html.ShowUserAvatar(user, AvatarSizeType.Small, false, HyperLinkTarget._blank)
+            </div>
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row tn-list-item-heading">
+                    @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserName), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+                </div>
+                <div class="tn-list-item-row tn-same">
+                    @{
+                    IEnumerable<string> companys = companyNameDic[user.UserId];
+                    }
+                    共同就职于：
+                    @foreach (string company in companys)
+                    {
+                    <a href="@SiteUrls.Instance().UserSearch(company, UserSearchRange.COMPANY)" target="_blank">@company</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </li>
+}
+@Html.Hidden("pageCount", @pageCount)

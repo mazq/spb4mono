@@ -1,0 +1,127 @@
+﻿@model  PagingDataSet<School>
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+    string areaCode = ViewData.Get<string>("areaCode", null);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>学校管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-shortsearch-adminform">
+                        @using (Html.BeginForm("ManageSchools", "ControlPanelSettings", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    所在地区：</label>
+                                @Html.AreaDropDownList("areaCode", Request.QueryString.GetString("areaCode", string.Empty), null, string.Empty)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    学校名称：</label>
+                                @Html.TextBox("keyword", Request.QueryString.Get<string>("keyword", string.Empty), new { maxlength = "32", @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    学校类型：</label>
+                                @Html.EnumDropDownList("SchoolType", Request.QueryString.Get<SchoolType?>("schoolType"), "请选择", new { @class = "tn-dropdownlist" })
+                            </div>                            
+                            <div class="tn-form-row">
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>      
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加学校", SiteUrls.Instance()._EditSchool(areaCode: Request.QueryString.GetString("AreaCode", string.Empty), schoolType: Request.QueryString.Get<SchoolType?>("schoolType")), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0)
+                    {
+                        <div class="tn-no-data">
+                            暂无数据</div>
+                    }
+                    else
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        学校名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        所在地区
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        学校类型
+                                    </th>
+                                    @if (!string.IsNullOrEmpty(areaCode))
+                                    {
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            排序
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        </th>
+                                    }
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @if (Model.Count() > 0)
+                                {
+                                    foreach (var schools in Model)
+                                    {
+                                    <tr class="tn-table-grid-row" id="@schools.Id" data-id="@schools.Id">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @schools.Name
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-location  tn-nowrap">
+                                            @Formatter.FormatArea(schools.AreaCode)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @schools.SchoolType.EnumMetadataDisplay()
+                                        </td>
+                                        @if (!string.IsNullOrEmpty(areaCode))
+                                        {
+                                            <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                                @Html.Link("上移", SiteUrls.Instance().ChangeSchoolDisplayOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "display-order-up" + schools.Id, name = schools.Id })
+                                            </td>
+                                            <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                                @Html.Link("下移", SiteUrls.Instance().ChangeSchoolDisplayOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "display-order-down" + schools.Id, name = schools.Id })
+                                            </td>
+                                        }
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            <a class="tn-action" href="@SiteUrls.Instance()._EditSchool(schools.Id)" plugin = "dialog">
+                                                <span class="tn-action-text">编辑</span> </a>
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetUrl(SiteUrls.Instance().DeleteSchool(schools.Id)).SetConfirm("确认要卸载吗？").SetText("删除").SetTooltip("删除").SetDeleteTarget("#" + schools.Id).SetOnErrorCallBack("error").SetOnSuccessCallBack("success"))
+                                        </td>
+                                    </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+						    @Html.PageSizeDropdownList("PageSize", null, new List<int> { 50, 100, 300, 500, 1000, 1500, 2000 })
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function error() {
+        art.dialog.tips("卸载失败！", 2, -1);
+    }
+
+    function success() {
+        art.dialog.tips("卸载成功！", 2, 1);
+    }
+</script>

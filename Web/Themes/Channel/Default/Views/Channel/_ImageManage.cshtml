@@ -1,0 +1,18 @@
+﻿@{
+
+    int associateId = ViewData.Get<int>("associateId", 0);
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", string.Empty);
+
+}
+<div class="tnc-attchment-dailog">
+    @Html.Tabs(new TabControl().SetName("_ImageManageTab")
+.SetIsSimple(true)
+             .AddTabItem(new TabItem("上传图片").SetContent(Html.Action("_EditImage", "Channel", new { tenantTypeId = tenantTypeId, associateId = associateId, t = new Random().Next(1, 100).ToString() })).SetSelected())
+            // .AddTabItem(new TabItem("图片相册").SetUrl(Url.Action("_EditPhoto")))
+                    .AddTabItem(new TabItem("网络图片").SetName("_EditNetImageButton").SetUrl(Url.Action("_EditNetImage")))            
+)
+</div>
+<script type="text/dialog">
+this.position(450, 100);
+this.title('上传图片');
+</script>

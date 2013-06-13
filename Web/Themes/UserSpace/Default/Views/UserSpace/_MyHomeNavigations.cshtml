@@ -1,0 +1,114 @@
+﻿@{
+    ApplicationBase microblogApplication = ViewData.Get<ApplicationBase>("MicroblogApplication", null);
+    User user = ViewData.Get<User>("user", null);
+
+    IEnumerable<Navigation> navigations = ViewData.Get<IEnumerable<Navigation>>("navigations", null);
+    IEnumerable<ApplicationManagementOperation> appManagementOperations = ViewData.Get<IEnumerable<ApplicationManagementOperation>>("ApplicationManagementOperations", null);
+
+    bool showOperation = ViewData.Get<bool>("showOperation", false);
+}
+<div class="tnc-user-menu tnc-basic-menu tn-border-top tn-border-gray">
+    <ul class="tn-side-menu">
+        @if (!showOperation)
+        {
+            <li>@Html.Icon(IconTypes.Home)<a class="tn-menu-text" title="我的首页" href="@SiteUrls.Instance().MyHome(user.UserId)">
+                我的首页</a></li>
+            <li>@Html.Icon(IconTypes.Bubble)<a class="tn-menu-text" href="@SiteUrls.Instance().ListCommentsInBox(Url.SpaceKey(), null)">
+                我的评论</a></li>
+            <li><span class="tn-icon tn-icon-email"></span><a class="tn-menu-text" href="@SiteUrls.Instance().ListMessageSessions(Url.SpaceKey(), null)">
+                我的私信</a></li>
+            if (microblogApplication != null && microblogApplication.IsEnabled)
+            {
+            <li>@Html.Icon(IconTypes.Microblog)<a class="tn-menu-text" href="@SiteUrls.Instance().Mine(Url.SpaceKey(), null)">我的微博</a></li>
+            }
+        }
+        else if (appManagementOperations != null)
+        {
+            foreach (var appManagementOperation in appManagementOperations)
+            {
+                if (!appManagementOperation.IsVisible(UserContext.CurrentUser) || appManagementOperation.AssociatedNavigationId > 0)
+                {
+                    continue;
+                }
+            <li>
+                @if (!string.IsNullOrEmpty(appManagementOperation.IconName))
+                {
+                    @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), appManagementOperation.IconName, false))
+                }
+                <a class="tn-menu-text" href="@appManagementOperation.GetUrl(Url.SpaceKey(), Html.ViewContext.RouteData.Values)" target="@appManagementOperation.NavigationTarget">
+                    @appManagementOperation.OperationText</a></li>
+            }
+
+        }
+    </ul>
+</div>
+<div class="tnc-user-menu tnc-app-menu tn-border-top tn-border-gray tn-hover">
+    @if (navigations != null)
+    {
+        int count = 0, index = -1;
+        <ul id="tnc-app-drop-menu" class="tn-side-menu tn-drop-menu">
+            @if (showOperation)
+            { 
+                <li><a class="tn-menu-text" title="我的首页" href="@SiteUrls.Instance().MyHome(user.UserId)">
+                    我的首页</a></li>
+            }
+            @foreach (var navigation in navigations)
+            {
+                index++;
+                if (!navigation.IsVisible(UserContext.CurrentUser) || (navigation.ApplicationId == 1001 && !showOperation))
+                {
+                    continue;
+                }
+
+                if (count == 7)
+                {
+                    break;
+                }
+                
+                <li>
+                    @if (!string.IsNullOrEmpty(navigation.IconName) && !showOperation)
+                    {
+                        @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), navigation.IconName, false))
+                    }
+                    <a class="tn-menu-text" href="@navigation.GetUrl(user.UserName, Html.ViewContext.RouteData.Values)">@navigation.Text</a>
+                </li>
+                
+                    count++;
+            }
+            @if (showOperation && navigations.Where(n => n.IsVisible(UserContext.CurrentUser)).Count() > 7)
+            {
+                <li><a class="tn-menu-text" href="javascript:;">更多</a>
+                    <ul class="tn-widget-content tn-corner-all">
+                        @foreach (var navigation in navigations.Skip(index))
+                        {
+                            if (!navigation.IsVisible(UserContext.CurrentUser))
+                            {
+                                continue;
+                            }                            
+                            <li><a target="@navigation.NavigationTarget" href="@navigation.GetUrl(Url.SpaceKey(), Html.ViewContext.RouteData.Values)" class="tn-item-link">@navigation.Text</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    }
+    @if (!showOperation)
+    {
+        <p class="tn-actions tn-state-hidden">
+            <a href="@SiteUrls.Instance().UserAddApplication(user.UserName)" class="tn-action tn-action-text-icon">
+                <span class="tn-icon tn-smallicon-add"></span><span class="tn-action-text">添加应用</span>
+            </a><a href="@SiteUrls.Instance().UserManageApplications(user.UserName)" class="tn-action tn-action-text-icon">
+                <span class="tn-icon tn-smallicon-config"></span><span class="tn-action-text">管理应用</span>
+            </a>
+        </p>
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function ($) {
+        $('#tnc-app-drop-menu').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+    });
+</script>

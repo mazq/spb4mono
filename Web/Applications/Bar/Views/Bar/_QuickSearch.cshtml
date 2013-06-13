@@ -1,0 +1,40 @@
+﻿@model PagingDataSet<Spacebuilder.Bar.Search.BarEntity>
+@{
+    Spacebuilder.Bar.Search.BarSearcher barSearcher = (Spacebuilder.Bar.Search.BarSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(Spacebuilder.Bar.Search.BarSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    }
+@if (Model.TotalRecords > 0)
+{
+  <input type="hidden" class="app-count" />
+  <div class="tn-section tn-border-gray tn-border-bottom">
+  <div class="tn-title tn-border-bottom tn-border-gray tnui-option" data-appname="Bar" data-search-url="@barSearcher.PageSearchActionUrl(keyword)">
+  <a href="@barSearcher.PageSearchActionUrl(keyword)">搜“<span class="tn-text-bright">@keyword</span>”相关帖子（@Model.TotalRecords）</a>
+  </div>
+  <ul class="tn-list" >
+  @foreach (Spacebuilder.Bar.Search.BarEntity bar in Model)
+  {
+      string barUrl = SiteUrls.Instance().ThreadDetail(bar.ThreadId);
+      if (bar.IsPost)
+      {
+          barUrl = SiteUrls.Instance().ThreadDetail(bar.PostId);
+      }
+  <li class="tn-list-item tnui-option" data-search-url="@barUrl" data-search-key="@bar.Subject">
+    <div class="tn-list-item-area-main ">
+        <div class="tn-list-item-row">
+              <a title="@bar.Subject" href="@barUrl">
+             @if (bar.Subject.Length > 13)
+             {
+                 @Html.Raw(string.Join("", Tunynet.Search.SearchEngine.Highlight(keyword, bar.Subject, 100).Take(13)) + "...")
+             }
+             else
+             {
+                 @Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, bar.Subject, 100))
+             }
+             </a>
+        </div>
+    </div>
+    </li>
+  }
+  </ul>
+  </div>
+}

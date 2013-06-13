@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Message>
+@{
+    MessageSession session = ViewData["session"] as MessageSession;
+    long currentUserId = ViewData.Get<long>("userId", 0);
+    IUser otherUser = ViewData.Get<IUser>("otherUser", null);
+    long LastcurrentUserId = 0;
+    bool dllast = false, isCurrent = false;
+
+    if (Model != null)
+    {
+        foreach (var message in Model)
+        {
+            isCurrent = message.SenderUserId == currentUserId;
+
+            string arrowColor = isCurrent ? "tn-widget-bubble" : "tn-bubble-gray";
+            string areaClass = isCurrent ? "tnc-letter-to" : "tnc-letter-from";
+            string directionClass = "tn-widget tn-bubble tn-bubble-arrow-";
+            directionClass += isCurrent ? "right" : "left";
+
+            if (dllast && LastcurrentUserId != 0 && LastcurrentUserId != message.SenderUserId)
+            {
+    @Html.Raw("</div></div></dd></dl>")
+                dllast = false;
+            }
+
+            if (message.SenderUserId != LastcurrentUserId)
+            {
+                dllast = true;
+    @Html.Raw("<dl class=\"" + areaClass + "\">")
+    <dt>
+        @Html.ShowUserAvatar(message.SenderUserId, AvatarSizeType.Small, true)
+    </dt>
+    @Html.Raw("<dd class=\"tnc-sender-content\">")
+    @Html.Raw("<div class=\"" + directionClass + "\">")
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2  @(arrowColor)">
+        </b>
+    </div>
+    @Html.Raw("<div class=\"tn-bubble-content tn-widget-content " + (isCurrent ? "" : "tn-bg-gray") + " tn-border-gray tn-corner-all\">")
+                LastcurrentUserId = message.SenderUserId;
+            }
+
+    <div id="msg_message_@(message.MessageId)"  class="tnc-message-info tn-border-bottom tn-border-gray">
+        <p class="tnc-info-content">
+            <span class="tnc-sender-name">
+                @if (isCurrent)
+                {
+                    @:客服消息
+                }
+                else
+                {
+                    if (otherUser != null)
+                    {
+                    <a href="@SiteUrls.Instance().SpaceHome(message.SenderUserId)" title="@message.Sender" target="_blank">
+                        @message.Sender</a>
+                    }
+                    else
+                    {
+                    @message.Sender
+                    }
+                }
+                :</span>
+            @Html.Raw(message.Body)
+        </p>
+        <em class="tn-date tn-text-note"><span class="tn-action">
+            @message.DateCreated.ToFriendlyDate()</span> <span name="operate_@(message.MessageId)" class="tn-action" style=" display:none">
+                @Html.AjaxDeleteButton(new AjaxDeleteButton()
+                     .SetConfirm("确认要删除私信内容吗")
+                     .SetText("删除")
+                     .SetTooltip("删除私信")
+                     .SetDeleteTarget("#msg_message_" + message.MessageId)
+                      .SetUrl(Url.Action("DeleteMessage","ControlPanelOperation", new { messageId = message.MessageId, session.SessionId }))
+                     .SetOnSuccessCallBack("DeleteMessageSuccess"))
+            </span>
+          
+        </em>
+    </div>
+
+        }
+
+        if (Model.Count() > 0)
+        {
+    @Html.Raw("</div>")
+    @Html.Raw("</div>")
+    @Html.Raw("</dd>")
+    @Html.Raw("</dl>")
+        }
+    }
+
+}
+<script type="text/dialog">
+    this.title("系统消息记录");
+</script>

@@ -1,0 +1,82 @@
+@{
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+
+    Regex urlRegex = new Regex(@"http://video.([\s\S]+.)?sina.com.cn/|http://sports.sina.com.cn/nba/video/movie/\d+\S+/\d.shtml", RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+    ParsedMedia entity = ParsedMedia.New();
+    entity.MediaType = MediaType.Video;
+    entity.Url = url;
+    if (urlMatch.Success)
+    {
+        string webMatter = HttpCollects.GetHTMLContent(url);
+        if (!string.IsNullOrEmpty(webMatter))
+        {
+            Regex movieRegex = new Regex(@"http://video.sina.com.cn/m/[\S]+_\d+.html|http://sports.sina.com.cn/nba/video/movie/\d+\S+/\d.shtml", RegexOptions.IgnoreCase);
+            Match movieMatch = movieRegex.Match(url);
+            if (movieMatch.Success)
+            {
+                Regex titleRegex = new Regex(@"<li class=""name"">(?<title>[^""]+)</li>", RegexOptions.IgnoreCase);
+                Match titleMatch = titleRegex.Match(webMatter);
+                if (titleMatch.Success)
+                {
+                    entity.Name = titleMatch.Groups["title"].Value;
+                }
+
+                Regex playerUrlRegex = new Regex(@"\bvid:'(?<swfOutsideUrl>[\s\S]*?)',", RegexOptions.IgnoreCase);
+                Match playerUrlMatch = playerUrlRegex.Match(webMatter);
+                if (playerUrlMatch.Success)
+                {
+                    entity.PlayerUrl = string.Format("http://p.you.video.sina.com.cn/swf/tvPlayer20120803_V4_2_39_45.swf?vid={0}", playerUrlMatch.Groups["swfOutsideUrl"].Value);
+                }
+
+                Regex thumbnailUrlRegex = new Regex(@"ÕýÔÚ²¥·Å</span>[\s]*?<img src=""(?<img>[^""]+)""", RegexOptions.IgnoreCase);
+                Match thumbnailUrlMatch = thumbnailUrlRegex.Match(webMatter);
+                if (thumbnailUrlMatch.Success)
+                {
+                    entity.ThumbnailUrl = thumbnailUrlMatch.Groups["img"].Value;
+                }
+
+                Regex descriptionRegex = new Regex(@"<li class=""drama"" id=""dramaContent""([\s\S]+)?><strong>([\s\S]+)?</strong>(?<desc>[\s\S]+?)</li>", RegexOptions.IgnoreCase);
+                Match descriptionMatch = descriptionRegex.Match(webMatter);
+                if (descriptionMatch.Success)
+                {
+                    entity.Description = descriptionMatch.Groups["desc"].Value;
+                }
+            }
+            else
+            {
+                Regex titleRegex = new Regex(@"<div class=""title"" id=""videoTitle"">(?<title>[\s\S]*?)</div>", RegexOptions.IgnoreCase);
+                Match titleMatch = titleRegex.Match(webMatter);
+                if (titleMatch.Success)
+                {
+                    entity.Name = titleMatch.Groups["title"].Value;
+                }
+
+                Regex playerUrlRegex = new Regex(@"swfOutsideUrl:'(?<swfOutsideUrl>[\s\S]*?)',", RegexOptions.IgnoreCase);
+                Match playerUrlMatch = playerUrlRegex.Match(webMatter);
+                if (playerUrlMatch.Success)
+                {
+                    entity.PlayerUrl = playerUrlMatch.Groups["swfOutsideUrl"].Value;
+                }
+
+                Regex thumbnailUrlRegex = new Regex(@"pic: '(?<img>[\s\S]*?)',", RegexOptions.IgnoreCase);
+                Match thumbnailUrlMatch = thumbnailUrlRegex.Match(webMatter);
+                if (thumbnailUrlMatch.Success)
+                {
+                    entity.ThumbnailUrl = thumbnailUrlMatch.Groups["img"].Value;
+                }
+
+                Regex descriptionRegex = new Regex(@"<td id=""videoContent"" class=""videoContent"">(?<des>[\s\S]*?)</td>|<td class=""videoContent"" id=""videoContent"">(?<des>[\s\S]*?)</td>", RegexOptions.IgnoreCase);
+                Match descriptionMatch = descriptionRegex.Match(webMatter);
+                if (descriptionMatch.Success)
+                {
+                    entity.Description = descriptionMatch.Groups["des"].Value;
+                }
+            }
+
+            ParsedMediaService parsedMediaService = new ParsedMediaService();
+            parsedMediaService.Create(entity);
+        }
+    }
+}
+@Html.Raw(Json.Encode(entity))

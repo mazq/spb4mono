@@ -1,0 +1,273 @@
+﻿@model UserProfileEditModel
+@{
+    Html.IncludeScript("~/Scripts/tunynet/tn.solarlunar.js");
+}
+@Html.HiddenFor(model => model.UserId)
+@Html.HiddenFor(model => model.AccountEmail)
+<tr>
+    <th>
+        昵称：
+    </th>
+    <td>
+        @Html.TextBoxFor(model => model.NickName, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.NickName)
+    </td>
+</tr>
+<tr>
+    <th>
+        真实姓名：
+    </th>
+    <td>
+        @Html.TextBoxFor(model => model.TrueName, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.TrueName)
+    </td>
+    <td>
+        @Html.DropDownList("PrivacyTrueName")
+    </td>
+</tr>
+<tr>
+    <th>
+        性别：
+    </th>
+    @{ViewData["Gender"] = Model.Gender;}
+    <td>
+        <ul class="tn-radiobutton-list">
+            <li class="tn-inline-list">@Html.RadioButton("Gender", (int)GenderType.Male, Model.Gender == GenderType.Male, new { @id = "Male", @class = "tn-radiobutton" })
+                <label for="Male">
+                    男</label>
+            </li>
+            <li class="tn-inline-list">@Html.RadioButton("Gender", (int)GenderType.FeMale, Model.Gender == GenderType.FeMale, new { @id = "FeMale", @class = "tn-radiobutton" })
+                <label for="FeMale">
+                    女</label>
+            </li>
+        </ul>
+    </td>
+    <td>
+        <span class="field-validation-error"><span id="gender-validation-msg"></span></span>
+    </td>
+</tr>
+<tr>
+    <th>
+        生日：
+    </th>
+    <td>
+        @{
+            IList<SelectListItem> birthdaytypes = new List<SelectListItem>();
+            birthdaytypes.Add(new SelectListItem() { Text = "公历", Value = ((int)BirthdayType.Birthday).ToString() });
+            birthdaytypes.Add(new SelectListItem() { Text = "农历", Value = ((int)BirthdayType.LunarBirthday).ToString() });
+            ViewData["birthdaytype"] = (int)Model.BirthdayType;
+        }
+        @Html.DropDownList("BirthdayType", birthdaytypes, new { @class = "tn-dropdownlist tnc-basicinfor-bday", id = "birth_type" })
+        @Html.DateTimePicker("Birthday", new DateTimePicker().SetSelectedDate(Model.Birthday).SetMinDate("-60Y").SetMaxDate("0").SetShowTime(false).MergeAdditionalOption("yearRange", "-60:+00"))
+        @Html.ValidationMessageFor(model => model.Birthday)
+    </td>
+    <td>@Html.DropDownList("PrivacyBirthday")
+    </td>
+</tr>
+<tr id="lunar_birthday" style="display: none;">
+    <th>
+    </th>
+    <td>
+        @Html.DropDownList("LunarYear", ViewData["Year"] as IList<SelectListItem>, new { id = "lunar_year", @class = "tn-dropdownlist tnc-basicinfor-bday" })
+    </td>
+</tr>
+<tr>
+    <th>
+        所在地：
+    </th>
+    <td>
+        @Html.AreaDropDownListFor(model => model.NowAreaCode, 3)
+    </td>
+    <td>
+        @Html.ValidationMessageFor(model => model.NowAreaCode)
+    </td>
+</tr>
+<tr>
+    <th>
+        家乡：
+    </th>
+    <td>@Html.AreaDropDownListFor(model => model.HomeAreaCode, 3)
+    </td>
+    <td>@Html.ValidationMessageFor(model => model.HomeAreaCode)
+    </td>
+</tr>
+<tr>
+    <th>
+        手机号码：
+    </th>
+    <td>@Html.TextBoxFor(model => model.Mobile, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.Mobile)
+    </td>
+    <td>
+        @Html.DropDownList("PrivacyMobile")
+    </td>
+</tr>
+<tr>
+    <th>
+        联系邮箱：
+    </th>
+    <td>
+        @Html.TextBoxFor(model => model.Email, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.Email)
+    </td>
+    <td>
+        @Html.DropDownList("PrivacyEmail")
+    </td>
+</tr>
+<tr>
+    <th>
+        QQ：
+    </th>
+    <td>
+        @Html.TextBoxFor(model => model.QQ, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.QQ)
+    </td>
+    <td>
+        @Html.DropDownList("PrivacyQQ")
+    </td>
+</tr>
+<tr>
+    <th>
+        MSN：
+    </th>
+    <td>
+        @Html.TextBoxFor(model => model.Msn, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.Msn)
+    </td>
+    <td>
+        @Html.DropDownList("PrivacyMSN")
+    </td>
+</tr>
+<tr>
+    <th>
+        自我介绍：
+    </th>
+    <td>
+        @Html.TextAreaFor(model => model.Introduction, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.Introduction)
+    </td>
+</tr>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //如果用户没有设置性别，则性别的单选框不给选定值
+        if ("@((int)Model.Gender)" == "0") {
+            $("input[name=Gender]").removeAttr("checked");
+        }
+
+        //清除性别验证消息
+        var interval = setInterval(function () {
+            if ($('input[name=Gender]:checked').length > 0)
+                $('#gender-validation-msg').text('');
+        }, 500);
+
+        $('#saveProfile,#save-all').click(function () {
+            if ($('input[name=Gender]:checked').length <= 0)
+                $('#gender-validation-msg').text('必须选择一个性别');
+        });
+
+        $('#birth_type').change(function () {
+            if ($(this).val() == 1) {
+                getBirthCal();
+                $('#Birthday').show();
+                $('#birth_privacy').show();
+                $('#lunar_birthday').hide();
+            }
+            else {
+                $("#Birthday").hide();
+                $('#birth_privacy').hide();
+                $('#lunar_birthday').show();
+                if ($("#Birthday").val() == '') {
+                    $('#lunar_year').unbind('change').change(function () {
+                        createLunarMonth();
+                    });
+                    createLunarMonth();
+                    createLunarDate();
+                    return false;
+                }
+                setLunar();
+            }
+
+        });
+
+        if ($('#birth_type').val() == 2) {
+            $('#birth_type').change();
+        }
+    });
+
+    function getBirthCal() {
+        var solar, year = 0, month = 0, date = 0, birth = '';
+        year = $('#lunar_year').get(0).options[$('#lunar_year').get(0).selectedIndex].value;
+        month = $('#lunar_month').length > 0 ? $('#lunar_month').get(0).options[$('#lunar_month').get(0).selectedIndex].value : 1;
+        date = $('#lunar_date').length > 0 ? $('#lunar_date').get(0).options[$('#lunar_date').get(0).selectedIndex].value : 1;
+        solar = convertLunarToSolar(year, month, date);
+        birth = solar[0] + '-' + (solar[1] > 9 ? solar[1] : ('0' + solar[1])) + '-' + (solar[2] > 9 ? solar[2] : ('0' + solar[2]));
+        $("#Birthday").val(birth);
+    }
+
+
+    /**
+    * 切换到阴历日期
+    */
+    function setLunar() {
+        var solar = $("#Birthday").val().split("-"), lunar, year = parseInt(solar[0], 10), month = parseInt(solar[1], 10), date = parseInt(solar[2], 10);
+        lunar = convertSolarToLunar(year, month, date);
+
+        $('#lunar_year').get(0).selectedIndex = lunar[0] - 1919;
+        $('#lunar_year').unbind('change').change(function () {
+            createLunarMonth();
+        });
+        createLunarMonth();
+        $('#lunar_month').get(0).selectedIndex = lunar[4] - 1;
+        $('#lunar_month').change(function () {
+            createLunarDate();
+        });
+        createLunarDate();
+        $('#lunar_date').get(0).selectedIndex = lunar[5] - 1;
+    }
+
+    /**
+    * 根据阴历年获取月份信息
+    **/
+    function createLunarMonth() {
+        var year = $('#lunar_year').get(0).options[$('#lunar_year').get(0).selectedIndex].value, leapMonth = getLeapMonth(year), str = ['<select id="lunar_month" name="LunarMonth" class="tn-dropdownlist tnc-basicinfor-bday">'], monthSum = (leapMonth == 0 ? 12 : 13), monthHash = ['正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '冬月', '腊月'];
+        if (leapMonth) {
+            monthHash.splice(leapMonth, 0, '闰' + monthHash[leapMonth - 1]);
+        }
+        for (var i = 0; i < monthSum; i++) {
+            str.push('<option value="' + (i + 1) + '">' + monthHash[i] + '</option>');
+        }
+        str.push('</select>');
+        if ($('#lunar_month').length > 0)
+            $('#lunar_month').remove();
+        $('#lunar_year').after(str.join(''));
+    }
+
+    /**
+    * 根据阴历年月获取每月天数信息
+    **/
+    function createLunarDate() {
+        var year = 0, month = 0, date = 0, days = 0, str = '<select id="lunar_date" class="tn-dropdownlist tnc-basicinfor-bday" name="LunarDay">';
+        year = $('#lunar_year').get(0).options[$('#lunar_year').get(0).selectedIndex].value;
+        month = $('#lunar_month').get(0).options[$('#lunar_month').get(0).selectedIndex].value;
+        days = getLunarMonthDays(year, month);
+
+        for (var i = 1; i <= days; i++) {
+            str += '<option value="' + i + '">' + getCapitalNum(i, false) + '</option>';
+        }
+        str += '</select>';
+        if ($('#lunar_date').length > 0)
+            $('#lunar_date').remove();
+        $('#lunar_month').after(str);
+    }
+
+    function success() {
+        location.reload(true);
+    }
+
+    function editUserPofile(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        location.reload(true);
+    }
+    $("#TrueName")[0].focus();
+</script>

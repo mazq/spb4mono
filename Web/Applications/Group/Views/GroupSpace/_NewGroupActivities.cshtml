@@ -1,0 +1,18 @@
+﻿@model Activity
+@if (Model != null)
+{
+    var applicationService = new ApplicationService();
+    var application = applicationService.Get(Model.ApplicationId);
+    string areaName = "Common";
+    if (application != null)
+    {
+        areaName = application.ApplicationKey;
+    }
+    string tenantTypeIdPart = string.Empty;
+    if (!string.IsNullOrEmpty(Model.TenantTypeId))
+    {
+        tenantTypeIdPart = Model.TenantTypeId;
+    }
+    @Html.AjaxRouteAction(string.Format("ActivityDetail_{0}_{1}", tenantTypeIdPart, Model.ActivityItemKey), new { ActivityId = Model.ActivityId, area = areaName, isOwnerActivity = true })
+    @Html.Hidden("NewActivityId", Model.ActivityId)
+}

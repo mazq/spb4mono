@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+@model LoginEditModel
+@{
+    var siteSettings = ViewData.Get<SiteSettings>("siteSettings", new SiteSettings());
+}
+<html class="tnc-manage-login-page">
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<body class="tnc-manage-login-form">
+    <div class="tn-manage-form-box">
+        <div class="tn-inner">
+            <div class="tnc-login-logo">
+                <em>@siteSettings.SiteName</em><strong>管理后台</strong>
+            </div>
+            @using (Html.BeginForm("ManageLogin", "ControlPanel", FormMethod.Post, new { @class = "tn-helper-flowfix" }))
+            {
+                @Html.HiddenFor(n => n.ReturnUrl)
+                <div class="tn-form tn-label-right">
+                    <div class="tn-tips">
+                        @{
+           StatusMessageData statusMessageData = TempData.Get<StatusMessageData>("StatusMessageData", null);
+           if (statusMessageData != null && statusMessageData.MessageType == StatusMessageType.Hint)
+           {
+                            @Html.PresetMessage(statusMessageData.MessageContent, true)
+           }
+           else
+           {
+                            @Html.StatusMessage()
+           }      
+                        }
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">
+                            帐&nbsp;&nbsp;&nbsp;号：</label>
+                        @Html.TextBoxFor(n => n.UserName, InputWidthTypes.Long)
+                        @Html.ValidationMessageFor(n => n.UserName)
+                    </div>
+                    <div class="tn-form-row">
+                        <label class="tn-form-label">
+                            密&nbsp;&nbsp;&nbsp;码：</label>
+                        @Html.TextBoxFor(n => n.Password, InputWidthTypes.Long, new RouteValueDictionary { { "type", "password" } })
+                        @Html.ValidationMessageFor(n => n.Password)
+                    </div>
+                    @Html.Captcha(VerifyScenarios.Login, true)
+                    <div class="tn-form-row tn-form-row-button">
+                        <label class="tn-form-label">
+                            &nbsp;</label>
+                        @Html.Button("登 录", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                        <a class="tn-button tn-corner-all tn-button-text-only tn-button-large tn-button-secondary" href="@SiteUrls.Instance().SiteHome()">
+                            <span class="tn-button-text">返回前台</span> </a>
+                    </div>
+                </div>
+            }
+            <div class="tn-legal">
+                @Html.Action("_Footer", "ControlPanel", new { area = "Common" })
+            </div>
+        </div>
+    </div>
+</body>
+</html>

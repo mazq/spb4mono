@@ -1,0 +1,33 @@
+﻿@{var advertising = ViewData.Get<Advertising>("advertising", null);}
+@if (advertising != null)
+{
+    var type = advertising.AdvertisingType;
+    if (type == AdvertisingType.Text && !string.IsNullOrEmpty(advertising.Body))
+    {
+    <a href="@advertising.Url" style="@advertising.TextStyle" @if (advertising.IsBlank){<text>target="_blank"</text>} title="@advertising.Name">@advertising.Body</a>
+    }
+    else if (type == AdvertisingType.Image)
+    {                
+    <a href="@advertising.Url" title="@advertising.Name" @if (advertising.IsBlank){<text>target="_blank"</text>}>
+        @if (advertising.AttachmentUrl.StartsWith("http"))
+        {
+            <img @if(advertising.Width!=0&&advertising.Height!=0){<text>width="@advertising.Width" height="@advertising.Height"</text>} alt="@advertising.Name" src="@advertising.AttachmentUrl" />
+        }
+        else
+        {
+            <img @if(advertising.Width!=0&&advertising.Height!=0){<text>width="@advertising.Width" height="@advertising.Height"</text>} alt="@advertising.Name" src="@SiteUrls.Instance().LogoUrl(advertising.AttachmentUrl, TenantTypeIds.Instance().Advertising(), ImageSizeTypeKeys.Instance().Original(),false)" />
+        }
+    </a>
+    }
+    else if (type == AdvertisingType.Flash)
+    {
+    <object id="FlashID" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+        <param name="movie" value="@advertising.AttachmentUrl" />
+        <param name="quality" value="high" />
+        <param name="wmode" value="opaque" />
+        <param name="swfversion" value="65535.0.0.0" />
+        <param name="expressinstall" value="Scripts/expressInstall.swf" />
+        <embed width="@(advertising.Width==0?"100%":advertising.Width.ToString())" height="@(advertising.Height==0?"100%":advertising.Height.ToString())" src="@advertising.AttachmentUrl" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" wmode="opaque">
+    </object>
+    }
+}

@@ -1,0 +1,45 @@
+﻿@model PagingDataSet<BarThread>
+@{  
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    ViewData["TenantTypeId"] = TenantTypeIds.Instance().Group();
+    GroupEntity group = ViewData.Get<GroupEntity>("group", null);
+    ViewData["ShowEditButton"] = true;
+}
+@section Aside{
+    @Html.AjaxAction("_TagCloud", "GroupSpaceBar", new { spaceKey = Url.SpaceKey() })
+}
+@section ContentHeader{
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_GroupHeader", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), showManageButton = false, area = "Group" })
+    </div>
+</div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-intro">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Partial("~/Applications/Bar/Views/Bar/_SectionDetail.cshtml", ViewData)
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(function () {
+        $("#blog-search").click(function () {
+            searchblog();
+        })
+        $("#blog-keyword").keydown(function (e) {
+            if (e.keyCode == 13) {
+                searchblog();
+            }
+        })
+        function searchblog() {
+            var keyword = $("#blog-keyword").val();
+            if (keyword == "") {
+                return;
+            }
+            window.location = '@(SiteUrls.Instance().GroupBarThreadSearch(Url.SpaceKey()))?keyword=' + keyword;
+        }
+    })
+</script>

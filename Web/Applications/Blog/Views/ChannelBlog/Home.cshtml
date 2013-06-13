@@ -1,0 +1,164 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    Layout = "app-home-2cols";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+    BlogSettings blogSettings = new BlogSettings();
+    IEnumerable<RecommendItem> recommendPicBlogs = ViewData.Get<IEnumerable<RecommendItem>>("recommendPicBlogs", null);
+    //Dictionary<long, BlogThread> recommendBlogsDic = ViewData.Get<Dictionary<long, BlogThread>>("recommendBlogsDic", null);
+    IEnumerable<RecommendItem> recommendWordBlogs = ViewData.Get<IEnumerable<RecommendItem>>("recommendWordItems", null);
+    int recommendCount = ViewData.Get<int>("recommendCount", 0);
+}
+@section Aside{
+    @Html.AjaxAction("_RecommendUser", "ChannelBlog", new { topNum = 5 })
+    @Html.AjaxAction("_UserRank", "ChannelBlog", new { topNum = 5 })
+    @Html.AjaxAction("_HotComment", "ChannelBlog", new { topNum = 6 })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                日志标签</h3>
+        </div>
+        <p class="tn-tags-hot">
+            @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().BlogThread(), Area = "Common" })
+        </p>
+    </div>
+    @Html.AdvertisingPosition("10100200002")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-rec">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if ((recommendPicBlogs != null && recommendPicBlogs.Count() > 0) || (recommendWordBlogs != null && recommendWordBlogs.Count() > 0))
+        {
+            <div class="spb-blog-rec-wrap tn-helper-clearfix">
+                @if (recommendPicBlogs != null && recommendPicBlogs.Count() > 0)
+                {                        
+                <div id="Barslider" class="spb-slider spb-photo-slider spb-blog-slider-rec">
+                    <div class="spb-slider-nav">
+                        <div class="spb-slider-nav-clip">
+                            <ul>
+                                @for (int i = 1; i <= recommendCount; i++)
+                                {
+                                    <li><a href="###">@i</a></li>   
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="spb-slider-panels">
+                        @foreach (var item in recommendPicBlogs)
+                        {
+                            var blogThread = item.GetBlogThread();
+                            string featuredImage =null;
+                            if (!string.IsNullOrEmpty(item.FeaturedImage))
+                            {
+                                featuredImage = SiteUrls.Instance().LogoUrl(item.FeaturedImage, TenantTypeIds.Instance().Recommend(), ImageSizeTypeKeys.Instance().Big());
+                            }
+                            else if (blogThread != null && !string.IsNullOrEmpty(blogThread.FeaturedImage))
+                            {
+                                featuredImage = SiteUrls.Instance().ImageUrl(blogThread.FeaturedImage, TenantTypeIds.Instance().BlogThread(), ImageSizeTypeKeys.Instance().Original());
+                            }
+                                
+                            if (!string.IsNullOrEmpty(featuredImage))
+                            {                             
+                            <div class="spb-slider-panel">
+                                <a href="@item.DetailUrl" target="_blank"><img alt="@item.ItemName" src="@featuredImage" /></a>
+                                <div class="spb-slider-panel-textbox">
+                                    <div class="spb-slider-panel-text">
+                                        <p>@item.ItemName</p>
+                                    </div>
+                                    <div class="spb-slider-panel-overlay"></div>
+                                </div>
+                            </div>   
+                            }
+                        }                                                               
+                    </div>
+                     @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BlogThread()))
+                    {
+                    <div class="spb-rec-btn"><a href="@SiteUrls.Instance()._ManageRecommendItems(blogSettings.RecommendPicTypeId)" class="tn-button tn-corner-all tn-button-default tn-button-icon-only" title="推荐管理" plugin="dialog"><span class="tn-icon tn-icon tn-icon-set"></span><span class="tn-button-text">推荐管理</span></a></div>
+                    }
+                    </div>
+                }
+                @if (recommendWordBlogs != null && recommendWordBlogs.Count() > 0)
+                {
+                    RecommendItem firstBlog = recommendWordBlogs.First();
+                    <div class="spb-blog-rec-list">  
+                        <ul class="tn-list">
+                            <li class=" tn-border-gray tn-border-bottom tn-list-first">
+                                <div class="tn-list-item-area-main">
+                                    <div class="tn-list-item-row tn-list-item-heading">
+                                        <div class="spb-rec-btn">
+                                            @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BlogThread()))
+                                            {
+                                                <a class="tn-button tn-corner-all tn-button-text-only tn-button-default" plugin="dialog" href="@SiteUrls.Instance()._ManageRecommendItems(blogSettings.RecommendWordTypeId)"><span class="tn-button-text">管理</span></a>
+                                            }
+                                        </div>
+                                        @{
+                                            var thread = firstBlog.GetBlogThread();
+                                            string dateCreated = null;
+                                            string author = null;
+                                            if (firstBlog.IsLink)
+                                            {
+                                                author = firstBlog.ReferrerName;
+                                                dateCreated = firstBlog.DateCreated.ToUserDateString(false);
+                                            }
+                                            else if (thread != null)
+                                            {
+                                                author = thread.Author;
+                                                dateCreated = thread.DateCreated.ToUserDateString(false);
+                                            }                                          
+                                        }
+                                        <h5 class="tn-helper-reset">
+                                            <a href="@firstBlog.DetailUrl" title="@firstBlog.ItemName" target="_blank">@firstBlog.ItemName</a>
+                                        </h5>
+                                        <p>
+                                            <a class="tn-user-name" href="@SiteUrls.Instance().Blog(UserIdToUserNameDictionary.GetUserName(firstBlog.ReferrerId))" target="_blank">@author</a>
+                                            <span class="tn-text-note">@dateCreated</span>
+                                        </p>
+                                    </div>
+                                    @if (!firstBlog.IsLink && thread != null)
+                                    {
+                                        <div class="tn-list-item-row tn-list-item-summary">
+                                            <p>@Tunynet.Utilities.HtmlUtility.TrimHtml(thread.Summary, 83)</p>
+                                        </div>
+                                    }
+                                </div>
+                            </li>
+                            @for (int i = 1; i < recommendWordBlogs.Count(); i++)
+                            {
+                                var item = recommendWordBlogs.ElementAt(i);
+                                var blogThread = item.GetBlogThread();
+                                long userId = 0;
+                                string userName = null;
+                                if (item.IsLink)
+                                {
+                                    userId = item.ReferrerId;
+                                    userName = item.ReferrerName;
+                                }
+                                else if (blogThread != null)
+                                {
+                                    userId = blogThread.UserId;
+                                    userName = blogThread.Author;
+                                }
+                                <li class=" tn-border-bottom tn-border-gray tn-border-dashed"><a href="@SiteUrls.Instance().Blog(UserIdToUserNameDictionary.GetUserName(userId))" target="_blank" class="tn-secondary-text tn-user-name tn-helper-right">@userName</a>
+                                    <a href="@item.DetailUrl" target="_blank" title="@item.ItemName">@item.ItemName</a> </li> 
+                            }
+                        </ul>                        
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-list">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Partial("_List", Model)
+    </div>
+</div>
+<script type="text/javascript">
+    $(window).load(function () {
+        $(".spb-blog-slider-rec").sliderkit({
+            cssprefix: "spb-slider",
+			shownavitems: 10,
+            autospeed: 3000,
+            circular: true
+        });
+    });	
+</script>

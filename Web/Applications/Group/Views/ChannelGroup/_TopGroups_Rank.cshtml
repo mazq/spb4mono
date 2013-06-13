@@ -1,0 +1,48 @@
+﻿@model IEnumerable<GroupEntity>
+@{
+    SortBy_Group sortBy = ViewData.Get<SortBy_Group>("SortBy", SortBy_Group.DateCreated_Desc);
+    string[] ranks = { "tnc-num-topone", "tnc-num-toptwo", "tnc-num-topthree", "tnc-num-topfore" };   
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-active-group">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+    <h3 class="tn-helper-reset">
+     活跃群组</h3>
+    </div>
+      <div class="tn-box-content tn-widget-content tn-corner-bottom ">
+       @if (Model.Count() <= 0)
+         {
+                <div class="tn-no-data">
+                    还没有活跃群组!</div> 
+         }
+         else
+         {
+        <ul class="tn-person-rank">
+         @for (int i = 0; i < Model.Count(); i++)
+         {
+            <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+                <div class="tnc-list-ranking">
+                @if (i < 3)
+                {
+                    <p class="tnc-blog-num @ranks[i]">
+                        <span class="tnc-charts-num">@(i + 1)</span></p>
+                }
+                else
+                {
+                    <p class="tnc-blog-num @ranks[3]">
+                            <span class="tnc-charts-num">@(i + 1)</span></p>
+                }
+                </div>
+                <div class="tnc-list-topic">
+                    <div class="tn-avatar-mini">
+                        <a href="@SiteUrls.Instance().GroupHome(Model.ElementAt(i).GroupKey)" target="_blank"><img src="@SiteUrls.Instance().LogoUrl(Model.ElementAt(i).Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" width="50px" alt="@Model.ElementAt(i).GroupName"/></a>
+                    </div>
+                    <a title="@Model.ElementAt(i).GroupName" target="_blank" href="@SiteUrls.Instance().GroupHome(Model.ElementAt(i).GroupKey)" class="tn-user-name">@StringUtility.Trim(Model.ElementAt(i).GroupName,8)</a>
+                </div>
+                <p class="tnc-list-number">
+                   @Model.ElementAt(i).Last7DaysHitTimes
+                </p>
+            </li> 
+         } 
+        </ul>}
+    </div>
+</div>

@@ -1,0 +1,55 @@
+﻿@{
+    string announcement = ViewData.Get<string>("announcement", string.Empty);
+}
+@using (Html.BeginAjaxForm("_EditAnnouncement", "GroupSpace", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success" }, new { id = "editAnnouncement" }))
+{    
+    <div class="tnc-edit-intro">
+        <div class="tnc-dailog-pd">
+            <div class="tn-form">
+                <div class="tn-form-row">
+                    <textarea id="announcement" class="tn-textarea tn-input-long tn-border-gray" rows="" cols="" name="announcement">@announcement</textarea><br />
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "editAnnouncementButton" })
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    </div>
+}
+<script type="text/dialog">
+ this.title("编辑公告");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#editAnnouncementButton").click(function () {
+            if (!$("#editAnnouncement").valid())
+                return false;
+        });
+        $("textarea#announcement").focus();
+
+        $("#editAnnouncement").validate({
+            rules: {
+                announcement: {
+                    maxlength: 500
+                }
+            },
+            messages: {
+                announcement: {
+                    maxlength: "最多输入500个汉字"
+                }
+            }
+        });
+    })
+    function success(data) {
+        $("#shortAnnouncement").html(data.shortAnnouncement);
+        $("#longAnnouncement").html(data.longAnnouncement);
+        if (data.longAnnouncement.length > 100) {
+            $("#announcementSwitchButton").show();
+        }
+        else {
+            $("#announcementSwitchButton").hide();
+        }
+        art.dialog.tips("更新公告操作成功", 1.5, 1);
+    }
+</script>

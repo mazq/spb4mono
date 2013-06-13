@@ -1,0 +1,33 @@
+﻿@model  PagingDataSet<User>
+@{
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, IEnumerable<string>> tagNameDic = ViewData["tagNameDic"] as Dictionary<long, IEnumerable<string>>;
+}
+ 
+@foreach (var user in Model)
+{
+    <li class="tn-list-item tnui-user-id" data-user-id="@user.UserId">
+        <div class="tn-inner tn-border-gray tn-helper-clearfix">
+            <div class="tn-list-item-area-left">
+                @Html.ShowUserAvatar(user, AvatarSizeType.Small, false, HyperLinkTarget._blank)
+            </div>
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row tn-list-item-heading">
+                    @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserName), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+                </div>
+                <div class="tn-list-item-row tn-same">
+                    @{
+                    IEnumerable<string> tags = tagNameDic[user.UserId];
+                    int count = tags.Count();
+                     }
+                    @count<text>个共用标签：</text>
+                    @foreach (string tag in tags)
+                    {
+                    <a href="@SiteUrls.Instance().UserSearch(tag, UserSearchRange.TAG)" target="_blank">@tag</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </li>
+}
+@Html.Hidden("pageCount", @Model.PageCount)

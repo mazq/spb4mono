@@ -1,0 +1,78 @@
+﻿@model IEnumerable<Visit>
+@{
+    bool isSameUser = ViewData.Get<bool>("isSameUser", false);
+    bool isAnonymousUser = ViewData.Get<bool>("isAnonymousUser", false);
+    long currentUserId = ViewData.Get<long>("currentUserId", 0);     
+}
+<div id="SpaceVisitListDiv">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            最近访客</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-mini-avatar-list">
+            @if (Model == null || Model.Count() == 0)
+            {
+                @Html.Raw("暂无访客")
+            
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                <li class="tn-helper-clearfix" name="spaceLastVisitLi">
+                    <div class="tn-avatar-mini">
+                        @Html.ShowUserAvatar(item.VisitorId, AvatarSizeType.Small, true, HyperLinkTarget._blank)</div>
+                    <div class="tn-info">
+                        <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(item.VisitorId)" target="_blank" title="@item.Visitor">
+                            @StringUtility.Trim(item.Visitor, 10)</a>
+                        @if (isSameUser || (currentUserId == item.VisitorId))
+                        {
+                            <a href="@SiteUrls.Instance().DeleteSpaceVisitors(Url.SpaceKey())" class="tn-icon tn-smallicon-cross" title="清除本次访问" id="deleteVisit_@(item.VisitorId)" data-id = "@(item.Id)">
+                                删除</a>
+                        }
+                        <em class="tn-text-note tn-date">@item.LastVisitTime.ToFriendlyDate(false)</em>
+                    </div>
+                </li>
+            
+                }
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("a[id^='deleteVisit_']").click(function (e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            var url = $(this).attr("href");
+            $this = $(this);
+            art.dialog.confirm("确认删除该条访客记录？", function () {
+                $.ajax({
+                    type: "POST",
+                    url: $this.attr("href"),
+                    cache: false,
+                    data: { id: id },
+                    success: function (data) {
+                        $("#SpaceVisitListDiv").replaceWith(data);
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+
+
+
+        $('li[name="spaceLastVisitLi"]').hover(
+        function () {
+            $(this).addClass('tn-bg-gray');
+        },
+        function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+
+    })
+</script>

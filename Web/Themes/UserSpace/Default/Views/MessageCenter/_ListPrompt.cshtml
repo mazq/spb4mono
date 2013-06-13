@@ -1,0 +1,53 @@
+﻿<div id="promp-div">
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+        </b>
+    </div>
+    <div class="tn-bubble-content tn-widget-content tn-border-gray">
+        @Html.Action("_ListPromptMessages", new { itemCount = ViewData["_ListPromptMessages"] })
+        @Html.Action("_ListPromptInvitation", new { itemCount = ViewData["_ListPromptInvitation"] })
+        @Html.Action("_ListPromptNotices", new { itemCount = ViewData["_ListPromptNotices"] })
+        @{
+            int allCount = ViewData.Get<int>("AllCount", 0);
+        }
+        <div class="tn-no-data" style="@(allCount > 0 ? "display: none;" : "") ">
+            暂时没有需要处理的消息。</div>
+    </div>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            $("a[id^='promp-item-'],a[id^='promp-all-']").die('click').live('click', function (e) {
+                $this = $(this);
+                $.post($(this).attr("href"), function (data) {
+                    $div = $("div[id='promp-div']");
+                    $div.after(data);
+                    $div.remove();
+                    var count = $('span.tn-msg-bubble').text();
+
+                    var tempCount = 1;
+                    if ($this.is("a[id^='promp-all-']")) {
+                        //已经处理的统计数
+                        var tempCount = $this.parents('div.tnc-prompt-wrap').find('li').length;
+                    }
+
+                    if (count > tempCount) {
+                        count = count - tempCount;
+                        $('span.tn-msg-bubble').text(count)
+                    }
+                    else {
+                        $('span.tn-msg-bubble').remove();
+                    }
+
+                    if ($("div[id='promp-div']").find('div[id^=promp]').children().length == 0) {
+                        $('div.tn-no-data', $("div[id='promp-div']")).show();
+                    }
+                });
+                return false;
+            });
+            $('#promp-div li').hover(function () {
+                $(this).addClass('tn-bg-gray');
+            }, function () {
+                $(this).removeClass('tn-bg-gray');
+            });
+        });
+    </script>
+</div>

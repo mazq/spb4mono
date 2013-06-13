@@ -1,0 +1,76 @@
+﻿@model RecommendItemTypeEditModel
+@{
+    SelectList tenantList = ViewData.Get<SelectList>("tenantList", null);
+    Dictionary<string, string> tenantDic = tenantList.ToDictionary(n => n.Value, n => n.Text);
+}
+@{
+    RouteValueDictionary htmlattr = new RouteValueDictionary();
+}
+<div id="editRecommentTypeDialog" class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_EditRecommendType", "ControlPanelOperation", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right tnc-label-short">
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.TypeId)
+                    @Model.TypeId
+                    @Html.HiddenFor(n => n.TypeId)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Name)
+                    @Html.TextBoxFor(n => n.Name, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.Name)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n=>n.TenantTypeId)
+                    @if (tenantDic.ContainsKey(Model.TenantTypeId))
+                    {
+                        @tenantDic[Model.TenantTypeId]
+                    }
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.HasFeaturedImage)
+                    <ul class="tn-radiobutton-list">
+                      <li class="tn-inline-list">
+                        @Html.RadioButton("HasFeaturedImage", true.ToString().ToLower(), Model.HasFeaturedImage, new { @id = "IsEnabled1", @class = "tn-radiobutton" })
+                        <label for="IsEnabled1">使用</label>
+                      </li>
+                      <li class="tn-inline-list">
+                        @Html.RadioButton("HasFeaturedImage", false.ToString().ToLower(), !Model.HasFeaturedImage, new { @id = "IsEnabled2", @class = "tn-radiobutton" })
+                        <label for="IsEnabled2">不使用</label>
+                      </li>
+                    </ul>
+                    @Html.ValidationMessageFor(n => n.HasFeaturedImage)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Description)
+                    @Html.TextAreaFor(n => n.Description, InputWidthTypes.Long)
+                    @Html.ValidationMessageFor(n => n.Description)
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+       
+    }
+
+      <script type="text/dialog">
+    
+      this.title("编辑推荐类别");
+    
+    </script>
+    <script type="text/javascript" language="javascript">
+
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(); });
+        }
+        function OnErrorCallBack(data) {
+            alert(data.MessageContent, function () {
+                window.location.reload();
+            })
+        }
+    </script>
+</div>

@@ -1,0 +1,13 @@
+﻿@model IEnumerable<ApplicationStatisticData>
+<div class="tnc-settings-num">
+    @foreach (var data in Model)
+    {
+        if (data.Value <= 0)
+        {
+            continue;
+        }
+        <span>@Html.Raw(string.Format(data.DescriptionPattern, Html.Link(data.Value.ToString(), data.Url, string.Empty).ToHtmlString()))
+        </span>
+    
+    }
+</div>

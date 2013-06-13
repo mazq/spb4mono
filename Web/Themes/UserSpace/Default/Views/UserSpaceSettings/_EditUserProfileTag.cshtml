@@ -1,0 +1,38 @@
+﻿<div class="tnc-set-tags tn-border-gray tn-helper-clearfix">
+    <div class="tnc-my-tags">
+        <div class="tn-text-heading">我的标签</div>
+        <div id="MyTagsDiv">
+            @Html.Action("_ListMyUserTags", new { spaceKey = Url.SpaceKey(), area = "Common" })
+        </div>
+    </div>
+    <div class="tnc-tags tn-border-gray tn-border-left">
+        @Html.Action("_ListUsersTags", new { spaceKey = Url.SpaceKey(), area = "Common" })
+        @using (Html.BeginAjaxForm("CreateUserTag", "UserSpaceSettings", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("success").SetOnErrorCallBack("error"), new { id = "createUserTagForm" }))
+        {
+            <div class="tnc-fill-tags">
+                @Html.TextBox("TagName", "", new { @class = "tn-textbox tn-input-medium tn-border-gray", id = "myTagTextBox", placeholder = "请输入标签", watermark = "请输入标签" })
+                @Html.Button("贴上自己的标签", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "createMyTag" })
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+
+    function success(data) {
+        $("#MyTagsDiv").load('@SiteUrls.Instance()._ListMyUserTags(Url.SpaceKey())');
+        $("#myTagTextBox").attr("value", '');
+    }
+    function error(response) {
+        var data = jQuery.parseJSON(response);
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    $("#createMyTag").click(function () {
+        if ($("#myTagTextBox").val()) {
+            return true;
+        }
+        else {
+            art.dialog.tips("标签框为空不能提交", 1.5, 0);
+            return false;
+        }
+    })
+</script>

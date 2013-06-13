@@ -1,0 +1,9 @@
+﻿<h2 class="tn-pagename">
+    <span class="tn-icon-special tn-special-icon-group"></span><a href="@SiteUrls.Instance().ChannelGroupHome()" title="群组首页">群组</a>
+</h2>
+<div class="tn-shortcut">
+    @if (new Authorizer().Group_Create())
+    { 
+        @Html.Button("创建群组", ButtonTypes.Link, HighlightStyles.Lite, ButtonSizes.Default, IconTypes.SmallAdd, url: SiteUrls.Instance().CreateGroup())
+    }
+</div>

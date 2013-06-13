@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Announcement>
+@{
+    string displayArea = ViewData.Get<string>("displayArea", string.Empty);
+}
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="tn-cue-highlight tn-corner-all tn-message-box" id="announcementcontainer">
+        <div class="spb-text-slider-wrap">
+            <div class="spb-slider spb-text-slider tn-helper-clearfix">
+                <div class="spb-text-slider-icon">
+                    <a class="tn-icon tn-icon-notice" href="@SiteUrls.Instance().AnnouncementList()" title="所有公告"></a>
+                </div>
+                <div class="spb-slider-panels spb-slider-nav-clip">
+                    @foreach (var announcement in Model)
+                    {                    
+                        <div class="spb-slider-panel">
+                            <a class="tn-icon tn-smallicon-cross" href="javascript:void(0)" data-announcement-id="@announcement.Id;@announcement.LastModified" id="closeAnnouncement-@announcement.Id"></a>
+                            @if (announcement.IsHyperLink)
+                            {                        
+                                <a data-announcement-id="@announcement.Id;@announcement.LastModified" id="announcement-@announcement.Id" href="@announcement.HyperLinkUrl" title="@announcement.Subject" target="_blank" style="@(announcement.SubjectStyle)">@(displayArea=="Home" ? HtmlUtility.TrimHtml(announcement.Subject, 51):HtmlUtility.TrimHtml(announcement.Subject, 36))</a>
+                            }
+                            else
+                            {
+                                if (announcement.EnabledDescription)
+                                {                     
+                                <a data-announcement-id="@announcement.Id;@announcement.LastModified" id="announcement-@announcement.Id" href="@SiteUrls.Instance().AnnouncementDetail(announcement.Id)" title="@announcement.Subject" target="_blank" style="@(announcement.SubjectStyle)">@(displayArea == "Home" ? HtmlUtility.TrimHtml(announcement.Subject, 51) : HtmlUtility.TrimHtml(announcement.Subject, 36))</a>
+                                }
+                                else
+                                { 
+                                <p data-announcement-id="@announcement.Id;@announcement.LastModified" id="announcement-@announcement.Id" title="@announcement.Subject" style="@(announcement.SubjectStyle)">@(displayArea=="Home" ? HtmlUtility.TrimHtml(announcement.Subject, 51):HtmlUtility.TrimHtml(announcement.Subject, 36))</p>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>   
+}
+<script type="text/javascript">
+    $(window).load(function () {
+        $(".spb-text-slider").sliderkit({
+            auto: true,
+            circular: true,
+            cssprefix: "spb-slider",
+            shownavitems: 1,
+            panelfx: "sliding",
+            panelfxspeed: 400,
+            panelfxeasing: "easeOutCirc",
+            mousewheel: false,
+            verticalnav: true,
+            verticalslide: true
+        });
+    });
+
+    $(document).ready(function () {
+        //设置浏览cookie
+        $("a[id^='announcement-']").click(function (e) {
+            setRead($(this).data("announcementId"));
+        });
+        //关闭单条公告
+        $("a[id^='closeAnnouncement-']").click(function () {
+            setRead($(this).data("announcementId"));
+            $(this).parent().remove();
+            if ($("div.spb-slider-panel", $("#announcementcontainer")).length == 0) {
+                $("#announcementcontainer").remove();
+                return false;
+            }
+            var mySliderkit = $(".spb-text-slider").data("sliderkit");
+            mySliderkit.stepForward();
+            while ($(".spb-slider-panel-active").length == 0) {
+                mySliderkit.stepForward();
+            }
+            return false;
+        });
+
+        //设置已读
+        function setRead(id) {
+            var cookieVal = $.cookie("AnnouncementList");
+            if (cookieVal == null) {
+                cookieVal = "";
+            }
+            cookieVal += "," + id;
+            $.cookie("AnnouncementList", cookieVal, { expires: 7, path: '/' });
+        }
+    });
+</script>

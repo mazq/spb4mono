@@ -1,0 +1,42 @@
+﻿@model  IEnumerable<User>
+@{    
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, string> interestedDic = ViewData["interestedDic"] as Dictionary<long, string>;
+}
+@foreach (var user in Model)
+{
+<li class="tn-list-item tnui-user-id" data-user-id="@user.UserId">
+    <div class="tn-inner tn-border-gray tn-helper-clearfix">
+        <div class="tn-list-item-area-left">
+            @Html.ShowUserAvatar(user, AvatarSizeType.Small, false, HyperLinkTarget._blank)
+        </div>
+        <div class="tn-list-item-area-main">
+            <div class="tn-list-item-row tn-list-item-heading">
+                @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserName), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+            </div>
+            <div class="tn-list-item-row tn-same">
+                @{
+                    string interested = interestedDic[user.UserId];
+                }
+                @if ("WithFollows".Equals(interested))
+                {
+                    <text>有共同关注的人</text>
+                }
+                else if ("WithCompanys".Equals(interested))
+                {
+                    <text>供职于同一公司</text>
+                }
+                else if ("WithSchools".Equals(interested))
+                {
+                    <text>毕业于同一学校</text>
+                }
+                else if ("WithTags".Equals(interested))
+                {
+                    <text>使用了相同标签</text>
+                }
+            </div>
+        </div>
+    </div>
+</li>
+}
+@Html.Hidden("pageCount", ViewData.Get<int>("pageCount",0))

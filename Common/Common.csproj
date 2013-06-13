@@ -1,0 +1,549 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4FE558F7-2E94-49C3-8A8A-50F52FBFBBC6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Spacebuilder.Common</RootNamespace>
+    <AssemblyName>Spacebuilder.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Spacebuilder.Common.XML</DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Spacebuilder.Common.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration">
+      <HintPath>..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mvc">
+      <HintPath>..\packages\Autofac.Mvc3.2.6.3.862\lib\NET40\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="C5">
+      <HintPath>..\packages\Quartz.2.0.1\lib\net40\C5.dll</HintPath>
+    </Reference>
+    <Reference Include="CodeKicker.BBCode">
+      <HintPath>..\packages\BBCode.5.0.0\lib\CodeKicker.BBCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres">
+      <HintPath>..\packages\combres.2.2.2.6\lib\net40\Combres.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres.Mvc">
+      <HintPath>..\packages\combres.mvc.2.2.2.6\lib\net40\Combres.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\packages\Common.Logging.2.0.0\lib\2.0\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching">
+      <HintPath>..\packages\EnyimMemcached.2.11\lib\net35\Enyim.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Fasterflect">
+      <HintPath>..\packages\fasterflect.2.1.0\lib\net40\Fasterflect.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.GData.Client">
+      <HintPath>..\packages\Google.GData.Client.2.1.0.0\lib\Google.GData.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.GData.Contacts">
+      <HintPath>..\packages\Google.GData.Contacts.2.1.0.0\lib\Google.GData.Contacts.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.GData.Extensions">
+      <HintPath>..\packages\Google.GData.Extensions.2.1.0.0\lib\Google.GData.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.0\lib\Net40\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.1.2.11\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net">
+      <HintPath>..\packages\Lucene.Net.2.9.4.2\lib\net40\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MSNPSharp">
+      <HintPath>..\packages\MSNPSharp.3.2.1.2668\lib\MSNPSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MSNPSharp.XmlSerializers">
+      <HintPath>..\packages\MSNPSharp.3.2.1.2668\lib\MSNPSharp.XmlSerializers.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NPinyin">
+      <HintPath>..\packages\NPinyin.0.2.0\lib\NPinyin.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu">
+      <HintPath>..\packages\PanGu.2.3.1.0\lib\PanGu.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.HighLight">
+      <HintPath>..\packages\PanGu.2.3.1.0\lib\PanGu.HighLight.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.Lucene.Analyzer">
+      <HintPath>..\packages\PanGu.2.3.1.0\lib\PanGu.Lucene.Analyzer.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz">
+      <HintPath>..\packages\Quartz.2.0.1\lib\net40\Quartz.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine">
+      <HintPath>..\packages\RazorEngine.3.0.8\lib\net40\RazorEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Spacebuilder.Identifier, Version=4.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Spacebuilder.Identifier.1.0.0\Spacebuilder.Identifier.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Messaging" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tunynet.Infrastructure">
+      <HintPath>..\packages\Tunynet.Infrastructure.1.0.0\lib\net40\Tunynet.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Tunynet.License">
+      <HintPath>..\packages\Tunynet.License.2.0.0\lib\net40\Tunynet.License.dll</HintPath>
+    </Reference>
+    <Reference Include="Tunynet.MvcExtensions">
+      <HintPath>..\packages\Tunynet.MvcExtensions.1.0.0\lib\net40\Tunynet.MvcExtensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Controllers\Filters\HttpCompressAttribute.cs" />
+    <Compile Include="Controllers\Filters\PauseSiteCheckAttribute.cs" />
+    <Compile Include="Email\EmailExtensions.cs" />
+    <Compile Include="Email\EmailServiceExtensions.cs" />
+    <Compile Include="Email\SmtpSettingsChild.cs" />
+    <Compile Include="EventModules\SupportOpposeEventModule.cs" />
+    <Compile Include="Extensions\ApplicationIds.cs" />
+    <Compile Include="Extensions\ApplicationKeys.cs" />
+    <Compile Include="Implementation\CommentAtUserAssociatedUrlGetter.cs" />
+    <Compile Include="Implementation\Settings\PauseSiteSettingsManager.cs" />
+    <Compile Include="Mvc\DataAnnotations\IsTrueAttribute.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.DisplayHtmlEditorContent.cs" />
+    <Compile Include="Search\ISearchEngineService.cs" />
+    <Compile Include="Statistics\CNZZStatisticsService.cs" />
+    <Compile Include="Statistics\StatisticsAccount.cs" />
+    <Compile Include="Tasks\ITaskService.cs" />
+    <Compile Include="Tasks\TaskServiceWCF.cs" />
+    <Compile Include="Tasks\TaskServiceClient.cs" />
+    <Compile Include="User\DefaultUserIdToNickNameDictionary.cs" />
+    <Compile Include="User\UserIdToNickNameDictionary.cs" />
+    <Compile Include="Utilities\Extensions\ModelStateDictionaryExtension.cs" />
+    <Compile Include="ViewModels\ManageMessagesEditModel.cs" />
+    <Compile Include="ViewModels\PauseSiteSettingsEditModel.cs" />
+    <Compile Include="ViewModels\ReminderSettingsEditModel.cs" />
+    <Compile Include="ViewModels\SmtpSettingsEditModel.cs" />
+    <Compile Include="ViewModels\TaskDetailEditModel.cs" />
+    <Compile Include="Identification\IdentificationService.cs" />
+    <Compile Include="Identification\IdentificationType.cs" />
+    <Compile Include="Identification\Identification.cs" />
+    <Compile Include="Identification\IdentificationQuery.cs" />
+    <Compile Include="Identification\Repositories\IdentificationTypeRepository.cs" />
+    <Compile Include="Identification\Repositories\IIdentificationTypeRepository.cs" />
+    <Compile Include="Identification\Repositories\IdentificationRepository.cs" />
+    <Compile Include="Identification\Repositories\IIdentificationRepository.cs" />
+    <Compile Include="Comment\CommentBodyProcessor.cs" />
+    <Compile Include="Controllers\ChannelController.cs" />
+    <Compile Include="Controllers\ControlPanelController.cs" />
+    <Compile Include="Controllers\FindUserController.cs" />
+    <Compile Include="Controllers\FollowController.cs" />
+    <Compile Include="Controllers\MessageCenterController.cs" />
+    <Compile Include="Controllers\UserSpaceController.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\UserSpaceSettingsController.cs" />
+    <Compile Include="Controllers\HonourController.cs" />
+    <Compile Include="Controllers\ControlPanelOperationController.cs" />
+    <Compile Include="Controllers\ControlPanelSettingsController.cs" />
+    <Compile Include="Controllers\ControlPanelUserController.cs" />
+    <Compile Include="Controllers\ControlPanelToolController.cs" />
+    <Compile Include="Controllers\ControlPanelContentController.cs" />
+    <Compile Include="EmailAddress\EmailAddressService.cs" />
+    <Compile Include="EmailAddress\MailAddress.cs" />
+    <Compile Include="EmailAddress\Repositories\IMailAddressRepository.cs" />
+    <Compile Include="EmailAddress\Repositories\MailAddressRepository.cs" />
+    <Compile Include="Email\EmailBuilderExtensions.cs" />
+    <Compile Include="Email\EmailServiceProvider.cs" />
+    <Compile Include="Email\EmailServiceProviderService.cs" />
+    <Compile Include="Email\EmailSettingsManager.cs" />
+    <Compile Include="EventModules\AtUserEventModule.cs" />
+    <Compile Include="EventModules\CommentEventModule.cs" />
+    <Compile Include="EventModules\CreateInviteFriendRecordEventModule.cs" />
+    <Compile Include="EventModules\RecommendEventModule.cs" />
+    <Compile Include="EventModules\RegisterEventModule.cs" />
+    <Compile Include="EventModules\DeleteUserEventModule.cs" />
+    <Compile Include="EventModules\PermissionOperationLogEventModule.cs" />
+    <Compile Include="EventModules\RoleEventModule.cs" />
+    <Compile Include="EventModules\SetStatusInvitationEventModule.cs" />
+    <Compile Include="EventModules\TagIndexEventModule.cs" />
+    <Compile Include="EventModules\UserEmailEventModule.cs" />
+    <Compile Include="EventModules\UserIndexEventModule.cs" />
+    <Compile Include="EventModules\UserOperationLogEventModule.cs" />
+    <Compile Include="EventModules\UserProfileEventModule.cs" />
+    <Compile Include="EventModules\FollowEventModule.cs" />
+    <Compile Include="EventModules\FollowUserIndexEventModule.cs" />
+    <Compile Include="EventModules\UserEventModule.cs" />
+    <Compile Include="EventModules\UserBlockedObjectEventModule.cs" />
+    <Compile Include="Extensions\ActivityItemKeys.cs" />
+    <Compile Include="Extensions\ApplicationManagementOperationExtensions.cs" />
+    <Compile Include="Extensions\CategoryServiceExtensions.cs" />
+    <Compile Include="Extensions\CommentExtensions.cs" />
+    <Compile Include="Extensions\InvitationTypeKeysExtension.cs" />
+    <Compile Include="Extensions\NavigationExtensions.cs" />
+    <Compile Include="Extensions\NoticeExtensions.cs" />
+    <Compile Include="Extensions\PresentAreaNavigationExtensions.cs" />
+    <Compile Include="Extensions\AccountTypeExtension.cs" />
+    <Compile Include="Handlers\AttachmentDownloadHandler.cs" />
+    <Compile Include="Handlers\CaptchaHttpHandler.cs" />
+    <Compile Include="Handlers\CustomStyleHandler.cs" />
+    <Compile Include="Handlers\ImageHandler.cs" />
+    <Compile Include="Handlers\UserAvatarHandler.cs" />
+    <Compile Include="Handlers\DownloadFileHandlerBase.cs" />
+    <Compile Include="Handlers\LogoHandler.cs" />
+    <Compile Include="Handlers\AttachmentAuthorizeHandler.cs" />
+    <Compile Include="ImpeachReport\ImpeachReason.cs" />
+    <Compile Include="ImpeachReport\ImpeachReportEntity.cs" />
+    <Compile Include="ImpeachReport\ImpeachReportService.cs" />
+    <Compile Include="ImpeachReport\Repositories\IImpeachReportRepository.cs" />
+    <Compile Include="ImpeachReport\Repositories\ImpeachReportRepository.cs" />
+    <Compile Include="Implementation\AccountBindings\Authenticators\QQOAuthAuthenticator.cs" />
+    <Compile Include="Implementation\AccountBindings\Authenticators\CommonOAuthAuthenticator.cs" />
+    <Compile Include="Implementation\AccountBindings\ThirdAccountGetter.cs" />
+    <Compile Include="Implementation\AccountBindings\QQAccountGetter.cs" />
+    <Compile Include="Implementation\AccountBindings\RenrenAccountGetter.cs" />
+    <Compile Include="Implementation\AccountBindings\SinaWeiboAccountGetter.cs" />
+    <Compile Include="Implementation\AccountBindings\ThirdAccountGetterFactory.cs" />
+    <Compile Include="Implementation\AccountBindings\ThirdUser.cs" />
+    <Compile Include="Implementation\ApplicationStatisticData\ApplicationStatisticDataKeys.cs" />
+    <Compile Include="Implementation\ApplicationStatisticData\ApplicationStatisticItem.cs" />
+    <Compile Include="Implementation\ApplicationStatisticData\SystemInfo.cs" />
+    <Compile Include="Implementation\DefaultIdGenerator.cs" />
+    <Compile Include="Implementation\EmailContactAccessor\126ContactAccessor.cs" />
+    <Compile Include="Implementation\EmailContactAccessor\163ContactAccessor.cs" />
+    <Compile Include="Implementation\EmailContactAccessor\GmailContactAccessor.cs" />
+    <Compile Include="Implementation\EmailContactAccessor\MsnContactAccessor.cs" />
+    <Compile Include="Implementation\IBodyProcessor.cs" />
+    <Compile Include="Implementation\LogoConfigManager.cs" />
+    <Compile Include="Implementation\OperatorInfoGetter.cs" />
+    <Compile Include="Implementation\RatingSettingsManageCancel.cs" />
+    <Compile Include="Implementation\ReminderInfoTypeAccessor\InvitationReminderAccessor.cs" />
+    <Compile Include="Implementation\ReminderInfoTypeAccessor\MessageReminderAccessor.cs" />
+    <Compile Include="Implementation\ReminderInfoTypeAccessor\NoticeReminderAccessor.cs" />
+    <Compile Include="Implementation\ReminderSender\EmailReminderSender.cs" />
+    <Compile Include="Implementation\Settings\AreaSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\AttachmentSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\CommentSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\EmotionSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\LogoSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\InvitationSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\InviteFriendSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\LinktimelinessSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\NoticeSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\PointSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\PrivacySettingsManager.cs" />
+    <Compile Include="Implementation\Settings\ReminderSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\Repositories\ISettingsRepository.cs" />
+    <Compile Include="Implementation\Settings\Repositories\SettingsRepository.cs" />
+    <Compile Include="Implementation\Settings\ShortUrlSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\SiteSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\UserProfileSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\UserSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\MessageSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\ActivitySettingsManager.cs" />
+    <Compile Include="Implementation\Settings\AttitudeSettingsManager.cs" />
+    <Compile Include="Implementation\Settings\AttitudeOnlySupportSettingsManager.cs" />
+    <Compile Include="Implementation\ApplicationStatisticData\IApplicationStatisticDataGetter.cs" />
+    <Compile Include="Implementation\ApplicationStatisticData\ApplicationStatisticData.cs" />
+    <Compile Include="Implementation\Settings\TagSettingsManager.cs" />
+    <Compile Include="Implementation\UrlShortner\GoogleUrlShortner.cs" />
+    <Compile Include="Links\LinkEntity.cs" />
+    <Compile Include="Links\LinkService.cs" />
+    <Compile Include="Links\LinkEnum.cs" />
+    <Compile Include="Links\OwnerTypes.cs" />
+    <Compile Include="Links\Repositories\ILinkRepository.cs" />
+    <Compile Include="Links\Repositories\LinkRepository.cs" />
+    <Compile Include="Controllers\Filters\AnonymousBrowseCheckAttribute.cs" />
+    <Compile Include="Mvc\Attributes\BuildNavigationRouteDataAttribute.cs" />
+    <Compile Include="Mvc\Attributes\NoFilterWordAttribute.cs" />
+    <Compile Include="Mvc\Attributes\TrackOnlineUserAttribute.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AdvertisingPosition.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.ActivityOperation.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AddFollowedUser.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AreaSelector.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AtUser.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AuditStatusIcon.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.PrivacyStatusIcon.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.SupportOppose.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.PageSizeDropdownList.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.SetTitleImage.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.UserRank.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.ContentTypeThumbnail.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.UserSelector.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.TagSelector.cs" />
+    <Compile Include="Mvc\Html\HtmlHelperIdentificationTypeExtensions.cs" />
+    <Compile Include="Mvc\Html\MvcHead.cs" />
+    <Compile Include="Mvc\Html\PageResourceExtensions.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.CategoryDropDownList.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.PagingResults.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.BodyAppCssClass.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.ShareToThird.cs" />
+    <Compile Include="Mvc\ModelBinder\CookieValueProviderFactory.cs" />
+    <Compile Include="Mvc\ModelBinder\CustomModelBinder.cs" />
+    <Compile Include="Search\ClauseScrubber.cs" />
+    <Compile Include="Search\LuceneSearchBuilder.cs" />
+    <Compile Include="Search\SearchEngineServiceClient.cs" />
+    <Compile Include="Search\SearchEngineService.cs" />
+    <Compile Include="Search\Tasks\FollowUserIndexTask.cs" />
+    <Compile Include="Search\Tasks\LuceneIndexCommitTask.cs" />
+    <Compile Include="Tag\Search\TagIndexDocument.cs" />
+    <Compile Include="Tag\Search\TagSearcher.cs" />
+    <Compile Include="UI\ControlPanelThemeSelector.cs" />
+    <Compile Include="Mvc\Url\UrlHelperExtension.cs" />
+    <Compile Include="Search\ISearcher.cs" />
+    <Compile Include="Search\SearcherFactory.cs" />
+    <Compile Include="Search\Tasks\LuceneIndexOptimizeTask.cs" />
+    <Compile Include="UI\CustomStyle\BackgroundImageStyle.cs" />
+    <Compile Include="UI\CustomStyle\CustomStyle.cs" />
+    <Compile Include="UI\CustomStyle\CustomStyleEntity.cs" />
+    <Compile Include="UI\CustomStyle\CustomStyleService.cs" />
+    <Compile Include="UI\CustomStyle\Repositories\ICustomStyleRepository.cs" />
+    <Compile Include="UI\CustomStyle\Repositories\CustomStyleRepository.cs" />
+    <Compile Include="User\Configuration\UserRecommendUrlGetter.cs" />
+    <Compile Include="User\Configuration\UserTagUrlGetter.cs" />
+    <Compile Include="User\CropAvatarEventArgs.cs" />
+    <Compile Include="User\RecommendItemExtensionByUser.cs" />
+    <Compile Include="User\Search\FollowUserSearcher.cs" />
+    <Compile Include="User\Search\UserFullTextQuery.cs" />
+    <Compile Include="User\Search\UserIndexDocument.cs" />
+    <Compile Include="User\Search\UserSearcher.cs" />
+    <Compile Include="User\UserProfileExtension.cs" />
+    <Compile Include="Utilities\Captcha\CaptchaVerifyAttribute.cs" />
+    <Compile Include="Mvc\Attributes\ExceptionHandlerAttribute.cs" />
+    <Compile Include="Controllers\Filters\UserSpaceAuthorizeAttribute.cs" />
+    <Compile Include="Controllers\Filters\ManageAuthorizeAttribute.cs" />
+    <Compile Include="Mvc\Html\AjaxDeleteButton.cs" />
+    <Compile Include="Mvc\Html\ButtonOptions.cs" />
+    <Compile Include="Mvc\Html\HtmlEditorOptions.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AjaxAction.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AjaxDeleteButton.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.AreaDropDownList.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.DescriptionFor.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.EnumDropDownListFor.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.HtmlEditor.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.Link.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.EmotionSelector.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.Message.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.Tree.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.Uploadify.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.Captcha.cs" />
+    <Compile Include="Mvc\Html\TreeNode.cs" />
+    <Compile Include="Mvc\Html\TreeOptions.cs" />
+    <Compile Include="Mvc\Html\UploadFileOptions.cs" />
+    <Compile Include="Mvc\Html\HtmlHelper.User.cs" />
+    <Compile Include="Mvc\TempData\CookieTempDataProvider.cs" />
+    <Compile Include="UI\ChannelThemeResolver.cs" />
+    <Compile Include="UI\UserSpaceThemeSelector.cs" />
+    <Compile Include="Mvc\TempData\TunynetControllerFactory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Authorizer.cs" />
+    <Compile Include="SiteUrls.cs" />
+    <Compile Include="UrlRoutingRegistration.cs" />
+    <Compile Include="User\Configuration\IUserProfileSettingsManager.cs" />
+    <Compile Include="User\Configuration\UserProfileSettings.cs" />
+    <Compile Include="User\Repositories\EducationExperienceRepository.cs" />
+    <Compile Include="User\Repositories\IEducationExperienceRepository.cs" />
+    <Compile Include="User\Repositories\IProfileRepository.cs" />
+    <Compile Include="User\Repositories\IWorkExperienceRepository.cs" />
+    <Compile Include="User\Repositories\ProfileRepository.cs" />
+    <Compile Include="User\Repositories\WorkExperienceRepository.cs" />
+    <Compile Include="User\UserEnum.cs" />
+    <Compile Include="User\UserProfileService.cs" />
+    <Compile Include="Utilities\Captcha\ICaptchaManager.cs" />
+    <Compile Include="Utilities\Captcha\DefaultCaptchaManager.cs" />
+    <Compile Include="Utilities\Captcha\CaptchaEnums.cs" />
+    <Compile Include="Utilities\ChineseCalendarHelper.cs" />
+    <Compile Include="Utilities\Extensions\EnumExtension.cs" />
+    <Compile Include="Utilities\TextLengthSettings.cs" />
+    <Compile Include="Utilities\UserContext.cs" />
+    <Compile Include="User\DefaultUserIdToUserNameDictionary.cs" />
+    <Compile Include="User\EventOperationTypeExtension.cs" />
+    <Compile Include="User\FormsAuthenticationService.cs" />
+    <Compile Include="User\MembershipService.cs" />
+    <Compile Include="User\Repositories\IUserRepository.cs" />
+    <Compile Include="User\Repositories\UserRepository.cs" />
+    <Compile Include="User\User.cs" />
+    <Compile Include="User\UserIdToUserNameDictionary.cs" />
+    <Compile Include="User\UserPasswordHelper.cs" />
+    <Compile Include="User\UserProfile.cs" />
+    <Compile Include="User\UserQuery.cs" />
+    <Compile Include="User\UserService.cs" />
+    <Compile Include="User\UserServiceExtension.cs" />
+    <Compile Include="Utilities\Extensions\ControllerContextExtension.cs" />
+    <Compile Include="Utilities\Extensions\DateTimeExtension.cs" />
+    <Compile Include="Utilities\Formatter.cs" />
+    <Compile Include="Utilities\IP\IPSeeker.cs" />
+    <Compile Include="Utilities\Msn\MsnHelper.cs" />
+    <Compile Include="Utilities\PostInterval\PostIntervalAttribute.cs" />
+    <Compile Include="Utilities\PostInterval\PostIntervalEntity.cs" />
+    <Compile Include="Utilities\PostInterval\PostIntervalEnum.cs" />
+    <Compile Include="Utilities\PostInterval\PostIntervalManager.cs" />
+    <Compile Include="Utilities\PostInterval\PostIntervalSettings.cs" />
+    <Compile Include="Utilities\Utility.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Configuration\VerificationCodeSection.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Enum\VerificationCodePersistenceMode.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\ImageModel\BackgroundVerificationCodeImage.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\ImageModel\LineNoiseVerificationCodeImage.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\ImageModel\PartitionedVerificationCodeImage.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\ImageModel\VerificationCodeImage.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\DefaultProviders\BasicEnglishVerificationCodeTextProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\DefaultProviders\CrosshatchVerificationCodeFilterProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\DefaultProviders\LineNoiseVerificationCodeImageProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\PartitionedVerificationCodeImageProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\VerificationCodeFilterProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\VerificationCodeImageProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Provider\VerificationCodeTextProvider.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Utility\VerificationCodeProviderHelper.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\Utility\VerificationCodeRandomString.cs" />
+    <Compile Include="Utilities\Captcha\VerificationCode\VerificationCodeManager.cs" />
+    <Compile Include="Utilities\Captcha\CaptchaSettings.cs" />
+    <Compile Include="Utilities\Captcha\CaptchaUtility.cs" />
+    <Compile Include="Utilities\WordFilter\WordEntity.cs" />
+    <Compile Include="Utilities\WordFilter\WordFilter.cs" />
+    <Compile Include="Utilities\WordFilter\WordFilterEnum.cs" />
+    <Compile Include="Utilities\WordFilter\WordFilterTypeIds.cs" />
+    <Compile Include="Utilities\WordFilter\WordGroup.cs" />
+    <Compile Include="Utilities\Extensions\NameValueCollectionExtension.cs" />
+    <Compile Include="ViewModels\AccountTypeEditModel.cs" />
+    <Compile Include="ViewModels\AdvertisingEditModel.cs" />
+    <Compile Include="ViewModels\AdvertisingPositionEditModel.cs" />
+    <Compile Include="ViewModels\AnnouncementEditModel.cs" />
+    <Compile Include="ViewModels\AreaCreatModel.cs" />
+    <Compile Include="ViewModels\AreaEditModel.cs" />
+    <Compile Include="ViewModels\AttachmentSettingsEditModel.cs" />
+    <Compile Include="ViewModels\BuyInviteCountEditModel.cs" />
+    <Compile Include="ViewModels\CategoryEditModel.cs" />
+    <Compile Include="ViewModels\ChangePasswordEditModel.cs" />
+    <Compile Include="ViewModels\CommentEditModel.cs" />
+    <Compile Include="ViewModels\ConfirmFollowViewModel.cs" />
+    <Compile Include="ViewModels\EmailSettingsEditModel.cs" />
+    <Compile Include="ViewModels\FindPasswordEditModel.cs" />
+    <Compile Include="ViewModels\IdentificationEditModel.cs" />
+    <Compile Include="ViewModels\IdentificationTypeEditModel.cs" />
+    <Compile Include="ViewModels\InvitedFriendViewModel.cs" />
+    <Compile Include="ViewModels\InviteFollowEditModel.cs" />
+    <Compile Include="ViewModels\InviteFriendByCsvEditModel.cs" />
+    <Compile Include="ViewModels\InviteFriendByEmailEditModel.cs" />
+    <Compile Include="ViewModels\InviteFriendByMsnEditModel.cs" />
+    <Compile Include="ViewModels\InviteFriendByUserInputEditModel.cs" />
+    <Compile Include="ViewModels\LinkEditModel.cs" />
+    <Compile Include="ViewModels\ListInvitationEditModel.cs" />
+    <Compile Include="ViewModels\ManageUsersCreateEditModel.cs" />
+    <Compile Include="ViewModels\MessageEditModel.cs" />
+    <Compile Include="ViewModels\MessageSessionEditModel.cs" />
+    <Compile Include="ViewModels\NavigationCreateModel.cs" />
+    <Compile Include="ViewModels\NavigationEditModel.cs" />
+    <Compile Include="ViewModels\OperationEditModel.cs" />
+    <Compile Include="ViewModels\PointItemEditModel.cs" />
+    <Compile Include="ViewModels\PresentAreaNavigationEditModel.cs" />
+    <Compile Include="ViewModels\PrivacyItemEditModel.cs" />
+    <Compile Include="ViewModels\RecommendItemEditModel.cs" />
+    <Compile Include="ViewModels\RecommendItemTypeEditModel.cs" />
+    <Compile Include="ViewModels\RecommentItemTypeCreateModel.cs" />
+    <Compile Include="ViewModels\RegisterEditModel.cs" />
+    <Compile Include="ViewModels\LoginEditModel.cs" />
+    <Compile Include="ViewModels\ResetPasswordEditModel.cs" />
+    <Compile Include="ViewModels\SchoolEditModel.cs" />
+    <Compile Include="ViewModels\SendEmailSucceedViewModel.cs" />
+    <Compile Include="ViewModels\BatchSetStatusEditModel.cs" />
+    <Compile Include="ViewModels\SensitiveWordEditModel.cs" />
+    <Compile Include="ViewModels\SensitiveWordTypeEditModel.cs" />
+    <Compile Include="ViewModels\SimpleHomeEditModel.cs" />
+    <Compile Include="ViewModels\SiteSettingsEditModel.cs" />
+    <Compile Include="ViewModels\StopedUserViewModel.cs" />
+    <Compile Include="ViewModels\SystemMessageViewModel.cs" />
+    <Compile Include="ViewModels\TagEditModel.cs" />
+    <Compile Include="ViewModels\TagGroupEditModel.cs" />
+    <Compile Include="ViewModels\TestForUserEditModel.cs" />
+    <Compile Include="ViewModels\EducationExperienceEditModel.cs" />
+    <Compile Include="ViewModels\ThirdRegisterEditModel.cs" />
+    <Compile Include="ViewModels\UserBlockedObjectViewModel.cs" />
+    <Compile Include="ViewModels\UserRankEditModel.cs" />
+    <Compile Include="ViewModels\UserSettingsEditModel.cs" />
+    <Compile Include="ViewModels\WorkExperienceEditModel.cs" />
+    <Compile Include="ViewModels\ActivateByEmail.cs" />
+    <Compile Include="ViewModels\UserProfileEditModel.cs" />
+    <Compile Include="ViewModels\ManageUsersEditModel.cs" />
+    <Compile Include="ViewModels\RoleEditModel.cs" />
+    <Compile Include="ViewModels\ImpeachReportCreateModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessComponents\Tunynet.BusinessComponents.csproj">
+      <Project>{D9BC9674-69DE-4742-AF24-E35C43DE84CE}</Project>
+      <Name>Tunynet.BusinessComponents</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

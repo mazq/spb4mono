@@ -1,0 +1,54 @@
+﻿@model CategoryEditModel
+@{
+    Layout = null;
+}
+@using (Html.BeginAjaxForm("_EditUserCategory", "ControlPanelContent", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack",OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.Hidden("CategoryId", @Model.CategoryId)
+    @Html.Hidden("ParentId", @Model.ParentId)
+    @Html.Hidden("TenantTypeId", @Model.TenantTypeId)
+    @Html.Hidden("Depth", @Model.Depth)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            类别名：
+                        </th>
+                        <td>
+                            @Html.TextBoxFor(n => n.CategoryName, InputWidthTypes.Long, new RouteValueDictionary { { "maxlength", 64 } })
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            描述：
+                        </th>
+                        <td>
+                            @Html.TextAreaFor(n => n.Description, new RouteValueDictionary { { "maxlength", 120 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+    this.title("编辑用户类别");
+</script>
+<script language="javascript" type="text/javascript">
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        setTimeout(function () { window.location.reload(); }, 500);
+    }
+    function OnErrorCallBack(data) {
+        alert(data.MessageContent, function () {
+            window.location.reload();
+        })
+    }
+</script>

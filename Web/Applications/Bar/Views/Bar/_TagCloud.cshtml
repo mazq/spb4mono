@@ -1,0 +1,23 @@
+﻿@model Dictionary<TagInOwner, int>
+@{
+    ITagUrlGetter urlGetter = null;
+}
+<div class="tn-box-content tn-widget-content tn-corner-bottom">
+    <p id="hot-tags" class="tn-tags-hot">
+        @if (Model != null)
+        {
+            string url = null;
+
+            foreach (var tag in Model)
+            {
+                if (urlGetter == null)
+                {
+                    urlGetter = TagUrlGetterManager.GetRegisteredGetter(tag.Key.TenantTypeId);
+                }
+
+                url = urlGetter != null ? urlGetter.GetUrl(tag.Key.TagName) : string.Empty;
+            <span class="tn-font-size-@tag.Value"><a href="@url" title="共有@(tag.Key.ItemCount)个内容">@Tunynet.Utilities.StringUtility.Trim(tag.Key.TagName, 6, "...")</a></span>
+            }
+        }
+    </p>
+</div>

@@ -1,0 +1,107 @@
+﻿@model IEnumerable<string>
+@{    
+    string searcherCode = ViewData.Get<string>("searcherCode", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-history">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option"><a id="clear-histories" class="tnc-deletle" href="#">清空</a></div>
+        <h3 class="tn-helper-reset">搜索历史</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model != null && Model.Count()>0)
+        {
+            <ul id="search-histories" class="tn-list">
+            @foreach (var item in Model)
+            {
+                <li data-history-value='@item'><a title='@item' href="javascript:void()">@HtmlUtility.TrimHtml(item, 14)</a></li>
+            }
+            </ul>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var searchForm = $('#searchForm');
+        var keyword = $('#keyword', searchForm);
+        var searchRangeFindUser = $('#searchRange', searchForm);
+        var nowAreaCode = $('#nowAreaCode', searchForm);
+        var parentAreaCode = $('#parentAreaCode', searchForm);
+        var gender = $('#gender', searchForm);
+        var ageMin = $('#ageMin', searchForm);
+        var ageMax = $('#ageMax', searchForm);
+        //问答
+        var range = $("#range", searchForm);
+        var selectNum = $('#selectNum', searchForm);
+        var sortBy = $("#sortBy", searchForm);
+        //贴吧
+        var sectionId = $('#Range', searchForm);
+        var searchRange = $('#Term', searchForm);
+        //日志
+        var allId = $('#allId', searchForm);
+        var loginId = $('#loginId', searchForm);
+        var userId = $('#userId', searchForm);
+        var selectNum = $('#selectNum', searchForm);
+        var range = $('#range', searchForm);
+        var blogRange = $('#blogRange', searchForm);
+        var siteCategoryId = $('#siteCategoryId', searchForm);
+        //群组
+        var nowAreaCode = $('#nowAreaCode', searchForm);
+        var parentAreaCode = $('#parentAreaCode', searchForm);
+        var range = $('#range', searchForm);
+        //微博
+        var searchTerm = $('#searchTerm', searchForm);
+        //相册
+        var userId = $('#userId', searchForm);
+        var rangeNum = $('#rangeNum', searchForm);
+        var filter = $('#filter', searchForm);
+
+
+        //注册点击搜索历史事件
+        $('#search-histories').delegate("a", "click", function (e) {
+            e.preventDefault();
+            searchRangeFindUser.val("0");
+            nowAreaCode.val("");
+            parentAreaCode.val("");
+            gender.val("");
+            ageMin.val("");
+            ageMax.val("");
+            //问答
+            range.val("0");
+            selectNum.val("0");
+            sortBy.val("");
+            //贴吧
+            sectionId.val("");
+            searchRange.val("0");
+            //日志
+            allId.val("-1");
+            loginId.val("");
+            userId.val("");
+            selectNum.val("0");
+            range.val("0");
+            blogRange.val("");
+            siteCategoryId.val("");
+            //群组
+            nowAreaCode.val("");
+            parentAreaCode.val("");
+            range.val("0");
+            //微博
+            searchTerm.val("0");
+            //相册
+            userId.val("0");
+            rangeNum.val("0");
+            filter.val("0");
+
+            keyword.val($(this).attr("title"));
+            searchForm.submit();
+        });
+
+        //点清空
+        $("#clear-histories").click(function (e) {
+            e.preventDefault();
+            var clearUrl = '@Html.Raw(SiteUrls.Instance().SearchHistories(searcherCode, true))';
+            $.get(clearUrl, function (data) {
+                $('.tnc-search-history').replaceWith(data);
+            })
+        })
+    })
+</script>

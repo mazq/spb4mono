@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Navigation>
+@{ int currentNavigationId = 0; if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+   {
+       currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+   }
+
+   Spacebuilder.Group.Controllers.GroupMenu? groupMenu = TempData["GroupMenu"] as Spacebuilder.Group.Controllers.GroupMenu?;
+   string spaceKey = Url.SpaceKey();
+   long groupId = GroupIdToGroupKeyDictionary.GetGroupId(spaceKey);
+   long userId = UserContext.CurrentUser != null ? UserContext.CurrentUser.UserId : 0;
+   IEnumerable<ApplicationManagementOperation> applicationManagementOperations = ViewData.Get<IEnumerable<ApplicationManagementOperation>>("ApplicationManagementOperations", new List<ApplicationManagementOperation>());
+}
+<div class="tn-box tn-widget tn-widget-content
+tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <ul class="tn-side-menu">
+            <li class="@if (groupMenu.HasValue && groupMenu == Spacebuilder.Group.Controllers.GroupMenu.Home)
+                       { @("tn-selected tn-bg-gray tn-border-gray tn-corner-all") }"><a class="tn-menu-text" href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())" title="主页">
+                           主页</a></li>
+            @foreach (var navigation in Model)
+            {
+                if (!navigation.IsVisible(UserContext.CurrentUser)
+                    || (navigation.NavigationId == 13900190 && !new Authorizer().Group_Manage(groupId)))
+                {
+                    continue;
+                }
+
+                string selectedStatus = "";
+                if (navigation.NavigationId == currentNavigationId)
+                {
+                    selectedStatus = "tn-selected tn-bg-gray tn-border-gray tn-corner-all";
+                } 
+                <li class="@(selectedStatus)">
+                    @if (applicationManagementOperations.Where(n => n.AssociatedNavigationId == navigation.NavigationId).Count() > 0)
+                    {
+                        var appmo = applicationManagementOperations.FirstOrDefault(n => n.AssociatedNavigationId == navigation.NavigationId);
+                        if (appmo.IsVisible(UserContext.CurrentUser) && new GroupService().IsMember(groupId, userId))
+                        { 
+                        <a href="@appmo.GetUrl(Url.SpaceKey())"
+                            class="tn-helper-right" target="@appmo.NavigationTarget">@appmo.OperationText</a>
+                        }
+                    }
+                    @if (!string.IsNullOrEmpty(navigation.IconName))
+                    {
+                        @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), navigation.IconName, false))
+                    }
+                    <a class="tn-menu-text" href="@navigation.GetUrl(spaceKey)" target="@navigation.NavigationTarget">@navigation.Text</a></li>
+            }
+            <li class=""><a title="返回所有群组" href="@SiteUrls.Instance().ChannelGroupHome()" class="tn-menu-text">
+                返回所有群组</a></li>
+        </ul>
+    </div>
+</div>

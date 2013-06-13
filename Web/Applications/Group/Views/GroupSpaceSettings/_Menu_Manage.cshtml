@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Navigation>
+@{
+    int currentNavigationId = 0;
+    if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+    {
+        currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+    }
+    GroupMenu? groupMenu = TempData["GroupMenu"] as GroupMenu?;
+    string spaceKey = Html.ViewContext.RouteData.Values["spaceKey"].ToString();
+    int count = ViewData.Get<int>("MemberApplyCount", 0);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-manage-menu">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <ul class="tn-side-menu">
+            @foreach (var navigation in Model)
+            {
+                string selectedStatus = "";
+                if (navigation.NavigationId == currentNavigationId)
+                {
+                    selectedStatus = "tn-selected tn-bg-gray tn-border-gray tn-corner-all";
+                }
+                <li class="@(selectedStatus)"><a class="tn-menu-text" href="@navigation.GetUrl(spaceKey)" title="@navigation.Text">@navigation.Text</a></li>
+            }
+            <li class="@if (groupMenu.HasValue && groupMenu == GroupMenu.ManageMember)
+                       {
+                        @("tn-selected tn-bg-gray tn-border-gray tn-corner-all")
+                       }" ><a class="tn-menu-text" href="@SiteUrls.Instance().ManageMembers(Url.SpaceKey())" title="成员管理">成员管理</a>
+                @if (count > 0)
+                {
+                    <span class="tn-msg-bubble">@("+" + count)</span>
+                }
+            </li>
+            <li class="@if (groupMenu.HasValue && groupMenu == GroupMenu.GroupSettings)
+                       {
+                        @("tn-selected tn-bg-gray tn-border-gray tn-corner-all")
+                       }" ><a class="tn-menu-text" href="@SiteUrls.Instance().EditGroup(Url.SpaceKey())" title="群组设置">群组设置</a></li>
+        </ul>
+    </div>
+</div>

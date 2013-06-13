@@ -1,0 +1,55 @@
+﻿@model IEnumerable<RecommendItem>
+@if (Model != null && Model.Count() > 0)
+{ 
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-slider">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-slider spb-photo-slider spb-bar-photo-slider" id="Barslider">
+            <div class="spb-slider-nav">
+                <div class="spb-slider-nav-clip">
+                    <ul>
+                    @for (int i = 1; i <= Model.Where(n => !string.IsNullOrEmpty(n.FeaturedImage)).Count(); i++)
+                    { 
+                        <li><a href="###" title="">@i</a></li>
+                    }
+                    </ul>
+                </div>
+            </div>
+            <div class="spb-slider-panels">
+            @foreach (var item in Model)
+            {
+                if (!string.IsNullOrEmpty(item.FeaturedImage))
+                { 
+                    <div class="spb-slider-panel"><a href="@item.DetailUrl"><img src="@SiteUrls.Instance().LogoUrl(item.FeaturedImage, TenantTypeIds.Instance().Recommend(), ImageSizeTypeKeys.Instance().Big())" alt="@item.ItemName"/></a>
+                        <div class="spb-slider-panel-textbox">
+                            <div class="spb-slider-panel-text">
+                                <p>@item.ItemName</p>
+                            </div>
+                            <div class="spb-slider-panel-overlay"></div>
+                        </div>
+                    </div>
+                }
+            }
+            </div>
+             @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BarThread()))
+            {
+            <div class="spb-rec-btn"><a href="@SiteUrls.Instance()._ManageRecommendItems("10120201")" class="tn-button tn-corner-all tn-button-default tn-button-icon-only" title="推荐管理" plugin="dialog"><span class="tn-icon tn-icon tn-icon-set"></span><span class="tn-button-text">推荐管理</span></a></div>
+            }
+        </div>
+    </div>
+</div>
+}
+<script type="text/javascript">
+    $(window).load(function () {
+        $(".spb-bar-photo-slider").sliderkit({
+           cssprefix: "spb-slider",
+            auto: true,
+            circular: true,
+            shownavitems: 8,
+            autospeed: 3000,
+            panelfx: "sliding",
+            panelfxspeed: 1000,
+            panelfxeasing: "easeInOutExpo"
+        });
+    });	
+</script>
+

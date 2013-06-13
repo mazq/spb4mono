@@ -1,0 +1,49 @@
+﻿@model PagingDataSet<Activity>
+@{
+    ViewBag.Title = "我的首页";
+    Layout = "_UserSpace_Profile";
+    User user = ViewData.Get<User>("user", null);
+
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+   
+}
+@section Aside_First{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-user-panel">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="spb-user-panel-wrap">
+                @Html.Action("_MyHomeUserInfo", new { spaceKey = Url.SpaceKey(), area = "Common" })
+                @Html.Action("_MyHomeNavigations", new { spaceKey = Url.SpaceKey(), area = "Common" })
+                @if (user.IsModerated)
+                {
+                    <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                        <ul>
+                            <li><strong>您正处在管制状态</strong></li>
+                            <li>您的部分操作将受到限制，您可以通过发布内容、完善个人资料等操作来赚取积分，当积分达到要求时系统将会为您自动解除管制，您可以在<a href="@SiteUrls.Instance().UserModerated(Url.SpaceKey())">关于管制</a>页面了解自己的权限。</li>
+                        </ul>
+                    </div>
+                }
+                @Html.AdvertisingPosition("11000000001")
+            </div>
+        </div>
+    </div>
+}
+<script src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js")" type="text/javascript"></script>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-my-following">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_AnnouncementItem", "Channel", new { displayArea = Announcement_DisplayArea.UserSpace })
+        @Html.Action("_MyHomeActivities", new { spaceKey = Url.SpaceKey(), area = "Common" })
+    </div>
+</div>
+@section Aside_Second{
+    @if (ThemeService.Validate(PresentAreaKeysOfBuiltIn.UserSpace, UserIdToUserNameDictionary.GetUserId(Url.SpaceKey())))
+    { 
+        <div class="tn-skin-switch">
+            <div class="tn-skin">
+                <a class="tnc-skin-link" href="@SiteUrls.Instance()._ThemeSettings(PresentAreaKeysOfBuiltIn.UserSpace, user.UserId, true, user.IsUseCustomStyle)" plugin="dialog">
+                    皮肤设置</a></div>
+        </div>
+    }
+    @Html.AjaxAction("_InterestedWithAllSide", "FindUser", new { pageSize = 5 })
+    @Html.AjaxAction("_HomeLastVisitList", "UserSpace", new { spaceKey = Url.SpaceKey(), area = "Common" })
+    @Html.AjaxAction("_ListTopUsers", "UserSpace", new { spaceKey = Url.SpaceKey(), topNumber = 12, area = "Common" })
+}

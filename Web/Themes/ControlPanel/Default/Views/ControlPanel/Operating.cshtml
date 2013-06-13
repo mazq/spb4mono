@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Spacebuilder.Search.ISearcher>
+@{
+    Layout = "_ControlPanel";
+    string message = Request.QueryString.GetString("message", "正在执行，请耐心等待");
+    string confirmInfo = Request.QueryString.GetString("confirmInfo", string.Empty);
+    string backUrl = Request.QueryString.GetString("backUrl", "javascript:window.history.go(-1)");
+    string operationUrl = Request.QueryString.GetString("operationUrl", "javascript:window.history.go(-1)");
+    bool isConfirm = !string.IsNullOrEmpty(confirmInfo);
+}
+<div class="tn-block" id="operationDiv" style="@(isConfirm ? "display:none" : "")">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <div class="tnc-run-state tnc-run-waiting">
+                <div class="tn-heading tn-helper-clearfix">
+                    <strong>@message</strong>
+                </div>
+                <p class="tn-state">
+                </p>
+                <p class="tn-actions">
+                    <a href="@backUrl" class="tn-action"><span class="tn-action-text">终止并返回上一个页>></span></a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {        
+    if(@(isConfirm.ToString().ToLower()))
+    {
+        art.dialog.confirm("@confirmInfo",function(){
+        $("#operationDiv").show();
+        window.location.href = '@operationUrl';        
+        }, function(){
+            window.location.href = '@backUrl';        
+        });
+     }
+     else
+        window.location.href = '@operationUrl';        
+    })
+</script>

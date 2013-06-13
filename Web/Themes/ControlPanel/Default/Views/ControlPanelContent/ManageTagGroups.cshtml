@@ -1,0 +1,162 @@
+﻿@model IEnumerable<TagGroup>
+@{
+    Layout = "_ControlPanel";
+    SelectList tenants = ViewData.Get<SelectList>("tenants", null);
+    Dictionary<string, string> tenantsDictionary = ViewData.Get<Dictionary<string, string>>("tenantsDictionary", null);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                @Html.ActionLink("标签管理", "ManageTags", null, new { @class = "tn-action" })
+                <span>标签分组管理</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            <div class="tn-filter tn-helper-right">
+                                <label class="tn-form-label">所属：</label>
+                                @Html.DropDownList("TenantTypeId", tenants,"不限", new { @class = "tn-dropdownlist tn-input-medium" })
+                            </div>
+                            @Html.LinkButton("删除", SiteUrls.Instance().DeleteTagGroups(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-tag-groups" })
+                            @Html.LinkButton("添加分组", SiteUrls.Instance()._EditTagGroup(0, Request.QueryString.Get<string>("tenantTypeId", string.Empty)), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "add-tag-group", plugin = "dialog" })
+                        </div>
+                    </div>
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header">
+                                <th class="tn-border-gray tn-border-bottom tn-width-check">
+                                    <input id="select-all" type="checkbox" />
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    分组名
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    所属
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    操作
+                                </th>
+                            </tr>
+                            @foreach (TagGroup tagGroup in Model)
+                            {
+                                <tr class="tn-table-grid-row">
+                                    <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                        @Html.CheckBox("tag-group-id", new { @class = "tag-group-id", value = @tagGroup.GroupId })
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        @tagGroup.GroupName
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @if (tenantsDictionary.ContainsKey(tagGroup.TenantTypeId))
+                                        {
+                                           @tenantsDictionary[tagGroup.TenantTypeId]
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">                                                                               
+                                        @Html.Link("编辑", SiteUrls.Instance()._EditTagGroup(tagGroup.GroupId), "编辑", new { plugin = "dialog" })
+                                        @Html.Link("删除", SiteUrls.Instance().DeleteTagGroups(tagGroup.GroupId.ToString()), "删除", new { @class = "delete-tag-group" })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        removeChecked();
+        //处理火狐下浏览器刷新后复选框仍然选中
+        function removeChecked() {
+            $(".tag-group-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+
+        //组合所有选中的复选框的只，以,分隔
+        function getCheckedTagGroupIds() {
+            var tagGroupIds = "";
+            $(".tag-group-id").each(function () {
+                if ($(this).attr("checked")) {
+                    tagGroupIds += $(this).val() + ",";
+                }
+            });
+
+            return tagGroupIds;
+        }
+
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".tag-group-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".tag-group-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+
+        //更改所属下拉框
+        $("#TenantTypeId").change(function () {
+            var tenantTypeId = $(this).val();
+            window.location.href = '@(SiteUrls.Instance().ManageTagGroups())?tenantTypeId=' + tenantTypeId;
+        });
+
+
+        //点批量删除
+        $("#delete-tag-groups").click(function (e) {
+            e.preventDefault();
+
+            var tagGroupIds = getCheckedTagGroupIds();
+            if (!tagGroupIds) {
+                alert("请至少选择一个标签分组！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.getJSON(url, { tagGroupIds: tagGroupIds }, function (data) {
+                    if (data == "success") {
+                        art.dialog.tips("删除成功！", 1.5, 1);
+                        setTimeout(function () { window.location.reload(true); }, 500);
+                    }
+                });
+            });
+        });
+
+        //点单个删除
+        $(".delete-tag-group").click(function (e) {
+            e.preventDefault();
+
+            var self = $(this);
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.getJSON(self.attr("href"), function (data) {
+                    if (data == "success") {
+                        window.location.reload(true);
+                    }
+                });
+            });
+        });
+
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+    });
+</script>

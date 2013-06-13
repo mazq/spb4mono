@@ -1,0 +1,59 @@
+﻿@{
+    string introduction = ViewData.Get<string>("introduction", string.Empty);
+}
+@using (Html.BeginAjaxForm("EditUserIntroduction", "UserSpace", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success", OnErrorCallBack = "error" }, new { id = "editUserIntroduction" }))
+{
+    
+    <div class="tnc-edit-intro">
+        <div class="tnc-dailog-pd">
+            <div class="tn-form">
+                <div class="tn-form-row">
+                    <textarea class="tn-textarea tn-input-long tn-border-gray" rows="" cols="" name="introduction"
+                        id="introduction">@Formatter.FormatMultiLinePlainTextForEdit(introduction, true)</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    </div>
+}
+<script type="text/dialog">
+ this.title("编辑简介");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#editUserIntroduction").validate({
+            rules: {
+                introduction: {
+                    maxlength: 200
+                }
+            },
+            messages: {
+                introduction: {
+                    maxlength: "最多输入200个汉字"
+                }
+            }
+        });
+
+    })
+
+    function success(data) {
+        var introduction = data.Data.introduction;
+        if (introduction == "") {
+            introduction = "可以在此填写个性简介";
+        }
+        $("#introductionSpan").html(introduction);
+        $("#integrityDiv").css("width", data.Data.integrity);
+        $("#integrityDiv").parent().attr("title", "资料完整度为" + data.Data.integrity);
+        $("#integrityStrong").text(data.Data.integrity);
+    }
+
+
+    function error(data) {
+        data = jQuery.parseJSON(data);
+        $.dialog.tips(data.MessageContent, 2, data.MessageType);
+    }
+
+</script>

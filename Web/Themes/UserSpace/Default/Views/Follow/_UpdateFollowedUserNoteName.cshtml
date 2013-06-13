@@ -1,0 +1,40 @@
+﻿@{
+    string spaceKey = ViewData.Get<string>("spaceKey", string.Empty);
+    long followedUserId = ViewData.Get<long>("followedUserId", 0);
+    string noteName = ViewData.Get<string>("noteName", string.Empty);
+}
+@using (Html.BeginAjaxForm("UpdateFollowedUserNoteName", "Follow", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "noteNameSuccess" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short">
+            <div class="tn-form-row">
+                @Html.Hidden("spaceKey", spaceKey)
+                @Html.Hidden("followedUserId", followedUserId)
+                <div id="noteNameAppendDiv"></div>
+                @Html.TextBox("noteName", noteName, new { MaxLength = "32", @class = "tn-textbox tn-border-gray  tn-input-medium" })
+                @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new {id = "noteNameSubmit", value = followedUserId })
+            </div>
+        </div>
+    </div>
+}
+<script type="text/dialog">
+       this.title("设置备注");
+</script>
+
+<script type="text/javascript">
+
+    function noteNameSuccess(data) {
+        var noteName = $("#noteName").val();
+        var followId = $("#noteNameSubmit").val();
+        if ($.trim(noteName) == '') {
+            $("a[userId=" + followId + "]").text(" 设置备注 ");
+            $("a[userId=" + followId + "]").attr("title", " 设置备注 ");
+        }
+        else {
+            $("a[userId=" + followId + "]").text(" " + data.Data.noteName + " ");
+            $("a[userId=" + followId + "]").attr("title", $.trim(noteName));
+        }
+    }
+
+
+</script>

@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<body class="tn-page-bg  spb-admin-page" id="@Html.GenerateBodyId()">
+    <div class="tn-doc-bg" id="tn-doc">
+        <div class="tn-header-bg" id="tn-header">
+            @Html.Action("_Header", "ControlPanel", new { area = "Common" })
+        </div>
+        <div class="tn-content-bg" id="tn-content">
+            <div class="tn-wrapper tn-template-l-170 tn-helper-clearfix">
+                <div class="tn-main">
+                    @RenderBody()
+                </div>
+                <div class="tn-block">
+                    <div class="tnc-aside">
+                        @if (IsSectionDefined("Aside"))
+                        {
+                            @RenderSection("Aside", false)
+                        }
+                        else
+                        { 
+                            @Html.Action("_AsideMenu", "ControlPanel", new { area = "Common" })
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tn-footer-bg" id="tn-footer">
+            <div class="tn-wrapper">
+                <div class="tnc-footer">
+                    @Html.Action("_Footer", "ControlPanel", new { area = "Common" })
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

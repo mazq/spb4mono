@@ -1,0 +1,83 @@
+﻿@model MessagesSettingEditModel
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>消息设置</span></h1>
+            <div class="tnc-ctnright-list spb-message-settings">
+                @using (Html.BeginAjaxForm("SaveMessages", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "tunr-form" }))
+                {
+                    <div class="tn-form tn-label-right tnc-user-register">
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>用户默认接收通知的类型 </strong>
+                            @Html.CheckBox("checkallNotice", false)
+                            <label for="checkallNotice">全选</label>
+                        </div>
+                        <div class="tn-tabs">
+                            <ul class="tn-helper-clearfix">
+                                @for (int i = 0; i < Model.NoticeTypeSettings.Count; i++)
+                                {
+                                    <li>
+                                        @Html.Hidden("NoticeTypeSettings[" + i + "].TypeId", Model.NoticeTypeSettings[i].TypeId)
+                                        @Html.CheckBox("NoticeTypeSettings[" + i + "].IsAllow", Model.NoticeTypeSettings[i].IsAllow, new { notice = "checkNotice" })
+                                        <label for="@Model.NoticeTypeSettings[i].TypeId">@NoticeType.Get(Model.NoticeTypeSettings[i].TypeId).TypeName</label>
+                                        <span class="tn-text-note">@NoticeType.Get(Model.NoticeTypeSettings[i].TypeId).Description</span>
+                                    </li>               
+                                }
+                            </ul>
+                        </div>
+                        <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                            <strong>用户默认接收请求的类型 </strong>
+                            @Html.CheckBox("checkallInvitation", false)
+                            <label for="checkallInvitation">全选</label>
+                        </div>
+                        <div class="tn-tabs">
+                            <ul class="tn-helper-clearfix">
+                                @for (int i = 0; i < Model.InvitationTypeSettings.Count; i++)
+                                {
+                                    <li>
+                                        @Html.Hidden("InvitationTypeSettings[" + i + "].TypeKey", Model.InvitationTypeSettings[i].TypeKey)
+                                        @Html.CheckBox("InvitationTypeSettings[" + i + "].IsAllow", Model.InvitationTypeSettings[i].IsAllow, new { invitation = "checkInvitation" })
+                                        <label for="@Model.InvitationTypeSettings[i].TypeKey">@InvitationType.Get(Model.InvitationTypeSettings[i].TypeKey).Name</label>
+                                        <span class="tn-text-note">@InvitationType.Get(Model.InvitationTypeSettings[i].TypeKey).Description</span>
+                                    </li>               
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //通知全选按钮
+        $("#checkallNotice").click(function () {
+            if ($(this)[0].checked) {
+                $("input[notice]").attr("checked", true);
+            }
+            else {
+                $("input[notice]").removeAttr("checked");
+            }
+        });
+
+        //请求全选按钮
+        $("#checkallInvitation").click(function () {
+            if ($(this)[0].checked) {
+                $("input[invitation]").attr("checked", true);
+            }
+            else {
+                $("input[invitation]").removeAttr("checked");
+            }
+        });
+    });
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

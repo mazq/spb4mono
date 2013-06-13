@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<invitations>
+    <invitation invitationTypeKey="InviteFollow">
+        <unhandledBody>
+            <a href="@Model.SenderUrl" target="_blank">@Model.Sender</a> 邀请您关注TA @Model.Remark
+        </unhandledBody>
+        <acceptBody>
+            您关注了<a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>
+        </acceptBody>
+        <refuseBody>
+            您拒绝关注<a href="@Model.SenderUrl" target="_blank">@Model.Sender</a>
+        </refuseBody>
+    </invitation>
+</invitations>

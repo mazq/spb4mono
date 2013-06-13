@@ -1,0 +1,28 @@
+﻿@model InviteFriendByUserInputEditModel
+@{
+    Layout = null;
+}
+@using (Html.BeginAjaxForm("_InviteFriendByUserInput", "Follow", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "InviteSuccessCallBack", OnErrorCallBack = "errorCallBack", ClearForm = false }))
+{
+    <div class="tn-form tn-label-right tnc-send-email">
+	    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+			<h4>发送邀请邮件</h4>
+		</div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            <span class="tn-text-note">您最多可添加20个邮箱，邮箱之间通过“，”隔开</span>
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            @Html.TextAreaFor(n => n.emails, new { id = "emails-user-input", @class = "tn-textarea tn-input-longest tn-border-gray" })
+        </div>
+        <div class="tn-form-row tn-form-row-button">
+            <label class="tn-form-label">
+            </label>
+            @Html.LinkButton("发送邀请", string.Empty, HighlightStyles.Primary, htmlAttributes: new { id = "button-csv-submit" })
+            @Html.ValidationMessageFor(n => n.emails)
+        </div>
+    </div>
+}

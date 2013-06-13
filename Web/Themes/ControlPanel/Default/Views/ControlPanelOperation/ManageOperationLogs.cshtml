@@ -1,0 +1,143 @@
+﻿@model PagingDataSet<Tunynet.Logging.OperationLogEntry>
+@{
+    Layout = "_ControlPanel";    
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>操作日志管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageOperationLogs", "ControlPanelOperation", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">来源：</label>
+                                @Html.TextBox("Source", Request["Source"], new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>                            
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">操作人：</label>
+                                @Html.TextBox("Operator", Request["Operator"], new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">操作说明：</label>
+                                @Html.TextBox("Keyword", Request["Keyword"], new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">操作时间：</label>
+                                @Html.DatePicker("StartDateTime", Request.QueryString.Get<DateTime?>("StartDateTime"), "-10Y", "+0D")
+                                到
+                                @Html.DatePicker("EndDateTime", Request.QueryString.Get<DateTime?>("EndDateTime"), "-10Y", "+0D")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label"></label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "searchBlog" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("清除历史数据", SiteUrls.Instance()._ManageOperationLogs(), HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "delete-blogs", plugin = "dialog" })
+                        </div>
+                    </div>
+                    @if (Model == null || Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作对象Id
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作对象
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作对象URL
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作说明
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作人
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作类型
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        来源
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        IP地址
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作时间
+                                    </th>
+                                </tr>
+                                @foreach (var log in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @log.OperationObjectId
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                           <span title="@log.OperationObjectName">@HtmlUtility.TrimHtml(@log.OperationObjectName, 12)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                           <span title="@log.AccessUrl">@HtmlUtility.TrimHtml(log.AccessUrl, 30)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            <span title="@log.Description">@HtmlUtility.TrimHtml(log.Description, 20)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            <a href="@SiteUrls.Instance().SpaceHome(log.OperatorUserId)" target="_blank">@log.Operator</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        <span title="@Tunynet.Globalization.ResourceAccessor.GetString("OperationType_" + log.OperationType)">@HtmlUtility.TrimHtml(Tunynet.Globalization.ResourceAccessor.GetString("OperationType_" + log.OperationType), 15)</span>                                        
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @log.Source
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @log.OperatorIP
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @log.DateCreated.ToFriendlyDate(true)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("PageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //当第二个日期选择框改变时判断是否小于第一个日期,小于则对换日期
+        $("#EndDateTime").change(function () {
+            var startdate = $("#StartDateTime").val();
+            var enddate = $(this).val();
+            if (startdate > enddate) {
+                $(this).val(startdate);
+                $("#StartDateTime").val(enddate);
+            }
+
+        });
+    });
+</script>

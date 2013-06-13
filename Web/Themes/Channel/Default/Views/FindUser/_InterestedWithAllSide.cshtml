@@ -1,0 +1,161 @@
+﻿@model  IEnumerable<User>
+@{    
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, string> interestedDic = ViewData["interestedDic"] as Dictionary<long, string>;
+    Dictionary<long, IEnumerable<long>> followedUserIdDic = ViewData["followedUserIdDic"] as Dictionary<long, IEnumerable<long>>;
+    Dictionary<long, User> followedUserDic = ViewData["followedUserDic"] as Dictionary<long, User>;
+    Dictionary<long, IEnumerable<string>> companyNameDic = ViewData["companyNameDic"] as Dictionary<long, IEnumerable<string>>;
+    Dictionary<long, IEnumerable<string>> schoolNameDic = ViewData["schoolNameDic"] as Dictionary<long, IEnumerable<string>>;
+    Dictionary<long, IEnumerable<string>> tagNameDic = ViewData["tagNameDic"] as Dictionary<long, IEnumerable<string>>;
+
+    int pageSize = ViewData.Get<int>("pageSize", 5);
+}
+@if (Model.Count() > 0)
+{ 
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-maybe">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option">
+                <a href="@SiteUrls.Instance().FindUserInterested()">更多</a></div>
+            <h3 class="tn-helper-reset">
+                可能感兴趣的人</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <ul class="tn-list">
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    User user = Model.ElementAt(i);
+                    <li class="tn-list-item tn-helper-clearfix tn-border-bottom">
+                        <div class="tn-list-item-area-left">
+                            @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                        </div>
+                        <div class="tn-list-item-area-main">
+                            <div class="tn-list-item-row tn-list-item-heading">
+                                <h5>
+                                    @Html.Link(StringUtility.Trim(user.DisplayName, 5), SiteUrls.Instance().SpaceHome(user.UserName), user.DisplayName, navigateTarget: HyperLinkTarget._blank)
+                                </h5>
+                                @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                                {
+                                    <span class="tn-actions" id="followedDiv">
+                                        @Html.FollowUser(user.UserId, "加关注")
+                                    </span>
+                                }
+                            </div>
+                            <div class="tn-list-item-row">
+                                @{
+                                string interested = interestedDic[user.UserId];
+                                }
+                                @if ("WithFollows".Equals(interested))
+                                {
+                                    IEnumerable<long> followedUserIds = followedUserIdDic[user.UserId];
+                                    int count = followedUserIds.Count<long>();
+                                    <a class="tn-secondary-text show-bubble" href="#" data-bubble-id="bubble-@(user.UserId)">@(count)个共同关注人</a>
+                                }
+                                else if ("WithCompanys".Equals(interested))
+                                {
+                                    <a class="tn-secondary-text show-bubble" href="#" data-bubble-id="bubble-@(user.UserId)">
+                                        供职于同一公司</a>
+                                }
+                                else if ("WithSchools".Equals(interested))
+                                {
+                                    <a class="tn-secondary-text show-bubble" href="#" data-bubble-id="bubble-@(user.UserId)">
+                                        毕业于同一学校</a>
+                                }
+                                else if ("WithTags".Equals(interested))
+                                {
+                                    IEnumerable<string> tags = tagNameDic[user.UserId];
+                                    int count = tags.Count();
+                                    <a class="tn-secondary-text show-bubble" href="#" data-bubble-id="bubble-@(user.UserId)">@(count)个公用标签</a>
+                                }
+                            </div>
+                        </div>
+                        <div id="bubble-@(user.UserId)" class="tn-widget tn-bubble tn-bubble-arrow-top" @if (i > 0)
+                                                                                                        { <text>style="display:none;"</text>}>
+                            <div class="tn-bubble-arrow">
+                                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                                </b>
+                            </div>
+                            <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                                <p>
+                                    @if ("WithFollows".Equals(interested))
+                                    {
+                                        IEnumerable<long> followedUserIds = followedUserIdDic[user.UserId];
+                                        for (int j = 0; j < Math.Min(followedUserIds.Count(), 3); j++)
+                                        {
+                                            long followedUserId = followedUserIds.ElementAt(j);
+                                            if (followedUserDic.ContainsKey(followedUserId))
+                                            {
+                                                User followedUser = followedUserDic[followedUserId];
+                                        <a href="@SiteUrls.Instance().SpaceHome(followedUser.UserName)" target="_blank">@followedUser.DisplayName</a>
+                                            }
+                                        }
+                                        if (followedUserIds.Count() > 3)
+                                        {
+                                        <text> 等</text>
+                                        }
+                                    }
+                                    else if ("WithCompanys".Equals(interested))
+                                    {
+                                        IEnumerable<string> companys = companyNameDic[user.UserId];
+                                        foreach (string company in companys)
+                                        {
+                                        <a href="@SiteUrls.Instance().UserSearch(company, UserSearchRange.COMPANY)" target="_blank">@company</a>
+                                        }
+                                    }
+                                    else if ("WithSchools".Equals(interested))
+                                    {
+                                        IEnumerable<string> schools = schoolNameDic[user.UserId];
+                                        foreach (string school in schools)
+                                        {
+                                        <a href="@SiteUrls.Instance().UserSearch(school, UserSearchRange.SCHOOL)" target="_blank">@school</a>
+                                        }
+                                    }
+                                    else if ("WithTags".Equals(interested))
+                                    {
+                                        IEnumerable<string> tags = tagNameDic[user.UserId];
+                                        for (int j = 0; j < Math.Min(tags.Count(), 3); j++)
+                                        {
+                                            string tag = tags.ElementAt(j);
+                                        <a href="@SiteUrls.Instance().UserSearch(tag, UserSearchRange.TAG)" target="_blank">@tag</a>
+                                        }
+                                        if (tags.Count() > 3)
+                                        {
+                                        <text> 等</text>
+                                        }
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div class="tn-change">
+                <a href="#" id="load-another-page-interested">换一换</a></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            //禁用ajax缓存
+            $.ajaxSetup ({
+                cache: false   //close AJAX cache
+            });
+            var url = '@SiteUrls.Instance()._InterestedWithAllSide()';
+
+            //点击换一换
+            $('#load-another-page-interested').click(function (e) {
+                e.preventDefault();
+
+                $.get(url, { pageSize: @(pageSize) }, function (data) {
+                    $('.spb-maybe').replaceWith(data);
+                });
+            });
+
+            //显示气泡提示
+            $('.show-bubble').click(function (e) {
+                e.preventDefault();
+
+                var bubbleId = $(this).data('bubbleId');
+                $('#' + bubbleId).toggle();
+            });
+        });
+    </script>
+}

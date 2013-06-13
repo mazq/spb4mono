@@ -1,0 +1,92 @@
+﻿@{
+    long userId = ViewData.Get<long>("userId", 0);
+    string itemName = ViewData.Get<string>("itemName", string.Empty);
+    Dictionary<int, Dictionary<long, string>> userPrivacySpecifyObjects = ViewData.Get<Dictionary<int, Dictionary<long, string>>>("userPrivacySpecifyObjects", new Dictionary<int, Dictionary<long, string>>());
+
+    string selectedUserIds = ViewData["selectedUserIds"] as string;
+    string selectedUserGroupIds = ViewData["selectedUserGroupIds"] as string;
+    SelectList selectList = ViewData[itemName] as SelectList;
+}
+<div id="@(itemName)_Container" class="tnc-space-rights">
+    <div class="tnc-privacy-specified">
+        @Html.DropDownList(itemName, null, new { @class = "tn-dropdownlist", id = "PrivacyStatusDropDownList-" + itemName })
+    </div>
+    @foreach (var pair in userPrivacySpecifyObjects)
+    {
+        @Html.Hidden(itemName + pair.Key, string.Join(",", pair.Value.Select(n => n.Key)))
+    }
+    @if (userPrivacySpecifyObjects.Count > 0 && userPrivacySpecifyObjects.All(n => n.Value.Count > 0))
+    {
+        <div class="tn-corner-all tn-border-gray tn-bg-gray tnc-designee" id="userSelector-@itemName-show" @if ((PrivacyStatus)selectList.SelectedValue != PrivacyStatus.Part)
+                                                                                                           {@Html.Raw("style=\"display: none;\"");
+                                                                                                           }>
+            @DisplaySpecifyObjects()
+        </div>
+    }
+    <span class="tn-action" id="userSelector-@itemName-edit" @if ((PrivacyStatus)selectList.SelectedValue != PrivacyStatus.Part)
+                                                             {@Html.Raw("style=\"display: none;\"");
+                                                             }><a href="@SiteUrls.Instance()._PrivacySpecifyObjectSelector(userId, itemName, selectedUserIds, selectedUserGroupIds)" id="@(itemName)EditButton" plugin="dialog">
+                                                                 编辑</a></span>
+</div>
+@helper DisplaySpecifyObjects()
+    {
+        Dictionary<int, Dictionary<long, string>> userPrivacySpecifyObjects = ViewData.Get<Dictionary<int, Dictionary<long, string>>>("userPrivacySpecifyObjects", new Dictionary<int, Dictionary<long, string>>());
+        if (userPrivacySpecifyObjects.ContainsKey(SpecifyObjectTypeIds.Instance().User()) && userPrivacySpecifyObjects[SpecifyObjectTypeIds.Instance().User()].Count > 0)
+        {
+            var userSpecifyObjects = userPrivacySpecifyObjects[SpecifyObjectTypeIds.Instance().User()];
+            int userDisplayCount = 6;
+            if (userPrivacySpecifyObjects.Count > 1)
+            {
+                userDisplayCount = 3;
+            }
+
+            foreach (var userSpecifyObject in userSpecifyObjects.Take(userDisplayCount))
+            {
+    <a href="@SiteUrls.Instance().SpaceHome(userSpecifyObject.Key)" target="_blank">@userSpecifyObject.Value</a>
+            }
+            if (userSpecifyObjects.Count() > userDisplayCount)
+            {
+    @Html.Raw("等<strong>" + userSpecifyObjects.Count() + "</strong>人 ");
+            }
+            else
+            {
+    @Html.Raw("共<strong>" + userSpecifyObjects.Count() + "</strong>人 ");
+            }
+        }
+        if (userPrivacySpecifyObjects.ContainsKey(SpecifyObjectTypeIds.Instance().UserGroup()) && userPrivacySpecifyObjects[SpecifyObjectTypeIds.Instance().UserGroup()].Count > 0)
+        {
+            var userGroupSpecifyObjects = userPrivacySpecifyObjects[SpecifyObjectTypeIds.Instance().UserGroup()];
+            if (userGroupSpecifyObjects.Any(n => n.Key == FollowSpecifyGroupIds.All))
+            {
+    @:我关注的所有人
+            }
+            else
+            {
+                int userGroupDisplayCount = 6;
+                if (userPrivacySpecifyObjects.Count > 1)
+                {
+                    userGroupDisplayCount = 3;
+                }
+    @string.Join("、", userGroupSpecifyObjects.Take(userGroupDisplayCount).Select(n => n.Value).ToArray())
+if (userGroupSpecifyObjects.Count() > userGroupDisplayCount)
+{
+    @:等<strong>@userGroupSpecifyObjects.Count()</strong>个分组
+                }
+else
+{
+    @:共<strong>@userGroupSpecifyObjects.Count()</strong>个分组
+                }
+            }
+        }
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("select#PrivacyStatusDropDownList-@itemName").change(function () {
+            if ($(this).val() == "Part") {
+                $("[id^='userSelector-@itemName']").show();
+            } else {
+                $("[id^='userSelector-@itemName']").hide();
+            }
+        });
+    });
+</script>

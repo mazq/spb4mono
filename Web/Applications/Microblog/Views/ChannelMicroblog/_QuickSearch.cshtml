@@ -1,0 +1,39 @@
+﻿@model PagingDataSet<MicroblogEntity>
+@{
+    MicroblogSearcher microblogSearcher = (MicroblogSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(MicroblogSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    }
+@if (Model.TotalRecords > 0)
+{
+  <div class="tn-section tn-border-gray tn-border-bottom">
+   <div class="tn-title tn-border-bottom tn-border-gray tnui-option" data-appname="Microblog" data-search-url="@microblogSearcher.PageSearchActionUrl(keyword)">
+  <a href="@microblogSearcher.PageSearchActionUrl(keyword)">搜“<span class="tn-text-bright">@keyword</span>”相关微博（@Model.TotalRecords）</a>
+  </div>
+   <ul class="tn-list" >
+  @foreach (MicroblogEntity microBlog in Model)
+  {
+  <li class="tn-list-item tnui-option" data-search-url="@SiteUrls.Instance().ShowMicroblog(microBlog.User.UserName,microBlog.MicroblogId)" data-search-key="@microBlog.Body">
+@*    <div class="tn-list-item-area-left">
+      @Html.ShowUserAvatar(microBlog.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+    </div>*@
+    <div class="tn-list-item-area-main ">
+        <div class="tn-list-item-row">
+            <a href="@SiteUrls.Instance().SpaceHome(microBlog.UserId)" class="tn-user-name" target="_blank">@microBlog.Author</a>@Html.IdentificationType(microBlog.UserId)：
+             <a title="@microBlog.Body" href="@SiteUrls.Instance().ShowMicroblog(microBlog.User.UserName, microBlog.MicroblogId)">
+             @if (microBlog.Body.Length > 13)
+             {
+                 @*@Html.Raw(StringUtility.Trim(Tunynet.Search.SearchEngine.Highlight(keyword,microBlog.Body,100), 60))*@
+                 @Html.Raw(string.Join("", Tunynet.Search.SearchEngine.Highlight(keyword, microBlog.Body, 100).Take(13)) + "...")
+             }
+             else
+             {
+                 @Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, microBlog.Body, 100))
+             }
+             </a>
+        </div>
+    </div>
+    </li>
+  }
+  </ul>
+    </div>
+}

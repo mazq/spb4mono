@@ -1,0 +1,57 @@
+﻿@{
+    Layout = "app-home-2cols";
+    IEnumerable<User> newUsers = ViewData.Get<IEnumerable<User>>("newUsers", null);
+    IEnumerable<IUser> hotUsers = ViewData.Get<IEnumerable<IUser>>("hotUsers", null);
+    bool enableTrackAnonymous = ViewData.Get<bool>("enableTrackAnonymous",false);
+}
+@section ContentHeader{
+    @Html.Action("_Header", "FindUser", new { menu = "Home" })
+}
+@section Aside{
+    @Html.AjaxAction("_QuickSearch", "FindUser")
+    @* todo:推荐用户 已添加*@
+    @Html.AjaxAction("_RecommendUser", "FindUser", new { topNumber = 5, recommendTypeId = "00001101" })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                热门用户标签</h3>
+        </div>
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().User() })
+    </div>
+}
+@Html.AjaxAction("_InterestedWithAll", "FindUser", new { pageSize = 6 })
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-new-user">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option">@Html.Link("更多", SiteUrls.Instance().FindUserRanking(SortBy_User.DateCreated), "更多")</div>
+        <h3 class="tn-helper-reset">
+            最新加入</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+            @foreach (var user in newUsers)
+            { 
+                <li class="tn-avatar-item">@Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small, true)
+                    @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserId), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-recent-popularusers">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option">@Html.Link("更多", SiteUrls.Instance().FindUserRanking(SortBy_User.HitTimes), "更多")</div>
+        <h3 class="tn-helper-reset">
+            近期人气用户</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+            @foreach (var user in hotUsers)
+            { 
+                <li class="tn-avatar-item">@Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small, true)
+                    @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserId), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+@Html.AjaxAction("OnlineUser", "FindUser", new { topNumber = 25, viewName = "_OnlineUser", ignoreAnonymousUsers = !enableTrackAnonymous })

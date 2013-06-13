@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<root>
+<![CDATA[
+    /*
+    Offical Style for Spacebuilder
+    (C) 2007-2012 Tunynet Inc.
+    */
+
+
+    /*page-bgcolor/border-color(页面背景)
+    ----------------------------------*/
+    .tn-page-bg,
+    .tn-bg-deep,
+    .tn-tabs .tn-tabs-nav li.tn-tabs-selected{ background:@Model.PageBackground; }
+
+    .tn-border-deep{ border-color:@Model.PageBackground;}
+
+
+    /*left-aside-bgcolor/border-color（内容背景）
+    ----------------------------------*/
+    .tn-header-bg,
+    .tn-bg-light,
+    .spb-new-activities .tn-load-more,
+	.tn-bubble .tn-bubble-content,
+	.tn-button-default,
+	.tn-content-bg .tn-wrapper,
+	.tn-footer-bg .tn-wrapper,
+	.tn-widget-content, .ui-widget-content{background:@Model.ContentBackground;}
+
+    .tn-bubble-light,
+	.tn-widget-bubble{ border-color:@Model.ContentBackground;}
+
+
+    /*main-txt-color（文字颜色）
+    ----------------------------------*/
+    Html,
+    .tn-pagination span,
+    .tn-state-active a,
+    .ui-state-active a,
+    .tn-box h3,
+    .tn-button-secondary .tn-button-text,
+    .tn-button-secondary:hover .tn-button-text{ color:@Model.MainTextColor;}
+
+	.tn-textarea,
+	.tn-textbox,
+	.tn-dropdownlist { background:@Model.MainTextColor;}
+
+
+    /*aid-txt-color（辅助文字色）
+    ----------------------------------*/
+    .tn-text-note{color:@Model.SubTextColor;}
+
+    .tn-bg-gray,
+    .tn-state-active,
+    .ui-state-active{background:@Model.SubTextColor;}
+
+    .tn-state-default,
+    .ui-state-default,
+    .tn-state-active,
+    .ui-state-active{border-color:@Model.SubTextColor;}
+
+
+    /*right-aside-bgcolor/border-color（边框线颜色）
+    ----------------------------------*/
+    .tn-button-primary .tn-button-text,
+    .tn-button-primary-hover .tn-button-text,
+    .tn-pagination a:hover,
+    .tn-pagination span.tn-selected{ color:@Model.BorderBackground;}
+
+    .tn-button-secondary,
+    .tn-button-secondary:hover,
+    .tn-search-button{background:@Model.BorderBackground;}
+
+    .tn-state-default,
+    .ui-state-default,
+    .tn-pagination span,
+    .tn-pagination a,
+    .tn-border-gray,
+    .tn-widget-content,
+    .ui-widget-content,
+    .tn-button-secondary,
+    .tn-button-secondary:hover{ border-color:@Model.BorderBackground;}
+
+
+    /*main-txt-linkcolor（主链接色）
+    ----------------------------------*/
+    a, a:hover,
+    .tn-state-default a,
+    .ui-state-default a,
+    .tn-pagination a,
+    .tn-button-default .tn-button-text,
+    .tn-button-default:hover .tn-button-text{ color:@Model.MainLinkColor;}
+
+    .tn-button-primary,
+    .tn-button-primary:hover,
+    .tn-pagination a:hover,
+    .tn-pagination span.tn-selected,
+    .tnc-user-menu .tn-side-menu .tn-selected,
+    a.tn-invert-text:hover,
+    .tn-side-menu li:hover,
+    .spb-user-panel-wrap .tn-selected{background:@Model.MainLinkColor;}
+
+    .tn-button-primary,
+    .tn-button-primary:hover,
+    .tn-pagination a:hover,
+    .tn-pagination span.tn-selected,
+    .tn-bubble-deep{border-color:@Model.MainLinkColor;}
+
+
+    /*aid-txt-linkcolor（辅助连接色）
+    ----------------------------------*/
+    a.tn-secondary-text,
+	textarea{color:@Model.SubLinkColor;}
+
+    .tn-widget-header,
+    .ui-widget-header,
+    .tn-button-default:hover,
+    .spb-top-menubar .spb-menu .tn-selected a.spb-menu-link,
+    .spb-top-menubar .spb-menu a.spb-menu-link:hover,
+    .spb-user-menu .tn-icon-menu.tn-hover{background:@Model.SubLinkColor;}
+
+    .tn-border-light,
+    .tn-pagination a,
+    .tn-widget-header,
+    .ui-widget-header,
+    .tn-button-default,
+    .tn-button-default:hover,
+    .spb-user-menu .tn-user-name:hover{border-color:@Model.SubLinkColor;}
+    ]]>
+</root>

@@ -1,0 +1,216 @@
+﻿@model AnnouncementEditModel
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000036;
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>@(Model.Id > 0 ? "编辑公告" : "创建公告")</span>
+            </h1>
+            @using (Html.BeginForm("EditAnnouncement", "ControlPanelOperation", FormMethod.Post, htmlAttributes: new RouteValueDictionary { { "id", "editAnnouncementForm" } }))
+            {
+                @Html.HiddenFor(n => n.Id)
+                <div class="tnc-ctnright-list">
+                    @Html.StatusMessage()
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        展示区域：
+                                    </th>
+                                    <td>
+                                        <ul class="tn-checkbox-list">
+                                            <li class="tn-inline-list">
+                                                @Html.SipmleCheckBox("Home", "Home", Model.DisplayArea == "Home," || Model.DisplayArea == "Home,UserSpace", new { id = "Home" })
+                                                <label for="Home">
+                                                    频道首页</label>&nbsp;&nbsp;
+                                                @Html.SipmleCheckBox("UserSpace", "UserSpace", Model.DisplayArea == ",UserSpace" || Model.DisplayArea == "Home,UserSpace", new { id = "UserSpace" })
+                                                <label for="UserSpace">
+                                                    用户空间首页</label>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        公告：
+                                    </th>
+                                    <td>
+                                        <div class="tnc-formbtn-box">
+                                            <a id="AnnouncemenTextColor" href="#" class="tnc-formbtn-a"></a><a href="#" id="AnnouncemenTextWeight"
+                                                class="tnc-formbtn-b"></a><a id="AnnouncemenTextItalic" href="#" class="tnc-formbtn-i">
+                                                </a><a href="#" id="AnnouncemenTextUnderline" class="tnc-formbtn-u"></a>
+                                        </div>
+                                        @Html.TextAreaFor(n => n.Subject, InputWidthTypes.Long, htmlAttributes: new RouteValueDictionary { { "id", "AnnouncementSubject" }, { "style", Model.SubjectStyle } })
+                                        @Html.ValidationMessage("Subject")
+                                        <input type="hidden" value="@Model.SubjectStyle" name="SubjectStyle"  id="SubjectStyle"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        附加说明：
+                                    </th>
+                                    <td>
+                                        <ul class="tn-radiobutton-list">
+                                            <li class="tn-inline-list">
+                                                @Html.RadioButton("type", "disenabled", !Model.EnabledDescription, new { @class = "tnui-type", id = "unenabled" })<label
+                                                    for="unenabled">不启用</label>&nbsp;&nbsp;
+                                                @Html.RadioButton("type", "text", Model.EnabledDescription && !Model.IsHyperLink, new { @class = "tnui-type", id = "text" })<label
+                                                    for="text">文字</label>&nbsp;&nbsp;
+                                                @Html.RadioButton("type", "hyperlink", Model.IsHyperLink, new { @class = "tnui-type", id = "hyperlink" })<label
+                                                    for="hyperlink">链接</label>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <td>
+                                        <div class="special-htmleditor-display" style="display:@(Model.EnabledDescription == true && Model.IsHyperLink == false ? "block" : "none")" >
+                                            @Html.HtmlEditor("Body", Model.Body, new HtmlEditorOptions(HtmlEditorMode.Enhanced).MergeHtmlAttribute("style", "height:400px;"))
+                                            @Html.ValidationMessage("Body")
+                                        </div>
+                                        <div class="special-hyperlink-display" style="display:@(Model.IsHyperLink == true ? "block" : "none")">
+                                            @if (Model.IsHyperLink == true)
+                                            {
+                                                @Html.TextBoxFor(n => n.HyperLinkUrl, InputWidthTypes.Long, new RouteValueDictionary { { "type", "url" }, { "maxLength", TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH } })
+                                                @Html.ValidationMessage("HyperLinkUrl")
+                                            }
+                                            else
+                                            { 
+                                                @Html.TextBoxFor(n => n.HyperLinkUrl, InputWidthTypes.Long, new RouteValueDictionary { { "class", "ignore" }, { "type", "url" }, { "maxLength", TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH } })
+                                                @Html.ValidationMessage("HyperLinkUrl")
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        有效时间：
+                                    </th>
+                                    <td>
+                                        @Html.DateTimePicker("ReleaseDate", Model.ReleaseDate)
+                                        到 @Html.DateTimePicker("ExpiredDate", Model.ExpiredDate)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                                        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, url: @SiteUrls.Instance().ManageAnnouncements(), htmlAttributes: new { id = "btnCancel" })
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>            
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+
+
+    $(function () {
+        $("#ReleaseDate").attr("readonly", "readonly");
+        $("#ExpiredDate").attr("readonly", "readonly");
+
+        //文字样式自动选中
+        if ($("#AnnouncementSubject").css("font-weight") == 'bold' || $("#AnnouncementSubject").css("font-weight") == '700') {
+            $("#AnnouncemenTextWeight").addClass("tn-selected");
+        }
+        if ($("#AnnouncementSubject").css("font-style") == 'italic') {
+            $("#AnnouncemenTextItalic").addClass("tn-selected");
+        }
+        if ($("#AnnouncementSubject").css("text-decoration") == 'underline') {
+            $("#AnnouncemenTextUnderline").addClass("tn-selected");
+        }
+
+        //判断至少选择了一个展示区域
+        $("#btnSave").click(function (e) {
+            if (!$("form input[type='checkbox']:checked").length) {
+                e.preventDefault();
+                alert("请至少选择一个展示区域！");
+                return;
+            }
+        });
+
+        $(".tnui-type").click(function () {
+            if ($(this).val() === "disenabled") {
+                $(".special-htmleditor-display").hide();
+                $(".special-hyperlink-display").hide();
+                $("#HyperLinkUrl").addClass("ignore");
+                $("#Body").addClass("ignore");
+            } else if ($(this).val() === "text") {
+                $(".special-htmleditor-display").show();
+                $(".special-hyperlink-display").hide();
+                $("#HyperLinkUrl").addClass("ignore");
+                $("#Body").removeClass("ignore");
+            } else if ($(this).val() === "hyperlink") {
+                $(".special-htmleditor-display").hide();
+                $(".special-hyperlink-display").show();
+                $("#HyperLinkUrl").removeClass("ignore");
+                $("#Body").addClass("ignore");
+            }
+        });
+
+        //文字颜色
+        $("#AnnouncemenTextColor").bigColorpicker(function (el, color) {
+
+            $("#AnnouncementSubject").css("color", color);
+            $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+        });
+
+        //文字加粗
+        $('#AnnouncemenTextWeight').click(function () {
+            if ($(this).hasClass("tn-selected")) {
+                $(this).removeClass("tn-selected")
+                $('#AnnouncementSubject').css('font-weight', 'normal');
+                $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+            }
+            else {
+                $(this).addClass("tn-selected")
+                $('#AnnouncementSubject').css('font-weight', 'bold');
+                $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+            }
+        });
+
+        //文字倾斜
+        $('#AnnouncemenTextItalic').click(function () {
+            if ($(this).is(".tn-selected")) {
+                $(this).removeClass("tn-selected")
+                $('#AnnouncementSubject').css('font-style', 'normal');
+                $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+            }
+            else {
+                $(this).addClass("tn-selected")
+                $('#AnnouncementSubject').css('font-style', 'italic');
+                $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+            }
+        });
+
+        //文字下划线
+        $('#AnnouncemenTextUnderline').click(function () {
+            if ($(this).is(".tn-selected")) {
+                $(this).removeClass("tn-selected")
+                $('#AnnouncementSubject').css('text-decoration', '');
+                $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+            }
+            else {
+                $(this).addClass("tn-selected")
+                $('#AnnouncementSubject').css('text-decoration', 'underline');
+                $('#SubjectStyle').val($('#AnnouncementSubject').attr('style'));
+            }
+        });
+
+    });  
+     
+</script>

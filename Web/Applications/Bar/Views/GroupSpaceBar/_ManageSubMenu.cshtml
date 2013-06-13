@@ -1,0 +1,10 @@
+﻿@{
+    ManageSubMenu menu = ViewData.Get<ManageSubMenu>("ManageSubMenu", ManageSubMenu.ManageThread);
+}
+<div class="tn-tabs">
+    <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+        <li class="tn-widget-content tn-border-gray tn-border-trl@(menu == ManageSubMenu.ManageThread ? " tn-tabs-selected" : "")"><a href="@SiteUrls.Instance().GroupManageThreads(Url.SpaceKey())"><span>帖子管理</span></a></li>
+        <li class="tn-widget-content tn-border-gray tn-border-trl@(menu == ManageSubMenu.ManagePost ? " tn-tabs-selected" : "")"><a href="@SiteUrls.Instance().GroupManagePosts(Url.SpaceKey())"><span>回帖管理</span></a></li>
+        <li class="tn-widget-content tn-border-gray tn-border-trl@(menu == ManageSubMenu.ManageCategroy ? " tn-tabs-selected" : "")"><a href="@SiteUrls.Instance().GroupManageThreadCategories(Url.SpaceKey())"><span>类别管理</span></a></li>
+    </ul>
+</div>

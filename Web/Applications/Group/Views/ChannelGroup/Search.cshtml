@@ -1,0 +1,273 @@
+﻿@model  PagingDataSet<GroupEntity>
+@{
+    Layout = "_Search";
+    ViewData["searcherCode"] = GroupSearcher.CODE;
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@section SearchForm{
+    @using (Html.BeginForm("Search", "ChannelGroup", FormMethod.Get, new { id = "searchForm" }))
+    {
+        @Html.TextBox("keyword", keyword, new { maxlength = "32", @class = "tn-textbox" })
+        @Html.Hidden("range", Request.QueryString.Get<int>("range", 0))
+        @Html.Hidden("nowAreaCode", Request.QueryString.GetString("nowAreaCode", string.Empty))
+        @Html.Hidden("parentAreaCode", Request.QueryString.GetString("parentAreaCode", string.Empty))
+        @Html.Hidden("keywordIsNull",false)
+        <a id="button-search" href="#" class="tn-button tn-button-text-only tn-button-large tn-button-primary"><span class="tn-button-text">搜索</span></a>
+    }
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">热门标签</h3>
+        </div>
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().Group(),Area="Common"})
+    </div>
+    @Html.AjaxAction("_SearchHistories", "Channel", new { searcherCode = GroupSearcher.CODE, Area = "Common" })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-results">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-group-search">
+            <div class="tn-list-header tn-bg-gray tn-border-gray tn-border-bottom">
+                <div class="tn-list-header-row">
+                <span class="tn-count">共有 <strong>@Model.TotalRecords</strong>个搜索结果（用时 @Model.QueryDuration 秒）</span>
+                    <span id="search-range" class="tn-keywords">
+                        <em>筛选：</em> 
+                        <a data-search-range="@((int)GroupSearchRange.ALL)" href="#">全部</a> 
+                        <a data-search-range="@((int)GroupSearchRange.GROUPNAME)" href="#">群组名</a> 
+                        <a data-search-range="@((int)GroupSearchRange.DESCRIPTION)" href="#">简介</a> 
+                        <a data-search-range="@((int)GroupSearchRange.TAG)" href="#">标签</a> 
+                        <a data-search-range="@((int)GroupSearchRange.CATEGORYNAME)" href="#">分类</a> 
+                    </span>
+                    &nbsp;&nbsp;
+                    <span class="tn-location"><span id="area-selected">所有地区</span> <a id="area-selector" href="#">[切换]</a></span>
+                </div>
+            </div>
+            @if (Model.TotalRecords > 0)
+            {
+                <div class="spb-group-list">
+                <ul class="tn-list">
+                    @foreach (GroupEntity group in Model)
+                    {
+                        @Html.Partial("_GroupItemSearch", group)
+                    }
+                </ul>
+                </div>
+                <div class="tn-pagination">
+                    @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                </div>
+            }
+            else if (string.IsNullOrEmpty(keyword))
+            {
+                <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                    <a class="tn-icon tn-smallicon-cross tn-helper-right" href="#"></a><span class="tn-helper-left">
+                        <span class="tn-icon tn-icon-exclamation"></span></span>
+                    <div class="tn-helper-flowfix">
+                        <strong>提示：</strong>请输入搜索条件</div>
+                </div>
+            }
+            else
+            { 
+                <div class="tnc-search-noresults">
+                    <p class="tn-title">
+                        很抱歉，没有找到符合您搜索条件的结果！</p>
+                    <dl class="tn-support">
+                        <dt><strong>建议：</strong></dt>
+                        <dd>
+                            请确保搜索文字拼写正确</dd>
+                        <dd>
+                            请尝试使用其他关键词或使用近义词</dd>
+                        <dd>
+                            请尝试使用含义更为宽泛的关键词</dd>
+                    </dl>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script id="template-auto-complete" type="text/x-jquery-tmpl">
+    <li class='tn-list-item tn-auto-complete-item tn-helper-clearfix tnc-auto-complete-public'>
+        <a class="tn-user-info">
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row">{{html tagNameWithHighlight}}</div>
+            </div>
+        </a>
+    </li>
+</script>
+@Html.AreaSelector("groupArea", "A1560000", @Request.QueryString.GetString("parentAreaCode", string.Empty), @Request.QueryString.GetString("nowAreaCode", string.Empty), 2, "groupSearcher.AreaSelected")
+<script type="text/javascript">
+     $(function(){ 
+        var GroupSearcher = function () {
+            this.init();
+        };
+        GroupSearcher.fn = GroupSearcher.prototype = {
+            init: function () {
+                var self = this;
+                var cache = {};
+
+                this.resetForm = false;  //是否清除搜索过滤条件
+
+                this.searchForm = $('#searchForm');
+                this.keyword = $('#keyword', this.searchForm);
+                 this.nowAreaCode = $('#nowAreaCode', this.searchForm);
+                this.parentAreaCode = $('#parentAreaCode', this.searchForm);
+                this.range = $('#range', this.searchForm);
+                this.keywordIsNull=$('#keywordIsNull',this.searchForm);
+                this.ifMustKeyword=false;
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == ""&&self.ifMustKeyword==true) {
+                        e.preventDefault();
+                         alert("请输入关键字！");
+                        this.keyword.focus();
+                    }
+
+                    if(self.resetForm){
+                        self.clearForm();
+                    }
+                });
+               
+                //注册自动完成响应事件
+                this.keyword.bind("input.autocomplete", function(){
+                    $(this).trigger('keydown.autocomplete');
+                });
+                this.keyword.autocomplete({
+                    minLength: 1,
+                    source: function (request, response) {
+                        //缓存搜索结果
+                        var term = request.term.toLowerCase(),
+                            element = this.element,
+                            cache  = this.element.data('autocompleteCache') || {},
+                            foundInCache = false;
+
+                        $.each(cache, function(key, data){
+                            if (term === key && data.length > 0) {
+                                response(data);
+                                foundInCache = true;
+                                return;
+                            }
+                        });
+
+                        if (foundInCache) return;
+                        var keyword = encodeURIComponent(self.keyword.val());
+                        $.getJSON('@SiteUrls.Instance().GroupSearchAutoComplete()?keyword='+keyword+'&topNumber=10', function (data) {
+                            cache[term] = data;
+                            element.data('autocompleteCache', cache);
+
+                            response(data);
+                        });
+                    },
+                    search: function (event, ui) {                        
+                    },
+                    open: function (event, ui) {                        
+                    },
+                    focus: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        self.searchForm.submit();
+                    }
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $('#template-auto-complete').tmpl(item).data("item.autocomplete", item).appendTo(ul);
+                };
+
+                //注册搜索按钮点击事件
+                $('#button-search').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+
+                 //注册选择地区事件
+                $('#area-selector').click(function (e) {
+                    e.preventDefault();
+                    groupArea.toggle();
+                    var left = $("#area-selector").offset().left;
+                    var top = $("#area-selector").offset().top;
+                    groupArea.position(left, top); //定位
+                });
+
+                //注册点击搜索筛选事件
+                $("#search-range a").click(function(e){
+                    e.preventDefault();
+                    //设置相应隐藏域的值
+                    self.range.val($(this).data('searchRange'));
+                    self.resetForm = false;
+                    self.ifMustKeyword=true;
+                    self.searchForm.submit();
+                });
+
+                //注册点击分类搜索事件
+                $(".tnui-searchCategory").click(function(e){
+                    e.preventDefault();
+                    self.keyword.val($(this).data('category'));
+                    self.range.val('4');
+                    self.nowAreaCode.val('');
+                    self.searchForm.submit();
+                })
+
+                //注册点击地区搜索事件
+                $(".tnui-searchArea").click(function(e){
+                    e.preventDefault();
+                    self.nowAreaCode.val($(this).data('area'));
+                })
+
+                //注册点击标签搜索事件
+                $(".tnui-searchTag").click(function(e){
+                    e.preventDefault();
+                    self.keyword.val($(this).data('tag'));
+                    self.range.val('3');
+                    self.nowAreaCode.val('');
+                    self.searchForm.submit();
+                })
+
+                //初始化搜索表单中的过滤条件状态
+                self.initSearchForm(); 
+            
+            },
+
+             /*
+            * 地区选择器回调函数
+            */
+            AreaSelected:  function (data) {
+                groupArea.hide();
+                var nowAreaName = data.areaName;
+                if(data.parentAreaCode != data.areaCode && data.parentAreaCode != data.topAreaCode){
+                    nowAreaName = data.parentAreaName+"-"+data.areaName;
+                }
+                this.nowAreaCode.val(data.areaCode);
+                this.parentAreaCode.val(data.parentAreaCode);
+                this.resetForm = false;
+                this.ifMustKeyword=false;
+                if ($.trim(this.keyword.val()) == "") {
+                 this.keywordIsNull.val(true);
+                }
+                this.searchForm.submit();
+            },
+
+            /*
+            * 初始化搜索表单中的过滤条件状态
+            */
+            initSearchForm: function () {
+                //设置筛选
+                var range=@(Request.QueryString.Get<int>("range", 0));
+                $('#search-range a[data-search-range="'+range+'"]').addClass('tn-selected');
+                 //设置地区
+                var nowAreaCode='@(Request.QueryString.GetString("nowAreaCode", string.Empty))';
+                var nowAreaName=' @Formatter.FormatArea(Request.QueryString.GetString("nowAreaCode", string.Empty), false)';
+                if(nowAreaCode == '' || nowAreaName == ''){
+                    nowAreaName='所有地区';
+                }
+                $("#area-selected").text(nowAreaName);
+            }
+        };
+
+        groupSearcher = new GroupSearcher();
+     });
+</script>

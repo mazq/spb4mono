@@ -1,0 +1,75 @@
+﻿@model IEnumerable<InitialNavigation>
+<div class="tnc-dailog-pd">
+    <div class="tn-directory">
+        @foreach (InitialNavigation navigation in Model)
+        {
+            if (!navigation.IsControlPanelManageable(UserContext.CurrentUser))
+            {
+                continue;
+            }
+
+            if (navigation.NavigationText != "主页" && navigation.IsEnabled)
+            {
+            <h5 class="tn-directory-path">
+                <a href="@if (!string.IsNullOrWhiteSpace(navigation.NavigationUrl))
+                                            {
+                                            @navigation.NavigationUrl
+                                            }
+                                            else
+                                            {
+                                            @CachedUrlHelper.RouteUrl(navigation.UrlRouteName)                                                    
+                                            }">
+                    @if (!string.IsNullOrEmpty(navigation.NavigationText))
+                    { 
+                        @navigation.NavigationText
+                    }
+                    else
+                    {
+                        @Tunynet.Globalization.ResourceAccessor.GetString(navigation.ResourceName)
+                    }
+                </a>
+            </h5>
+            <div class="tn-directory-level tn-border-gray tn-border-bottom">
+                @if (navigation.Children.Count() > 0)
+                {
+                    foreach (InitialNavigation children in navigation.Children)
+                    {
+                        if (children.Children.Count()>0)
+                        {
+                            foreach(InitialNavigation child in children.Children)
+                            {
+                                if (child.IsEnabled && child.IsControlPanelManageable(UserContext.CurrentUser))
+                                {
+                                <span class="tn-directory-item">
+                                    <a href="@if (!string.IsNullOrWhiteSpace(child.NavigationUrl))
+                                                {
+                                                @child.NavigationUrl
+                                                }
+                                                else
+                                                {
+                                                @CachedUrlHelper.RouteUrl(child.UrlRouteName)                                                    
+                                                }">
+                                    @if (!string.IsNullOrEmpty(child.NavigationText))
+                                    { 
+                                        @child.NavigationText
+                                    }
+                                    else
+                                    {
+                                        @Tunynet.Globalization.ResourceAccessor.GetString(child.ResourceName)
+                                    }</a></span>
+                                }
+                            }
+                        }
+                    }
+                }
+            </div>
+            }
+        }
+    </div>
+</div>
+
+<script type="text/dialog">
+    
+      this.title("功能地图");
+    
+</script>

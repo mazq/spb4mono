@@ -1,0 +1,32 @@
+﻿@{
+    FollowUserMenu menu = ViewData.Get<FollowUserMenu>("FollowUserMenu", FollowUserMenu.MyFolloweds);
+    RegistrationMode registrationMode = ViewData.Get<RegistrationMode>("RegistrationMode", RegistrationMode.All);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-msg-menu">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    关注用户</h4>
+            </div>
+            <ul class="tn-side-menu">
+                <li @if (menu == FollowUserMenu.MyFolloweds)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-sneak"></span>
+                    @Html.Link("我的关注", SiteUrls.Instance().ManageFollowedUsers(Url.SpaceKey()), "我的关注", new { @class = "tn-menu-text" })
+                </li>
+                <li @if (menu == FollowUserMenu.MyFollowers)
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }><span class="tn-icon tn-icon-user-relation"></span>
+                    @Html.Link("我的粉丝", SiteUrls.Instance().ManageFollowers(Url.SpaceKey()), "我的粉丝", new { @class = "tn-menu-text" })</li>
+                @if (registrationMode != RegistrationMode.Disabled)
+                {
+                    <li @if (menu == FollowUserMenu.InviteFriend)
+                        { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                        }><span class="tn-icon tn-icon-user-invite"></span>
+                        @Html.Link("邀请好友", SiteUrls.Instance().InviteFriend(Url.SpaceKey()), "邀请好友", new { @class = "tn-menu-text" })</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

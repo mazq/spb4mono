@@ -1,0 +1,98 @@
+﻿@model SensitiveWordEditModel
+@{
+    var sensitiveWordTypes = ViewData.Get<IEnumerable<SensitiveWordType>>("sensitiveWordTypes", null);
+    WordFilterStatus sensitiveWordLevel = new WordFilterStatus();   
+    
+}
+@using (Html.BeginAjaxForm("_AddSensitiveWord", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success", OnErrorCallBack = "error" }, new { id = "AddSensitiveWordForm" }))
+{ 
+    @Html.HiddenFor(n => n.Id)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short">            
+                @if (Model.Id > 0)
+                {
+                    <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Word)
+                    @Html.TextBoxFor(n => n.Word, InputWidthTypes.Medium)               
+                    @Html.ValidationMessageFor(n => n.Word)
+                    </div>
+                }
+                else
+                {
+                    <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Word)
+                    @Html.TextAreaFor(n => n.Word, InputWidthTypes.Long)               
+                    @Html.ValidationMessageFor(n => n.Word)
+                    </div>
+                    <div class="tn-form-row">
+                    <label class="tn-form-label">
+                    </label>
+                    <text class="tn-text-note">可以添加多个敏感词，每行只允许有一个</text>
+                    </div>
+                }            
+            <div class="tn-form-row">
+                @Html.FormLabelFor(n => n.TypeId)
+                @Html.DropDownListFor(n => n.TypeId, new SelectList(sensitiveWordTypes, "TypeId", "Name"), "请选择类别", new { @class = "tn-dropdownlist" })
+            </div>
+            @if (Model.Replacement == "{Banned}")
+            {
+                Model.Replacement = null;
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Replacement)
+                    @Html.EnumDropDownList("select", WordFilterStatus.Banned, htmlAttributes: new { @class = "tn-dropdownlist" })
+                </div>
+                <div class="tn-form-row" id="Replacement-Container" style="display: none">
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.TextBoxFor(n => n.Replacement, InputWidthTypes.Medium, new RouteValueDictionary { { "class", "ignore" } })
+                    @Html.ValidationMessageFor(n => n.Replacement)
+                </div>
+            }
+            else
+            {
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.Replacement)
+                    @Html.EnumDropDownList("select", sensitiveWordLevel, htmlAttributes: new { @class = "tn-dropdownlist" })
+                </div>
+                <div class="tn-form-row" id="Replacement-Container">
+                    <label class="tn-form-label">
+                    </label>
+                    @Html.TextBoxFor(n => n.Replacement, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.Replacement)
+                </div>
+            }
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+       this.title("@(Model.Id > 0 ? "编辑敏感词" : "添加敏感词")");
+</script>
+<script type="text/javascript">
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+    }
+    function error(reponse) {
+        $("#AddSensitiveWordForm").replaceWith(reponse);
+    }
+
+    //选择"替换"时，显示文本框
+    $(document).ready(function () {
+        $("#select").change(function () {
+            if ($(this).val() == "Replace") {
+                $("#Replacement-Container").show();
+                $("#Replacement").removeClass("ignore");
+            } else {
+                $("#Replacement-Container").hide();
+                $("#Replacement").addClass("ignore");
+            }
+        });
+    });
+</script>

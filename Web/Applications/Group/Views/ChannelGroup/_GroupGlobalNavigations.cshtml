@@ -1,0 +1,32 @@
+﻿@model IEnumerable<GroupEntity>
+@{
+    IUser currentUser = UserContext.CurrentUser;
+}
+<a class="spb-menu-link" href="@SiteUrls.Instance().ChannelGroupHome()">群组</a>
+@if (currentUser != null)
+{
+    <ul class="tn-widget-content tn-border-gray spb-group-menu">
+        <li class="tn-title tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().FindGroup()">
+            发现群组</a><strong>我的群组</strong></li>
+        @if (Model != null && Model.Count() > 0)
+        {
+            foreach (var item in Model)
+            { 
+            <li class="tn-person">
+                <div class="tn-avatar">
+                    <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" title="@item.GroupName" >
+                        <img alt="@item.GroupName" title="@item.GroupName" src="@SiteUrls.Instance().LogoUrl(item.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" width="50" height="50"/>
+                    </a>
+                </div>
+                <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)"  class="tn-name">@item.GroupName</a>
+            </li> 
+            }
+        }
+        else
+        {
+            <li class="tn-no-data">您还没有加入任何群组，到<a href="@SiteUrls.Instance().ChannelGroupHome()">群组首页</a>逛逛吧。</li>
+        }
+        <li class="tn-actions tn-border-gray tn-border-top"><a href="@SiteUrls.Instance().CreateGroup()">
+            创建群组</a><a href="@SiteUrls.Instance().UserJoinedGroups(UserContext.CurrentUser.UserName)">查看我的群组</a></li>
+    </ul>
+}

@@ -1,0 +1,281 @@
+﻿@model IEnumerable<LinkEntity>
+@{
+    IEnumerable<LinkEntity> textLinks=Model.Where(n=>n.LinkType==LinkType.TextLink);
+    IEnumerable<LinkEntity> imageLinks=Model.Where(n=>n.LinkType==LinkType.ImageLink);
+    
+    long ownerId = ViewData.Get<long>("ownerId", 0);
+    int ownerType = ViewData.Get<int>("ownerType", 0);
+    
+    bool isTextLinkEnabled = false;
+    bool isImageLinkEnabled = false;
+
+    if (textLinks.Where(n => n.IsEnabled == true).Count() > 0)
+    {
+        isTextLinkEnabled = true;
+    }
+    if (imageLinks.Where(n => n.IsEnabled == true).Count() > 0)
+    {
+        isImageLinkEnabled = true;
+    }
+}
+<div class="tn-unit" id="manageLinks">
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-managelink-box">
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <div class="tnc-manage-link tn-border-bottom tn-border-gray">
+                <div class="tn-list-header">
+                    <div class="tn-list-header-row tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+                        <div style="padding-bottom: 10px;">
+                            <input class="tn-checkbox" type="checkbox" id="isTextLinkEnabled" @(isTextLinkEnabled ? "checked=checked" : "") />
+                            <label for="isTextLinkEnabled">启用文字链接</label>
+                        </div>
+                        <div class="tn-filter" id="textLinkActions" @(!isTextLinkEnabled ? "style=display:none" : "")>
+                            @Html.LinkButton("添加文字链接", SiteUrls.Instance()._EditTextLinkForOwner(), HighlightStyles.Primary, iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                            <span>链接名称最多输入20个字</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tnc-overflow-y" id="textLinkList" @(!isTextLinkEnabled ? "style=display:none" : "")>
+                    <form action="#" id="form-textlink">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                @foreach (LinkEntity link in textLinks)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap tn-firm-name tn-border-dashed">
+                                            <span title="@link.LinkName">@HtmlUtility.TrimHtml(link.LinkName, 10)</span>
+                                            <input type="hidden" name="linkIds" value="@link.LinkId" />
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap tn-firm-url tn-border-dashed">
+                                            <a href="@link.LinkUrl" target="_blank">@HtmlUtility.TrimHtml(link.LinkUrl, 25)</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-avatar tn-border-dashed">
+                                            @if (link.IsEnabled)
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-pass" title="启用"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-stop" title="不启用"></span>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap tn-width-icon tn-border-dashed">
+                                            <a href="@SiteUrls.Instance()._ChangeLinkDisplayOrder()" title="上移" class="tn-item-link tn-icon tn-smallicon-upload">上移</a> 
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap tn-width-icon tn-border-dashed">
+                                            <a href="@SiteUrls.Instance()._ChangeLinkDisplayOrder()" title="下移" class="tn-item-link tn-icon tn-smallicon-download">下移</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-nowrap tn-width-action1 tn-border-dashed">
+                                            <a href="@SiteUrls.Instance()._EditTextLinkForOwner(link.LinkId)" plugin = "dialog">编辑</a> 
+                                            <a href="@SiteUrls.Instance()._DeleteLinkForOwner(link.LinkId)" class="tn-item-delete">删除</a>
+                                        </td>
+                                    </tr>                                                                                                                                                                                                                                                                                                                                                
+                                }
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+
+
+            <div class="tnc-manage-link tnc-manage-piclink">
+            <div class="tn-list-header">
+                <div class="tn-list-header-row tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+                    <div style="padding-bottom: 10px;">
+                        <input class="tn-checkbox" type="checkbox" id="isImageLinkEnabled" @(isImageLinkEnabled ? "checked=checked" : "") />
+                        <label for="isImageLinkEnabled">启用图片链接</label>
+                    </div>
+                    <div class="tn-filter" id="imageLinkActions" @(!isImageLinkEnabled ? "style=display:none" : "")>
+                        @Html.LinkButton("添加图片链接", SiteUrls.Instance()._EditImageLinkForOwner(), HighlightStyles.Primary, iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                        <span>链接名称最多输入20个字</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tnc-overflow-y" id="imageLinkList" @(!isImageLinkEnabled ? "style=display:none" : "")>   
+                <form action="#" id="form-imagelink">         
+                    <table class="tn-table-grid">
+                        <tbody>
+                            @foreach (LinkEntity link in imageLinks)
+                            {
+                                <tr class="tn-table-grid-row" data-link-id="@link.LinkId">
+                                    <td class="tn-border-gray tn-border-bottom tn-nowrap tn-firm-logo tn-border-dashed">
+                                        @{
+                                            string imageUrl = link.ImageUrl.Trim();
+                                            if (!imageUrl.ToLower().StartsWith("http"))
+                                            {
+                                                imageUrl = SiteUrls.Instance().LogoUrl(imageUrl, TenantTypeIds.Instance().Link(), ImageSizeTypeKeys.Instance().Medium(), false);
+                                            }
+                                        }
+                                        <img src="@imageUrl" alt="@link.LinkName" width="200" />
+                                        <span title="@link.LinkName">@HtmlUtility.TrimHtml(link.LinkName,5)</span>
+                                        <input type="hidden" name="linkIds" value="@link.LinkId" />
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-nowrap tn-firm-url tn-border-dashed">
+                                        <a href="@link.LinkUrl" target="_blank" title="@link.LinkName">@HtmlUtility.TrimHtml(link.LinkUrl, 15)</a>
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-avatar tn-border-dashed">
+                                            @if (link.IsEnabled)
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-pass" title="启用"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-stop" title="不启用"></span>
+                                            }
+                                        </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-nowrap tn-width-icon tn-border-dashed">
+                                        <a href="@SiteUrls.Instance()._ChangeLinkDisplayOrder()" title="上移" class="tn-item-link tn-icon tn-smallicon-upload">上移</a> 
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-nowrap tn-width-icon tn-border-dashed">
+                                        <a href="@SiteUrls.Instance()._ChangeLinkDisplayOrder()" title="下移" class="tn-item-link tn-icon tn-smallicon-download">下移</a>
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-nowrap tn-width-action1 tn-border-dashed">
+                                        <a href="@SiteUrls.Instance()._EditImageLinkForOwner(link.LinkId)" plugin = "dialog">编辑</a> 
+                                        <a href="@SiteUrls.Instance()._DeleteLinkForOwner(link.LinkId)" class="tn-item-delete">删除</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<script type="text/dialog">
+    this.title("管理友情链接");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var manageLinks = $("#manageLinks");
+        var isTextLinkEnabled = $("#isTextLinkEnabled");
+        var isImageLinkEnabled = $("#isImageLinkEnabled");
+        var textLink = $("#textLinkActions, #textLinkList", manageLinks);
+        var imageLink = $("#imageLinkActions, #imageLinkList", manageLinks);
+
+        //重新载入_ManageLinks页面
+        function reloadManageLinks() {
+            manageLinks.parent().load($("#ownerLinks a[id = 'manageLinks']")[0].href);
+        }
+
+        //重新载入_OwnerLinks页面
+        function reloadOwnerLinks() {
+            $.get($("#ownerLinks #ownerLinksUrl").val(), function (data) {
+                $("#ownerLinks").replaceWith(data);
+            });
+        }
+
+        //删除
+        $(".tn-item-delete").click(function (e) {
+            e.preventDefault();
+
+            var url = this.href;
+            art.dialog.confirm("您确认要删除该链接吗？", function () {
+                $.post(url, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    reloadManageLinks();
+                    reloadOwnerLinks();
+                });
+            });
+        });
+
+        //更新文字链接启用状态
+        function updateLinksStatus(url, data) {
+            $.post(url, data, function () {
+                reloadManageLinks();
+                reloadOwnerLinks();
+            });
+        }
+
+        //点击“启用文字链接”按钮
+        isTextLinkEnabled.click(function () {
+            var linkIds = $("#textLinkList form", manageLinks).serialize();
+            if (this.checked) {
+                textLink.show();
+                if (linkIds) {
+                    updateLinksStatus("@Html.Raw(SiteUrls.Instance()._EditLinksStatus(true))", linkIds);
+                }
+            }
+            else {
+                textLink.hide();
+                if (linkIds) {
+                    updateLinksStatus("@Html.Raw(SiteUrls.Instance()._EditLinksStatus(false))", linkIds);
+                }
+            }
+        });
+
+        //无数据时启用文字链接，不启用图片链接
+        if (!$("#textLinkList td").length) {
+            isTextLinkEnabled[0].checked = true;
+            textLink.show();
+        }
+
+        //点击“启用图片链接”按钮
+        isImageLinkEnabled.click(function () {
+            var linkIds = $("#imageLinkList form", manageLinks).serialize();
+
+            if (this.checked) {
+                imageLink.show();
+                if (linkIds) {
+                    updateLinksStatus("@Html.Raw(SiteUrls.Instance()._EditLinksStatus(true))", linkIds);
+                }
+            }
+            else {
+                imageLink.hide();
+                if (linkIds) {
+                    updateLinksStatus("@Html.Raw(SiteUrls.Instance()._EditLinksStatus(false))", linkIds);
+                }
+            }
+        });
+
+
+        //调整显示顺序
+        initial();
+        function initial() {
+            $("#textLinkList .tn-smallicon-upload").first().hide();
+            $("#textLinkList .tn-smallicon-download").last().hide();
+            $("#imageLinkList .tn-smallicon-upload").first().hide();
+            $("#imageLinkList .tn-smallicon-download").last().hide();
+        }
+
+        $(".tn-smallicon-upload").click(function (e) {
+            e.preventDefault();
+            var $tr = $(this).parents("tr:first");
+            var id = $tr.children(":first").children("input:hidden").val();
+            var referenceId = $tr.prev().children(":first").children("input:hidden").val();
+
+            $.ajax({
+                url: "@Html.Raw(SiteUrls.Instance()._ChangeLinkDisplayOrder())",
+                type: "POST",
+                data: { id: id, referenceId: referenceId },
+                success: function () {
+                    $tr_prev = $tr.prev();
+                    $tr.insertBefore($tr_prev);
+                    $(".tn-smallicon-upload, .tn-smallicon-download").show();
+                    initial();
+                    reloadOwnerLinks();
+                }
+            });
+        });
+
+        $(".tn-smallicon-download").click(function (e) {
+            e.preventDefault();
+            var $tr = $(this).parents("tr:first");
+            var id = $(this).parents("tr:first").children(":first").children("input:hidden").val();
+            var referenceId = $(this).parents("tr:first").next().children(":first").children("input:hidden").val();
+
+            $.ajax({
+                url: "@Html.Raw(SiteUrls.Instance()._ChangeLinkDisplayOrder())",
+                type: "POST",
+                data: { id: id, referenceId: referenceId },
+                success: function () {
+                    $tr_next = $tr.next();
+                    $tr.insertAfter($tr_next);
+                    $(".tn-smallicon-upload, .tn-smallicon-download").show();
+                    initial();
+                    reloadOwnerLinks();
+                }
+            });
+        });
+    });
+</script>

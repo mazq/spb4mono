@@ -1,0 +1,43 @@
+﻿@model PagingDataSet<GroupEntity>
+@{
+    Layout = "app-home-2cols";
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    SortBy_Group? sortBy = ViewData.Get<SortBy_Group?>("sortBy", null);
+    string tagName = ViewData.Get<string>("tagName", null);
+}
+@section ContentHeader{
+    @Html.Action("_GroupSubmenu", "ChannelGroup")
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+            <div class="tn-option">
+                <a href="@SiteUrls.Instance().GroupTagMap()">更多</a>
+            </div>
+            <h3 class="tn-helper-reset">
+                热门标签
+            </h3>
+        </div>
+        @Html.Action("_TagCloud", "Channel", new { area = "Common", tenantTypeId = TenantTypeIds.Instance().Group() })
+    </div>
+    @Html.AjaxAction("_TopGroups", "ChannelGroup", new { topNumber = 10,sortBy=SortBy_Group.StageHitTimes, viewName = "_TopGroups_Rank" })
+    @Html.AjaxAction("_RecommendedGroupOwners", "ChannelGroup", new { topNumber = 5, recommendTypeId = "00001111" })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-list">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading">
+            <h2>
+                标签：@tagName</h2>
+        </div>
+        <div class="spb-group-list-box">
+            <div class="tn-filter tn-helper-align-right tn-sort tn-border-gray tn-border-bottom">
+                排序方式： <a class="tn-action @(sortBy == SortBy_Group.DateCreated_Desc ? "tn-selected" : "")" href="@SiteUrls.Instance().ListByTag(tagName)">
+                    <span class="tn-action-text">最新</span></a><span class="tn-spacer tn-text-note">|</span>
+                <a class="tn-action @(sortBy == SortBy_Group.MemberCount_Desc ? "tn-selected" : "")" href="@SiteUrls.Instance().ListByTag(tagName, sortBy: SortBy_Group.MemberCount_Desc)">
+                    <span class="tn-action-text">成员数</span></a> 
+                
+            </div>
+            @Html.Partial("_List", Model, new ViewDataDictionary { { "showJoinButton",false } })
+        </div>
+    </div>
+</div>

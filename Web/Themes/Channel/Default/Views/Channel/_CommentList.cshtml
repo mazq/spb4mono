@@ -1,0 +1,145 @@
+﻿@model PagingDataSet<Comment>
+@{
+    //todo:bianchx,by zhengw:租户类型Id应该是tenantTypeId，尽量不要简写常用词
+    //回复：当面沟通吧。因为我看了下。调用这个位置的。好像就是这么写的参数名。所以不知道这么写有什么问题。
+    string tenantType = ViewData.Get<string>("tenantType", string.Empty);
+    long commentedObjectId = ViewData.Get<long>("commentedObjectId", 0);
+    //todo:bianchx,by zhengw: childComment建议改为childCommentsUrl
+    long commentId = ViewData.Get<long>("CommentId", 0);
+    bool showAfter = ViewData.Get<bool>("ShowAfter", false);
+    bool showBefor = ViewData.Get<bool>("ShowBefor", true);
+    TenantCommentSettings settings = TenantCommentSettings.GetRegisteredSettings(tenantType);
+
+    bool enableComment = ViewData.Get<bool>("enableComment", true);
+
+
+    //回复：修改为ChildCommentLink
+    string childComment = ViewData.Get<string>("ChildCommentLink", SiteUrls.Instance()._ChildComment(null, enableComment));
+
+    string parentIds = null;
+    if (Model != null && Model.Count > 0)
+    {
+        parentIds = string.Join(",", Model.Select(n => n.Id).ToArray());
+    }
+}
+@if (showAfter && showBefor)
+{
+    <div class="tn-list-header tn-helper-clearfix">
+        <h4 class="tn-text-heading">
+            评论
+            @if (settings.ShowCommentCount)
+            {
+                <span class="tn-count tn-text-note">（@Model.TotalRecords）</span>
+            }
+        </h4>
+    </div>
+}
+@if (showAfter && Model.PageIndex > 1)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        <a href="@SiteUrls.Instance()._CommentList(tenantType, commentedObjectId, pageIndex: Model.PageIndex - 1, showBefor: false, showAfter: true)">
+            更多↑</a>
+    </div>
+}
+<ul class="tn-comments" id="commentList-@commentedObjectId-0" >
+    @foreach (var comment in Model)
+    {
+        if (new Authorizer().Comment_Show(comment))
+        {
+        <li class="tn-comment-item tn-border-gray tn-border-top" id="li-comment-@comment.Id">
+            <a name="@comment.Id"></a>
+            <div class="tn-comment tn-helper-clearfix">
+                <div class="tn-comment-avatar">
+                    @Html.ShowUserAvatar(comment.IsAnonymous ? 0 : comment.UserId, AvatarSizeType.Small)
+                </div>
+                <div class="tn-comment-info tn-hover">
+                    <div class="tn-comment-act tn-state-hidden">
+                        @{
+               //todo:bianchx,by zhengw:没必要声明canDelete
+               //回复：已经处理
+                        }
+                        @if (new Authorizer().Comment_Delete(comment))
+                        {
+                            //todo:bianchx,by zhengw:为何不使用异步删除按钮？为何要拼接url？
+                            //回复：已经处理
+                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetDeleteTarget("#li-comment-" + comment.Id).SetText("删除").SetUrl(SiteUrls.Instance()._DeleteComment(comment.Id)))
+                        }
+                        <a href="@SiteUrls.Instance()._ImpeachReport(comment.UserId, Request.RawUrl, HtmlUtility.TrimHtml(comment.Body, 50))" plugin="dialog" class="tn-report" id="impeach-report"+@comment.Id >
+                            举报</a></div>
+                    <div class="tn-commentator">
+                        <h5>
+                            @if (comment.IsAnonymous || comment.UserId == 0)
+                            {
+                                @comment.Author
+                            }
+                            else
+                            {
+                                @Html.Link(comment.Author, SiteUrls.Instance().SpaceHome(comment.UserId), comment.Author, new { @class = "tn-author" })   
+                            }
+                        </h5>
+                        <em class="tn-text-note tn-date">@comment.DateCreated.ToFriendlyDate()</em>
+                        @if (comment.IsPrivate)
+                        {
+                            <span class="tn-explain-icon"><span class="tn-icon tn-icon-colorful tn-icon-colorful-private">
+                            </span><span class="tn-icon-text">悄悄话</span></span>
+                        }
+                    </div>
+                    <p>@Html.Raw(comment.Body)</p>
+                    <div class="tn-comment-feed tn-helper-clearfix">
+                        @if (settings.EnableSupportOppose)
+                        {
+                            @Html.SupportOppose(TenantTypeIds.Instance().Comment(), comment.Id, comment.UserId, AttitudeMode.Bidirection)
+                        }
+@*//todo:bianchx,by zhengw:子回复数为啥没加？ 
+                        //回复已经添加
+                         *@
+                        @if (comment.ChildCount > 0 || (settings.EnableComment && UserContext.CurrentUser != null) || settings.AllowAnonymousComment)
+                        {
+                            <span class="tn-reply"><a id="_ChildCommentList-reply-@comment.Id" class="tn-action tn-action-text-icon-right" value="@comment.Id" href="@childComment">
+                                <span class="tn-icon tn-smallicon-triangle-down"></span><span class="tn-action-text">@(settings.ShowCommentCount && comment.ChildCount > 0 ? string.Format("回复（{0}）", comment.ChildCount) : "回复")</span></a></span>
+                        }
+                    </div>
+                </div>
+                <div class="tn-replies" commentId="@comment.Id" id="tn-comments-replies-@comment.Id">
+                    @if (settings.ShowLowCommentOnLoad)
+                    {
+                        @Html.Action("_ChildComment", "Channel", new { parentId = comment.Id, showAfter = comment.Id == commentId, pageIndex = comment.Id == commentId ? ViewData.Get<int>("ChildIndex", 1) : 1, enableComment = enableComment })
+                    }
+                </div>
+            </div>
+        </li>
+        }
+    }
+</ul>
+@if (showBefor && Model.PageIndex < Model.PageCount)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        <a href="@SiteUrls.Instance()._CommentList(tenantType, commentedObjectId, pageIndex: Model.PageIndex + 1)">
+            更多↓</a>
+    </div>
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        //todo:bianchx,by zhengw:_ChildCommentList-reply- 命名建议改为childCommentList-，注意_OneComment.cshtml中的命名也需要修改
+        //点击回复时
+        $("a[id^='_ChildCommentList-reply-']").die("click").live('click', (function (e) {
+            e.preventDefault();
+            $this = $(this);
+            $this.children(".tn-icon").toggleClass("tn-smallicon-triangle-down");
+            $this.children(".tn-icon").toggleClass("tn-smallicon-triangle-up");
+            //todo:bianchx,by zhengw:尽量不要用正则来组合选择器，$this.attr("id").replace(/[^0-9]/g, '')可以改为$this.attr("value")
+            $CommentsReplies = $("#tn-comments-replies-" + $this.attr("id").replace(/[^0-9]/g, ''));
+            //todo:bianchx,by zhengw:可使用$CommentsReplies.is(":empty")
+            if (!$CommentsReplies.find("div").length) {
+                $.get($this.attr("href"), { parentId: $this.attr("value") }, function (data) {
+                    $CommentsReplies.html(data);
+                });
+            } else {
+                $CommentsReplies.toggle();
+            }
+        }));
+        //todo:bianchx,by zhengw:能不能封装一个小控件？每次都重复写不嫌麻烦？
+        //回复：已经写了
+
+    });
+</script>

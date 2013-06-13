@@ -1,0 +1,39 @@
+﻿@{
+    User user = (User)UserContext.CurrentUser;
+    int integrity = user.Profile.Integrity;
+    Spacebuilder.Common.Configuration.UserProfileSettings userProfileSetting = new Spacebuilder.Common.Configuration.UserProfileSettings();
+  }
+@using (Html.BeginAjaxForm("_CompleteGuide", "UserSpaceSettings", FormMethod.Post, new AjaxFormOptions()))
+{ 
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <label>您的档案完成程度已达到了 <b>@integrity%</b>，但还没有达到<br />
+                                <b>@userProfileSetting.MinIntegrity%</b>，下次登录仍会自动进入向导</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="tn-check-all">
+                                @Html.CheckBox("isNeedGuide")下次登录不要再进入向导
+                            </label>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary, url: SiteUrls.Instance().MyHome(Url.SpaceKey()))
+    </div>
+}
+<script type="text/dialog">
+  this.title("以后还需要向导吗？");
+</script>

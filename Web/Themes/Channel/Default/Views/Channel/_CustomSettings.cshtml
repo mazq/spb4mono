@@ -1,0 +1,268 @@
+﻿@model CustomStyle
+@{
+    var colorSchemes = ViewData.Get<IEnumerable<CustomStyle>>("colorSchemes", new List<CustomStyle>());
+    string presentAreaKey = Request.QueryString.GetString("presentAreaKey", PresentAreaKeysOfBuiltIn.UserSpace);
+    long ownerId = Request.QueryString.Get<long>("ownerId");
+    string customStyleCssBlock = ViewData.Get<string>("customStyleCssBlock", "{}");
+    bool isUseCustomStyle = Request.QueryString.Get<bool>("isUseCustomStyle", false);
+}
+@using (Html.BeginAjaxForm("_SaveCustomSettings", "Channel", new { presentAreaKey = presentAreaKey, ownerId = ownerId }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("OnSuccessCallBack"), new { id = "SaveCustomSettingsForm" }))
+{        
+    @Html.Hidden("BackgroundImageStyle.Url", Model.BackgroundImageStyle.Url)
+    <div class="tnc-custom-pic tn-helper-clearfix">
+        <div class="tnc-pic-photo">
+            <div class="tnc-upload-pic tnc-custom-note" id="customBackImg">
+                未上传背景图片
+            </div>
+            <p class="tnc-bg-check">
+                <label>
+                    @Html.CheckBox("IsUseBackgroundImage", Model.IsUseBackgroundImage)使用背景</label></p>
+        </div>
+        <div class="tnc-pic-text">
+            <div class="tn-form tn-form-single">
+                @Html.Uploadify("uploadBackImg", "gif,jpg,png", 5120, buttonOptions: new ButtonOptions().SetText(string.IsNullOrEmpty(Model.BackgroundImageStyle.Url) ? "上传背景图片" : "重新上传").SetCssClass("tnc-custom-uploadbutton").SetHeight(24), uploadFileOptions: new UploadFileOptions()
+                    .MergeUploadifyCallBack("onQueueComplete", "OnQueueComplete")
+                    .SetMultiple(false)
+                    .SetAutoUpload(true)
+                    .SetPreventCaching(true)
+                    .SetRemoveCompleted(true)
+                    .SetQueueId("uploadBackImgQueue")
+                    .SetFileTypeDescription("图像文件(*.gif,*.jpg,*.png)")
+                    .SetUploaderUrl(SiteUrls.Instance()._UploadBackgroundImage(presentAreaKey, ownerId))
+                    .MergeUploadifyFormData("CurrentUserIdToken", Utility.EncryptTokenForUploadfile(0.1, UserContext.CurrentUser.UserId))
+                    )
+                <div id="uploadBackImgQueue" style="display: none">
+                </div>
+            </div>
+            <p class="tnc-text-pad tnc-custom-note">
+                支持大小不超过5M的jpg、gif、png图片上传</p>
+            <p class="tnc-text-pad">
+                <span>对齐方式：</span> <span>
+                    <input type="radio" id="isLeft" value="@BackgroundPosition.Left" @(Model.BackgroundImageStyle.BackgroundPosition == BackgroundPosition.Left ? "checked=checked" : "") name="BackgroundImageStyle.BackgroundPosition"/><label
+                        for="isLeft">居左</label></span> <span>
+                            <input type="radio" id="isCenter" value="@BackgroundPosition.Center" @(Model.BackgroundImageStyle.BackgroundPosition == BackgroundPosition.Center ? "checked=checked" : "") name="BackgroundImageStyle.BackgroundPosition"/><label
+                                for="isCenter">居中</label></span> <span>
+                                    <input type="radio" id="isRight" value="@BackgroundPosition.Right" @(Model.BackgroundImageStyle.BackgroundPosition == BackgroundPosition.Right ? "checked=checked" : "") name="BackgroundImageStyle.BackgroundPosition"/><label
+                                        for="isRight">居右</label></span>
+            </p>
+            <p class="tnc-text-pad">
+                <span>是否延伸：</span><span><label>
+                    @Html.SipmleCheckBox("BackgroundImageStyle.IsFix", "true", Model.BackgroundImageStyle.IsFix, new { @class = "tn-checkbox", id = "isFix" })
+                    固定</label></span><span>
+                        <label>
+                            @Html.SipmleCheckBox("BackgroundImageStyle.IsRepeat", "true", Model.BackgroundImageStyle.IsRepeat, new { @class = "tn-checkbox", id = "isRepeat" })
+                            平铺</label></span></p>
+            <div class="tnc-text-pad">
+                <span>顶部标题栏高度：</span>
+                @Html.DropDownList("HeaderHeight", null, new { @class = "tn-dropdownlist" })
+            </div>
+        </div>
+    </div>
+    <div class="tnc-color-scheme tn-border-tb">
+        <h4>
+            页面配色方案：</h4>
+        <div class="tnc-color-box">
+            @foreach (var colorScheme in colorSchemes)
+            {
+                string themeUrl = Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/Custom/theme{1}.css", presentAreaKey, colorScheme.IsDark ? "-deep" : string.Empty));
+                <a data-colorscheme="@Json.Encode(colorScheme.DefinedColours)" data-isdark="@colorScheme.IsDark" data-themeurl="@themeUrl" href="javascript:void(0);">
+                    <img alt="配色方案" src="@SiteUrls.FullUrl(colorScheme.ImageUrl)"/></a>
+            }
+        </div>
+    </div>
+    @Html.Hidden("IsDark", Model.IsDark)
+    <div class="tnc-color-custom">
+        <h4>
+            自定义配色：</h4>
+        <ul class="tnc-choose-color">
+            <li>页面背景<span class="tnc-color-detail "><a  name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.PageBackground.ToString()]"
+                    id="PageBackground" href="javascript:void(0)"></a>
+                @Html.Hidden("DefinedColours[0].Key", ColorLabel.PageBackground)
+                @Html.Hidden("DefinedColours[0].Value", Model.DefinedColours[ColorLabel.PageBackground.ToString()])</span>
+            </li>
+            <li>区块背景 <span class="tnc-color-detail "><a id="ContentBackground" href="javascript:void(0)"
+                   name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.ContentBackground.ToString()]">
+            </a>
+                @Html.Hidden("DefinedColours[1].Key", ColorLabel.ContentBackground)
+                @Html.Hidden("DefinedColours[1].Value", Model.DefinedColours[ColorLabel.ContentBackground.ToString()])</span>
+            </li>
+            <li>边框 <span class="tnc-color-detail "><a id="BorderBackground" href="javascript:void(0)"
+                    name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.BorderBackground.ToString()]">
+            </a>
+                @Html.Hidden("DefinedColours[2].Key", ColorLabel.BorderBackground)
+                @Html.Hidden("DefinedColours[2].Value", Model.DefinedColours[ColorLabel.BorderBackground.ToString()])
+            </span></li>
+            <li>主文字色 <span class="tnc-color-detail "><a id="MainTextColor" href="javascript:void(0)"
+                    name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.MainTextColor.ToString()]">
+            </a>
+                @Html.Hidden("DefinedColours[3].Key", ColorLabel.MainTextColor)
+                @Html.Hidden("DefinedColours[3].Value", Model.DefinedColours[ColorLabel.MainTextColor.ToString()])
+            </span></li>
+            <li>次文字色 <span class="tnc-color-detail "><a id="SubTextColor" href="javascript:void(0)"
+                    name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.SubTextColor.ToString()]">
+            </a>
+                @Html.Hidden("DefinedColours[4].Key", ColorLabel.SubTextColor)
+                @Html.Hidden("DefinedColours[4].Value", Model.DefinedColours[ColorLabel.SubTextColor.ToString()])
+            </span></li>
+            <li>主链接色 <span class="tnc-color-detail "><a id="MainLinkColor" href="javascript:void(0)"
+                    name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.MainLinkColor.ToString()]">
+            </a>
+                @Html.Hidden("DefinedColours[5].Key", ColorLabel.MainLinkColor)
+                @Html.Hidden("DefinedColours[5].Value", Model.DefinedColours[ColorLabel.MainLinkColor.ToString()])
+            </span></li>
+            <li>次链接色 <span class="tnc-color-detail "><a id="SubLinkColor" href="javascript:void(0)"
+                    name="customcolor" style="background-color:@Model.DefinedColours[ColorLabel.SubLinkColor.ToString()]">
+            </a>
+                @Html.Hidden("DefinedColours[6].Key", ColorLabel.SubLinkColor)
+                @Html.Hidden("DefinedColours[6].Value", Model.DefinedColours[ColorLabel.SubLinkColor.ToString()])
+            </span></li>
+        </ul>
+    </div>
+    <div class="tnc-custom-btn">
+
+        @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "saveCustomStyle" })
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { id = "cancelCustom", dialogOperation = "close" })
+    </div>
+}
+<script type="text/javascript" language="javascript">
+    //单击提交按钮的回调函数
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType,function(){
+            refresh();
+        });
+    }
+
+    //单击上传按钮的回调函数
+    function OnQueueComplete(queueData) {
+        var backgroundImageUrl = '@(SiteUrls.Instance()._BackgroundImageUrl(presentAreaKey, ownerId))';
+        var backImg = "<img src='" + backgroundImageUrl+"?_="+ new Date() + "' width='150' height='150'/>";
+        $("#customBackImg").html(backImg);
+        $("#BackgroundImageStyle_Url").val(backgroundImageUrl);
+        if ($("#IsUseBackgroundImage").attr("checked")) {
+            $("body").css("background-image", "url('" + backgroundImageUrl+"?_="+ new Date() + "')");
+        }
+        $('#uploadBackImg').uploadify('settings','buttonText','重新上传');
+    }
+
+    $(function () {
+        //初始化
+        var themeurl = '@Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/Custom/theme{1}.css", presentAreaKey, Model.IsDark ? "-deep" : ""))';
+       $('link[href$="theme.css"],link[href$="theme-deep.css"]').attr("href", themeurl);
+       var appearanceUrl = "@Html.Raw(SiteUrls.Instance().CustomStyle(presentAreaKey))" + "&customStyle=" + encodeURIComponent('@(Html.Raw(Json.Encode(Model.DefinedColours)))')+"&isDark=@Model.IsDark";
+       $('link[href$="appearance.css"],link[href*="CustomStyle.ashx"]').attr("href", appearanceUrl);
+       $("body").css(@(Html.Raw(customStyleCssBlock)));
+       $("#tn-content").css("margin-top","@Model.HeaderHeight"+"px");
+
+        var backgroundImageUrl = '@(Model.BackgroundImageStyle.Url)';
+        if (backgroundImageUrl) {
+            var backgroundImg = "<img src='" + backgroundImageUrl+"?_="+ new Date() + "' width='150px' height='150px'/>";
+            $("#customBackImg").html(backgroundImg);
+        }
+        //是否使用图片复选框未被选中时，相关设置不可用
+        if (!$("#IsUseBackgroundImage").attr("checked")) {
+            $("#isRepeat,#isFix,#isRight,#isCenter,#isLeft").attr("disabled", "disabled");
+        }
+        $("#SaveCustomSettingsForm").find(":checkbox,:radio,select").change(function(){
+            $("#SaveCustomSettingsForm").data("FormIsChanged",true);
+        });
+        //取消事件
+        $("#cancelCustom").click(function () {
+                if($("#cancelButton").data("FormIsChanged")|| $("#SaveCustomSettingsForm").data("FormIsChanged"))
+                    refresh();
+        });
+
+        //是否启用背景图
+        $("#IsUseBackgroundImage").click(function () {
+            if ($(this).attr("checked")) {
+                $("#isRepeat,#isFix,#isRight,#isCenter,#isLeft").removeAttr("disabled");
+                var backgroundImageUrl = $("#BackgroundImageStyle_Url").val();
+
+                if (backgroundImageUrl) {
+                    $("body").css("background-image", "url('" + backgroundImageUrl+"?_="+ new Date() + "')").css("background-repeat", "no-repeat").css("background-attachment", "scroll").css("background-position", '@(Model.BackgroundImageStyle.BackgroundPosition) 0');
+                }
+            } else {
+                $("#isRepeat,#isFix,#isRight,#isCenter,#isLeft").attr("disabled", "disabled");
+                $("#isRepeat,#isFix").removeAttr("checked");
+                                 
+                $("body").css("background-image", "none");
+            }
+        });
+
+
+        //图片位置设置
+        $("#isLeft").click(function () {
+            $("body").css("background-position", "left top");
+        });
+        $("#isRight").click(function () {
+            $("body").css("background-position", "right top");
+        });
+        $("#isCenter").click(function () {
+            $("body").css("background-position", "center top");
+        });
+        $("#isFix").click(function () {
+            if ($(this).attr("checked")) {
+                $("body").css("background-attachment", "fixed");
+            } else {
+                $("body").css("background-attachment", "scroll");
+            }
+        });
+        //图片是否固定，重复设置
+        $("#isRepeat").click(function () {
+            if ($(this).attr("checked")) {
+                $("body").css("background-repeat", "repeat");
+            } else {
+                $("body").css("background-repeat", "no-repeat");
+            }
+        });
+        //顶部高度
+        $("#HeaderHeight").change(function () {
+            var heighttop = $(this).val();
+            $("#tn-content").css("margin-top", heighttop + "px");
+        });
+
+        //配色方案的相关操作
+        $("a[data-colorscheme]").click(function () {
+            var colorScheme = $(this).data("colorscheme");
+            var isDark = $(this).data("isdark");
+            var appearanceUrl = "@Html.Raw(SiteUrls.Instance().CustomStyle(presentAreaKey))" + "&customStyle=" + encodeURIComponent($(this).attr("data-colorscheme"))+"&isDark=" + isDark +"&_="+ new Date();
+            $('link[href$="theme.css"],link[href$="theme-deep.css"]').attr("href", $(this).data("themeurl"));
+            $('link[href$="appearance.css"],link[href*="CustomStyle.ashx"]').attr("href", appearanceUrl);
+            $("#IsDark").val(isDark);
+            $("#PageBackground").css("backgroundColor", colorScheme.PageBackground);
+            $("#DefinedColours_0__Value").val(colorScheme.PageBackground);
+            $("#ContentBackground").css("backgroundColor", colorScheme.ContentBackground);
+            $("#DefinedColours_1__Value").val(colorScheme.ContentBackground);
+            $("#BorderBackground").css("backgroundColor", colorScheme.BorderBackground);
+            $("#DefinedColours_2__Value").val(colorScheme.BorderBackground);
+            $("#MainTextColor").css("backgroundColor", colorScheme.MainTextColor);
+            $("#DefinedColours_3__Value").val(colorScheme.MainTextColor);
+            $("#SubTextColor").css("backgroundColor", colorScheme.SubTextColor);
+            $("#DefinedColours_4__Value").val(colorScheme.SubTextColor);
+            $("#MainLinkColor").css("backgroundColor", colorScheme.MainLinkColor);
+            $("#DefinedColours_5__Value").val(colorScheme.MainLinkColor);
+            $("#SubLinkColor").css("backgroundColor", colorScheme.SubLinkColor);
+            $("#DefinedColours_6__Value").val(colorScheme.SubLinkColor);
+            $("#SaveCustomSettingsForm").data("FormIsChanged",true);
+            return false;
+        });
+
+        //颜色选择器
+        $("a[name='customcolor']").bigColorpicker(function (el, color) {
+            $(el).css("backgroundColor", color);
+            $(el).siblings("input[name*='Value']").val(color);
+            var pageBackgroundColor = $("#DefinedColours_0__Value").val();
+            var contentBackground = $("#DefinedColours_1__Value").val();
+            var borderBackground = $("#DefinedColours_2__Value").val();
+            var mainTextColor = $("#DefinedColours_3__Value").val();
+            var subTextColor = $("#DefinedColours_4__Value").val();
+            var mainLinkColor = $("#DefinedColours_5__Value").val();
+            var subLinkColor = $("#DefinedColours_6__Value").val();
+
+            var customcolor = "{'PageBackground':'" + pageBackgroundColor + "','ContentBackground':'" + contentBackground + "','BorderBackground':'" + borderBackground + "','MainTextColor':'" + mainTextColor + "','SubTextColor':'" + subTextColor + "','MainLinkColor':'" + mainLinkColor + "','SubLinkColor':'" + subLinkColor + "'}";
+            var appearanceUrl = "@SiteUrls.Instance().CustomStyle(presentAreaKey)" + "&customStyle=" + encodeURIComponent(customcolor)+"&isDark="+$("#IsDark").val()+"&_="+ new Date();
+            $('link[href$="appearance.css"],link[href*="CustomStyle.ashx"]').attr("href", appearanceUrl);
+            $("#SaveCustomSettingsForm").data("FormIsChanged",true);
+            return false;
+        });
+    });
+</script>

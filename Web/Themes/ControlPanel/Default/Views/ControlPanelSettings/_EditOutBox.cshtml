@@ -1,0 +1,123 @@
+﻿@model SmtpSettingsEditModel
+@{
+    bool needAutoCompletion = ViewData.Get<bool>("NeedAutoCompletion", true);
+}
+@using (Html.BeginAjaxForm(needAutoCompletion ? "_AutoCompletionSmtpSetting" : "_EditOutBox", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions().SetCloseDialog(false).SetOnSuccessCallBack("EditOutBoxOnSuccessCallBack"), new { id = "form_EditOutBox" }))
+{
+    @Html.HiddenFor(n => n.Id)
+    <div class="tnc-dailog-pd">
+        @Html.StatusMessage()
+        <div class="tn-form tn-label-right tnc-label-short tnc-tips-location">
+            <div class="tn-form-row">
+                <label class="tn-form-label" for="UserEmailAddress">
+                    发件邮箱：
+                </label>
+                @Html.TextBoxFor(n => n.UserEmailAddress, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(n => n.UserEmailAddress)
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label" for="Password">
+                    密码：</label>
+                @Html.TextBoxFor(n => n.Password, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(n => n.Password)
+            </div>
+            @if (!needAutoCompletion)
+            {
+                <div class="tn-form-row">
+                    <label class="tn-form-label" for="UserName">
+                        邮箱登陆名：
+                    </label>
+                    @Html.TextBoxFor(n => n.UserName, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.UserName)
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label" for="Host">
+                        SMTP地址：
+                    </label>
+                    @Html.TextBoxFor(n => n.Host, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.Host)
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label" for="Port">
+                        端口号：
+                    </label>
+                    @Html.TextBoxFor(n => n.Port, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.Port)
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        SSL：
+                    </label>
+                    @Html.RadioButtonFor(n => n.EnableSsl, true, new { id = "EnableSsl-true" })
+                    <label for="EnableSsl-true">
+                        是
+                    </label>
+                    @Html.RadioButtonFor(n => n.EnableSsl, false, new { id = "EnableSsl-false" })
+                    <label for="EnableSsl-false">
+                        否
+                    </label>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        使用该邮箱作为发件人：
+                    </label>
+                    @Html.RadioButtonFor(n => n.ForceSmtpUserAsFromAddress, true, new { id = "ForceSmtpUserAsFromAddress-true" })
+                    <label for="ForceSmtpUserAsFromAddress-true">
+                        是
+                    </label>
+                    @Html.RadioButtonFor(n => n.ForceSmtpUserAsFromAddress, false, new { id = "ForceSmtpUserAsFromAddress-false" })
+                    <label for="ForceSmtpUserAsFromAddress-false">
+                        否
+                    </label>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        需验证帐号：
+                    </label>
+                    @Html.RadioButtonFor(n => n.RequireCredentials, true, new { id = "RequireCredentials-true" })
+                    <label for="RequireCredentials-true">
+                        是
+                    </label>
+                    @Html.RadioButtonFor(n => n.RequireCredentials, false, new { id = "RequireCredentials-false" })
+                    <label for="RequireCredentials-false">
+                        否
+                    </label>
+                </div>
+            }
+            <div class="tn-form-row">
+                <label class="tn-form-label" for="DailyLimit">
+                    每日限制：
+                </label>
+                @Html.TextBoxFor(n => n.DailyLimit, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(n => n.DailyLimit)
+                <br />
+                <span class="tn-text-note">此邮箱每天发送邮件的最大值 </span>
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button(needAutoCompletion ? "下一步" : "确定", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Submit, HighlightStyles.Secondary, htmlAttributes: new { dialogoperation = "close", id = "CloseArtdilogButton" })
+    </div>
+
+}
+<script type="text/dialog">
+       this.title("@(Model.Id > 0 ? "编辑发件邮箱" : "添加发件邮箱")");
+</script>
+<script language="javascript" type="text/javascript">
+    function EditOutBoxOnSuccessCallBack(data) {
+        if (data.MessageContent) {
+            if (data.MessageType <= 0) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+            } else {
+                var list = art.dialog.list;
+                for (var i in list) {
+                    list[i].close();
+                };
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+            }
+        } else {
+            $("#form_EditOutBox").replaceWith(data);
+        }
+    }
+</script>

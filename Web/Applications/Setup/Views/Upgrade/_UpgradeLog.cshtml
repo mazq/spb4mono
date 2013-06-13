@@ -1,0 +1,12 @@
+﻿@{
+    string log = ViewData.Get<string>("log", null);
+}
+<div class="tnc-dailog-pd">
+    @Html.Raw(log)
+</div>
+<div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+    @Html.Button("关闭", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { dialogOperation = "closeAll" })
+</div>
+<script type="text/dialog">
+this.title("升级日志");
+</script>

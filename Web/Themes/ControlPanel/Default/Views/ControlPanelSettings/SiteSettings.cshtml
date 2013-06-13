@@ -1,0 +1,248 @@
+﻿@model SiteSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+    SelectList selectListBusiness = ViewData.Get<SelectList>("selectListBusiness", null);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>基础设置</span>
+            </h1>
+            @using (Html.BeginAjaxForm("SaveSiteSettings", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+            {
+                <div class="tnc-ctnright-list">
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        站点名称：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.SiteName, new RouteValueDictionary { { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.SiteName)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        站点地址：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.MainSiteRootUrl, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.MainSiteRootUrl)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        站点描述：
+                                    </th>
+                                    <td>
+                                        @Html.TextAreaFor(n => n.SiteDescription, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.SiteDescription)
+                                        <div class="tn-explain">
+                                            <span class="tn-text-note">用于在浏览器的title中的站点名后面展示</span></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        MetaKeywords：
+                                    </th>
+                                    <td>
+                                        @Html.TextAreaFor(n => n.SearchMetaKeyWords, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.SearchMetaKeyWords)
+                                        <div class="tn-explain">
+                                            <span class="tn-text-note">用于展示在页面的meta信息里：@("<meta content=\"页面头信息关键字\" name=\"keywords\" />")</span></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        MetaDescription：
+                                    </th>
+                                    <td>
+                                        @Html.TextAreaFor(n => n.SearchMetaDescription, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.SearchMetaDescription)
+                                        <div class="tn-explain">
+                                            <span class="tn-text-note">用于展示在页面的meta信息里：@("<meta content=\"页面头信息描述\" name=\"description\" />")</span></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        备案信息：
+                                    </th>
+                                    <td>
+                                        @Html.TextAreaFor(n => n.BeiAnScript, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.BeiAnScript)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        页脚统计脚本：
+                                    </th>
+                                    <td>
+                                        @Html.TextAreaFor(n => n.StatScript, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.StatScript)
+                                        @if (string.IsNullOrEmpty(Model.StatScript.Trim()))
+                                        {
+                                            @Html.Link("一键开启CNZZ统计", SiteUrls.Instance()._SetCNZZStatisticsStatus(true), "一键开启CNZZ统计", new { id = "SetCNZZStatisticsStatus" })
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        页脚链接：
+                                    </th>
+                                    <td>
+                                        @Html.TextAreaFor(n => n.Links, new RouteValueDictionary { { "class", "tn-textbox tn-input-longest tn-border-gray" } })
+                                        @Html.ValidationMessageFor(n => n.Links)
+                                    </td>
+                                </tr>
+                                @*<tr>
+                                    <th>
+                                        匿名发帖：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("EnableAnonymousPosting", true, Model.EnableAnonymousPosting, new { @class = "tn-radiobutton", id = "EnableAnonymousPosting" })
+                                        <label for="EnableAnonymousPosting"> 启用</label>
+                                        @Html.RadioButton("EnableAnonymousPosting", false, !Model.EnableAnonymousPosting, new { @class = "tn-radiobutton", id = "DisableAnonymousPosting" })
+                                        <label for="DisableAnonymousPosting"> 不启用</label>
+                                    </td>
+                                </tr>*@
+                                <tr>
+                                    <th>
+                                        匿名访问：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("EnableAnonymousBrowse", true, Model.EnableAnonymousBrowse, new { @class = "tn-radiobutton", id = "EnableAnonymousBrowse" })
+                                        <label for="EnableAnonymousBrowse">
+                                            允许</label>
+                                        @Html.RadioButton("EnableAnonymousBrowse", false, !Model.EnableAnonymousBrowse, new { @class = "tn-radiobutton", id = "DisableAnonymousBrowse" })
+                                        <label for="DisableAnonymousBrowse">
+                                            不允许</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        匿名用户默认访问：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("EnableSimpleHome", true, Model.EnableSimpleHome, new { id = "SimpleHome" })
+                                        <label for="SimpleHome">
+                                            简单首页</label>
+                                        @Html.RadioButton("EnableSimpleHome", false, !Model.EnableSimpleHome, new { id = "ChannelHome" })
+                                        <label for="ChannelHome">
+                                            频道首页</label>
+                                        <label class="tn-text-note">
+                                            重启站点之后生效，请手动重启站点</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        启用评论：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("EnableComment", true, Model.EnableComment, new { @class = "tn-radiobutton", id = "EnableComment" })
+                                        <label for="EnableComment">
+                                            启用</label>
+                                        @Html.RadioButton("EnableComment", false, !Model.EnableComment, new { @class = "tn-radiobutton", id = "DisableComment" })
+                                        <label for="DisableComment">
+                                            不启用</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        允许匿名评论：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("AllowAnonymousComment", true, Model.AllowAnonymousComment, new { @class = "tn-radiobutton", id = "AllowAnonymousComment" })
+                                        <label for="AllowAnonymousComment">
+                                            允许</label>
+                                        @Html.RadioButton("AllowAnonymousComment", false, !Model.AllowAnonymousComment, new { @class = "tn-radiobutton", id = "DisAllowAnonymousComment" })
+                                        <label for="DisAllowAnonymousComment">
+                                            不允许</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        分享到站外：
+                                    </th>
+                                    <td>
+                                        @Html.DropDownList("ShareToThirdBusiness", selectListBusiness, null, new { @class = "tn-dropdownlist tn-input-medium" })
+                                        <span id="shareDisplayTypeSpan" style="display: none">以
+                                            @Html.EnumDropDownList("ShareToThirdDisplayType", Model.ShareToThirdDisplayType, null, new { @class = "tn-dropdownlist tn-input-medium" })
+                                            方式呈现 &nbsp;&nbsp;
+                                            @Html.EnumDropDownList("ShareDisplayIconSize", Model.ShareDisplayIconSize, null, new { @class = "tn-dropdownlist tn-input-medium" })
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType)
+    }
+    $(function () {
+        $("#SearchMetaDescription").watermark("主要用于站点seo优化");
+        $("#BeiAnScript").watermark("网站备案信息，支持Html代码");
+        $("#StatScript").watermark("用于统计站点访问记录，支持Html代码");
+    });
+
+    $(function () {
+        //分享到其他网站商家改变时显示分享形式
+        if ($("#ShareToThirdBusiness").val() != "") {
+            $("#shareDisplayTypeSpan").show();
+        }
+        else {
+            $("#shareDisplayTypeSpan").hide();
+        }
+        if ($("#ShareToThirdDisplayType").val() != "Icon") {
+            $("#ShareDisplayIconSize").hide();
+        }
+        else {
+            $("#ShareDisplayIconSize").show();
+        }
+
+        $("#ShareToThirdBusiness").change(function () {
+            if ($(this).val() != "") {
+                $("#shareDisplayTypeSpan").show();
+            }
+            else {
+                $("#shareDisplayTypeSpan").hide();
+            }
+        });
+
+        $("#ShareToThirdDisplayType").change(function () {
+            if ($(this).val() != "Icon") {
+                $("#ShareDisplayIconSize").hide();
+            }
+            else {
+                $("#ShareDisplayIconSize").show();
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        //开启CNZZ统计
+        $("#SetCNZZStatisticsStatus").click(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("href"), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    window.location.reload(true);
+                });
+            });
+        });
+    });
+</script>

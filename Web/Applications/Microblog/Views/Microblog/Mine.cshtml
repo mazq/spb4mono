@@ -1,0 +1,161 @@
+﻿@model PagingDataSet<long>
+@{
+    Layout = "app-list-2cols";
+
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/jquery/masonry/jquery.infinitescroll.js");
+
+    bool showNavigation = false;
+    if (UserContext.CurrentUser != null && UserContext.CurrentUser.UserName == Url.SpaceKey())
+    {
+        showNavigation = true;
+    }
+    Html.ViewContext.RouteData.Values["ShowNavigation"] = showNavigation;
+}
+@section Aside{
+    @Html.Action("_FollowTopics", "Microblog", new { spaceKey = Url.SpaceKey() })
+    @Html.Action("_TopTopics", "ChannelMicroblog", new { topNum = 10 })
+    @Html.AdvertisingPosition("11000000003")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-microblog-wrap">
+            @if (UserContext.CurrentUser != null && UserContext.CurrentUser.UserName.Equals(Url.SpaceKey()))
+            {
+                @Html.Action("_Create", "Microblog", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } })
+            }
+            <div class="tn-tabs spb-new-activities">
+                <div class="tn-tabs">
+                    <ul id="tabs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                        <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected" type="">
+                            <a href="javascript:;"><span>全部</span></a></li><li class="tn-widget-content tn-border-gray tn-border-trl"
+                                type="original"><a href="javascript:;"><span>原创</span></a></li><li class="tn-widget-content tn-border-gray tn-border-trl" type="@MediaType.Image">
+                                    <a href="javascript:;"><span>图片</span></a></li><li class="tn-widget-content tn-border-gray tn-border-trl" type="@MediaType.Video">
+                                        <a href="javascript:;"><span>视频</span></a></li><li class="tn-widget-content tn-border-gray tn-border-trl" type="@MediaType.Audio">
+                                            <a href="javascript:;"><span>音乐</span></a></li></ul>
+                </div>
+                <div id="panel" class="tn-tabs-panel">
+                    @if (Model != null)
+                    {
+                        <ul class="tn-list tnc-dynamic">
+                            @foreach (var id in Model)
+                            {
+                                @Html.Action("_Microblog", "MicroblogActivity", new RouteValueDictionary { { "microblogId", id } })
+                            }
+                        </ul>
+                            if (Model.PageCount > 3)
+                            {
+                        <div style="display: none;" class="tn-load-more tn-bg-gray tn-border-gray" id="more">
+                            <a class="tn-action tn-action-text-icon-right" href="javascript:;"><span class="tn-icon
+                            tn-smallicon-collapse-open"></span><span class="tn-action-text">更多</span></a>
+                        </div>
+                        <div style="display: none;" class="tn-loading tn-border-gray tn-corner-all" id="loading">
+                        </div>
+                            }
+                        <nav id="page-nav">
+                           <a href="?pageIndex=2"></a>
+                        </nav>
+                    }
+                    else
+                    {
+                        <div class="tn-no-data">
+                            还没有发过微博</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var index = 1;
+        //翻页加数据
+        $('ul.tnc-dynamic').livequery(function () {
+            $(this).infinitescroll({
+                navSelector: '#page-nav',    // selector for the paged navigation 
+                nextSelector: '#page-nav a',  // selector for the NEXT link (to page 2)
+                itemSelector: '.spb-microblog-item'     // selector for all items you'll retrieve
+            }, function (newElements) {
+                //取消插件绑定
+                if (index >= 3) {
+                    $(window).unbind('.infscr');
+                    $('#more').show();
+                }
+
+                index++;
+
+            });
+        });
+
+        $('#more').click(function () {
+            $(this).hide();
+            $('#loading').show();
+            $.get('@(SiteUrls.Instance()._ListMyMicroblogs(Url.SpaceKey(), null))', { type: $('#tabs li.tn-tabs-selected').attr('type'), pageIndex: index }, function (data) {
+                $loadContainer = $('#panel div.tnc-dynamic');
+                if (data.length > 0) {
+
+                    $loadContainer.append(data);
+
+                    $('#more').show();
+                    $('#loading').hide();
+                }
+            });
+        });
+
+        $('#tabs li').click(function () {
+
+            var $this = $(this);
+            if ($this.hasClass('tn-tabs-selected')) {
+                return false;
+            }
+            else {
+                $this.siblings('li').removeClass('tn-tabs-selected');
+                $this.addClass('tn-tabs-selected');
+
+                $.get('@(SiteUrls.Instance()._ListMyMicroblogs(Url.SpaceKey(), null))', { type: $this.attr('type') }, function (data) {
+                    $panel = $('#panel');
+                    if (data.length > 0) {
+                        if ($panel.children('ul.tn-list').length == 0) {
+                            $panel.html('<ul class="tn-list tnc-dynamic"></ul><nav id="page-nav"><a href="?pageIndex=2"></a></nav>');
+                        }
+
+                        $panel.children('ul.tn-list').html(data);
+
+                        index = 0;
+                    }
+                    else {
+                        $panel.html('<div class="tn-no-data">还没有这种类型的微博</div>');
+                    }
+                });
+
+
+            }
+        });
+
+        var index = 1;
+    });
+
+
+    //发布微博 表单提交成功 调用函数
+    var microblogCreateSuccess = function (data) {
+        if (data.status == 'hint') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-cross-circle").addClass("tn-bigicon-exclamation");
+        } else if (data.status == 'error') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-exclamation").addClass("tn-bigicon-cross-circle");
+        } else {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-exclamation tn-bigicon-cross-circle").addClass("tn-bigicon-accept-circle");
+        }
+        $('#msg-sussess').children('strong').html(data.message);
+        $('#msg-sussess').show();
+        setTimeout(function () { $('#msg-sussess').hide(); }, 1500);
+
+        $.get('@(SiteUrls.Instance()._Microblog())', { microblogId: data.id }, function (data) {
+            $('#panel ul.tnc-dynamic').prepend(data);
+        });
+        $("#microblogBody").val("");
+    }
+</script>

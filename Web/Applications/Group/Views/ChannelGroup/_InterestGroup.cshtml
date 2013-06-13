@@ -1,0 +1,50 @@
+﻿@model IEnumerable<GroupEntity>
+@if (Model != null && Model.Count() > 0)
+{
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-interest-group">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">可能感兴趣的群组</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <div id="Carousel" class="spb-slider spb-carousel-slider">
+            <div class="spb-slider-nav">
+                <div class="spb-slider-nav-clip">
+                    <ul class="tn-photo-list tn-widget tn-helper-clearfix">
+                        @foreach (var group in Model)
+                        {                     
+                            <li class="tn-photo-item">
+                                <p class="tn-photo-wrap tn-widget-content tn-border-gray"><a href="@SiteUrls.Instance().GroupHome(group.GroupKey)" title="@group.GroupName"><img src="@SiteUrls.Instance().LogoUrl(group.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium(), group.HasLogo)" title="@group.GroupName" alt="@group.GroupName" /></a></p>
+                                <p class="tn-text-heading"><a href="@SiteUrls.Instance().GroupHome(group.GroupKey)" title="@group.GroupName">@group.GroupName</a></p>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="spb-slider-btn spb-slider-nav-btn spb-slider-nav-prev"><a title="向左滑动" href="javascript:void(0)"><span class="tn-icon tn-icon-slide-prev"></span></a></div>
+                <div class="spb-slider-btn spb-slider-nav-btn spb-slider-nav-next"><a title="向右滑动" href="javascript:void(0)"><span class="tn-icon tn-icon-slide-next"></span></a></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	$(window).load(function () {
+		$("#Carousel").sliderkit({
+			cssprefix: "spb-slider",
+			auto: true,
+			autospeed: 4000,
+			shownavitems: 4,
+			circular: true,
+			fastchange: false,
+			scrolleasing: "easeOutExpo",
+			//"easeOutBounce, easeOutBack" 
+			scrollspeed: 500
+		});
+		$(".spb-slider-nav-btn").hover(
+		function () {
+		  $(this).addClass("tn-bg-gray");
+		},
+		function () {
+		  $(this).removeClass("tn-bg-gray");
+		});
+	}); 
+</script>
+}

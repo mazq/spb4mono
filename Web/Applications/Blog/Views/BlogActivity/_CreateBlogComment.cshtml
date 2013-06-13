@@ -1,0 +1,78 @@
+﻿@model Comment
+@{
+    BlogThread thread = ViewData.Get<BlogThread>("BlogThread", null);
+    long commentCount = thread.CommentCount;
+    string spaceKeyComment = UserIdToUserNameDictionary.GetUserName(Model.UserId);
+    string spaceKeyThread = UserIdToUserNameDictionary.GetUserName(thread.UserId);
+    IUserService userService = ViewData.Get<IUserService>("UserService", null);
+    var user = userService.GetFullUser(Model.UserId);
+    string url = SiteUrls.Instance().BlogDetail(spaceKeyThread, thread.ThreadId);
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-blog-item">
+    <div class="tn-list-item-area-left">
+        @{
+            HyperLinkTarget hyperLinkTarget;
+            if (user == UserContext.CurrentUser)
+            {
+                hyperLinkTarget = HyperLinkTarget._self;
+            }
+            else
+            {
+                hyperLinkTarget = HyperLinkTarget._blank;
+            }
+            }
+        @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, hyperLinkTarget)
+    </div>
+    <div class="tn-list-item-area-main">
+        @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+        <div class="tnc-dynamic-title">
+            @Html.Link(Model.Author, SiteUrls.Instance().SpaceHome(Model.UserId), null, new { @class = "tn-commenter" }, hyperLinkTarget)
+            @Html.IdentificationType(Model.UserId)
+            评论了
+            @Html.Link(thread.Author, SiteUrls.Instance().SpaceHome(thread.UserId), null, new { @class = "tn-author" }, hyperLinkTarget)
+            @Html.IdentificationType(thread.UserId)
+            的日志
+            @Html.Link(thread.ResolvedSubject,url, thread.Subject, new { @class = "tn-title" }, HyperLinkTarget._blank)
+        </div>
+        <div class="tnc-dynamic-commentbox spb-status-textarea tnc-textsize-small">
+            <div class="spb-bar-comment">
+                <ul class="tn-comments">
+                    <li class="tn-comment-item">
+                        <div class="tn-comment tn-helper-clearfix tn-hover">
+                            <div class="tn-comment-info">
+                                <div class="tn-commentator">
+                                    @HtmlUtility.TrimHtml(Model.Body, 88)</div>
+                                <em class="tn-text-note tn-date">@Model.DateCreated.ToFriendlyDate()</em>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-dynamic-quote">
+          <div class="tn-bubble-arrow"><b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b></div>
+          <div class="tn-bubble-content tn-border-gray tn-corner-all">
+              <p class="tnc-dynamic-box">
+                @HtmlUtility.TrimHtml(thread.GetResolvedBody(), 105)</p>
+            @{
+                Attachment attachment = ViewData.Get<Attachment>("Attachments", null);
+            }
+            @if (attachment != null)
+            {
+                <div class="tnc-dynamic-imgbox">
+                    <a href="@url" class="tnc-imgbox-bigshow" target="_blank">
+                        <img src="@SiteUrls.Instance().ImageUrl(attachment, attachment.TenantTypeId, ImageSizeTypeKeys.Instance().Original())" alt="@attachment.FriendlyFileName" width="400" /></a></div>    
+            }
+            <p class="tnc-dynamic-box tnc-textsize-small">
+                @{
+                    string postCount = string.Format("评论({0})", commentCount);
+                }
+                @Html.Link(postCount, url + "#comment", postCount, new { @class = "tnc-mrf" }, HyperLinkTarget._blank)
+                <em class="tn-date tn-text-note">@thread.DateCreated.ToFriendlyDate()</em>
+            </p>
+          </div>
+        </div>
+    
+    </div>
+</li>

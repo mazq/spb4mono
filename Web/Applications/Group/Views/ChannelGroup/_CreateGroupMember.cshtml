@@ -1,0 +1,51 @@
+﻿@model GroupEntity
+@{Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);}
+@if (Model != null)
+{
+    <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+        <div class="tn-list-item-area-left">
+            <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)" title="@Model.GroupName">
+                <img width="50" src="@SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Small())"/></a>
+            @*@Html.ShowUserAvatar(ViewData.Get<long>("ActivityUserId", 0), AvatarSizeType.Small)*@
+        </div>
+        <div class="tn-list-item-area-main">
+            @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+            <div class="tnc-dynamic-title">
+                群组 @Html.Link(Model.GroupName, SiteUrls.Instance().GroupHome(Model.GroupKey), Model.GroupName, new { @class = "tnc-mlrf" })中有新成员加入</div>
+            @{
+              IEnumerable<GroupMember> groupMembers = ViewData.Get<IEnumerable<GroupMember>>("GroupMembers", new List<GroupMember>());
+              if (groupMembers.Count() > 0)
+              {
+                  groupMembers = groupMembers.Take(3);
+              }
+            }
+            @if (groupMembers == null || groupMembers.Count() <= 0)
+            {
+                <div class="tn-no-data">
+                    暂时没有人加入此群组哦</div>
+            }
+            else
+            {
+                <ul class="tnc-dynamic-mayknow">
+                    @foreach (var item in groupMembers)
+                    {
+                        <li class="tnc-mayknow-single"><a data-user-card-url="@SiteUrls.Instance()._UserCard(item.UserId)" outerclass="tn-user-card" plugin="tipsyHoverCard" class="tnc-mayknow-img tn-helper-left" href="@SiteUrls.Instance().SpaceHome(item.UserId)">
+                            <img alt="@item.User.DisplayName" src="@SiteUrls.Instance().UserAvatarUrl(item.User, AvatarSizeType.Small)" width="50"/></a>
+                            <div class="tnc-mayknow-main">
+                                <a class="tnc-mayknow-tit" href="@SiteUrls.Instance().SpaceHome(item.UserId)">@item.User.DisplayName</a>
+                                <p class="tnc-mayknow-tit">
+                                    @Formatter.FormatArea(item.User.Profile.NowAreaCode)</p>
+                                @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != item.UserId)))
+                                {     
+                                    @Html.FollowUser(item.UserId, "关注")
+                                }
+                            </div>
+                        </li>
+                    }
+                </ul> 
+            }
+            <div class="tnc-mayknow-time">
+                <span class="tn-date tn-text-note tn-helper-left">@Model.DateCreated.ToFriendlyDate()</span></div>
+        </div>
+    </li>
+}

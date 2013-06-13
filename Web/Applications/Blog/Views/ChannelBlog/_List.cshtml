@@ -1,0 +1,18 @@
+﻿@model PagingDataSet<BlogThread>
+@if (Model != null && Model.Count() > 0)
+{ 
+    <div class=" spb-blog-list-wrap" id="blog-list">
+        <ul class="tn-list">
+        @foreach (var blogThread in Model)
+        {        
+            @Html.Partial("_BlogItemChannel", blogThread)
+        }                   
+        </ul>
+        <div class="tn-pagination">
+            @Html.AjaxPagingButton(Model, "blog-list")
+        </div>
+    </div>
+}
+else { 
+    <div class="tn-no-data">暂无数据</div>
+}

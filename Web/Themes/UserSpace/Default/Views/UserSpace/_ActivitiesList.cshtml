@@ -1,0 +1,146 @@
+﻿@model PagingDataSet<Activity>
+@{
+    IEnumerable<ApplicationBase> applicationBases = ViewData.Get<IEnumerable<ApplicationBase>>("applicationBases ", null);
+    long? groupId = ViewData.Get<long?>("groupId", null);
+    int? applicationId = ViewData.Get<int?>("applicationId", null);
+    bool? isOriginalThread = ViewData.Get<bool?>("isOriginalThread", null);
+    MediaType? mediaType = ViewData.Get<MediaType?>("mediaType", null);
+    long lastActivityId = ViewData.Get<long>("lastActivityId", 0);
+    string countUrl = SiteUrls.Instance().GetNewerCount(Url.SpaceKey(), applicationId);
+    int pageIndex = ViewData.Get<int>("pageIndex", 1);
+    int pageCount = Model.PageCount;
+
+    var applicationService = new ApplicationService();
+}
+@Html.Hidden("lastActivityId", lastActivityId)
+<ul class="tn-list tnc-dynamic">
+    @if (groupId == null)
+    {
+        <li class="tnc-dynamic-new" id="newerActivitiesLi" style="display: none;"><a href="@SiteUrls.Instance()._GetNewerActivities(Url.SpaceKey(), applicationId)" class="tn-instant-note tn-corner-all" >
+        </a></li>
+    }
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+
+            string areaName = "Common";
+            if (item.ApplicationId > 0)
+            {
+                var application = applicationService.Get(item.ApplicationId);
+                if (application == null || !application.IsEnabled)
+                {
+                    continue;
+                }
+                areaName = application.ApplicationKey;
+            }
+            string tenantTypeIdPart = "";
+            if (!string.IsNullOrEmpty(item.TenantTypeId))
+            {
+                tenantTypeIdPart = "ActivityDetail_" + item.TenantTypeId;
+            }
+        @Html.AjaxRouteAction(string.Format("{0}_{1}", tenantTypeIdPart, item.ActivityItemKey), new { ActivityId = item.ActivityId, area = areaName, isMyTimeline = true })
+            
+        }
+    }
+</ul>
+<div class="tn-load-more tn-bg-gray tn-border-gray" id="showMoreDiv">
+    <div id="active_loading" class="tn-loading" style="display: none">
+    </div>
+    <a href="javascript:;" class="tn-action tn-action-text-icon-right">@Html.Icon(IconTypes.SmallCollapseOpen)<span
+        class="tn-action-text">更多信息</span> </a>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //新动态
+        if ("@groupId" == "") {
+            $(function () {
+                function GetNewerActivities() {
+                    $.ajax({
+                        type: "POST",
+                        url: "@countUrl",
+                        data: { lastActivityId: $("#lastActivityId").val() },
+                        success: function (data) {
+
+                            if (data.Data.hasNew) {
+                                $("#newerActivitiesLi").show();
+                                $("#newerActivitiesLi a").text(data.Data.showName);
+                            }
+                        }
+                    });
+                }
+                window.setInterval(GetNewerActivities, 60000);
+            });
+
+            $("#newerActivitiesLi").bind("click", function (e) {
+
+                var lastAddress = "<li class=\"tn-mark\" id=\"lastAddress\"><div class=\"tn-cue-highlight tn-mark\"><div class=\"tn-widget-content\">上次浏览到这里</div></div></li>";
+                e.preventDefault();
+                var url = $("a", this).attr("href");
+                $this = $(this);
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: { lastActivityId: $("#lastActivityId").val() },
+                    success: function (data) {
+                        $this.hide();
+                        $("#showTimeDiv").remove();
+                        $("li#lastAddress").remove();
+                        $this.after(lastAddress);
+                        $this.after(data);
+                    }
+                });
+            });
+        }
+
+
+
+        var pageIndex = parseInt("@pageIndex");
+        if (pageIndex >= parseInt("@pageCount")) {
+            $("#showMoreDiv").hide();
+        }
+
+        //翻页加数据
+        //        $('ul.tnc-dynamic').livequery(function () {
+        //            $(this).infinitescroll({
+        //                navSelector: '#page-nav',    // selector for the paged navigation 
+        //                nextSelector: '#page-nav a',  // selector for the NEXT link (to page 2)
+        //                itemSelector: '.spb-microblog-item'     // selector for all items you'll retrieve
+        //            }, function (newElements) {
+        //                //取消插件绑定
+        //                if (pageIndex >= 3) {
+        //                    $(window).unbind('.infscr');
+        //                    $('#more').show();
+        //                }
+
+        //                pageIndex++;
+
+        //            });
+        //        });
+
+        function addPageIndex() {
+            pageIndex += 1;
+        };
+
+        //更多
+        $("#showMoreDiv").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            $('#active_loading').show();
+            $this.find('a').hide();
+            addPageIndex();
+            $.get('@Html.Raw(Url.Action("_GetNewerActivities", new { spaceKey = Url.SpaceKey(), applicationId = applicationId, groupId = groupId, isOriginalThread = isOriginalThread, mediaType = mediaType }))',
+             { pageIndex: pageIndex },
+             function (data) {
+                 $this.prev().append(data);
+                 $('#active_loading').hide();
+                 $this.children('a').show();
+                 if (pageIndex >= parseInt("@pageCount")) {
+                     $this.hide();
+                 }
+             });
+        });
+    })
+
+</script>

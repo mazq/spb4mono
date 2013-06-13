@@ -1,0 +1,141 @@
+﻿@model IEnumerable<BlogThread>
+@{
+    Layout = "_UserSpace_Wide";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-manage">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-blog-manage-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                    <a href="@SiteUrls.Instance().BlogManage(Url.SpaceKey())" class="tn-action"><span class="tn-action-text">日志管理</span></a>
+                    <span class="tn-spacer tn-text-note">|</span>
+                    <a href="@SiteUrls.Instance().BlogHome(Url.SpaceKey())" class="tn-action"><span class="tn-action-text">日志首页</span></a>
+                </div>
+                <h2>草稿箱</h2>
+            </div>
+                @if (Model==null || Model.Count()==0) { 
+                    <div class="tn-no-data">没有查询到数据！</div>
+                }
+                else
+                {
+                <form action="#" method="post" id="Form-BatchSet">
+                    <table class="tn-table-grid">
+                        <tbody>
+                        <tr class="tn-table-grid-header">                     
+                            <th class="tn-border-gray tn-border-bottom tn-text-note">标题</th>
+                            <td class="tn-border-gray tn-border-bottom tn-text-note">类别</td>
+                            <td class="tn-border-gray tn-border-bottom tn-text-note">标签</td>
+                            <td class="tn-border-gray tn-border-bottom tn-text-note">最后编辑时间</td>
+                            <td class="tn-border-gray tn-border-bottom tn-text-note"> 操作</td>
+                        </tr>
+                            @foreach (BlogThread blogThread in Model)
+                            { 
+                                <tr class="tn-table-grid-row">                                
+                                    <th class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        <a href="@SiteUrls.Instance().BlogDetail(Url.SpaceKey(), blogThread.ThreadId)" target="_blank">@blogThread.ResolvedSubject</a>
+                                    </th>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                        @{
+                                            IEnumerable<string> ownerCategoryNames = blogThread.OwnerCategoryNames;
+                                        }
+                                         @if (ownerCategoryNames != null && ownerCategoryNames.Count() > 0)
+                                                {
+                                                    string categoryNames = string.Empty;
+                                                    for (int i = 0; i < Math.Min(ownerCategoryNames.Count(), 1); i++)
+                                                    {
+                                                        categoryNames += ownerCategoryNames.ElementAt(i) + "，";
+                                                    }
+                                                    categoryNames = categoryNames.TrimEnd('，');
+                                                    <span @if (ownerCategoryNames != null && ownerCategoryNames.Count() > 1)
+                                                                                                      { <text>menu="#more-category-@blogThread.ThreadId"</text> }>@categoryNames</span>
+                                                    if (ownerCategoryNames.Count() > 1)
+                                                    {
+                                                        categoryNames = string.Empty;
+                                                        <div class="tn-widget tn-bubble tn-bubble-arrow-top" id="more-category-@blogThread.ThreadId" style="display:none">
+                                                            <div class="tn-bubble-arrow">
+                                                                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                                                            </div>
+                                                            <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                                                                @{
+                                                                    for (int i = 1; i < ownerCategoryNames.Count(); i++)
+                                                                    {
+                                                                        categoryNames += ownerCategoryNames.ElementAt(i) + "，";
+                                                                    }
+                                                                    categoryNames = categoryNames.TrimEnd('，');
+                                                                }
+                                                                @categoryNames
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-tags">
+                                        @{
+                                            IEnumerable<string> blogTagNames = blogThread.TagNames;
+                                        }
+                                        @if (blogTagNames != null &&blogTagNames.Count() > 0)
+                                                {
+                                                    string tagNames = string.Empty;
+                                                    for (int i = 0; i < Math.Min(blogTagNames.Count(), 2); i++)
+                                                    {
+                                                        tagNames +=blogTagNames.ElementAt(i) + "，";
+                                                    }
+                                                    tagNames = tagNames.TrimEnd('，');
+                                                    <span @if (blogTagNames != null &&blogTagNames.Count() > 2)
+                                                                                                      { <text>menu="#more-tag-@blogThread.ThreadId"</text> }>@tagNames</span>
+                                                    if (blogTagNames.Count() > 2)
+                                                    {
+                                                        tagNames = string.Empty;
+                                                        <div class="tn-widget tn-bubble tn-bubble-arrow-top" id="more-tag-@blogThread.ThreadId" style="display:none">
+                                                            <div class="tn-bubble-arrow">
+                                                                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                                                            </div>
+                                                            <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                                                                @{
+                                                                    for (int i = 2; i <blogTagNames.Count(); i++)
+                                                                    {
+                                                                        tagNames +=blogTagNames.ElementAt(i) + "，";
+                                                                    }
+                                                                    tagNames = tagNames.TrimEnd('，');
+                                                                }
+                                                                @tagNames
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">@blogThread.LastModified.ToUserDateString(true)
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                        <a href="@SiteUrls.Instance().BlogEdit(Url.SpaceKey(), blogThread.ThreadId, null)" class="tn-action">
+                                            <span class="tn-action-text">编辑</span></a>
+                                        <a href="@SiteUrls.Instance()._BlogDelete(Url.SpaceKey(), blogThread.ThreadId)" class="tn-action tnui-delete-thread">
+                                            <span class="tn-action-text">删除</span></a>
+                                    </td>
+                                </tr> 
+                            }
+                        </tbody>
+                    </table>
+                </form>
+                }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    //单个删除
+    $(".tnui-delete-thread").click(function (e) {
+        e.preventDefault();
+
+        var url = $(this).attr("href");
+        art.dialog.confirm('您确认要删除吗？', function () {
+            $.post(url, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    window.location.reload();
+                });
+            });
+        });
+    });
+</script>

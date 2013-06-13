@@ -1,0 +1,84 @@
+﻿@model BarThread
+@{
+    BarRating barRating = ViewData.Get<BarRating>("BarRating", new BarRating());
+    string tenantTypeName = ViewData.Get<string>("tenantTypeName", null);
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(Model.TenantTypeId);
+    var tradePointCategory = new PointService().GetPointCategory("TradePoints");
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+    <div class="tn-list-item-area-left">
+        @{
+            HyperLinkTarget hyperLinkTarget;
+            if(Model.User==UserContext.CurrentUser)
+            {
+                hyperLinkTarget = HyperLinkTarget._self;
+            }
+            else
+            {
+                hyperLinkTarget = HyperLinkTarget._blank;
+            }
+            }
+        @Html.ShowUserAvatar(barRating.User, SiteUrls.Instance().SpaceHome(Model.UserId), AvatarSizeType.Small, hyperLinkTarget)
+    </div>
+    <div class="tn-list-item-area-main">
+        @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+        <div class="tnc-dynamic-title">
+            @Html.Link(barRating.UserDisplayName, SiteUrls.Instance().SpaceHome(barRating.UserId), null, new { @class = "tn-commenter" }, hyperLinkTarget)
+            @Html.IdentificationType(barRating.UserId)
+            @if (!string.IsNullOrEmpty(tenantTypeName))
+            { 
+                <text>在</text> @tenantTypeName @Html.Link(Model.BarSection.Name, urlGetter.SectionDetail(Model.SectionId), Model.BarSection.Name, new { @class = "tn-title" }, HyperLinkTarget._blank) <text>中</text>
+            }
+            评分了
+            @Html.Link(Model.Author, urlGetter.UserSpaceHome(Model.UserId, Model.SectionId), Model.Author, new { @class = "tn-author" }, HyperLinkTarget._blank)
+            @Html.IdentificationType(Model.UserId)
+            的
+            @Html.Link(Model.Subject, urlGetter.ThreadDetail(Model.ThreadId), Model.Subject, new { @class = "tn-title" }, HyperLinkTarget._blank)
+        </div>
+        <table class="tn-table-grid tn-border-gray tn-border-top" id="content-ranting-data">
+            <tbody id="bar-rating">
+                <tr class="tn-table-grid-row">
+                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                        @Html.Link(HtmlUtility.TrimHtml(barRating.UserDisplayName, 20), urlGetter.UserSpaceHome(barRating.UserId, Model.SectionId), barRating.UserDisplayName)
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                        @(barRating.ReputationPoints != 0 ? "威望积分" + (barRating.ReputationPoints > 0 ? "+" + barRating.ReputationPoints.ToString() : barRating.ReputationPoints.ToString()) : "")
+                        @(barRating.TradePoints > 0 ? tradePointCategory.CategoryName + barRating.TradePoints : "")
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom">
+                        理由：@barRating.Reason
+                    </td>
+                    <td class="tn-border-gray tn-border-bottom tn-nowrap">
+                        @Html.Link(barRating.DateCreated.ToFriendlyDate(), urlGetter.ThreadDetail(Model.ThreadId), barRating.DateCreated.ToFriendlyDate(), new { @class = "tn-date tn-secondary-text" }, HyperLinkTarget._blank)
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-dynamic-quote">
+            <div class="tn-bubble-arrow">
+                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                </b>
+            </div>
+            <div class="tn-bubble-content tn-border-gray tn-corner-all">
+                <p class="tnc-dynamic-box">
+                    @Html.Raw(HtmlUtility.TrimHtml(Model.GetResolvedBody(), 105))</p>
+                @{
+                    Attachment attachment = ViewData.Get<Attachment>("Attachments", null);
+                }
+                @if (attachment != null)
+                {
+                    <div class="tnc-dynamic-imgbox">
+                        <a href="@urlGetter.ThreadDetail(Model.ThreadId)" class="tnc-imgbox-bigshow" target="_blank">
+                            <img src="@SiteUrls.Instance().ImageUrl(attachment, attachment.TenantTypeId, ImageSizeTypeKeys.Instance().Original())" alt="@attachment.GetOriginalFileName()" width="400" /></a></div>    
+                }
+                <p class="tnc-dynamic-box tnc-textsize-small">
+                    @{
+                        string postName = Model.PostCount > 0 ? string.Format("回帖（{0}）", Model.PostCount) : "回帖";
+                    }
+                    @Html.Link(postName, urlGetter.ThreadDetail(Model.ThreadId, isAnchorPostList: true), postName, new { @class = "tnc-mrf" }, HyperLinkTarget._blank)
+                    @Html.Link(Model.DateCreated.ToFriendlyDate(), urlGetter.ThreadDetail(Model.ThreadId), Model.DateCreated.ToFriendlyDate(), new { @class = "tn-date tn-secondary-text" }, HyperLinkTarget._blank)
+                </p>
+            </div>
+        </div>
+    </div>
+</li>

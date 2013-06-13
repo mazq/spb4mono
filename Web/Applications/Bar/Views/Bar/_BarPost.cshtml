@@ -1,0 +1,69 @@
+﻿@model BarPost
+@{
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(Model.TenantTypeId);
+}
+<li class="tn-comment-item tn-border-gray tn-border-bottom" id="deleteButton-@Model.PostId">
+    <div class="tn-comment tn-helper-clearfix tn-hover">
+        <div class="tn-comment-avatar">
+            @Html.ShowUserAvatar(Model.User, urlGetter.UserSpaceHome(Model.UserId, Model.SectionId), AvatarSizeType.Small, HyperLinkTarget._blank)
+        </div>
+        <div class="tn-comment-info">
+            <div class="tn-commentator">
+                @if (!string.IsNullOrEmpty(Model.Subject))
+                {
+                    <div class="tn-title">
+                        @Model.Subject</div>
+                }
+                <h5>
+                    @Html.Link(Model.Author, urlGetter.UserSpaceHome(Model.UserId, Model.SectionId), Model.Author, new { @class = "tn-author" }, HyperLinkTarget._blank)
+                </h5>
+                <em class="tn-text-note tn-date">@Model.DateCreated.ToFriendlyDate()</em></div>
+            <div class="tn-detail-text">@Html.Raw(Model.GetResolvedBody())</div>
+            <div class="tn-comment-feed tn-helper-clearfix">
+                @if (new Authorizer().BarPost_Delete(Model) || new Authorizer().BarPost_Edit(Model))
+                {
+                    <div class="tn-helper-right tn-state-hidden">
+                        @if (new Authorizer().BarPost_Delete(Model))
+                        {
+                            //todo:bianchx,by zhengw:为什么没有使用异步删除按钮？
+                            //回复：已经处理对应问题
+                            <span class="tn-action">
+                                @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除？").SetDeleteTarget("#deleteButton-" + Model.PostId).SetText("删除").SetUrl(SiteUrls.Instance().DeletePost(Model.PostId)))
+                            </span>
+                        }
+                        @if (new Authorizer().BarPost_Delete(Model) && new Authorizer().BarPost_Edit(Model))
+                        {
+                            <span class="tn-spacer tn-text-note tn-action">|</span>
+                        }
+                        @if (new Authorizer().BarPost_Edit(Model))
+                        {
+                            <span class="tn-action tn-edit">
+                                @Html.Link("编辑", SiteUrls.Instance().EditPost(Model.ThreadId, Model.PostId), "编辑", new { @class = "tn-action-text" })
+                            </span>
+                        }
+                    </div>
+                }
+                @if (Model.ChildPostCount > 0 || UserContext.CurrentUser != null)
+                {
+                    if (Model.ParentId == 0)
+                    {
+                    <span class="tn-reply"><a href="@SiteUrls.Instance()._ChildPost(Model.PostId)" id="barpost-id-@Model.PostId" class="tn-action tn-action-text-icon-right">
+                        <span class="tn-icon tn-smallicon-triangle-down"></span><span class="tn-action-text">
+                            回复</span></a> </span>
+                    }
+                    else
+                    {
+                    <span class="tn-reply"><a href="javascript:;" id="three-level-post-@Model.PostId" foruser = "@Model.User.NickName" class="tn-action tn-action-text-icon-right">
+                        <span class="tn-action-text">回复</span> </a></span>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    @if (Model.ParentId == 0)
+    {
+        <div class="tn-replies">
+            @Html.Action("_ChildPost", new { parentId = Model.PostId })
+        </div>
+    }
+</li>

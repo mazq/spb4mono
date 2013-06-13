@@ -1,0 +1,74 @@
+@{
+    string appKey = "2129b2621f2c0a268ae3fed163d3a028";
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+
+    ParsedMedia entity = ParsedMedia.New();
+    entity.MediaType = MediaType.Video;
+    entity.Url = url;
+
+    Regex urlPWRegex = new Regex(@"http://my.tv.sohu.com/u/pw/\d+_\d+_\d+", RegexOptions.IgnoreCase);
+    Match urlPWMatch = urlPWRegex.Match(url);
+    if (urlPWMatch.Success)
+    {
+        string vidRegexString = @"var vid='(?<videoId>[\d]+)';";
+        string webMatter = HttpCollects.GetHTMLContent(url, vidRegexString);
+        Regex vidRegex = new Regex(vidRegexString, RegexOptions.IgnoreCase);
+        Match vidMatch = vidRegex.Match(webMatter);
+        if (vidMatch.Success)
+        {
+            url = string.Format("http://my.tv.sohu.com/u/vw/{0}", vidMatch.Groups["videoId"].Value);
+        }
+    }
+
+    Regex urlBokeRegex = new Regex(@"http://my.tv.sohu.com/u/[p|v]w/(?<bokeVideoId>[\d]+)", RegexOptions.IgnoreCase);
+    Match urlBokeMatch = urlBokeRegex.Match(url);
+
+    string urlRegexString = @"^http://tv.sohu.com/([\s\S]*?)/n(?<videoId>[\d]*?).shtml";
+    Regex urlRegex = new Regex(urlRegexString, RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+
+
+    if (urlMatch.Success)
+    {
+        string webMatter = HttpCollects.GetHTMLContent(url);
+        string videoIdRegexString = @"var vid=""(?<vid>[\d]+)"";";
+        Regex videoIdRegex = new Regex(videoIdRegexString, RegexOptions.IgnoreCase);
+        Match videoIdMatch = videoIdRegex.Match(webMatter);
+        if (videoIdMatch.Success)
+        {
+            string videoId = videoIdMatch.Groups["vid"].Value;
+            entity.PlayerUrl = string.Format("http://share.vrs.sohu.com/{0}/v.swf&autoplay=false", videoId);
+            string videoInofJosn = HttpCollects.GetHTMLContent(string.Format("http://api.tv.sohu.com/set/info/v/{0}.json?api_key={1}", videoId, appKey));
+
+            if (!string.IsNullOrEmpty(videoInofJosn))
+            {
+
+                dynamic videoInfo = Json.Decode(videoInofJosn);
+                if (videoInfo != null && videoInfo.data != null)
+                {
+                    entity.Description = videoInfo.data.tv_desc;
+                    entity.Name = videoInfo.data.tv_name;
+                    entity.ThumbnailUrl = videoInfo.data.hor_big_pic;
+                }
+            }
+            ParsedMediaService parsedMediaService = new ParsedMediaService();
+            parsedMediaService.Create(entity);
+        }
+    }
+    else if (urlBokeMatch.Success)
+    {
+        string bokeVideoId = urlBokeMatch.Groups["bokeVideoId"].Value;
+        entity.PlayerUrl = string.Format(@"http://share.vrs.sohu.com/my/v.swf&topBar=1&autoplay=false&id={0}", bokeVideoId);
+        string webMatter = HttpCollects.GetHTMLContent(string.Format("http://api.tv.sohu.com/boke/video/info/{0}.json?api_key={1}", bokeVideoId, appKey));
+        dynamic videoInfo = Json.Decode(webMatter);
+        if (videoInfo != null && videoInfo.data != null)
+        {
+            entity.Description = videoInfo.data.introduction;
+            entity.Name = videoInfo.data.title;
+            entity.ThumbnailUrl = videoInfo.data.bigCoverImg;
+        }
+        ParsedMediaService parsedMediaService = new ParsedMediaService();
+        parsedMediaService.Create(entity);
+    }
+}
+@Html.Raw(Json.Encode(entity))

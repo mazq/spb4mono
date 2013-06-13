@@ -1,0 +1,60 @@
+﻿@model PagingDataSet<BarEntity>
+@{
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", TenantTypeIds.Instance().Bar());
+
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+
+    string keyword = Request.QueryString.Get<string>("keyword", string.Empty);
+}
+<div id="barThreadsContainer" class="spb-bar-category-list">
+    <ul class="tn-list">
+        @foreach (var thread in Model)
+        {
+            if (thread.IsPost)
+            {
+            <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                <div class="tn-list-item-row tn-list-item-heading">
+                    <h5 class="tn-helper-reset">
+                        <a target="_blank" href="@SiteUrls.Instance().ThreadDetailGotoPost(thread.PostId)">回复:@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, thread.Subject, 30))</a>
+                    </h5>
+                </div>
+                <div class="tn-list-item-row tn-list-item-summary">
+                    <p>@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, HtmlUtility.TrimHtml(thread.Body, 100), 100))</p>
+                </div>
+                <div class="tn-list-item-row tn-info">
+                    <em class="tn-date tn-text-note">@thread.DateCreated.ToUserDateString(true)</em>
+                    <a target="_blank" class="tn-user-name" href="@urlGetter.UserThreads(thread.UserId, thread.SectionId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, thread.Author, 100))</a>
+                    <a target="_blank" class="tn-category" href="@urlGetter.SectionDetail(thread.SectionId)" title="@thread.SectionName">@thread.SectionName</a>
+                </div>
+            </li>
+            }
+            else
+            {
+            <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                <div class="tn-list-item-row tn-list-item-heading">
+                    <h5 class="tn-helper-reset">
+                        <a target="_blank" href="@urlGetter.ThreadDetail(thread.ThreadId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, thread.Subject, 30))</a>
+                    </h5>
+                </div>
+                <div class="tn-list-item-row tn-list-item-summary">
+                    <p>@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, HtmlUtility.TrimHtml(thread.Body, 100), 100))</p>
+                </div>
+                <div class="tn-list-item-row tn-tags">
+                    @foreach (var tag in thread.Tag)
+                    {
+                        <span><a target="_blank" href="@urlGetter.ListByTag(tag, thread.SectionId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, tag, 100))</a></span>
+                    }
+                </div>
+                <div class="tn-list-item-row tn-info">
+                    <em class="tn-date tn-text-note">@thread.DateCreated.ToUserDateString(true)</em>
+                    <a target="_blank" class="tn-user-name" href="@urlGetter.UserThreads(thread.UserId, thread.SectionId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, thread.Author, 100))</a>
+                    <a target="_blank" class="tn-category" href="@urlGetter.SectionDetail(thread.SectionId)">@thread.SectionName</a>
+                </div>
+            </li>
+            }
+        }
+    </ul>
+    <div class="tn-pagination">
+        @Html.AjaxPagingButton(Model, "barThreadsContainer")
+    </div>
+</div>

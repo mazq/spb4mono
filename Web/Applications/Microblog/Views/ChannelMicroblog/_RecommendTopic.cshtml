@@ -1,0 +1,35 @@
+﻿@model IEnumerable<RecommendItem>
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-recom-topic">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+            <div class="tn-option">
+                @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().Microblog()))
+                {
+                    <a href="@SiteUrls.Instance()._ManageRecommendItems("10010101")" plugin="dialog">管理</a>
+                }
+            </div>
+            <h3 class="tn-helper-reset">
+                推荐话题</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom ">
+            <ul class="tn-list">
+                @foreach (var tag in Model)
+                {
+                    var topic = tag.GetMicroblogTopic();
+                    if (topic == null)
+                    {
+                        continue;
+                    }
+                    <li>
+                        @Html.Link(StringUtility.Trim(tag.ItemName, 10, ""), tag.DetailUrl, tag.ItemName)
+                        @if (!tag.IsLink)
+                        { 
+                            <span class="tn-text-note">(@topic.ItemCount)</span>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

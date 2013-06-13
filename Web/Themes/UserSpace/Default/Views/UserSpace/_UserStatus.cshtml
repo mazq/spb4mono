@@ -1,0 +1,42 @@
+﻿@model User
+@{
+    string accessedCount = ViewData.Get<string>("accessedCount", string.Empty);
+ 
+}
+<dl>
+    <dt>用户等级：</dt>
+    <dd>
+        <span class="spb-user-type">
+           <a href="@SiteUrls.Instance().MyRank(Model.UserName)"> @Html.UserRankIcon(Model.Rank)</a></span>
+    </dd>
+</dl>
+<dl>
+    <dt>在线状态：</dt>
+    <dd>
+        <span class="spb-user-type">
+            @if (Model.IsOnline)
+            {
+                <img alt="在线" title="在线" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/icons/user_IsOnline.gif")" />
+            }
+            else
+            { 
+                <img alt="离线" title="离线" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/icons/user_IsOffline.gif")" />
+            }
+        </span>
+    </dd>
+</dl>
+<dl>
+    <dt>注册日期：</dt>
+    <dd>
+        @Model.DateCreated.ToUserDateString()</dd>
+</dl>
+<dl>
+    <dt>最新访问：</dt>
+    <dd>
+        @Model.LastActivityTime.ToFriendlyDate()</dd>
+</dl>
+<dl>
+    <dt>被访次数：</dt>
+    <dd>
+        <span>@accessedCount</span></dd>
+</dl>

@@ -1,0 +1,42 @@
+﻿@{
+    string textareaId = ViewData.Get<String>("textareaId", string.Empty);
+    string seletorId = ViewData.Get<String>("seletorId", string.Empty);
+    int randomNum = new Random().Next(100000, 999999); 
+}
+<div id="atUserView-@randomNum" class="tn-at-view tnc-mode-windows tn-widget tn-bubble tn-bubble-arrow-top">
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+        </b>
+    </div>
+    <div class="tn-bubble-content tn-widget-content">
+        <div class="tnc-mode-content">
+            <div class="tnc-mode-icon">
+                <a id="close" class="tn-icon tn-smallicon-cross">关闭</a></div>
+            <div class="tn-form tn-form-single">
+                <input id="searchUser" class="tn-textbox tn-border-gray" /></div>
+            <ul id='userList' class="tn-border-gray tn-border-top">
+            </ul>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $.atUserNameArray = [];
+        $.getJSON('@SiteUrls.Instance()._AtRemindUser()', function (data) {
+            $.each(data, function (i, value) {
+                if (value.nickName) {
+                    if (value.noteName)
+                        $.atUserNameArray.push(value.nickName + "(" + value.noteName + ")");
+                    else
+                        $.atUserNameArray.push(value.nickName);
+                }
+            });
+            $.atUserNameArray = $.map($.atUserNameArray, function (value, i) {
+                return { 'name': value };
+            });
+
+            $("#@(seletorId)").atUser($.atUserNameArray, "#@(textareaId)", "@(randomNum)");
+        });
+
+    });
+</script>

@@ -1,0 +1,43 @@
+﻿@{
+    string url = null;
+    if (UserContext.CurrentUser != null)
+    {
+        string spaceKey = UserContext.CurrentUser.UserName;
+        url = SiteUrls.Instance()._CreatMicroblog(spaceKey);
+    }
+    else
+    {
+        url = SiteUrls.Instance().Login(true, Spacebuilder.Common.SiteUrls.LoginModal._LoginInModal, null);
+    }
+
+    string tab = ViewData.Get<string>("tab", string.Empty);
+    string mode = ViewData.Get<string>("mode", string.Empty);
+}
+<div class="tn-section tn-helper-clearfix">
+    <h2 class="tn-pagename">
+        <span class="tn-icon-special tn-special-icon-microblog"></span>微博</h2>
+    <div class="tn-shortcut">
+        @if (!string.IsNullOrEmpty(mode))
+        {
+            <a id="list-mode" class="tn-button tn-corner-left tn-button-secondary tn-button-large tn-button-icon-only @("List".Equals(mode) ? "tn-selected" : "tn-button-hollow")" href="@SiteUrls.Instance().Microblog()" title="列表模式">
+                <span class="tn-icon tn-icon-browse-list"></span><span class="tn-button-text">列表模式</span></a>
+            <a id="image-mode" class="tn-button tn-corner-right tn-button-secondary tn-button-large tn-button-icon-only @("List".Equals(mode) ? "tn-button-hollow" : "tn-selected")" href="@SiteUrls.Instance().MicroblogWaterfall()" title="图片模式">
+                <span class="tn-icon tn-icon-browse-medium"></span><span class="tn-button-text">图片模式</span></a>
+        }
+        <a class="tn-button tn-corner-all tn-button-large tn-button-primary tn-button-text-icon-primary" id="dialog1" plugin = "dialog" href="@url">
+            <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">发微博</span>
+        </a>
+    </div>
+</div>
+<div class="tn-submenu-area">
+    <div class="tn-submenu-inner">
+        <ul class="tn-submenu tn-drop-menu tn-helper-clearfix" id="tn-submenu">
+            <li class="tn-submenu-item @if ("Square".Equals(tab))
+                                       { <text>tn-selected</text> }" ><a class="tn-submenu-link" href="@SiteUrls.Instance().Microblog()">
+                                           广场</a></li>
+            <li class="tn-submenu-item @if ("Ranking".Equals(tab))
+                                       { <text>tn-selected</text> }" ><a class="tn-submenu-link" href="@SiteUrls.Instance().MicroblogRanking()">
+                                           排行榜</a></li>
+        </ul>
+    </div>
+</div>

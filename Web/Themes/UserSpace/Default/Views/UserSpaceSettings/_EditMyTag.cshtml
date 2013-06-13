@@ -1,0 +1,35 @@
+﻿@model TagEditModel
+@using (Html.BeginAjaxForm("_EditMyTag", "UserSpaceSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tr id="typeCategoryName">
+                    <td>
+                        @Html.TextBox("TagName", Model.TagName, htmlAttributes: new { @class = "tn-textbox tn-border-gray", id = "TagName", maxlength = "32" })
+                        @Html.ValidationMessage("TagName")
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+    <input type="hidden" name="tagId" value="@Model.TagId" />
+    <input type="hidden" name="tenantTypeId" value="@Model.TenantTypeId" />
+}
+<script type="text/dialog">
+    this.title("编辑标签");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#TagName").watermark("请输入标签名");
+    })
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        window.location.reload();
+    }
+</script>

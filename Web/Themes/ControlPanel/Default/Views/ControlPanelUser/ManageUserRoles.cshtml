@@ -1,0 +1,112 @@
+﻿@model IEnumerable<Role>
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>用户角色</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            @Html.LinkButton("添加角色", SiteUrls.Instance()._CreateRole(string.Empty), HighlightStyles.Default, ButtonSizes.Default, IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog", @title = "添加角色" })
+                        </div>
+                    </div>
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header ">
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    角色名称
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    友好的角色名
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    描述
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    所属应用
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    公开显示
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    是否启用
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    操作
+                                </th>
+                            </tr>
+                            @if (Model != null)
+                            {
+                                foreach (var role in Model)
+                                {
+                                <tr id="role_@(role.RoleName)"   class="tn-table-grid-row">
+                                    <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                        @(role.RoleName)
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                        <img src="@SiteUrls.Instance().LogoUrl(role.RoleImage, TenantTypeIds.Instance().Role(), ImageSizeTypeKeys.Instance().Small())" width="16" height="16"  />
+                                        @(StringUtility.Trim(role.FriendlyRoleName, 18))
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        @(role.Description)
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                        @if (role.ApplicationId <= 0)
+                                        {
+                                            @:未设置
+                                                                                
+                                        }
+                                        else
+                                        {
+                                            @(Tunynet.Globalization.ResourceAccessor.GetString("ApplicationName_" + role.ApplicationId, role.ApplicationId))
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                        @Html.Icon(role.IsPublic ? IconTypes.Accept : IconTypes.Cross)
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                        @Html.Icon(role.IsEnabled ? IconTypes.Accept : IconTypes.Cross)
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                        @Html.Link("修改", SiteUrls.Instance()._CreateRole(role.RoleName), "修改", new { plugin = "dialog" })
+                                        @if (!role.IsBuiltIn)
+                                        {
+                                            @Html.Raw("&nbsp; &nbsp;")
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除角色吗")
+                                                 .SetText("删除")
+                                                 .SetTooltip("删除角色")
+                                                 .SetDeleteTarget("#role_" + role.RoleName)
+                                                 .SetUrl(SiteUrls.Instance().DeleteRole(role.RoleName)))
+                                            @Html.Raw("&nbsp; &nbsp;")
+                                            @Html.Link("设置权限", SiteUrls.Instance().SetRolePermission(role.RoleName), "设置权限")
+                                        }
+                                    </td>
+                                </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+
+    });
+
+    function success() {
+        location.reload(true);
+    }
+</script>

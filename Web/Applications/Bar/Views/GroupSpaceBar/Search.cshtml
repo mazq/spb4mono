@@ -1,0 +1,316 @@
+﻿@model PagingDataSet<BarEntity>
+@{ 
+    
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    ViewData["TenantTypeId"] = TenantTypeIds.Instance().Group();
+    ViewData["ShowSearch"] = false;
+    var group = ViewData.Get<GroupEntity>("group", null);
+    var keywords = Request.QueryString.Get<string>("keyword", string.Empty);
+
+    var currentThreadCategory = ViewData.Get<Category>("currentThreadCategory", null);
+    var threadCategories = ViewData.Get<IEnumerable<Category>>("threadCategories", null);
+    SortBy_BarThread? sortBy = Request.QueryString.Get<SortBy_BarThread?>("sortBy", null);
+    bool? isEssential = Request.QueryString.Get<bool?>("isEssential", null);
+    var barSection = ViewData.Get<BarSection>("section", new BarSection());
+
+    string allSelectedClass = string.Empty; //全部是否选中样式
+    string postCountSelectedClass = string.Empty;//热门是否选中样式
+    string essentialSelectedClass = string.Empty;//精华是否选中样式
+    if (isEssential == true)
+    {
+        essentialSelectedClass = "tn-tabs-selected";
+    }
+    else if (sortBy == SortBy_BarThread.PostCount)
+    {
+        postCountSelectedClass = "tn-tabs-selected";
+    }
+    else
+    {
+        allSelectedClass = "tn-tabs-selected";
+    }
+
+    #region 贴吧群组扩展代码
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+
+    #endregion
+    bool showGroupLogo = TempData.Get<bool>("ShowGroupLogo", true);
+}
+@section Aside{
+    @Html.AjaxAction("_TagCloud", "GroupSpaceBar", new { spaceKey = Url.SpaceKey() })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-crumbs">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-breadcrumb tn-helper-clearfix">
+            @if (showGroupLogo)
+            { 
+                <div class="tn-avatar-mini">
+                    <a href="@SiteUrls.Instance().GroupHome(group.GroupKey)" title="@group.GroupName">
+                        <img width="25" src="@SiteUrls.Instance().LogoUrl(group.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Small())"/></a>
+                </div>
+                <span class="tn-breadcrumb-item"><a title="@group.GroupName" href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())">@StringUtility.Trim(group.GroupName, 10)</a>
+                </span>
+                <span class="tn-seperator">&gt;</span>
+            }
+            <span class="tn-breadcrumb-item"><a title="帖子搜索" href="@SiteUrls.Instance().GroupBarThreadSearch(Url.SpaceKey(), keywords)">
+                帖子搜索</a> </span><span class="tn-seperator">&gt;</span> <span class="tn-selected" title="@keywords">@StringUtility.Trim(keywords, 20)</span>
+        </div>
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-results">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-bar-search">
+            <div class="tn-list-header tn-bg-gray tn-border-gray tn-border-bottom">
+                <div class="tn-list-header-row tn-helper-clearfix">
+                    @using (Html.BeginForm("Search", "GroupSpaceBar", FormMethod.Get, new { name = "barThreadSearchBox" }))
+                    {
+                        <div class="tn-search-box">
+                            <input type="text" name="keyword" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl" value="@(Request.QueryString.Get<string>("keyword", string.Empty))" />
+                            <span class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray">
+                                <button type="submit">
+                                    <span class="tn-icon tn-smallicon-find"></span>
+                                </button>
+                            </span>
+                        </div>
+                    }<br />
+                    <span id="search-range" class="tn-keywords"><em>筛选：</em> <a data-search-range="0"
+                        href="#">全部</a> <a data-search-range="1" href="#">标题</a> <a data-search-range="2"
+                            href="#">全文</a> <a data-search-range="3" href="#">作者</a> <a data-search-range="4"
+                                href="#">标签</a> </span><span class="tn-count">共有 <strong>@Model.TotalRecords</strong>个搜索结果（用时
+                                    @Model.QueryDuration 秒）</span>
+                </div>
+            </div>
+            <div class="tn-tabs-panel">
+                @if (threadCategories != null && threadCategories.Count() > 0)
+                {
+                    var lastCategoryId = threadCategories.Last().CategoryId;
+                    <div class="tn-directory tn-border-gray tn-border-rbl">
+                        <div class="tn-directory-level">
+                            @if (ViewData.Get<bool>("ShowSearch", true))
+                            { 
+                                <div class="tn-search-box">
+                                    <input type="text" id="blog-keyword" name="keyword" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl" />
+                                    <span id="blog-search" class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray">
+                                        <button>
+                                            <span class="tn-icon tn-smallicon-find"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            }
+                            @{
+                            string allCategorySelectedClass = "";
+                            if (currentThreadCategory == null)
+                            {
+                                allCategorySelectedClass = "tn-selected";
+                            }
+                            }
+                            <span class="tn-directory-item  tn-text-note @allCategorySelectedClass"><a href="@urlGetter.SectionDetail(barSection.SectionId, sortBy, isEssential)">
+                                全部</a></span>
+                            @foreach (var category in threadCategories.Take(6))
+                            {
+                                string selectedClass = "";
+                                if (currentThreadCategory != null && currentThreadCategory.CategoryId == category.CategoryId)
+                                {
+                                    selectedClass = "tn-selected";
+                                }
+                                <span class="tn-spacer tn-text-note">|</span>
+                                <span class="tn-directory-item  tn-text-note @selectedClass"><a href="@urlGetter.SectionDetail(barSection.SectionId, sortBy, isEssential, category.CategoryId)">@category.CategoryName</a></span>                                                                                                                                                                                                                                       
+                            }
+                            @if (threadCategories.Count() > 6)
+                            {
+                                var menuItems = threadCategories.Skip(8).Select(n => new MenuItem { Text = n.CategoryName, Url = urlGetter.SectionDetail(barSection.SectionId, null, null, n.CategoryId) });
+                                <span class="tn-spacer tn-text-note">|</span> 
+                                <span class="tn-directory-item "><a class="tn-action tn-action-text-icon-right" href="javascript:void(0)"
+                                    menu="#moreThreadCategoriesDiv">
+                                    @Html.Icon(IconTypes.SmallTriangleDown)<span class="tn-action-text">更多</span></a>
+                                </span>
+                                <div id="moreThreadCategoriesDiv" style="display: none" class="tn-more-options tn-widget-content tn-border-gray">
+                                    <ul class="tn-more-list">
+                                        @foreach (var category in threadCategories.Skip(6))
+                                        {
+                                            <li><a class="tn-item-link" href="@urlGetter.SectionDetail(barSection.SectionId, null, null, category.CategoryId)">@category.CategoryName</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                @if (Model != null && Model.Count > 0)
+                {       
+                    @Html.Partial("~/Applications/Bar/Views/Bar/_ListSearchThread.cshtml", Model)
+                }
+                else
+                {
+                    string keyword = Request.QueryString.Get<string>("keyword", string.Empty);
+                    if (string.IsNullOrEmpty(keyword))
+                    {
+                    <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                        <a class="tn-icon tn-smallicon-cross tn-helper-right" href="#"></a><span class="tn-helper-left">
+                            <span class="tn-icon tn-icon-exclamation"></span></span>
+                        <div class="tn-helper-flowfix">
+                            <strong>提示：</strong>请输入搜索条件</div>
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="tnc-search-noresults">
+                        <p class="tn-title">
+                            很抱歉，没有找到符合您搜索条件的结果！</p>
+                        <dl class="tn-support">
+                            <dt><strong>建议：</strong></dt>
+                            <dd>
+                                请确保搜索文字拼写正确</dd>
+                            <dd>
+                                请尝试使用其他关键词或使用近义词</dd>
+                            <dd>
+                                请尝试使用含义更为宽泛的关键词</dd>
+                        </dl>
+                    </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Search", "GroupSpaceBar", FormMethod.Get, new { id = "searchForm" }))
+{
+    @Html.Hidden("keyword", Request.QueryString.Get<string>("keyword", string.Empty), new { maxlength = "32", @class = "tn-textbox" })
+    @Html.Hidden("Term", Request.QueryString.GetString("Term", "0"))
+}
+<script type="text/javascript">
+    $(function () {
+        var BarSearcher = function () {
+            this.init();
+        };
+        BarSearcher.fn = BarSearcher.prototype = {
+            init: function () {
+                var self = this;
+                var cache = {};
+
+                this.resetForm = false;  //是否清楚搜索过滤条件
+
+                this.searchForm = $('#searchForm');
+                this.keyword = $('#keyword', this.searchForm);
+                this.sectionId = $('#Range', this.searchForm);
+                this.searchRange = $('#Term', this.searchForm);
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == "") {
+                        e.preventDefault();
+                        alert("请输入关键字！");
+                        this.keyword.focus();
+                    }
+
+                    if (self.resetForm) {
+                        self.clearForm();
+                    }
+                });
+
+                //注册自动完成响应事件
+                this.keyword.bind("input.autocomplete", function () {
+                    $(this).trigger('keydown.autocomplete');
+                });
+                this.keyword.autocomplete({
+                    minLength: 1,
+                    source: function (request, response) {
+                        //缓存搜索结果
+                        var term = request.term.toLowerCase(),
+                            element = this.element,
+                            cache = this.element.data('autocompleteCache') || {},
+                            foundInCache = false;
+
+                        $.each(cache, function (key, data) {
+                            if (term === key && data.length > 0) {
+                                response(data);
+                                foundInCache = true;
+                                return;
+                            }
+                        });
+
+                        if (foundInCache) return;
+                        var keyword = encodeURIComponent(self.keyword.val());
+                        $.getJSON('@SiteUrls.Instance().SearchBarAutoComplete()?keyword=' + keyword + '&topNumber=10', function (data) {
+                            cache[term] = data;
+                            element.data('autocompleteCache', cache);
+
+                            response(data);
+                        });
+                    },
+                    search: function (event, ui) {
+                    },
+                    open: function (event, ui) {
+                    },
+                    focus: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        self.searchForm.submit();
+                    }
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $('#template-auto-complete').tmpl(item).data("item.autocomplete", item).appendTo(ul);
+                };
+
+                //注册搜索按钮点击事件
+                $('#button-search').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+
+                //注册点击搜索条件事件
+                $("#section-id a").click(function (e) {
+                    e.preventDefault();
+                    self.sectionId.val($(this).data('sectionId'));
+                    self.resetForm = false;
+                    self.searchForm.submit();
+                });
+
+                //注册点击搜索范围事件
+                $("#search-range a").click(function (e) {
+                    e.preventDefault();
+                    self.searchRange.val($(this).data('searchRange'));
+                    self.resetForm = false;
+                    self.searchForm.submit();
+                });
+
+                //初始化搜索表单中的过滤条件状态
+                self.initSearchForm();
+
+            },
+
+
+            /*
+            * 初始化搜索表单中的过滤条件状态
+            */
+            initSearchForm: function () {
+                //设置搜索范围
+                var sectionId = $("#Range").val();
+                $('#section-id a[data-section-id="' + sectionId + '"]').addClass('tn-selected');
+                //设置搜索条件
+                var searchRange = $("#Term").val();
+                $('#search-range a[data-search-range="' + searchRange + '"]').addClass('tn-selected');
+            },
+
+            /*
+            * 更改关键词搜索前先清除搜索过滤条件
+            */
+            clearForm: function () {
+                this.sectionId.val("-1");
+                this.searchRange.val("0");
+            }
+        };
+
+        BarSearcher = new BarSearcher();
+    });
+</script>

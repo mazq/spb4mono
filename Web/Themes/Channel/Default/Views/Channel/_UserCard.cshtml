@@ -1,0 +1,82 @@
+﻿@model User
+@{
+    IUser currentUser = UserContext.CurrentUser;
+    bool isStopped = ViewData.Get<bool>("isStopped", false);
+    bool seeMessage = ViewData.Get<bool>("seeMessage", false);
+}
+<div class="tn-user-card-wrap">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+            <div class="tn-card tn-helper-clearfix">
+                <div class="tn-avatar">
+                    @Html.ShowUserAvatar(Model, AvatarSizeType.Small, isShowUserCard: false)
+                </div>
+                <div class="tn-info">
+                    <p class="tn-title">
+                        <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(Model.UserId)"><strong>@StringUtility.Trim(Model.DisplayName, 7)</strong></a><span
+                            class="tn-identify">@Html.IdentificationType(Model.UserId)</span><span class="tn-credit"><a href="@SiteUrls.Instance().MyRank(Model.UserName)">@Html.UserRankIcon(Model.Rank)</a></span>
+                    </p>
+                    <p class="tn-property tn-helper-clearfix">
+                        @if (Model.Profile != null)
+                        {
+                            if (Model.Profile.Gender == GenderType.Male)
+                            {
+                            @Html.Icon(IconTypes.Male, "男")
+                            }
+                            else if (Model.Profile.Gender == GenderType.FeMale)
+                            {
+                            @Html.Icon(IconTypes.Female, "女")
+                            }
+                            <span class="tn-location">@Formatter.FormatArea(Model.Profile.NowAreaCode)</span>
+                        }
+                    </p>
+                    <p class="tnc-usernums">
+                        <span>关注<a href="@SiteUrls.Instance().ManageFollowedUsers(Model.UserName)" target="_blank">
+                            <strong>@Model.FollowedCount</strong> </a></span><span class="tn-spacer tn-text-note">
+                                |</span><span>粉丝<a href="@SiteUrls.Instance().ManageFollowers(Model.UserName)" target="_blank">
+                                    <strong>@Model.FollowerCount</strong> </a></span><span class="tn-spacer tn-text-note">
+                                        |</span><span>内容 <strong>@Model.ContentCount</strong> </span>
+                    </p>
+                </div>
+            </div>
+            @if (Model.Profile != null && Model.Profile.HasIntroduction)
+            { 
+                <div class="tn-introduction">
+                    简介：@HtmlUtility.TrimHtml(Model.Profile.Introduction, 40)</div>
+            }
+            <div class="tn-actions tn-border-gray tn-border-top tn-helper-clearfix">
+                <span class="tn-status">
+                    @if (Model.IsOnline)
+                    {
+                        <img alt="在线" title="在线" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/icons/user_IsOnline.gif")" />
+                    }
+                    else
+                    { 
+                        <img alt="离线" title="离线" src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/icons/user_IsOffline.gif")" />
+                    }
+                </span>
+                @if (currentUser != null && currentUser.UserId != Model.UserId)
+                {
+                    if (seeMessage)
+                    {
+                    @Html.Link("私信", SiteUrls.Instance()._CreateMessage(currentUser.UserName, Model.UserId), "私信", new { @class = "tn-link", plugin = "dialog" })
+                    }
+                    if (!isStopped)
+                    {
+                    @Html.Link("拉黑", SiteUrls.Instance().CreateStopedUser(currentUser.UserName, Model.UserId), "拉黑", new { id = "StopUser_" + Model.UserId, stopedUserId = Model.UserId, @class = "tn-link" })             
+                    }
+                }
+                @if (currentUser != null && currentUser.UserId != Model.UserId)
+                {
+                    <div class="tn-follow" id="followedDiv">
+                        @Html.Action("_AddFollowUser", "Channel", new { userId = Model.UserId })
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,191 @@
+﻿@model PagingDataSet<MessageSession>
+@{
+    Layout = "_ControlPanel";
+    long? userId = ViewData.Get<long?>("userId", null);
+    IUserService userService = DIContainer.Resolve<IUserService>();
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>客服消息</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageCustomMessage", "ControlPanelOperation", FormMethod.Get, new { id = "" }))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    发件人：</label>
+                                @Html.TextBox("uname", Request.QueryString.GetString("uname", string.Empty), InputWidthTypes.Medium)
+                            </div>                            
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    角色：</label>
+                                @Html.DropDownList("RoleName","全部")
+@*                                @Html.TextBox("roleName", Request["roleName"], new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+*@                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    等级：</label>
+                                @Html.TextBox("minRank", Request["minRank"], new { @class = "tn-textbox tn-input-short tn-border-gray" })
+                                -
+                                @Html.TextBox("maxRank", Request["maxRank"], new { @class = "tn-textbox tn-input-short tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text", id = "" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            <a class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary" href="@SiteUrls.Instance().DeleteMessageSession()" id="deletesession">
+                                <span class="tn-icon tn-smallicon-cross"></span><span class="tn-button-text">删除</span>
+                            </a><a class="tn-button tn-corner-all tn-button-text-only tn-button-default" plugin="dialog" href="@SiteUrls.Instance()._CustomCreateMessage("liuz")">
+                                <span class="tn-button-text">发消息</span> </a>
+                        </div>
+                    </div>
+                    @if (Model == null || Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    { 
+
+                        
+                        <table class="tn-table-grid">
+                               <form id="customMessage" method="post">
+                                    <tr class="tn-table-grid-header">
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            <input type="checkbox" id="TopCheckBox" class="tn-radiobutton" onclick="checkAll(this,'CheckBoxGroup')" />
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            发件人
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            内容
+                                        </th>
+                                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                            时间
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            操作
+                                        </th>
+                                    </tr>
+                                   @foreach (var session in Model)
+                                   {
+                                       if (session.LastMessage == null)
+                                       {
+                                           continue;
+                                       }
+                                       <tr class="tn-table-grid-row" id="msg_session_@(session.SessionId)">
+                                       <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("CheckBoxGroup", session.SessionId)
+                                       </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-avatar">
+                                            @Html.ShowUserAvatar(session.OtherUserId, AvatarSizeType.Small, true)
+                                        </td>
+                                        <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                                            @if (session.LastMessage.SenderUserId ==(long)BuildinMessageUserId.CustomerService)
+                                                {
+                                                    <p>
+                                                        @Html.Raw("发给")
+                                                        <strong>
+                                                            @{
+                                                        IUser user = userService.GetUser(@session.LastMessage.ReceiverUserId);
+    
+                                                        if (user != null)
+                                                        {
+                                                                <a title="@session.LastMessage.Receiver" href="@SiteUrls.Instance().SpaceHome(session.LastMessage.ReceiverUserId)">@StringUtility.Trim(session.LastMessage.Receiver,15)</a>
+                                                        }
+                                                        else
+                                                        {
+                                                               <p title="@session.LastMessage.Receiver"> @session.LastMessage.Receiver</p>
+                                                        }
+                                                            }
+                                                        </strong>
+                                                    </p>
+                                                }
+                                            else
+                                            {
+                                                IUser user = userService.GetUser(@session.LastMessage.SenderUserId);
+                                                <p>
+                                                    <strong>
+                                                        @if (user != null)
+                                                        { 
+                                                            <a href="@SiteUrls.Instance().SpaceHome(session.LastMessage.SenderUserId)">@session.LastMessage.Sender</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @session.LastMessage.Sender
+                                                        }
+                                                    </strong>
+                                                    @Html.Raw(":")
+                                                </p>
+                                            }
+                                            <p>@Html.Raw(session.LastMessage.Body.Replace("<br />", ""))</p>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @session.LastModified.ToFriendlyDate()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            <span><a href="@SiteUrls.Instance()._ListCustomMessages(session.SessionId)" plugin = "dialog">查看</a></span>
+                                           
+                                            <span>@Html.AjaxDeleteButton(new AjaxDeleteButton()
+                                             .SetConfirm("确认要删除会话内容吗")
+                                             .SetText("删除")
+                                             .SetTooltip("删除")
+                                             .SetDeleteTarget("#msg_session_" + session.SessionId)
+                                             .SetUrl(Url.Action("DeleteMessageSessionAsyn", new { sessionId = session.SessionId }))
+                                             .MergeHtmlAttribute("name", "operate_" + (session.SessionId))
+                                             .SetOnSuccessCallBack("DeleteSuccess"))</span>
+                                        </td>
+                                       </tr>
+                                   }
+                            </form>
+                      </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+
+
+        $("#deletesession").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='CheckBoxGroup']:checked").length) {
+                alert("请至少选择一个！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $("#customMessage").ajaxSubmit({
+                    success: function (data) {
+                        window.location.reload(true);
+                    },
+                    url: url,
+                    error: function (XMLResponse) {
+                        //alert(XMLResponse.responseText);   
+                        alert('操作失败！');
+                    }
+                });
+            });
+        });
+    });
+    function DeleteSuccess() {
+        if ($("tr.tn-table-grid-row").length == 0) {
+            window.location = '@Html.Raw(Url.Action("ManageCustomMessage", new { area = "Common", pageIndex = Model.PageIndex - 1 }))';
+        }
+//        var count = $("#messagesCount").html();
+//        $("#messagesCount").html(count - 1);
+    }
+</script>

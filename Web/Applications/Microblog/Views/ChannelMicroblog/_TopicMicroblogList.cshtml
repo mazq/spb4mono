@@ -1,0 +1,15 @@
+﻿@model  PagingDataSet<MicroblogEntity>
+@{
+    Html.IncludeScript("~/Scripts/jquery/tunynet/jquery.tn.ui.unobtrusive.js");
+}
+@foreach (var microblog in Model)
+{
+    Html.RenderPartial("~/Applications/Microblog/Views/MicroblogActivity/_Microblog.cshtml", microblog);
+}
+@Html.Hidden("pageCount", Model.PageCount)
+@if (Model.TotalRecords > Model.PageIndex * Model.PageSize)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        <a href="@SiteUrls.Instance()._TopicMicroblogList(Request.QueryString.Get<int>("tagId", 0), pageIndex: Model.PageIndex + 1)">
+            更多↓</a></div>
+}

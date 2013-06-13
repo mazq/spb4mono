@@ -1,0 +1,12 @@
+﻿@{
+    string name = ViewData.Get<string>("name", string.Empty);
+    string options = ViewData.Get<string>("options", string.Empty);
+}
+<div id="@name" data="@options">
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var options = $.parseJSON($('#@name').attr("data"));
+        $('#@name').uploadify(options);
+    });
+</script>

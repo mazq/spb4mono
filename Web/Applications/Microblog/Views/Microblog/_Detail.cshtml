@@ -1,0 +1,122 @@
+﻿@model MicroblogEntity
+<div class="spb-microblog-info tnc-dynamic">
+    <div class="spb-microblog-item">
+        <div class="tnc-dynamic-title">
+            @Html.Raw(Model.GetResolvedBody())
+        </div>
+        @if (Model.IsForward)
+        {            
+            <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-bubble-wrap">
+                <div class="tn-bubble-arrow">
+                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                    </b>
+                </div>
+                <div class="tn-bubble-content tn-border-gray tn-corner-all">
+                    @if (Model.OriginalMicroblog != null)
+                    {
+                        string showOriginalMicroblogUrl = SiteUrls.Instance().ShowMicroblog(Model.OriginalMicroblog.User.UserName, Model.OriginalMicroblog.MicroblogId);
+                         
+                        <p>
+                            <a href="@SiteUrls.Instance().SpaceHome(Model.OriginalMicroblog.UserId)" class="tn-user-name" target="_blank">@Model.OriginalMicroblog.Author：</a>
+                            @Html.Raw(Model.OriginalMicroblog.GetResolvedBody())
+                        </p>
+                        @Html.Action("_Microblog_Attachments", "MicroblogActivity", new RouteValueDictionary { { "microblogId", Model.OriginalMicroblog.MicroblogId } })
+                        <div class="tn-list-item-row tn-helper-clear tn-helper-clearfix ">
+                            <em class="tn-date tn-text-note tn-helper-left"><a class="tn-secondary-text" href="@showOriginalMicroblogUrl" target="_blank">@Model.DateCreated.ToFriendlyDate()</a>
+                            </em><span class="tn-spacer tn-text-note">| </span><span class="tn-action"><a href="@showOriginalMicroblogUrl" target="_blank" class="tn-action-text">
+                                原文转发
+                                @if (Model.OriginalMicroblog.ForwardedCount > 0)
+                                {
+                                    @("(" + Model.OriginalMicroblog.ForwardedCount + ")") 
+                                }</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-action"><a href="@showOriginalMicroblogUrl" target="_blank">
+                                    原文评论
+                                    @if (Model.OriginalMicroblog.ReplyCount > 0)
+                                    {
+                                        @("(" + Model.OriginalMicroblog.ReplyCount + ")")
+                                    }</a> </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tn-no-data">
+                            当前微博已被删除。
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.Action("_Microblog_Attachments", "MicroblogActivity", new RouteValueDictionary { { "microblogId", Model.MicroblogId } })
+        }
+        <div class="tn-list-item-row tn-helper-align-right tn-helper-clearfix">
+            <em class="tn-date tn-text-note tn-helper-left">@Model.DateCreated.ToFriendlyDate()</em>
+            @if (new Authorizer().Microblog_Delete(Model))
+            {
+                <span class="tn-action"><a id="deleteMicroblog-@Model.MicroblogId" href="@SiteUrls.Instance().Delete(Url.SpaceKey(), Model.MicroblogId)">
+                    删除</a> </span><span class="tn-spacer tn-text-note">|</span> 
+            }
+            @if (UserContext.CurrentUser != null)
+            {
+                <span class="tn-action"><a  href="@SiteUrls.Instance()._ForwardMicroblog(Url.SpaceKey(), Model.MicroblogId)" plugin="dialog">
+                    转发
+                    @if (Model.ForwardedCount > 0)
+                    {
+                        @("(" + Model.ForwardedCount + ")")
+                    }</a> </span>
+            }
+            @if (UserContext.CurrentUser != null)
+            {
+                FavoriteService faroriteService = new FavoriteService(TenantTypeIds.Instance().Microblog());
+                long currentUserId = UserContext.CurrentUser.UserId;
+
+                string text = "收藏", stauts = "0";
+                if (faroriteService.IsFavorited(Model.MicroblogId, UserContext.CurrentUser.UserId))
+                {
+                    text = "取消收藏";
+                    stauts = "1";
+                }
+                <span class="tn-spacer tn-text-note">|</span> <span class="tn-action">
+                    @Html.Link(text, SiteUrls.Instance().Favorite(Url.SpaceKey(), Model.MicroblogId, currentUserId), text, new { id = "favoriteMicroblog-" + Model.MicroblogId, status = stauts })
+                </span>
+            }
+            @if (UserContext.CurrentUser != null)
+            {
+                <span class="tn-spacer tn-text-note">|</span><span class="tn-action"><a id="commontAction"
+                    href="#comment">评论
+                    @if (Model.ReplyCount > 0)
+                    {
+                        @("(" + Model.ReplyCount + ")")
+                    }
+                </a></span>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#commontAction').click(function () {
+            $("textarea[id^='Body-comment-']").focus();
+        });
+
+        $("a[id^='deleteMicroblog-']").click(function () {
+
+            $this = $(this);
+            var microblogId = $this.data("id");
+            $.dialog.confirm("删除该条微博？", function () {
+                $.ajax({
+                    type: "Post",
+                    url: $this.attr("href"),
+                    success: function () {
+                        window.location.href = '@(SiteUrls.Instance().MyHome(Url.SpaceKey()))';
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+            });
+
+            return false;
+        });
+    });
+</script>

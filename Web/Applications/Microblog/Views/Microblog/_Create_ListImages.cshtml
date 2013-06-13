@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Attachment>
+@{
+    string spaceKey = Url.SpaceKey();
+}
+<div class="tnc-mode-icon" id="uplodaImagesDiv">
+    <a class="tn-icon tn-smallicon-cross" href="javascript:void(0);" id="closeimageContainer">
+    </a>
+</div>
+<h3>
+    图片列表</h3>
+<div class="tnc-mode-ctn">
+    <ul class="tnc-mode-photo tn-helper-clearfix" id="microblogImageListUl">
+        @if (Model != null && Model.Count() > 0)
+        {
+            foreach (var attachment in Model)
+            {
+                string imageStyleSet = string.Empty;
+                int width = attachment.Width;
+                int heigth = attachment.Height;
+
+                int frameWidth = 60;
+                if (width > frameWidth || heigth > frameWidth)
+                {
+                    if (width >= heigth)
+                    {
+                        imageStyleSet = string.Format("width=100%");
+                    }
+                    else
+                    {
+                        imageStyleSet = string.Format("height=100%");
+                    }
+                }
+            
+            <li class="tn-border-gray tn-hover"><span class="tn-icon-area tn-bg-deep tn-state-hidden">
+                <a title="删除图片" id="deleteUplodaImageA-@attachment.AttachmentId" href="@Html.Raw(SiteUrls.Instance()._DeleteAttachment_Microblog(spaceKey, attachment.AttachmentId))" data-attachmentId="@attachment.AttachmentId" class="tn-icon tn-smallicon-cross">
+                    删除</a></span>
+                <div class="tn-img">
+                    <img alt="@(attachment.FriendlyFileName)" id="img_@(attachment.AttachmentId)"  name="imageSelect"  @imageStyleSet src="@(SiteUrls.Instance().ImageUrl(attachment.AttachmentId, attachment.TenantTypeId, ImageSizeTypeKeys.Instance().Medium()))" /></div>
+            </li>
+            }
+        }
+    </ul>
+    <div class="tnc-mode-button tn-border-gray tn-border-top">
+        @Html.Uploadify("continueUploadImages", TenantTypeIds.Instance().Microblog(), "gif,jpg,png", buttonOptions: new ButtonOptions().SetText("继续传图"), uploadFileOptions: new UploadFileOptions()
+                                  .MergeUploadifyCallBack("onQueueComplete", "OnContinueQueueComplete")
+                .SetAutoUpload(true)
+                .SetMultiple(true)
+                .SetPreventCaching(true)
+                .SetQueueId("queueManage")
+                .SetQueueSizeLimit(6)
+                .SetRemoveCompleted(true)
+                .SetUploadLimit(100)
+                .MergeUploadifyFormData("CurrentUserIdToken", Utility.EncryptTokenForUploadfile(0.1, UserContext.CurrentUser.UserId))
+                .MergeUploadifyFormData("resize", true))
+    </div>
+    <div id="queueManage">
+    </div>
+</div>
+<script type="text/javascript">
+    function OnContinueQueueComplete(queueData) {
+        $('#continueUploadImages').uploadify('destroy');
+        $("#uplodaImagesDiv").parent().load('@Html.Raw(SiteUrls.Instance()._ListImages_Microblog(spaceKey))');
+    }
+
+    $(document).ready(function () {
+        $('#closeimageContainer').click(function () {
+            $('#imageContainer').hide();
+        });
+        $("a[id^='deleteUplodaImageA-']").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            $.post($this.attr("href"), { attachmentId: $this.attr("data-attachmentId") }, function (data) {
+                if (data.errorMessage) {
+                    alert(data.errorMessage);
+                }
+                else {
+                    if ($("#microblogImageListUl > li").length < 2) {
+                        $.get('@Html.Raw(SiteUrls.Instance()._UploadImages(spaceKey))', function (data) {
+                            $("#imageContainer").replaceWith(data);
+                            $("#uploadPicsA").click();
+                        });
+                        $.cookie("microblog_PhotoExists", "", { path: '/' });
+                    }
+                    else {
+                        $('#continueUploadImages').uploadify('destroy');
+                        $("#uplodaImagesDiv").parent().load('@Html.Raw(SiteUrls.Instance()._ListImages_Microblog(spaceKey))');
+                        $("#imageContainer").show();
+                    }
+                }
+                return false;
+            });
+        });
+    });
+</script>

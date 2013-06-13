@@ -1,0 +1,90 @@
+﻿@model IEnumerable<StopedUserViewModel>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.UserBlacklist;
+    long stopUserMaxCount = ViewData.Get<long>("stopUserMaxCount", 100);
+    int specifyUserMaxCount = ViewData.Get<int>("specifyUserMaxCount", 10);
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-user-blacklist">
+		    <div class="tn-main-heading tn-border-gray tn-border-bottom">
+				<h2>黑名单</h2>
+            </div>
+            @Html.StatusMessage(ViewData["StatusMessageData"] as StatusMessageData)
+            <div class="tnc-blanklist">
+                <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                    <p>
+                        • 黑名单用户<strong>不能做任何针对您的操作</strong>，例如：访问空间、发私信、评论、加关注；</p>
+                    <p>
+                        • 若已有关注关系，则将自动解除；</p>
+                    <p>
+                        • 至多允许您添加<strong>@stopUserMaxCount</strong>个黑名单用户。</p>
+                </div>
+                @using (Html.BeginForm("Blacklist", "UserSpaceSettings", FormMethod.Post, new { id = "blacklist-form" }))
+                {
+                    <div class="tnc-selector-blanklist tn-helper-clearfix">
+                        @Html.UserSelector("blacklistId", specifyUserMaxCount, null, SelectorWidthType.Longer, UserSelectorSearchScope.Site)
+                        <div class="tnc-addbtn-blacklist">
+                            @Html.Button("添加", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "blacklist-submit" })
+                        </div>
+                    </div>
+                }
+                <div class="tnc-blacklist-list">
+                    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                        <h4>黑名单列表</h4>
+                    </div>
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        <ul class="tn-list tn-helper-clearfix">
+                            @foreach (var item in Model)
+                            {
+                                <li class="tn-list-item tn-helper-clearfix" id="li-black-user-@item.Id">
+                                    <div class="tn-list-item-area-left">
+                                        @Html.ShowUserAvatar(item.ToUserId, AvatarSizeType.Small, true)
+                                    </div>
+                                    <div class="tn-list-item-area-main">
+                                        <div class="tn-list-item-row tn-list-item-heading">
+                                            @Html.Link(item.ToUserDisplayName, SiteUrls.Instance().SpaceHome(item.ToUserId), item.ToUserDisplayName, new { target = "_blank" })</div>
+                                        <div class="tn-list-item-row tn-list-item-summary">
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("解除 × ")
+                                                .SetUrl(SiteUrls.Instance().DeleteStopedUser(Url.SpaceKey(), item.ToUserId))
+                                                .SetDeleteTarget("#li-black-user-" + item.Id)
+                                                .SetConfirm("你确定要解除吗？")
+                                                .MergeHtmlAttribute("class", "tn-secondary-text"))
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                            <div class="tn-no-data">
+                                目前还没有人进入您的黑名单
+                            </div>
+                        </div>
+                    }
+                    <div style="display: none;" class="tn-no-data">
+                        目前还没有人进入您的黑名单</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("button#blacklist-submit").click(function () {
+            if ($("input#as-values-blacklistId").val() == "") {
+                alert("至少选择一个好友进行操作");
+            } else {
+                $("#blacklist-form").submit();
+            }
+        });
+    });
+</script>

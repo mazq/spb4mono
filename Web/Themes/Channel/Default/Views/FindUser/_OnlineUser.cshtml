@@ -1,0 +1,40 @@
+﻿@model PagingDataSet<OnlineUser>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-online-users">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    @if(Model.Count()>25){
+        <div class="tn-option"><a href="@SiteUrls.Instance().OnlineUser(ignoreAnonymousUsers: false)">更多</a></div>
+        }
+        <h3 class="tn-helper-reset">在线用户</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <div class="tnc-online-list">
+            @if (Model != null && Model.Count() > 0)
+            {
+                <ul class="tn-helper-clearfix">
+                    @foreach (var item in Model)
+                    {
+                        if (item.UserId != 0)
+                        {
+                        <li>
+                            @Html.ShowUserAvatar(item.UserId, avatarSizeType: AvatarSizeType.Micro, navigateTarget: HyperLinkTarget._blank)
+                            <div class="tn-info"><a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(item.UserId)" title="@item.DisplayName" target="_blank">@item.DisplayName</a></div>
+                        </li>
+                        }
+                        else
+                        {
+                        <li>
+                            @Html.ShowUserAvatar(null, avatarSizeType: AvatarSizeType.Micro)
+                            <div class="tn-info"><a class="tn-user-name" href="javascript:void(0)">匿名用户</a></div> </li> 
+                        }
+                    }
+                </ul>
+                           
+            }
+            else
+            {
+                <div class="tn-no-data">貌似大家都很忙，没有人在线呢！</div> 
+            }
+        </div>
+    </div>
+</div>
+

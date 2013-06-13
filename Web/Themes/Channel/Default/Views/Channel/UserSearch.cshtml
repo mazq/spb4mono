@@ -1,0 +1,401 @@
+﻿@model  PagingDataSet<User>
+@{
+    Layout = "_Search";
+    ViewData["searcherCode"] = UserSearcher.CODE;
+
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    int searchRange = Request.QueryString.Get<int>("searchRange", 0);
+}
+@section SearchForm{
+    @using (Html.BeginForm("UserSearch", "Channel", FormMethod.Get, new { id = "searchForm" }))
+    {
+        @Html.TextBox("keyword", keyword, new { maxlength = "32", @class = "tn-textbox" })
+        @Html.Hidden("searchRange", Request.QueryString.GetString("searchRange", string.Empty))
+        @Html.Hidden("nowAreaCode", Request.QueryString.GetString("nowAreaCode", string.Empty))
+        @Html.Hidden("homeAreaCode", Request.QueryString.GetString("homeAreaCode", string.Empty))
+        @Html.Hidden("parentAreaCode", Request.QueryString.GetString("parentAreaCode", string.Empty))
+        @Html.Hidden("gender", Request.QueryString.GetString("gender", string.Empty))
+        @Html.Hidden("ageMin", Request.QueryString.GetString("ageMin", string.Empty))
+        @Html.Hidden("ageMax", Request.QueryString.GetString("ageMax", string.Empty))
+        <a id="button-search" href="#" class="tn-button tn-button-text-only tn-button-large tn-button-primary"><span class="tn-button-text">搜索</span></a>
+    }
+}
+@section Aside{
+    @Html.AjaxAction("_InterestedWithAllSide", "FindUser", new { pageSize = 5 })
+    @Html.AjaxAction("_SearchHistories", "Channel", new { searcherCode = UserSearcher.CODE, Area = "Common" })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">热门标签</h3>
+        </div>
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().User(), Area = "Common" })
+    </div>
+}
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-results">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-list-header tn-bg-gray tn-border-gray tn-border-bottom">
+            <div class="tn-list-header-row tn-helper-clearfix tn-bg-gray">
+                <span id="search-range" class="tn-keywords"><em>搜索词匹配范围：</em><a data-search-range="0" href="#">全部</a> <a data-search-range="1" href="#">姓名</a> <a data-search-range="2" href="#">标签</a> <a data-search-range="3" href="#">学校</a> <a data-search-range="4" href="#">公司</a></span>
+            </div>
+            <div class="tn-list-header-row">
+                <span class="tn-count">共有 <strong>@Model.TotalRecords</strong>个搜索结果（用时 @Model.QueryDuration 秒）</span> 
+        @*        @if (searchRange != (int)UserSearchRange.NOWAREACODE && searchRange != (int)UserSearchRange.HOMEAREACODE)
+                {*@
+                <span class="tn-location"><span id="area-selected">所有地区</span> <a id="area-selector" href="#">[切换]</a></span>
+               @* }*@
+                <a name="search-gender" href="#" class="tn-action tn-action-text-icon-right"><span id="search-gender-pop" class="tn-icon tn-smallicon-triangle-down"  menu="#search-gender"></span><span id="sex-selected" class="tn-action-text">不限性别</span></a>
+                <div id="search-gender" class="tn-widget tn-bubble tn-bubble-arrow-top tn-menu tnc-gender-select-menu" style="display: none">
+                    <div class="tn-bubble-arrow">
+                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                    </div>
+                    <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                        <ul class="tn-list">
+                            <li><a data-gender="0" class="tn-item-link" href="#">不限性别</a></li>
+                            <li><a data-gender="1" class="tn-item-link" href="#">男</a></li>
+                            <li><a data-gender="2" class="tn-item-link" href="#">女</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <a name="search-age"  href="#" class="tn-action tn-action-text-icon-right"><span id="search-age-pop" class="tn-icon tn-smallicon-triangle-down" menu="#search-age"></span><span id="age-selected" class="tn-action-text">不限年龄</span> </a>
+                <div id="search-age" class="tn-widget tn-bubble tn-bubble-arrow-top tn-menu tnc-age-select-menu" style="display: none">
+                    <div class="tn-bubble-arrow">
+                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                    </div>
+                    <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                        <ul class="tn-list">
+                            <li><a data-age-min="0" data-age-max="0" class="tn-item-link" href="#">不限年龄</a></li>
+                            <li><a data-age-min="0" data-age-max="18" class="tn-item-link" href="#">18岁以下</a></li>
+                            <li><a data-age-min="19" data-age-max="22" class="tn-item-link" href="#">19~22岁</a></li>
+                            <li><a data-age-min="23" data-age-max="29" class="tn-item-link" href="#">23~29岁</a></li>
+                            <li><a data-age-min="30" data-age-max="39" class="tn-item-link" href="#">30~39岁</a></li>
+                            <li><a data-age-min="40" data-age-max="200" class="tn-item-link" href="#">40岁以上</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (Model.TotalRecords > 0)
+        {
+            <div class="tnc-user-list">
+                <ul class="tn-list">
+                    @foreach (var user in Model)
+                    {
+                        string gender = "";
+                        string introduction = "";
+
+                        if (user.Profile != null)
+                        {
+                            introduction = user.Profile.Introduction;
+
+                            if (user.Profile.Gender == GenderType.Male)
+                            {
+                                gender = "tn-icon tn-smallicon-male";
+                            }
+                            else if (user.Profile.Gender == GenderType.FeMale)
+                            {
+                                gender = "tn-icon tn-smallicon-female";
+                            }
+                        }
+                        <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                            <div class="tn-list-item-area-left">
+                                @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row">
+                                    <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(user.UserId)">@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, user.DisplayName, 100))</a>
+                                    @Html.IdentificationType(user.UserId)
+                                    @if (isCurrentUserFollowDic != null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                                    {
+                                        <div class="tnc-add-attention" id="followedDiv">
+                                            @Html.FollowUser(user.UserId,"加关注")
+                                        </div>
+                                    }
+                                </div>
+                                <div class="tn-list-item-row">
+                                    <div class="tn-location">
+                                        <span class="@gender"></span>
+                                        @if (user.Profile != null && !string.IsNullOrEmpty(user.Profile.NowAreaCode))
+                                        {
+                                            @Formatter.FormatArea(user.Profile.NowAreaCode, false)
+                                        }
+                                    </div>
+                                </div>
+                                <div class="tn-list-item-row tnc-usernums">
+                                    <span>关注 <a href="@SiteUrls.Instance().ListFollowedUsers(user.UserName)"><strong>@user.FollowedCount</strong></a></span> <span class="tn-spacer tn-text-note">|</span> <span>粉丝 <a href="@SiteUrls.Instance().ListFollowers(user.UserName)"><strong>@user.FollowerCount</strong></a></span>
+                                    <span class="tn-spacer tn-text-note">|</span> <span>内容数 <strong>@user.ContentCount</strong></span>
+                                </div>
+                                <div class="tn-list-item-row">
+                                    简介：@HtmlUtility.TrimHtml(introduction,100)
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="tn-pagination">
+                @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+            </div>
+        }
+        else if (string.IsNullOrEmpty(Request.QueryString.GetString("keyword", string.Empty)) && searchRange != (int)UserSearchRange.NOWAREACODE && searchRange != (int)UserSearchRange.HOMEAREACODE)
+        {
+            <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+                <div class="tn-helper-flowfix">
+                    <strong>提示：</strong>请输入搜索条件</div>
+            </div>
+        }
+        else
+        { 
+            <div class="tnc-search-noresults">
+                <p class="tn-title">
+                    很抱歉，没有找到符合您搜索条件的结果！</p>
+                <dl class="tn-support">
+                    <dt><strong>建议：</strong></dt>
+                    <dd>
+                        请确保搜索文字拼写正确</dd>
+                    <dd>
+                        请尝试使用其他关键词或使用近义词</dd>
+                    <dd>
+                        请尝试使用含义更为宽泛的关键词</dd>
+                </dl>
+            </div>
+        }
+    </div>
+</div>
+<script id="template-auto-complete" type="text/x-jquery-tmpl">
+    <li class='tn-list-item tn-auto-complete-item tn-helper-clearfix tnc-auto-complete-public'>
+        <a class="tn-user-info">
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row">{{html DisplayNameWithHighlight}}</div>
+            </div>
+        </a>
+    </li>
+</script>
+@Html.AreaSelector("userArea", "A1560000", @Request.QueryString.GetString("parentAreaCode", string.Empty), @Request.QueryString.GetString("nowAreaCode", string.Empty), 2, "userSearcher.AreaSelected")
+<script type="text/javascript">
+     $(function(){
+        var UserSearcher = function () {
+            this.init();
+        };
+        UserSearcher.fn = UserSearcher.prototype = {
+            init: function () {
+                var self = this;
+                var cache = {};
+
+                this.resetForm = false;  //是否清楚搜索过滤条件
+
+                this.searchForm = $('#searchForm');
+                this.keyword = $('#keyword', this.searchForm);
+                this.searchRange = $('#searchRange', this.searchForm);
+                this.nowAreaCode = $('#nowAreaCode', this.searchForm);
+                this.parentAreaCode = $('#parentAreaCode', this.searchForm);
+                this.gender = $('#gender', this.searchForm);
+                this.ageMin = $('#ageMin', this.searchForm);
+                this.ageMax = $('#ageMax', this.searchForm);
+                this.ifIgnoreKeyword=false; //对于有些情况是可以忽略关键字
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == ""&&self.ifIgnoreKeyword==false) {
+                        e.preventDefault();
+                        self.searchRange.val(0);
+                        alert("请输入关键字！");
+                        this.keyword.focus();
+                    }
+
+                    if(self.resetForm){
+                        self.clearForm();
+                    }
+                });
+               
+                //注册自动完成响应事件
+                this.keyword.bind("input.autocomplete", function(){
+                    $(this).trigger('keydown.autocomplete');
+                });
+                this.keyword.autocomplete({
+                    minLength: 1,
+                    source: function (request, response) {
+                        //缓存搜索结果
+                        var term = request.term.toLowerCase(),
+                            element = this.element,
+                            cache  = this.element.data('autocompleteCache') || {},
+                            foundInCache = false;
+
+                        $.each(cache, function(key, data){
+                            if (term === key && data.length > 0) {
+                                response(data);
+                                foundInCache = true;
+                                return;
+                            }
+                        });
+
+                        if (foundInCache) return;
+                         var keyword = self.keyword.val();
+                        $.getJSON('@SiteUrls.Instance().UserSearchAutoComplete()', { keyword:keyword }, function (data) {
+                            cache[term] = data;
+                            element.data('autocompleteCache', cache);
+
+                            response(data);
+                        });
+                    },
+                    search: function (event, ui) {                        
+                    },
+                    open: function (event, ui) {                        
+                    },
+                    focus: function (event, ui) {
+                        self.keyword.val(ui.item.DisplayName);
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        self.keyword.val(ui.item.DisplayName);
+                        self.searchForm.submit();
+                    }
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $('#template-auto-complete').tmpl(item).data("item.autocomplete", item).appendTo(ul);
+                };
+
+                //注册搜索按钮点击事件
+                $('#button-search').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+
+                //注册点击热门标签事件
+                $('#hot-tags').delegate("a", "click", function (e) {
+                    e.preventDefault();
+                    self.keyword.val($(this).attr("title"));
+                    self.searchForm.submit();
+                });
+
+                //注册点击搜索范围事件
+                $("#search-range a").click(function (e) {
+                    e.preventDefault();
+                    self.searchRange.val($(this).data('searchRange'));
+                    self.resetForm = false;
+                    self.searchForm.submit();
+                });
+
+                //注册选择地区事件
+                $('#area-selector').click(function (e) {
+                    e.preventDefault();
+                    userArea.toggle();
+                    var left = $("#area-selector").offset().left;
+                    var top = $("#area-selector").offset().top;
+                    userArea.position(left, top); //定位
+                });
+
+                //注册点击选择性别事件
+                $("#search-gender a").click(function (e) {
+                    e.preventDefault();
+                    self.gender.val($(this).data('gender'));
+                    self.resetForm = false;
+                    self.ifIgnoreKeyword=true;
+                    if ($.trim(self.keyword.val()) == "") {
+                        self.searchRange.val(7)
+                    }
+                    self.searchForm.submit();
+                });
+
+                 //注册点击选择年龄事件
+                $("#search-age a").click(function (e) {
+                    e.preventDefault();
+                    self.ageMin.val($(this).data('ageMin'));
+                    self.ageMax.val($(this).data('ageMax'));
+                    self.resetForm = false;
+                    self.ifIgnoreKeyword=true;
+                    if ($.trim(self.keyword.val()) == "") {
+                        self.searchRange.val(8)
+                    }
+                    self.searchForm.submit();
+                });                
+
+                //初始化搜索表单中的过滤条件状态
+                self.initSearchForm(); 
+
+            },
+
+            /*
+            * 初始化搜索表单中的过滤条件状态
+            */
+            initSearchForm: function (clear) {
+                //设置搜索范围
+                var searchRange = '@(Request.QueryString.Get<string>("searchRange", "0"))';
+                if (searchRange=="TAG") {
+                   $('#search-range a[data-search-range=2]').addClass('tn-selected');
+                }else{
+                $('#search-range a[data-search-range="'+searchRange+'"]').addClass('tn-selected');
+                }
+
+                //设置地区
+                var nowAreaCode='@(Request.QueryString.GetString("nowAreaCode", string.Empty))';
+                var nowAreaName='@Formatter.FormatArea(Request.QueryString.GetString("nowAreaCode", string.Empty), false)';
+                if(nowAreaCode == '' || nowAreaName == ''){
+                    nowAreaName='所有地区';
+                }
+                $("#area-selected").text(nowAreaName);
+                
+                //设置性别
+                var gender = @(Request.QueryString.Get<int>("gender", 0));
+                $('#sex-selected').text($('#search-gender a[data-gender="'+gender+'"]').text());
+
+                //设置年龄
+                var ageMin = @(Request.QueryString.Get<int>("ageMin", 0));
+                var ageMax = @(Request.QueryString.Get<int>("ageMax", 0));
+                $('#age-selected').text($('#search-age a[data-age-min="'+ageMin+'"][data-age-max="'+ageMax+'"]').text());
+            },
+
+            /*
+            * 更改关键词搜索前先清除搜索过滤条件
+            */
+            clearForm: function () {
+                this.searchRange.val("");
+                this.nowAreaCode.val("");
+                this.parentAreaCode.val("");
+                this.gender.val("");
+                this.ageMin.val("");
+                this.ageMax.val("");
+            },
+
+            /*
+            * 地区选择器回调函数
+            */
+            AreaSelected:  function (data) {
+                userArea.hide();
+                var nowAreaName = data.areaName;
+                if(data.parentAreaCode != data.areaCode && data.parentAreaCode != data.topAreaCode){
+                    nowAreaName = data.parentAreaName+"-"+data.areaName;
+                }
+                this.nowAreaCode.val(data.areaCode);
+                this.parentAreaCode.val(data.parentAreaCode);
+                this.resetForm = false;
+                this.ifIgnoreKeyword=true;
+                this.searchRange.val(5);
+                this.searchForm.submit();
+            }
+        };
+
+        userSearcher = new UserSearcher();
+     });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sex-selected").mouseenter(function () {
+            $("#search-gender-pop").mouseenter();
+        });
+        $("#sex-selected").mouseleave(function () {
+            $("#search-gender-pop").mouseleave();
+        });
+
+        $("#age-selected").mouseenter(function () {
+            $("#search-age-pop").mouseenter();
+        });
+        $("#age-selected").mouseleave(function () {
+            $("#search-age-pop").mouseleave();
+        });
+    });
+</script>

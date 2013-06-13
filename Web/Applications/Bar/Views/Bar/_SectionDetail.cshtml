@@ -1,0 +1,194 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    var currentThreadCategory = ViewData.Get<Category>("currentThreadCategory", null);
+    var threadCategories = ViewData.Get<IEnumerable<Category>>("threadCategories", new List<Category>());
+    SortBy_BarThread? sortBy = Request.QueryString.Get<SortBy_BarThread?>("sortBy", null);
+    bool? isEssential = Request.QueryString.Get<bool?>("isEssential", null);
+    var barSection = ViewData.Get<BarSection>("section", new BarSection());
+    var isPosted = Request.QueryString.Get<bool?>("isPosted", null);
+
+    string allSelectedClass = string.Empty; //全部是否选中样式
+    string postCountSelectedClass = string.Empty;//热门是否选中样式
+    string essentialSelectedClass = string.Empty;//精华是否选中样式
+    string myPostSelectedClass = string.Empty;//群组下我的讨论样式
+    string myThreadsSelectedClass = string.Empty;
+    string threadsSelectedClass = string.Empty;
+
+    #region 贴吧群组扩展代码
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+
+    #endregion
+
+    if (isEssential == true)
+    {
+        essentialSelectedClass = "tn-tabs-selected";
+    }
+    else if (sortBy == SortBy_BarThread.PostCount)
+    {
+        postCountSelectedClass = "tn-tabs-selected";
+    }
+    else if (tenantTypeId == TenantTypeIds.Instance().Group() && isPosted.HasValue)
+    {
+        if (isPosted == true)
+        {
+            myPostSelectedClass = "tn-selected";
+        }
+        else
+        {
+            myThreadsSelectedClass = "tn-selected";
+        }
+
+        threadsSelectedClass = "tn-tabs-selected";
+    }
+    else
+    {
+        allSelectedClass = "tn-tabs-selected";
+    }
+
+    IUser currentUser = UserContext.CurrentUser;
+}
+<div class="spb-bar-headlines">
+    <div class="tn-tabs">
+        <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+            <li class="tn-widget-content tn-border-gray tn-border-trl @allSelectedClass"><a href="@urlGetter.SectionDetail(barSection.SectionId)">
+                全部</a> </li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl @postCountSelectedClass"><a href="@Html.Raw(urlGetter.SectionDetail(barSection.SectionId, SortBy_BarThread.PostCount))">
+                热门</a> </li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl @essentialSelectedClass"><a href="@Html.Raw(urlGetter.SectionDetail(barSection.SectionId, SortBy_BarThread.StageHitTimes, true))">
+                精华</a> </li>
+            @if (tenantTypeId == TenantTypeIds.Instance().Group() && currentUser != null)
+            { 
+                <li class="tn-widget-content tn-border-gray tn-border-trl @threadsSelectedClass"><a href="@SiteUrls.Instance().GroupSectionDetail(GroupIdToGroupKeyDictionary.GetGroupKey(barSection.SectionId), isPosted: false)">
+                    我的讨论</a> </li>
+            }
+            @if (ViewData.Get<bool>("ShowEditButton", true))
+            {
+                <li class="tn-option">
+                    @Html.LinkButton("发帖", urlGetter.Edit(barSection.SectionId), HighlightStyles.Primary, ButtonSizes.Default, IconTypes.SmallWrite, htmlAttributes: new { id = "FastEdit" })
+                </li>
+            }
+        </ul>
+        <div class="tn-tabs-panel">
+            @{
+                var lastCategoryId = threadCategories.Count() == 0 ? 0 : threadCategories.Last().CategoryId;    
+            }
+            @if (!isPosted.HasValue)
+            { 
+                <div class="tn-directory tn-helper-clearfix">
+                    <div class="tn-directory-level">
+                        @if (ViewData.Get<bool>("ShowSearch", true))
+                        { 
+                            <div class="tn-search-box">
+                                <input type="text" id="blog-keyword" name="keyword" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl"
+                                    watermark="贴子搜索" />
+                                <span id="blog-search" class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray required">
+                                    <button>
+                                        <span class="tn-icon tn-smallicon-find"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        }
+                        @{
+                        string allCategorySelectedClass = "";
+                        if (currentThreadCategory == null)
+                        {
+                            allCategorySelectedClass = "tn-selected";
+                        }
+                        }
+                        @if (threadCategories.Count() > 0)
+                        {
+                            <span class="tn-directory-item  tn-text-note @allCategorySelectedClass"><a href="@urlGetter.SectionDetail(barSection.SectionId, sortBy, isEssential)">
+                                全部</a></span>
+                        }
+                        @foreach (var category in threadCategories.Take(6))
+                        {
+                            string selectedClass = "";
+                            if (currentThreadCategory != null && currentThreadCategory.CategoryId == category.CategoryId)
+                            {
+                                selectedClass = "tn-selected";
+                            }
+                            <span class="tn-spacer tn-text-note">|</span>
+                            <span class="tn-directory-item  tn-text-note @selectedClass"><a href="@urlGetter.SectionDetail(barSection.SectionId, sortBy, isEssential, category.CategoryId)" title="@category.CategoryName">@(category.CategoryName.Length > 4 ? category.CategoryName.Substring(0, 4) : category.CategoryName)</a></span>
+                        }
+                        @if (threadCategories.Count() > 6)
+                        {
+                            var menuItems = threadCategories.Skip(8).Select(n => new MenuItem { Text = n.CategoryName, Url = urlGetter.SectionDetail(barSection.SectionId, null, null, n.CategoryId) });
+                            <span class="tn-spacer tn-text-note">|</span> 
+                            <span class="tn-directory-item "><a class="tn-action tn-action-text-icon-right" href="javascript:void(0)"
+                                menu="#moreThreadCategoriesDiv">
+                                @Html.Icon(IconTypes.SmallTriangleDown)<span class="tn-action-text">更多</span></a>
+                            </span>
+                            <div id="moreThreadCategoriesDiv" style="display: none" class="tn-more-options tn-widget-content tn-border-gray">
+                                <ul class="tn-more-list">
+                                    @foreach (var category in threadCategories.Skip(6))
+                                    {
+                                        <li><a class="tn-item-link" href="@urlGetter.SectionDetail(barSection.SectionId, null, null, category.CategoryId)">@category.CategoryName</a></li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            { 
+                <div class="tn-directory tn-helper-clearfix">
+                    <div class="tn-directory-level">
+                        <span class="tn-directory-item tn-text-note @myThreadsSelectedClass"><a href="@SiteUrls.Instance().GroupSectionDetail(GroupIdToGroupKeyDictionary.GetGroupKey(barSection.SectionId), isPosted: false)">
+                            我的帖子</a> </span><span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item  @myPostSelectedClass">
+                                <a href="@SiteUrls.Instance().GroupSectionDetail(GroupIdToGroupKeyDictionary.GetGroupKey(barSection.SectionId), isPosted: true)">
+                                    我的回复</a> </span>
+                    </div>
+                </div>
+            }
+            @if (Model != null && Model.Count > 0)
+            {
+                if (currentThreadCategory == null)
+                {
+                    ViewData["ShowThreadCategory"] = true;
+                }
+                @Html.Partial("~/Applications/Bar/Views/Bar/_List.cshtml", Model, ViewData)
+                
+            }
+            else
+            {
+                if (isPosted.HasValue && isPosted.Value == true)
+                { 
+                <div class="tn-no-data">
+                    暂无回帖</div>
+                }
+                else
+                { 
+                <div class="tn-no-data">
+                    暂无帖子，现在就去 <a href="@urlGetter.Edit(barSection.SectionId)"><strong>发帖</strong></a></div>
+                }
+            }
+        </div>
+    </div>
+</div>
+@{
+    bool onlyFollowerCreateThread = ViewData.Get<bool>("OnlyFollowerCreateThread", false);
+    bool isSubscribed = ViewData.Get<bool>("IsSubscribed", false);
+}
+@if (barSection != null && onlyFollowerCreateThread && !isSubscribed)
+{
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            $("#FastEdit").click(function (e) {
+                var _this = $(this);
+                art.dialog.confirm('需要关注才能发帖，是否马上关注发帖？', function () {
+                    $.post('@SiteUrls.Instance().SubscribeSection(barSection.SectionId)', function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            if (data.MessageType == 1) {
+                                window.location.href = _this.attr("href");
+                            }
+                        });
+                    });
+                });
+                return false;
+            });
+        });
+    </script>
+}

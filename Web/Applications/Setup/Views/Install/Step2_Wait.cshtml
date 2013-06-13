@@ -1,0 +1,111 @@
+﻿@model DataBaseInfoModel
+@{
+    Layout = "Common";
+}
+@using (Html.BeginForm("_Step2_Wait", "Install", FormMethod.Post))
+{
+    @Html.HiddenFor(n => n.Server)
+    @Html.HiddenFor(n => n.Instance)
+    @Html.HiddenFor(n => n.Port)
+    @Html.HiddenFor(n => n.DataBase)
+    @Html.HiddenFor(n => n.DataBaseUserName)
+    @Html.HiddenFor(n => n.DataBasePassword)
+    @Html.HiddenFor(n => n.Administrator)
+    @Html.HiddenFor(n => n.UserPassword)
+    @Html.HiddenFor(n => n.MainRootSiteUrl)
+}
+<div class="spb-waiting">
+    <div class="spb-slider spb-features" style="display: block;">
+        <div class="spb-slider-nav" style="">
+            <div class="spb-slider-nav-clip" style="width: 0px; height: 0px;">
+                <ul style="width: 0px;">
+                    <li style="width: 0px; height: 0px;" class="spb-slider-selected"><a title="Photo sample 01"
+                        href="javascript:;"></a></li>
+                    <li style="width: 0px; height: 0px;" class=""><a title="Photo sample 02" href="#"></a>
+                    </li>
+                    <li style="width: 0px; height: 0px;" class=""><a title="Photo sample 03" href="#"></a>
+                    </li>
+                    <li style="width: 0px; height: 0px;" class=""><a title="Photo sample 04" href="#"></a>
+                    </li>
+                    <li style="width: 0px; height: 0px;" class=""><a title="Photo sample 05" href="#"></a>
+                    </li>
+                    <li style="width: 0px; height: 0px;" class=""><a title="Photo sample 06" href="#"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="spb-slider-panels">
+            <div class="spb-slider-panel">
+                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Setup/Styles/Images/slide-1.jpg")" alt="" />
+            </div>
+            <div class="spb-slider-panel">
+                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Setup/Styles/Images/slide-2.jpg")" alt="" />
+            </div>
+            <div class="spb-slider-panel">
+                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Setup/Styles/Images/slide-3.jpg")" alt="" />
+            </div>
+            <div class="spb-slider-panel">
+                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Setup/Styles/Images/slide-4.jpg")" alt="" />
+            </div>
+            <div class="spb-slider-panel">
+                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Setup/Styles/Images/slide-5.jpg")" alt="" />
+            </div>
+            <div class="spb-slider-panel">
+                <img src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Setup/Styles/Images/slide-6.jpg")" alt="" />
+            </div>
+        </div>
+    </div>
+    <div class="spb-progress-bar">
+        <div class="spb-progress-inner">
+            <div style="width: 0%;" class="spb-progress-growing" id="schedule">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('form').ajaxSubmit({ success: onSuccess });
+        $("#schedule").animate({ width: "98%" }, 26000);
+
+
+        $(window).load(function () {
+            $(".spb-features").sliderkit({
+                cssprefix: "spb-slider",
+                auto: true,
+                circular: true,
+                shownavitems: 6,
+                panelfx: "sliding",
+                panelfxspeed: 1500,
+                panelfxeasing: "linear"
+            });
+        });
+
+    });
+    function onSuccess(data) {
+        if (data.success && data.connectString) {
+            $.post('@(Url.Action("_Step2_Install_Schema", "Install"))', { connectString: data.connectString }, function (schemaData) {
+                if (schemaData.MessageType < 1) {
+                    alert(schemaData.MessageContent);
+                    location.href = '@(Url.Action("InstallLog", "Install"))';
+                }
+                else {
+                    $.post('@(Url.Action("_Step2_Install_InitialData", "Install"))', { connectString: data.connectString, Administrator: $("#Administrator").attr("value"), UserPassword: $("#UserPassword").attr("value"), MainRootSiteUrl: $("#MainRootSiteUrl").attr("value") }, function (initialData) {
+                        if (initialData.MessageType < 1) {
+                            alert(initialData.MessageContent);
+                            location.href = '@(Url.Action("InstallLog", "Install"))';
+                        } else {
+                            $("#schedule").animate({ width: "100%" }, 1500, function (status) {
+                                location.href = '@(Url.Action("Success", "Install"))';
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        else if (data.success == undefined) {
+            location.href = '@(Url.Action("Step2_DatabaseInfo", "Install"))';
+        }
+    }
+
+    
+</script>

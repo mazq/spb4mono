@@ -1,0 +1,32 @@
+﻿@model IList<EmotionCategory>
+@if (Model != null)
+{
+    <div id="emotionSelector" style="display: none; z-index:2000000" class="tn-emotion-arrow-box tn-widget tn-bubble tn-bubble-arrow-top tnc-mode-windows tnc-mode-wid-one tnc-mode-wid-two">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content">
+            <div class=" tnc-mode-content">
+                <div class="tnc-mode-icon">
+                    <a href="javascript:;" class="tn-icon tn-smallicon-cross"></a>
+                </div>
+                <div class="tn-tabs">
+                    <ul id="emotion-tabs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                        @foreach (EmotionCategory category in Model)
+                        {
+                            <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="javascript:;" ohref="@SiteUrls.Instance().GetEmotions()" value="@category.DirectoryName"  title="@category.Description">
+                                <span>@category.CategoryName</span></a></li>
+                        }
+                    </ul>
+                    <div id="emotion-container" class="tn-tabs-panel">
+                        <div id="leftOriginal" style="left: 0pt; right: auto;" class="tn-emotion-original">
+                        </div>
+                        <div id="rightOriginal" style="left: auto; right: 20px;" class="tn-emotion-original">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,47 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    string tagName = ViewData.Get<string>("tagName", string.Empty);
+    SortBy_BarThread? sortBy = ViewData.Get<SortBy_BarThread?>("sortBy", null);
+    bool? isEssential = Request.QueryString.Get<bool?>("isEssential", null);
+
+    string allSelectedClass = string.Empty; //全部是否选中样式
+    string postCountSelectedClass = string.Empty;//热门是否选中样式
+    string essentialSelectedClass = string.Empty;//精华是否选中样式
+    if (isEssential == true)
+    {
+        essentialSelectedClass = "tn-tabs-selected";
+    }
+    else if (sortBy == SortBy_BarThread.PostCount)
+    {
+        postCountSelectedClass = "tn-tabs-selected";
+    }
+    else
+    {
+        allSelectedClass = "tn-tabs-selected";
+    }
+
+    long? sectionId = ViewData.Get<long?>("SectionId", null);
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading">
+            <h2>
+                标签：@tagName</h2>
+        </div>
+        <div class="tn-tabs">
+            <ul id="sectionTabNavs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl @allSelectedClass"><a href="@urlGetter.ListByTag(tagName, sectionId)">全部</a> </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl @postCountSelectedClass"><a href="@Html.Raw(urlGetter.ListByTag(tagName, sectionId, SortBy_BarThread.PostCount))">热门</a> </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl @essentialSelectedClass"><a href="@Html.Raw(urlGetter.ListByTag(tagName, sectionId, null, true))">精华</a> </li>
+            </ul>
+            <div class="tn-tabs-panel">
+                @Html.Partial("~/Applications/Bar/Views/Bar/_List.cshtml", Model)
+            </div>
+        </div>
+    </div>
+</div>

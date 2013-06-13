@@ -1,0 +1,25 @@
+﻿@model List<IUser>
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-related-microblog">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">相关微博</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <ul class="tn-user-list">
+                @foreach (var user in Model)
+                {
+                    <li class="tn-user-item tn-helper-clearfix">
+                        <div class="tn-pic">
+                            @Html.ShowUserAvatar(user, AvatarSizeType.Small, true)
+                        </div>
+                        <div class="tn-con">
+                            <div class="tn-name">@Html.Link(StringUtility.Trim(user.DisplayName, 4, ""), SiteUrls.Instance().SpaceHome(user.UserId), user.DisplayName, new { @class = "tn-user-name" }, HyperLinkTarget._blank)</div>
+                            <div class="tn-act">@Html.FollowUser(user.UserId, "关注")</div>
+                        </div>                             
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

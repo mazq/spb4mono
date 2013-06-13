@@ -1,0 +1,107 @@
+﻿@model IEnumerable<GroupEntity>
+@{
+    string areaCode = ViewData.Get<string>("areaCode", string.Empty);
+    string parentCode = ViewData.Get<string>("parentCode",string.Empty);
+}
+<div id="sd" class="tn-box tn-widget tn-widget-content tn-corner-all spb-location-group">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+        <h3 class="tn-helper-reset">
+            <span class="tn-location"><span id="area-selected">
+            @if (string.IsNullOrEmpty(areaCode))
+            {
+                @:未限定地区
+            }
+            else
+            {
+            @Formatter.FormatArea(areaCode, false)
+            }</span> <a id="area-selector" href="#">[切换地区]</a></span>
+        </h3>
+    </div>
+    @if (Model.Count() <= 0)
+    {
+        <div class="tn-no-data">
+            此地区还没有群组!</div> 
+    }
+    else
+    {
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <div class="tnc-person-list">
+                <ul class="tn-list ">
+                    @foreach (var item in Model)
+                    {
+                        <li class="tn-list-item tn-helper-clearfix">
+                            <div class="tn-list-item-area-left">
+                                <div class="tn-avatar">
+                                    <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" >
+                                        <img src="@SiteUrls.Instance().LogoUrl(item.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" alt="@item.GroupName" width="50px" /></a></div>
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-list-item-heading">
+                                    <h5 class="tn-helper-reset">
+                                        <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" target="_blank">@item.GroupName</a>
+                                    </h5>
+                                </div>
+                                <div class="tn-list-item-row tn-list-item-summary">
+                                    <p>
+                                        @if (item.User != null)
+                                        {
+                                            @:群主:<a href="@SiteUrls.Instance().UserJoinedGroups(item.User.UserName)" title="@item.User.UserName">@item.User.DisplayName</a>
+                                                                                                                        }
+                                    </p>
+                                    <p>
+                                        成员：@item.MemberCount</p>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="tn-more tn-border-gray tn-border-dashed tn-border-top">
+                <a href="@SiteUrls.Instance().FindGroup(areaCode, null, null)">更多</a></div>
+        </div>
+        
+    }
+    @Html.AreaSelector("groupArea", "A1560000", parentCode, areaCode, 2, "areaGroup.AreaSelected")
+    <script type="text/javascript">
+        //todo:wanf,by zhengw:以下代码写的很乱，不应该让调用者使用起来这么麻烦，其实这里仅需要声明一个回调函数即可；
+        $(function () {
+            var AreaGroup = function () {
+                this.init();
+            };
+            AreaGroup.fn = AreaGroup.prototype = {
+                init: function () {
+                    //注册选择地区事件
+                    $('#area-selector').click(function (e) {
+                        e.preventDefault();
+                        groupArea.toggle();
+                        var left = $("#area-selector").offset().left;
+                        var top = $("#area-selector").offset().top;
+                        groupArea.position(left, top); //定位
+                    });
+                },
+                /*
+                * 地区选择器回调函数
+                */
+                AreaSelected: function (data) {
+                    groupArea.hide();
+                    var nowAreaName = data.areaName;
+
+                    if (data.parentAreaCode != data.areaCode && data.parentAreaCode != data.topAreaCode) {
+                        nowAreaName = data.parentAreaName + "-" + data.areaName;
+                        $("#area-selected").text(nowAreaName);
+
+                    }
+                    $.ajax({ type: "post",
+                        url: '@SiteUrls.Instance()._AreaGroups()',
+                        data: { "areaCode": data.areaCode },
+                        success: function (msg) {
+                            $("#sd").replaceWith(msg);
+                        }
+                    });
+
+                }
+            }
+            areaGroup = new AreaGroup();
+        })
+    </script>
+</div>

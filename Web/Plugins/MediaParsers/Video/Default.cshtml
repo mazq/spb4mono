@@ -1,0 +1,24 @@
+﻿@{
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+    Regex urlRegex = new Regex(@"^.*\.(swf|flv|rmvb|mp4|mpg4|3gp|mpeg|mpg|mpa|mpe|wmv|wma|mov|qt|avi|asf|asr|asx)$", RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+
+    if (urlMatch.Success)
+    {
+        ParsedMedia entity = ParsedMedia.New();
+        entity.MediaType = MediaType.Video;
+        entity.Url = url;
+        entity.PlayerUrl = url;
+        entity.Description = string.Empty;
+        entity.ThumbnailUrl = Tunynet.Utilities.WebUtility.ResolveUrl("~/Themes/Shared/Styles/Images/figure.jpg");
+        entity.Name = Tunynet.Utilities.WebUtility.UrlDecode(url.Remove(url.LastIndexOf('.')).Substring(url.LastIndexOf('/') + 1));
+        entity.SourceFileUrl = url;
+        ParsedMediaService parsedMediaService = new ParsedMediaService();
+        parsedMediaService.Create(entity);
+    @Html.Raw(Json.Encode(entity))
+    }
+    else
+    { 
+    @Html.Raw(Json.Encode(new { errorMessage = "可能暂时不支持此视频解析" }))
+    }
+}

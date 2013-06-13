@@ -1,0 +1,64 @@
+﻿@model Comment
+@{
+    TenantCommentSettings settings = TenantCommentSettings.GetRegisteredSettings(Model.TenantTypeId);
+}
+@if (new Authorizer().Comment_Show(Model))
+{
+    <li class="tn-comment-item tn-border-gray tn-border-top" id="li-comment-@Model.Id"><a
+        name="@Model.Id"></a>
+        <div class="tn-comment tn-helper-clearfix">
+            <div class="tn-comment-avatar">
+                @Html.ShowUserAvatar(Model.IsAnonymous ? 0 : Model.UserId, AvatarSizeType.Small)
+            </div>
+            <div class="tn-comment-info tn-hover">
+                <div class="tn-comment-act tn-state-hidden">
+                    @if (new Authorizer().Comment_Delete(Model))
+                    {
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetDeleteTarget("#li-comment-" + Model.Id).SetText("删除").SetUrl(SiteUrls.Instance()._DeleteComment(Model.Id)))
+                    }
+                    <a href="@SiteUrls.Instance()._ImpeachReport(Model.UserId, Request.RawUrl, HtmlUtility.TrimHtml(Model.Body, 50))" plugin="dialog" class="tn-report">举报</a></div>
+                <div class="tn-commentator">
+                    <h5>
+                        @if (Model.IsAnonymous || Model.UserId == 0)
+                        {
+                            @Model.Author
+                        }
+                        else
+                        {
+                            @Html.Link(Model.Author, SiteUrls.Instance().SpaceHome(Model.UserId), Model.Author, new { @class = "tn-author" })
+                        }
+                    </h5>
+                    <em class="tn-text-note tn-date">@Model.DateCreated.ToFriendlyDate()</em>
+                    @if (Model.IsPrivate)
+                    {
+                        <span class="tn-explain-icon"><span class="tn-icon tn-icon-colorful tn-icon-colorful-private">
+                        </span><span class="tn-icon-text">悄悄话</span></span>
+                    }
+                </div>
+                <p>
+                    @Html.Raw(Model.Body)</p>
+                <div class="tn-comment-feed tn-helper-clearfix">
+                    @*                    <div class="tn-thumb-rate">
+                        <em class="tn-thumb-up-count tn-count">0</em><a title="支持" class="tn-icon tn-icon-thumb-up" href="#">支持</a><a title="反对" class="tn-icon tn-icon-thumb-down" href="#">反对</a><em class="tn-thumb-up-count tn-count">0</em></div>*@
+                    <span class="tn-reply">
+                        @if (Model.ParentId == 0)
+                        {
+                            <a id="_ChildCommentList-reply-@Model.Id" value="@Model.Id" class="tn-action tn-action-text-icon-right" href="@SiteUrls.Instance()._ChildComment(Model.Id)">
+                                <span class="tn-icon tn-smallicon-triangle-@(settings.ShowLowCommentOnLoad ? "down" : "up")">
+                                </span><span class="tn-action-text">回复</span></a> 
+                        }
+                    </span>
+                </div>
+            </div>
+            @if (Model.ParentId == 0)
+            {
+                <div class="tn-replies"  id="tn-comments-replies-@Model.Id">
+                    @if (settings.ShowLowCommentOnLoad)
+                    {
+                        @Html.Action("_ChildComment", "Channel", new { parentId = Model.Id, showAfter = false, pageIndex = 1 })
+                    }
+                </div>
+            }
+        </div>
+    </li>
+}

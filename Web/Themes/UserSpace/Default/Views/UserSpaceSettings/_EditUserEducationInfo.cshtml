@@ -1,0 +1,84 @@
+﻿@model EducationExperienceEditModel
+@{ SelectList StareYear = ViewData["StareYear"] as SelectList;
+
+   string action = "CreateEducation";
+   if (Model != null && Model.Id > 0)
+   {
+       action = "UpdateEducation";
+   }
+
+   UserProfile userProfile = ViewData.Get<UserProfile>("userProfile", null);
+   string areacode = IPSeeker.Instance().GetAreaCode(Tunynet.Utilities.WebUtility.GetIP());
+   if (!string.IsNullOrEmpty(userProfile.HomeAreaCode))
+   {
+       areacode = userProfile.HomeAreaCode.Remove(2)+"000000";
+   }
+   if (!string.IsNullOrEmpty(userProfile.NowAreaCode))
+   {
+       areacode = userProfile.NowAreaCode.Remove(2) + "000000";
+   }
+   
+}
+<div class="tn-content-heading tn-border-gray tn-border-bottom">
+    <h4>
+        @if (Model != null && Model.Id > 0)
+        {
+            @Html.Raw("编辑教育信息")
+        }
+        else
+        {
+            @Html.Raw("添加教育信息")
+        }
+    </h4>
+</div>
+@using (Html.BeginAjaxForm(action, "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("createEducation"), htmlAttributes: new { id = "CreateEducation" }))
+{
+    @Html.Hidden("Id", Model.Id)
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.Degree)
+        @Html.EnumDropDownList("Degree", Model.Degree)
+    </div>
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.School) @*//todo:ful by libsh,没有验证长度【已修复】*@
+        @Html.TextBoxFor(model => model.School, InputWidthTypes.Long, new RouteValueDictionary {{"id","open-SchoolSelector"}})
+        @Html.ValidationMessageFor(model => model.School)
+        <a class="tn-icon tn-icon-school" href="@SiteUrls.Instance()._SchoolSelector("open-SchoolSelector", areacode)" plugin = "dialog" id="SchoolSelector"></a>
+    </div>
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.StartYear)
+        @Html.DropDownListFor(model => model.StartYear, StareYear)
+    </div>
+    <div class="tn-form-row">
+        @Html.FormLabelFor(model => model.Department)
+        @Html.TextBoxFor(model => model.Department, InputWidthTypes.Long)
+        @Html.ValidationMessageFor(model => model.Department)
+    </div>
+    <div class="tn-form-row tn-form-row-button">
+        <label class="tn-form-label">
+            &nbsp;</label>
+        @if (Model != null && Model.Id > 0)
+        {
+            @Html.Button("更新", ButtonTypes.Submit, HighlightStyles.Primary)
+        }
+        else
+        {
+            @Html.Button("添加", ButtonTypes.Submit, HighlightStyles.Primary)
+        }
+        @*//todo:ful by libsh,编辑的时候才显示 【已修复】*@
+        @if (Model != null && Model.Id > 0)
+        {
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { onClick = "ClearFrom()" })
+        }
+    </div>
+}
+<script type="text/javascript">
+    function ClearFrom() {
+        $("#UserEducationInfo").load('@(Url.Action("_EditUserEducationInfo", "UserSpaceSettings"))?spaceKey=@(Url.SpaceKey())');
+    }
+
+    function createEducation(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        $("#UserEducations").load('@(Url.Action("_UserEducations", "UserSpaceSettings"))?spaceKey=@(Url.SpaceKey())');
+        $("#UserEducationInfo").load('@(Url.Action("_EditUserEducationInfo", "UserSpaceSettings"))?spaceKey=@(Url.SpaceKey())');
+    } 
+</script>

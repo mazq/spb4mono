@@ -1,0 +1,19 @@
+﻿@model Tunynet.Common.Message
+@{
+
+    <div id="msg_message_@(Model.MessageId)"  class="tnc-message-info tn-border-bottom tn-border-gray">
+        <p class="tnc-info-content">
+            <span class="tnc-sender-name">
+                @Html.Raw("客服消息")：</span>@Html.Raw(Model.Body)</p>
+        <em class="tn-date tn-text-note"><span class="tn-action">
+            @Model.DateCreated.ToFriendlyDate()</span> <span name="operate_@(Model.MessageId)" class="tn-action" style=" display:none">
+                @Html.AjaxDeleteButton(new AjaxDeleteButton()
+                                     .SetConfirm("确认要删除私信内容吗")
+                                     .SetText("删除")
+                                     .SetTooltip("删除私信")
+                                     .SetDeleteTarget("#msg_message_" + Model.MessageId)
+                                     .SetUrl(Url.Action("DeleteMessage", new { messageId = Model.MessageId, sessionId = ViewData.Get<long>("sessionId", 0) }))
+                                     .SetOnSuccessCallBack("DeleteMessageSuccess"))
+            </span></em>
+    </div>
+}

@@ -1,0 +1,67 @@
+﻿@model  PagingDataSet<Activity>
+@{
+    int pageIndex = ViewData.Get<int>("pageIndex", 1);
+    int? applicationId = ViewData.Get<int?>("applicationId", null);
+    int pageCount = Model.PageCount;
+    var applicationService = new ApplicationService();
+}
+<ul class="tn-list tnc-dynamic">
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            string areaName = "Common";
+            if (item.ApplicationId > 0)
+            {
+                var application = applicationService.Get(item.ApplicationId);
+                if (application == null || !application.IsEnabled)
+                {
+                    continue;
+                }
+                areaName = application.ApplicationKey;
+            } 
+            string tenantTypeIdPart = "";
+            if (!string.IsNullOrEmpty(item.TenantTypeId))
+            {
+                tenantTypeIdPart = "_" + item.TenantTypeId;
+            }
+            string spaceKey = UserIdToUserNameDictionary.GetUserName(item.UserId);
+        @Html.AjaxRouteAction(string.Format("ActivityDetail{0}_{1}", tenantTypeIdPart, item.ActivityItemKey), new { ActivityId = item.ActivityId, spaceKey = spaceKey, area = areaName, isOwnerActivity = true })
+        }
+    }
+</ul>
+<div class="tn-load-more tn-bg-gray tn-border-gray" id="showMoreDiv">
+    <div id="active_loading" class="tn-loading" style="display: none">
+    </div>
+    <a href="javascript:;" class="tn-action tn-action-text-icon-right">@Html.Icon(IconTypes.SmallCollapseOpen)<span
+        class="tn-action-text">更多信息</span> </a>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var pageIndex = parseInt("@pageIndex");
+        if (pageIndex >= parseInt("@pageCount")) {
+            $("#showMoreDiv").hide();
+        }
+        function addPageIndex() {
+            pageIndex += 1;
+        };
+        $("#showMoreDiv").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            $('#active_loading').show();
+            $this.find('a').hide();
+            addPageIndex();
+            $.get('@Html.Raw(Url.Action("SpaceHome", new { spaceKey = Url.SpaceKey(), applicationId = applicationId }))',
+             { pageIndex: pageIndex },
+             function (data) {
+                 $this.prev().append(data);
+                 $('#active_loading').hide();
+                 $this.children('a').show();
+                 if (pageIndex >= parseInt("@pageCount")) {
+                     $this.hide();
+                 }
+                 $this.remove();
+             });
+        });
+    });
+</script>

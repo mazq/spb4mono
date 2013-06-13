@@ -1,0 +1,227 @@
+﻿@model PagingDataSet<Tag>
+@{
+    Layout = "_ControlPanel";
+    var isFeatured = Request.QueryString.Get<string>("isFeatured", null);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+                @Html.Partial("_ManageMicroblogRightMenu")
+            </div>
+        </div>
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>微博话题管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageMicroblogTopics", "ControlPanelMicroblog", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    话题关键字：</label>
+                                @Html.TextBox("keyword", "", new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    话题类型：</label>
+                                    <select id="isFeatured" name ="isFeatured">
+                                        <option @if(isFeatured==null){<text>selected="selected"</text>} value="">全部</option>
+                                        <option @if(isFeatured=="false"){<text>selected="selected"</text>} value="false">普通话题</option>
+                                        <option @if(isFeatured=="true"){<text>selected="selected"</text>} value="true">特色话题</option>
+                                    </select>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "search" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("创建", SiteUrls.Instance().EditTopic(), iconType: IconTypes.SmallAdd)
+                            @Html.LinkButton("设置分组", SiteUrls.Instance()._SetTopicGroup(), iconType: IconTypes.SmallSet, htmlAttributes: new { id = "set-topics-group" })
+                            @Html.LinkButton("删除", SiteUrls.Instance().DeleteTopics(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-topics" })
+                        </div>
+                    </div>
+                    @if (Model != null && Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else if (Model != null)
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" id="select-all" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        话题内容
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        特色话题
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        话题分组
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        内容数
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        创建时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (Tag topic in Model)
+                                { 
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.CheckBox("topic-id", new { @class = "tnui-topic-id", value = @topic.TagId })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @Html.Link(topic.TagName, SiteUrls.Instance().MicroblogTopic(topic.TagName), topic.TagName,navigateTarget:HyperLinkTarget._blank)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @if(topic.IsFeatured)
+                                            {
+                                                <span class="tn-icon tnc-icon-rights tnc-icon-rights-success"></span>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category tn-nowrap">
+                                            @topic.GroupName
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @topic.ItemCount
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @topic.DateCreated.ToUserDateString(true)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance().EditTopic(topic.TagId), "编辑",htmlAttributes:new{@class="tn-action"})
+                                            @Html.Link("推荐",SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().Microblog(),topic.TagId,topic.TagName),"推荐该话题",new{@class="tn-action",plugin="dialog"})
+                                            @Html.Link("删除", SiteUrls.Instance().DeleteTopics(topic.TagId.ToString()), "删除该条话题", new { @class = "tn-action tnui-delete-topic", id = "delete-topic" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removechecked();
+        function removechecked() {
+            $(".tnui-topic-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".tnui-topic-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".tnui-topic-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+        //组合所有选中的复选框的只，以,分隔
+        function getCheckedTopicIds() {
+            var topicIds = "";
+            $(".tnui-topic-id").each(function () {
+                if ($(this).attr("checked")) {
+                    topicIds += $(this).val() + ",";
+                }
+            });
+            return topicIds;
+        }
+
+        //点批量删除
+        $("#delete-topics").click(function (e) {
+            e.preventDefault();
+
+            var topicIds = getCheckedTopicIds();
+            if (!topicIds) {
+                alert("请至少选择一条话题！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.getJSON(url, { topicIds: topicIds }, function (data) {
+                    if (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                        setTimeout(function () { window.location.reload(true); }, 500);
+                    }
+                });
+                removechecked();
+            });
+        });
+        //点设置分组
+        $("#set-topics-group").click(function (e) {
+            e.preventDefault();
+
+            var topicIds = getCheckedTopicIds();
+            if (topicIds == null || topicIds == "") {
+                $(this).removeAttr("plugin");
+                alert("请至少选择一条话题！");
+                return;
+            }
+            else {
+                $(this).attr("href", '@SiteUrls.Instance()._SetTopicGroup()' + "?topicIds=" + topicIds);
+                $(this).attr("plugin", "dialog")
+            }
+        });
+        //单个删除
+        $('.tnui-delete-topic').click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.getJSON(url, function (data) {
+                    if (data) {
+                        art.dialog.tips("删除成功！", 1.5, 1);
+                        setTimeout(function () { window.location.reload(true); }, 500);
+                    }
+                });
+            });
+        });
+    });
+</script>

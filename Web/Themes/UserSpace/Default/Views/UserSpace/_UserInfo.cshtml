@@ -1,0 +1,52 @@
+﻿@model User
+@{
+    bool isSameUser = ViewData.Get<bool>("isSameUser", false);
+    //List<OwnerStatisticData> OwnerStatisticDataList = ViewData.Get<List<OwnerStatisticData>>("OwnerStatisticDataList", null);
+    Dictionary<int, List<OwnerStatisticData>> OwnerStatisticDataDictionary = ViewData.Get<Dictionary<int, List<OwnerStatisticData>>>("OwnerStatisticDataDictionary",null);
+    Dictionary<int, string> dictionary = ViewData.Get<Dictionary<int, string>>("dictionary",null);
+    IEnumerable<ApplicationBase> applicationBase = ViewData.Get<IEnumerable<ApplicationBase>>("applicationBase",null);
+}
+<div class="tn-avatar-wrap tn-hover">
+    @Html.ShowUserAvatar(Model.UserId, AvatarSizeType.Big, navigateTarget: HyperLinkTarget._self, enableCachingInClient: !isSameUser, isShowUserCard: false)
+    @if (isSameUser)
+    {
+        <a href="@SiteUrls.Instance().EditAvatar(Url.SpaceKey())" class="tn-action tn-action-text-icon tn-state-hidden tn-in-pic">
+            <span class="tn-icon tn-smallicon-write"></span><span class="tn-action-text">上传头像</span>
+        </a>}
+</div>
+<ul class="spb-user-atten tn-helper-clearfix">
+    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ListFollowedUsers(Url.SpaceKey())">
+        <strong class="tn-count">@Model.FollowedCount</strong><span>关注</span></a> </li>
+    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ListFollowers(Url.SpaceKey())">
+        <strong class="tn-count" id="userFollowerCount">@Model.FollowerCount</strong><span>粉丝</span></a>
+    </li>
+    <li><a href="#"  menu="#@(Model.UserId)"><strong class="tn-count">@Model.ContentCount</strong><span>内容</span></a>
+    </li>
+    
+</ul>
+<div class="spb-content-pop-bubbles" id = "@Model.UserId" style="display:none">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+            <ul class="tn-helper-clearfix">
+                @foreach (var item in applicationBase)
+                    {
+                        <li>@dictionary[item.ApplicationId]：
+                        @for (int i = 0; i < OwnerStatisticDataDictionary[item.ApplicationId].Count(); i++)
+			            {
+                            if (i != 0)
+                            {
+                                <span>/</span>
+                            }
+                            <a href="@OwnerStatisticDataDictionary[item.ApplicationId][i].DataUrl" title="@OwnerStatisticDataDictionary[item.ApplicationId][i].DataName">@OwnerStatisticDataDictionary[item.ApplicationId][i].ContentCount</a>
+                        }
+                        </li>
+                    }
+            </ul>
+        </div>
+    </div>
+</div>
+

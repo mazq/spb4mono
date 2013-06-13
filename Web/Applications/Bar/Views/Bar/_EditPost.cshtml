@@ -1,0 +1,48 @@
+﻿@model BarPostEditModel
+@{
+    string title = Model.PostId.HasValue ? "编辑回帖" : "回复";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+
+    int PostBodyMaxLength = ViewData.Get<int>("PostBodyMaxLength", 5000);
+
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-topic-eidt">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-topic-eidt-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>@title：@Html.Link(Model.Subject, urlGetter.ThreadDetail(Model.ThreadId), Model.Subject)</h2>
+            </div>
+            @using (Html.BeginForm("EditPost", "Bar", FormMethod.Post))
+            {
+                <div class="tn-publish">
+                    <div class="tn-editor">
+                        @Html.HtmlEditorFor(model => Model.Body, new HtmlEditorOptions(HtmlEditorMode.Enhanced)
+                        .MergeHtmlAttribute("maxlength", PostBodyMaxLength)
+                        .MergeHtmlAttribute("style", "height:400px;")
+                                                     .AddPhotoButton(TenantTypeIds.Instance().BarPost(), Model.PostId ?? 0)
+                                                     .AddFileButton(TenantTypeIds.Instance().BarPost(), Model.PostId ?? 0)
+                                                    )
+                    </div>
+                    @Html.ValidationMessageFor(n => n.Body)
+                    <div class="tn-publish-btn">
+                        @Html.Button("发表回帖", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                        @if (Request.UrlReferrer != null)
+                        {
+                            @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, ButtonSizes.Large, url: Request.UrlReferrer.PathAndQuery)
+                        }
+                    </div>
+                </div>
+            
+                @Html.HiddenFor(n => n.PostId)
+                @Html.HiddenFor(n => n.ThreadId)
+                @Html.HiddenFor(n => n.SectionId)
+            }
+        </div>
+    </div>
+</div>

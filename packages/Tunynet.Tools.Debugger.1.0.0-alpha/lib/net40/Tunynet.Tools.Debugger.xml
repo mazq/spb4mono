@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Tunynet.Tools.Debugger</name>
+    </assembly>
+    <members>
+        <member name="M:Tunynet.Tools.Debugger.PreApplicationStart.Start">
+            <summary>
+            在应用程序启动时注册Model
+            </summary>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.SqlTraceHttpModule.context_BeginRequest(System.Object,System.EventArgs)">
+            <summary>
+            请求开始时执行
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.SqlTraceHttpModule.OnEndRequest(System.Object,System.EventArgs)">
+            <summary>
+            请求结束时执行
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.DebuggerConfiguration.Instance">
+            <summary>
+            实例化Debugger配置
+            </summary>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.DebuggerConfiguration.EnableSqlTraceOrResponseTime">
+            <summary>
+            是否启用了Sql跟踪或运行时间显示
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.DebuggerConfiguration.EnableSqlTrace">
+            <summary>
+            判断Sql跟踪是否启用
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.DebuggerConfiguration.EnableResponseTime">
+            <summary>
+            判断页面运行时间是否启用
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceToLog">
+            <summary>
+            Sql跟踪结果是否从日志输出
+            </summary>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceToPage">
+            <summary>
+            Sql跟踪结果是否从页面输出
+            </summary>
+        </member>
+        <member name="T:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceSettings">
+            <summary>
+            SqlTrace 设置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceSettings.Page">
+            <summary>
+            SQL跟踪输出到页面
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceSettings.Log">
+            <summary>
+            SQL跟踪输出到日志文件
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceSettings.PageAndLog">
+            <summary>
+            SQL跟踪输出到页面和日志文件
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.SqlTraceSettings.Disabled">
+            <summary>
+            禁用SQL跟踪
+            </summary>
+        </member>
+        <member name="T:Tunynet.Tools.Debugger.DebuggerConfiguration.ResponseTimeSetting">
+            <summary>
+            页面执行时间设置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.ResponseTimeSetting.Page">
+            <summary>
+            页面执行时间输出到页面
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.ResponseTimeSetting.Database">
+            <summary>
+            页面执行时间输出到数据库
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.ResponseTimeSetting.PageAndDatabase">
+            <summary>
+            页面执行时间输出到页面和数据库
+            </summary>
+        </member>
+        <member name="F:Tunynet.Tools.Debugger.DebuggerConfiguration.ResponseTimeSetting.Disabled">
+            <summary>
+            禁用页面执行时间输出
+            </summary>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.TraceHttpHandler.OutSql(System.Collections.Generic.List{Tunynet.SqlTraceEntity},System.String)">
+            <summary>
+            对sql语句进行分类统计
+            </summary>
+        </member>
+        <member name="M:Tunynet.Tools.Debugger.TraceHttpHandler.IsRoutedRequest(System.Web.HttpRequest)">
+            <summary>
+            判断请求是否为动态页面
+            </summary>
+        </member>
+        <member name="P:Tunynet.Tools.Debugger.TraceHttpHandler.IsReusable">
+            <summary>
+            接口成员
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Tunynet.Common.Tag>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.UserTag;
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-set-tags-box">
+  <div class="tn-box-content tn-widget-content tn-corner-all">
+      <div class="tnc-set-tags-wrap">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+          <h2>个人标签</h2>
+        </div>
+        @Html.Action("_EditUserProfileTag", new { spaceKey = Url.SpaceKey() })
+      </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+    function success(data) {
+        $("#MyTagsDiv").load('@SiteUrls.Instance()._ListMyUserTags(Url.SpaceKey())');
+        $("#myTagTextBox").attr("value", '');
+    }
+    function error(response) {
+        var data = jQuery.parseJSON(response);
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    $("#createMyTag").click(function () {
+        if ($("#myTagTextBox").val()) {
+            return true;
+        }
+        else {
+            art.dialog.tips("标签框为空不能提交", 1.5, 2);
+            return false;
+        }
+    })
+</script>

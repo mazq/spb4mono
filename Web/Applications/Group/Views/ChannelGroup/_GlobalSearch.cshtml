@@ -1,0 +1,44 @@
+﻿@model PagingDataSet<GroupEntity>
+@{
+    GroupSearcher groupSearcher = (GroupSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(GroupSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@if (Model.TotalRecords > 0)
+{
+    <input type="hidden" class="totalRecords" value="@Model.TotalRecords" />
+    <input type="hidden" class="queryDuration" value="@Model.QueryDuration" />
+    <div class="tn-content-heading tn-border-light tn-border-bottom">
+        <div class="tn-option">
+            <a href="@groupSearcher.PageSearchActionUrl(keyword)">更多</a>
+        </div>
+        <h4>
+            群组</h4>
+    </div>
+    <div class="tnc-search-article">
+        <ul class="tn-list">
+            @foreach (GroupEntity group in Model)
+            {
+                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                    <div class="tn-list-item-area-main">
+                        <div class="tn-list-item-row tn-list-item-heading">
+                            <h5 class="tn-helper-reset">
+                                <a target="_blank" href="@SiteUrls.Instance().GroupHome(group.GroupKey)">
+                                @Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, group.GroupName, 100))</a>
+                            </h5>
+                        </div>
+                        <div class="tn-list-item-row tn-list-item-summary">
+                            <p>@Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, HtmlUtility.TrimHtml(group.Description, 100), 100))</p>
+                        </div>
+                        <div class="tn-list-item-row tn-list-info">
+                            <p>
+                                <a target="_blank" href="@SiteUrls.Instance().SpaceHome(group.User.UserName)" class="tn-user-name">
+                                @Html.Raw(Tunynet.Search.SearchEngine.Highlight(keyword, group.User.DisplayName, 100))</a>
+                                <em class="tn-date tn-text-note">@group.DateCreated.ToUserDateString(true)</em>
+                            </p>
+                        </div>
+                    </div>
+                </li> 
+            }
+        </ul>
+    </div>
+}

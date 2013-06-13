@@ -1,0 +1,24 @@
+﻿@model ImpeachReportCreateModel
+@{
+    var anonymityReport = ViewData.Get<ImpeachReportEntity>("anonymityReport", null);
+}
+<div class="tnc-dailog-pd">
+    <div class="tn-form tn-label-left tnc-label-short tnc-tips-location">
+           
+        <div class="tn-form-row">
+            @Html.FormLabelFor(model=>model.Reporter)
+            <label class="tn-border-bottom tn-width-category tn-width-auto">@anonymityReport.Reporter</label>
+        </div>
+        <div class="tn-form-row">
+            @Html.FormLabelFor(model=>model.Email)
+            <label class="tn-border-bottom tn-width-category tn-width-auto">@anonymityReport.Email</label>
+        </div>
+        <div class="tn-form-row">
+            @Html.FormLabelFor(model=>model.Telephone)
+            <label class="tn-border-bottom tn-width-category tn-width-auto">@anonymityReport.Telephone</label>
+        </div>                       
+    </div>
+</div>
+<script type="text/dialog">
+  this.title("匿名用户举报信息");
+</script>

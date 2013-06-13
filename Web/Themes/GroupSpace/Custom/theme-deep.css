@@ -1,0 +1,108 @@
+﻿/* 
+Offical Style for Spacebuilder
+(C) 2007-2012 Tunynet Inc.
+*/ 
+
+/* Page Layout
+----------------------------------*/
+#tn-header .tn-wrapper,
+#tn-content .tn-wrapper,
+#tn-footer .tn-wrapper{ width: 950px;margin: 0 auto; }
+#tn-header { margin-bottom: 20px; }
+#tn-header .tn-wrapper {height: 36px;}
+#tn-content { margin-bottom: 20px; }
+.spb-layout-19-5 .tn-content-bg .tn-wrapper { background-image: url(Images/glass.png); background-repeat: repeat-y; background-position: right 0; }
+
+/* Content Layout
+----------------------------------*/
+.tnc-aside,
+.tnc-aside-first,
+.tnc-aside-second,
+.tnc-main { padding-top: 20px; }
+
+/* Global navigation */
+.spb-top-menubar .spb-logo a{height:36px; width:170px;} 
+.spb-top-menubar .spb-menu li a{ line-height:36px;} 
+.spb-top-menubar .tn-search-box{ padding-top:6px;}
+.spb-top-menubar .spb-user-menu{ padding-top:6px;}
+.tn-drop-menu li.tn-icon-menu .tn-msg-bubble{top: -6px;}
+
+/* Box
+----------------------------------*/
+.tn-box .tn-box-header { margin: 0; }
+.tn-box .tn-box-header h3 { font-size: 14px; }
+.tnc-aside .tn-box-content { padding: 10px; }
+.tnc-aside .tn-avatar-item { width: 56px; }
+
+/* Button
+----------------------------------*/
+.tn-button-default { box-shadow: 0 1px 0 #fff inset; }
+.tn-button-default:hover {box-shadow: 0 1px 0 #fff inset; }
+.tn-button-primary{  box-shadow: 0 0px 0 0 inset; }
+.tn-button-primary:hover{ box-shadow: 0 0px 0 0 inset; }
+.tn-button-lite { background: none; border-color: transparent; _border: none; box-shadow: none; }
+.tn-button-hollow { background: none; box-shadow: none; }
+
+/* Header
+----------------------------------*/
+.spb-top-menubar a.spb-menu-link,
+.spb-top-menubar a.spb-menu-link:hover,
+.spb-top-menubar .spb-user-menu .tn-icon,
+.spb-top-menubar .spb-user-menu .tn-user-name{ color: #fff; }
+.spb-top-menubar .spb-menu .tn-selected a.spb-menu-link,
+.spb-top-menubar .spb-menu .tn-icon,
+.spb-top-menubar .spb-user-menu .tn-icon { background-image: url(../../Shared/Styles/icons/white/tn-icon-small.png); }
+.spb-top-menubar .spb-user-menu .tn-icon:hover { background-image: url(../../Shared/Styles/icons/white/tn-icon-small.png); }
+.spb-user-menu .tn-user-name:hover {padding: 0 2px; line-height: 23px; text-decoration: none; border-style: solid ; border-width:1px; }
+.spb-top-menubar .spb-menu li li .tn-icon{background-image: url(../../Shared/Styles/icons/25gray/tn-icon-small.png);}
+.tn-msg-bubble{ background-color: #f00; }
+
+/* User Center
+----------------------------------*/
+.spb-user-panel .spb-profile-card { padding: 0 10px; }
+.spb-user-panel .spb-declist,
+.spb-user-panel .tn-side-menu li,
+.spb-user-panel .tn-actions{ padding-left:15px;}
+.spb-user-panel .tn-side-menu .tn-icon{ left:15px;}
+
+/* Box
+----------------------------------*/
+.tn-content-bg .tn-box,
+.tn-content-bg .tn-box .tn-box-content,
+.tn-content-bg .ui-tabs { background: none ; border-width: 0; border-radius:0;}
+.tn-content-bg .tn-box .tn-box-header { background: none; }
+
+/* Side Navigation
+----------------------------------*/
+.tn-side-menu a:hover {text-decoration: none; }
+
+/* Footer
+----------------------------------*/
+#tn-footer { text-align: center; margin-bottom: 10px; }
+#tn-footer .tn-wrapper { padding: 20px 0; }
+
+/* Theme
+----------------------------------*/
+html { overflow-x:hidden;}
+.tn-header-bg{height:36px; }
+.spb-top-menubar .spb-logo { background-image: url(../../../Images/logo-light.png); }
+.spb-layout-3-9-4 .tnc-aside-first .tn-icon,
+.spb-layout-5-19 .tnc-aside .tn-icon{background-image: url("../../Shared/Styles/icons/25gray/tn-icon-small.png");}
+.tn-side-menu li:hover .tn-icon,
+.tn-side-menu .tn-selected .tn-icon,
+.spb-layout-5-19 .tn-button-primary .tn-icon,
+.spb-layout-3-9-4 .tn-button-primary .tn-icon{background-image: url("../../Shared/Styles/icons/white/tn-icon-small.png");}
+
+/* none
+----------------------------------*/
+.tn-side-menu li:hover a,
+.spb-user-panel-wrap .tn-selected a,
+.tnc-user-menu .tn-side-menu .tn-selected a{ color:#FFF;}
+.tn-tabs .tn-tabs-nav li{ background: none;}
+
+.tn-skin a.tnc-skin-link{ background-position:-72px -35px;}
+.tn-skin a.tnc-skin-link:hover{background-position:-107px -35px;}
+.tn-button-secondary,
+.tn-button-secondary:hover,
+.tn-button-default,
+.tn-button-default:hover{box-shadow:none;}

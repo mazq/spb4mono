@@ -1,0 +1,190 @@
+﻿@model LinkEditModel
+@{
+    string title = string.Empty;
+    bool isLocal = false;
+    bool status = true;
+    SelectList categories = ViewData.Get<SelectList>("categories", null);
+    
+    if (Model.LinkId > 0)
+    {
+        title = "编辑友情链接";
+        
+        if (!Model.ImageUrl.Trim().ToLower().StartsWith("http"))
+        {
+            isLocal = true;
+        }
+        if (!Model.IsEnabled)
+        {
+            status = false;
+        }
+    }
+    else
+    {
+        title = "添加友情链接";
+    }
+}
+@using (Html.BeginAjaxForm("_EditLink", "ControlPanelOperation", null, FormMethod.Post, new AjaxFormOptions { DataType = AjaxDataType.Json, OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "editLinkForm", enctype = "MULTIPART/FORM-DATA" }))
+{
+    <div class="tn-form tn-label-right tnc-dailog-pd tnc-link-box">
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                链接名称：</label>
+            @Html.TextBoxFor(n => n.LinkNameForSite, new RouteValueDictionary { { "maxlength", "65" }, { "class", "tn-textbox tn-border-gray" } })
+            @Html.ValidationMessageFor(n => n.LinkNameForSite)
+            <input type="hidden" name="linkId" value="@Model.LinkId" />
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                链接地址：</label>
+            @Html.TextBoxFor(n => n.LinkUrl, new RouteValueDictionary { { "id", "linkUrl" }, { "maxlength", "512" }, { "class", "tn-textbox tn-border-gray" } })
+            @Html.ValidationMessageFor(n => n.LinkUrl)
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                链接说明：</label>
+            @Html.TextBoxFor(n => n.Description, new RouteValueDictionary { { "maxlength", "201" }, { "class", "tn-textbox tn-border-gray" } })
+            @Html.ValidationMessageFor(n => n.Description)
+        </div>
+
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                图片：</label>
+            <input type="hidden" id="_onlineImage" name="imageUrl" value="@Model.ImageUrl" />
+
+            <input type="file" id="localImage" name="localImage" @(!isLocal ? "style=display:none;" : "") />
+            @Html.TextBoxFor(n => n.ImageUrl, new { maxlength = "512", id = "onlineImage", name = "useless", @class = "tn-textbox tn-border-gray", style = isLocal ? "display:none;" : "display:inline;" })
+
+            <input type="checkbox" id="isLocal" class="tn-checkbox" @(isLocal ? "checked=checked" : "") />
+            <label for="isLocal" id="lblForIsLocal">
+                本地上传</label>
+
+            @Html.ValidationMessageFor(n => n.ImageUrl)
+        </div>
+
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                &nbsp;</label>
+            <span class="tn-text-note">设置后自动为图片链接，建议图片尺寸为150*50</span>
+        </div>
+        <div class="tn-form-row" id="logoImg" @(Model.LinkType == LinkType.ImageLink ? "" : "style=display:none;")>
+            <label class="tn-form-label">
+            &nbsp;</label>
+            <img src="@(isLocal ? SiteUrls.Instance().LogoUrl(Model.ImageUrl, TenantTypeIds.Instance().Link(), ImageSizeTypeKeys.Instance().Medium(), false) : Model.ImageUrl)" alt="@HtmlUtility.TrimHtml(Model.LinkNameForSite, 12)" title="@Model.LinkNameForSite" class="tnc-link-img" />
+            <a id="deleteLogoImage" href="javascript:void(0)">删除</a>
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                链接类别：</label>
+            @Html.DropDownList("categoryId", categories, "请选择类别", new { id = "category" })
+            <span id="linkCategoriesMsg" style="display:none;color:Red;">请选择链接类别</span>
+        </div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+                状态：</label>
+            <ul class="tn-radiobutton-list">
+                <li>
+                    <input type="radio" id="enabled" name="isEnabled" value="true" @(status ? "checked=checked" : "") class="tn-radiobutton" />
+                    <label for="enabled">
+                        启用</label>
+                </li>
+                <li>
+                    <input type="radio" id="disabled" name="isEnabled" value="false" @(!status ? "checked=checked" : "") class="tn-radiobutton" />
+                    <label for="disabled">
+                        不启用</label>
+                </li>
+            </ul>
+        </div>
+        <div class="tn-form-row tn-form-row-button">
+            <label class="tn-form-label">
+                &nbsp;</label>
+            @Html.Button("确定",ButtonTypes.Submit,HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogoperation = "close" })
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    this.title("@title");
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            window.location.reload(true);
+        });
+    }
+
+    $(document).ready(function () {
+        $onlineImage = $("#onlineImage");
+        $localImage = $("#localImage");
+        $_onlineImage = $("#_onlineImage");
+
+        if ('@(Model.LinkId > 0 ? "edit" : "create")' == "create") {
+            $("#linkUrl,#onlineImage").val("http://");
+        }
+        if (!$onlineImage.val() || '@(isLocal ? "local" : "online")' == "local") {
+            $onlineImage.val("http://");
+        }
+
+        //更改是否为本地，更换标签
+        $("#isLocal").click(function () {
+            if (this.checked) {
+                $onlineImage.hide();
+                $localImage.show();
+                $_onlineImage.val("");
+                $onlineImage.val("http://");
+                $("#lblForIsLocal").next().hide();
+            }
+            else {
+                $onlineImage.show();
+                $localImage.hide();
+            }
+        });
+
+        //数据验证-至少选择一个类别,url
+        $(":submit").click(function () {
+            if ($onlineImage.val() == "http://") {
+                var validatorSettings = $("#editLinkForm").data('validator').settings;
+                validatorSettings.ignore = "#onlineImage";
+            }
+
+            if (!$("#category").val()) {
+                $("#linkCategoriesMsg").show();
+                return false;
+            }
+        });
+
+        //隐藏链接类别验证消息
+        $("#category").select(function () {
+            if ($(this).val() != "请选择类别") {
+                $("#linkCategoriesMsg").hide();
+            }
+        });
+
+        //删除图片链接logo
+        $logoImg = $("#logoImg");
+        $("#deleteLogoImage").click(function (e) {
+            e.preventDefault();
+
+            $logoImg.hide();
+            $_onlineImage.val("");
+            $onlineImage.val("http://");
+        });
+
+        $onlineImage.change(function () {
+            //删除图片链接logo
+            $logoImg.hide();
+            //设置ImageUrl
+            $_onlineImage.val($(this).val());
+        }).blur(function () {
+            //忽略验证
+            if ($onlineImage.val() == "http://") {
+                $("#lblForIsLocal").next().hide();
+            }
+        });
+
+        $localImage.change(function () {
+            $logoImg.hide();
+            $_onlineImage.val("");
+            $onlineImage.val("http://");
+        });
+    });
+</script>

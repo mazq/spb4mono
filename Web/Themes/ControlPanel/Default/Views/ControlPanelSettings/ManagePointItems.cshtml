@@ -1,0 +1,153 @@
+﻿@model IEnumerable<Tunynet.Common.PointItem>
+@{
+    Layout = "_ControlPanel";
+    string expName = ViewData.Get<string>("expPoint", "经验");
+    string traName = ViewData.Get<string>("traPoint", "交易");
+    string preName = ViewData.Get<string>("prePoint", "威望");
+
+    string rules = ViewData.Get<string>("UserIntegratedPointRuleText", string.Empty);
+    int transactionTax = ViewData.Get<int>("TransactionTax", 0);
+    IEnumerable<PointCategory> pointCategories = ViewData.Get<IEnumerable<PointCategory>>("PointCategories", new List<PointCategory>());
+
+    IEnumerable<KeyValuePair<int, string>> applications = ViewData.Get<IEnumerable<KeyValuePair<int, string>>>("Applications", new List<KeyValuePair<int, string>>());
+    int moietyCount = applications.Count() % 2 == 0 ? applications.Count() / 2 : applications.Count() / 2 + 1;
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>积分规则</span>
+            </h1>
+            <div class="tnc-ctnright-list tnc-integral-rule-module">
+                <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                    <div class="tn-helper-right">
+                        <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._EditPointSettings()" plugin = "dialog">
+                            <span class="tn-icon tn-smallicon-write"></span><span class="tn-action-text">修改设置</span>
+                        </a>
+                        <!-- <span class="tn-icon tn-icon-write tn-icon-inline"></span>
+                        @Html.Link("修改设置", SiteUrls.Instance()._EditPointSettings(), "修改设置", htmlAttributes: new
+                   {
+                       plugin = "dialog",
+                       id = "cc"
+                   })-->
+                    </div>
+                    <div>
+                        @{
+                            string s = null;//积分规则字符串
+                            string showItem;
+
+                            foreach (var pointCategory in pointCategories)
+                            {
+                                if (pointCategory.QuotaPerDay == 0)
+                                {
+                                    showItem = pointCategory.CategoryName + "无限制";
+                                }
+                                else
+                                {
+                                    showItem = pointCategory.QuotaPerDay + pointCategory.Unit + pointCategory.CategoryName;
+                                }
+                                s += showItem;
+
+                                s = s + "/";
+                            }
+                            if (s.EndsWith("/"))
+                            {
+                                s = s.Remove(s.Length - 1);
+                            }
+                            <p>
+                                • 每人每日积分上限： @s</p>
+                        }
+                        <p>
+                            • 用户综合积分 = @rules</p>
+                        <p>
+                            • 积分交易税 = @transactionTax %</p>
+                    </div>
+                </div>
+                <div class="tnc-inegral-table">
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr>
+                                @for (int i = 0; i < 2; i++)
+                                {
+                                    List<KeyValuePair<int, string>> applicationLists = applications.ToList().GetRange(i * applications.Count() / 2, i == 0 ? applications.Count() / 2 : moietyCount);
+                                
+                                    <td class="tnc-half-width">
+                                        @if (applicationLists != null && applicationLists.Count() > 0)
+                                        {
+                                            foreach (var application in applicationLists)
+                                            {
+                                                IEnumerable<PointItem> integralRule = Model.Where(n => n.ApplicationId == application.Key);
+                                                if (integralRule != null && integralRule.Count() > 0)
+                                                {
+                                            <div class="tnc-list tnc-float-left">
+                                                <h2>
+                                                    <span class="tnc-admin-icon tnc-icon-position-4">@application.Value</span>
+                                                </h2>
+                                                <div class="tnc-list-text">
+                                                    <table class="tn-table-grid">
+                                                        <tbody>
+                                                            <tr class="tn-table-grid-header">
+                                                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                                    操作
+                                                                </td>
+                                                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                                    @expName
+                                                                </td>
+                                                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                                    @preName
+                                                                </td>
+                                                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                                    @traName
+                                                                </td>
+                                                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                                </td>
+                                                            </tr>
+                                                            @foreach (var item in Model.Where(n => n.ApplicationId == application.Key))
+                                                            {
+                                                                <tr class="tn-table-grid-row">
+                                                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                                                        @Html.DisplayTextFor(modelItem => item.ItemName)
+                                                                    </td>
+                                                                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                                                        @Html.DisplayTextFor(modelItem => item.ExperiencePoints)
+                                                                    </td>
+                                                                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                                                        @Html.DisplayTextFor(modelItem => item.ReputationPoints)
+                                                                    </td>
+                                                                    <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                                                        @Html.DisplayTextFor(modelItem => item.TradePoints)
+                                                                    </td>
+                                                                    <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                                                                        @Html.Link("编辑", SiteUrls.Instance()._EditPointRules(item.ItemKey), "编辑", new { plugin = "dialog" })
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+    })
+</script>

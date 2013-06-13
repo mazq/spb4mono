@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Visit>
+@{
+    long groupId = ViewData.Get<long>("groupId", 0);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-recent-visitors"
+    id="groupVisitListDiv">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            最近访客</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-user-list">
+            @if (Model == null || Model.Count() == 0)
+            {
+                @Html.Raw("暂无访客")
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    bool result = new Authorizer().Group_DeleteVisitor(groupId, item.VisitorId);
+                <li class="tn-user-item tn-helper-clearfix tn-operational tn-hover">
+                    <div class="tn-pic">
+                        @Html.ShowUserAvatar(item.VisitorId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                    </div>
+                    <div class="tn-con">
+                        <div class="tn-icon-btn">
+                            @if (result)
+                            {
+                                <a href="@SiteUrls.Instance().DeleteGroupVisitor(Url.SpaceKey())" data-user-id="@item.VisitorId" data-id="@item.Id" id="visitUser-@item.VisitorId" class="tn-icon tn-smallicon-cross tn-state-hidden" title="删除该访客记录"></a>
+                            }
+                        </div>
+                        <div class="tn-name"><a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(item.VisitorId)"  title="@item.Visitor" target="_blank">@item.Visitor</a></div>
+                        <div class="tn-text-note tn-date" title="@item.LastVisitTime.ConvertToUserDate()">@item.LastVisitTime.ToFriendlyDate()</div>
+                    </div>
+                </li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("a[id^='visitUser']").click(function (e) {
+            e.preventDefault();
+            var userId = $(this).data("userId");
+            var id = $(this).data("id");
+            var url = $(this).attr("href");
+            art.dialog.confirm("确认删除该条访客记录？", function () {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: { userId: userId, id: id },
+                    cache: false,
+                    success: function (data) {
+                        $("#groupVisitListDiv").replaceWith(data);
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+    })
+</script>

@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Announcement>
+@if (Model != null && Model.Count() > 0)
+{ 
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <div class="tn-option">
+    <a href="@SiteUrls.Instance().AnnouncementList()">更多</a>
+    </div>
+        <h3 class="tn-helper-reset">站点公告</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-list">
+        @foreach (var announcement in Model)
+        {    
+            if (announcement.IsHyperLink)
+            {
+            <li class="tn-img-sprite tn-list-bullet"><a href="@announcement.HyperLinkUrl" title="@announcement.Subject" target="_blank" style="@(announcement.SubjectStyle)">@announcement.Subject</a></li>  
+            }
+            else
+            {
+                if (announcement.EnabledDescription)
+                { 
+                <li class="tn-img-sprite tn-list-bullet"><a href="@SiteUrls.Instance().AnnouncementDetail(announcement.Id)" title="@announcement.Subject" target="_blank" style="@(announcement.SubjectStyle)">@announcement.Subject</a></li>
+                }
+                else
+                { 
+                <li class="tn-img-sprite tn-list-bullet"><div title="@announcement.Subject" style="@(announcement.SubjectStyle)">@announcement.Subject</div></li>
+                }
+            }
+        }          
+        </ul>
+    </div>
+</div>
+
+}
+
+

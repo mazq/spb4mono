@@ -1,0 +1,62 @@
+﻿@model GroupEntity
+@{
+    var applications = ViewData.Get<IEnumerable<ApplicationBase>>("applications", new List<ApplicationBase>());
+}
+@if (UserContext.CurrentUser != null)
+{ 
+    @Html.Action("_Create", "Microblog", new RouteValueDictionary { { "spaceKey", UserContext.CurrentUser.UserName }, { "tenantTypeId", TenantTypeIds.Instance().Group() }, { "ownerId", Model.GroupId }, { "area", "Microblog" } })
+}
+@Html.AdvertisingPosition("13101100003")
+<div class="tn-tabs spb-new-activities">
+    <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+        <li class="tn-widget-content tn-border-gray tn-border-trl" name="application-all"><a
+                    href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey())">全部</a> </li>
+        @if (applications != null)
+        {
+            foreach (var application in applications)
+            { 
+            <li class="tn-widget-content tn-border-gray tn-border-trl" name="application-@(application.ApplicationKey)"><a
+                    href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: application.ApplicationId)">@Tunynet.Globalization.ResourceAccessor.GetString(string.Format("ApplicationName_GroupSpace_{0}", application.ApplicationKey), application.ApplicationId)</a></li>
+            }
+        }
+    </ul>
+    <div class="tn-tabs-panel">
+        <div class="tn-directory tn-border-gray tn-border-rbl" id="microblogType">
+            <div class="tn-directory-level">
+                <span class="tn-directory-item  tn-text-note" name="microblogType-all"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001)">全部 </a></span><span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-original"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, isOriginal: true)">原创</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-image"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, mediaType: MediaType.Image)">图片</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-video"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, mediaType: MediaType.Video)">视频</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-audio"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, mediaType: MediaType.Audio)">音乐</a></span>
+                @if (UserContext.CurrentUser != null)
+                { 
+                    <span class="tn-spacer tn-text-note">|</span>
+                    <span class="tn-directory-item" name="microblogType-my"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, userId: UserContext.CurrentUser.UserId)">我的发言</a> </span>
+                }
+            </div>
+        </div>
+        <div id="activitiesForLoadDiv">
+            @Html.AjaxAction("_ListActivities", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    //发布微博 表单提交成功 调用函数
+    var microblogCreateSuccess = function (data) {
+        if (data.status == 'hint') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-cross-circle").addClass("tn-bigicon-exclamation");
+        } else if (data.status == 'error') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-exclamation").addClass("tn-bigicon-cross-circle");
+        } else {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-exclamation tn-bigicon-cross-circle").addClass("tn-bigicon-accept-circle");
+        }
+        $('#msg-sussess').children('strong').html(data.message);
+        $('#msg-sussess').show();
+        setTimeout(function () { $('#msg-sussess').hide(); }, 1500);
+        $.get('@(SiteUrls.Instance()._NewGroupActivities(Url.SpaceKey()))', function (data) {
+            var lastActivityId = $("#lastActivityId").val(), newActivityId = $(data).last().val();
+            $(data).remove('#NewActivityId');
+            if (newActivityId > lastActivityId) {
+                $('#activitiesForLoadDiv ul.tnc-dynamic').children(':first').after(data);
+                $("#lastActivityId").val(newActivityId);
+            }
+        })
+        $("#microblogBody").val("");
+    }
+</script>

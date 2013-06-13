@@ -1,0 +1,343 @@
+﻿@model User
+@{
+    Layout = "_UserSpace_Common";
+    IEnumerable<WorkExperience> workExperiences = ViewData.Get<IEnumerable<WorkExperience>>("workExperiences", null);
+    IEnumerable<EducationExperience> educationExperiences = ViewData.Get<IEnumerable<EducationExperience>>("educationExperiences", null);
+    Dictionary<string, PrivacyStatus> userPrivacySettings = ViewData.Get<Dictionary<string, PrivacyStatus>>("userPrivacySettings", null);
+    bool seeBirthDay = ViewData.Get<bool>("seeBirthDay", false);
+    bool seeMobile = ViewData.Get<bool>("seeMobile", false);
+    bool seeEmail = ViewData.Get<bool>("seeEmail", false);
+    bool seeQQ = ViewData.Get<bool>("seeQQ", false);
+    bool seeMsn = ViewData.Get<bool>("seeMsn", false);
+    bool seeWork = ViewData.Get<bool>("seeWork", false);
+    bool seeEducation = ViewData.Get<bool>("seeEducation", false);
+    bool seeUserSpace = ViewData.Get<bool>("seeUserSpace", false);
+    bool seeFollow = ViewData.Get<bool>("seeFollow", false);
+    bool seeMessage = ViewData.Get<bool>("seeMessage", false);
+    bool seeTrueName = ViewData.Get<bool>("seeTrueName", false);
+    IUser currentUser = UserContext.CurrentUser;
+}
+@section ContentHeader{
+    <div class="spb-po-user-profile">
+        <div class="spb-po-profile-wrap tn-helper-clearfix">
+            <div class="spb-po-face-info">
+                @Html.Action("_UserInfo", new { spaceKey = Url.SpaceKey() })
+            </div>
+            <div class="spb-po-user-info">
+                @Html.Action("UserInfo", new { spaceKey = Url.SpaceKey() })
+                @Html.Action("_SelectMenu", new { spaceKey = Url.SpaceKey() })
+            </div>
+        </div>
+    </div>
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-profile">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="tn-info-part">
+                @Html.Action("_UserStatus", new { spaceKey = Url.SpaceKey() })
+            </div>
+        </div>
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-tags">
+        @Html.Action("_TopUserTags", new { spaceKey = Url.SpaceKey() })
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-followed">
+        @Html.Action("_FollowedUserList", new { spaceKey = Url.SpaceKey() })
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-fans">
+        @Html.Action("_FollowerList", new { spaceKey = Url.SpaceKey() })
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-user-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                个人资料</h2>
+        </div>
+        @if (seeUserSpace)
+        {
+            <div class="tn-info">
+                <div class="tn-info-part">
+                    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                        @if (currentUser != null)
+                        {
+                            if (Model.UserId == currentUser.UserId || new Authorizer().IsAdministrator(0))
+                            {
+                            <div class="tn-option">
+                                <a href="@SiteUrls.Instance().EditUserProfile(Model.UserName)" class="tn-action"><span
+                                    class="tn-action-text">编辑</span></a>
+                            </div>
+                            }
+                        }
+                        <h4>
+                            基础资料</h4>
+                    </div>
+                    <dl>
+                        <dt>真实姓名：</dt>
+                        @if (seeTrueName)
+                        { 
+                            <dd>@Model.TrueName</dd>
+                        }
+                        else { 
+                            <dd>保密</dd>
+                        }
+                    </dl>
+                    <dl>
+                    <dl>
+                        <dt>昵称：</dt>
+                        <dd>@Model.DisplayName</dd>
+                    </dl>
+                        <dt>性别：</dt>
+                        <dd>@(Model.Profile.Gender == GenderType.Male ? "男" : "女")</dd>
+                    </dl>
+                    <dl>
+                        <dt>生日：</dt>
+                        @if (seeBirthDay)
+                        {
+                            <dd>@Model.Profile.Birthday.ToUserDateString()</dd>
+                        }
+                        else
+                        {
+                            <dd>
+                                保密</dd>
+                        }
+                    </dl>
+                    <dl>
+                        <dt>家乡：</dt>
+                        <dd>@Formatter.FormatArea(Model.Profile.HomeAreaCode)</dd>
+                    </dl>
+                    <dl>
+                        <dt>现居：</dt>
+                        <dd>@Formatter.FormatArea(Model.Profile.NowAreaCode)</dd>
+                    </dl>
+                    <dl>
+                        <dt>简介：</dt>
+                        <dd>@Html.Raw(Model.Profile.Introduction)</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="tn-contact">
+                <div class="tn-info-part">
+                    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                        @if (currentUser != null)
+                        {
+                            if (Model.UserId == currentUser.UserId || new Authorizer().IsAdministrator(0))
+                            {
+                            <div class="tn-option">
+                                <a href="@SiteUrls.Instance().EditUserProfile(Model.UserName)" class="tn-action"><span
+                                    class="tn-action-text">编辑</span></a>
+                            </div>
+                            }
+                        }
+                        <h4>
+                            联系方式</h4>
+                    </div>
+                    <dl>
+                        <dt>手机：</dt>
+                        @if (seeMobile)
+                        {
+                            <dd>@Model.Profile.Mobile</dd>
+                        }
+                        else
+                        {
+                            <dd>
+                                保密</dd>
+                        }
+                    </dl>
+                    <dl>
+                        <dt>邮箱：</dt>
+                        @if (seeEmail)
+                        {
+                            <dd>@Model.Profile.Email</dd>
+                        }
+                        else
+                        {
+                            <dd>
+                                保密</dd>
+                        }
+                    </dl>
+                    <dl>
+                        <dt>QQ：</dt>
+                        @if (seeQQ)
+                        {
+                            <dd>@Model.Profile.QQ</dd>
+                        }
+                        else
+                        {
+                            <dd>
+                                保密</dd>
+                        }
+                    </dl>
+                    <dl>
+                        <dt>MSN：</dt>
+                        @if (seeMsn)
+                        {
+                            <dd>@Model.Profile.Msn</dd>
+                        }
+                        else
+                        {
+                            <dd>
+                                保密</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+            <div class="tn-work">
+                <div class="tn-info-part">
+                    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                        @if (currentUser != null)
+                        {
+                            if (Model.UserId == currentUser.UserId || new Authorizer().IsAdministrator(0))
+                            {
+                            <div class="tn-option">
+                                <a href="@SiteUrls.Instance().EditUserWork(Model.UserName)" class="tn-action"><span
+                                    class="tn-action-text">编辑</span></a>
+                            </div>
+                            }
+                        }
+                        <h4>
+                            工作经历</h4>
+                    </div>
+                    @if (seeWork)
+                    {
+                        if (workExperiences != null && workExperiences.Count() > 0)
+                        {
+                            foreach (WorkExperience workExperience in workExperiences)
+                            {
+                        <dl>
+                            <dt>公司：</dt>
+                            <dd>@(workExperience.CompanyName + "(" + workExperience.StartDate.ToUserDateString() + "-" + workExperience.EndDate.ToUserDateString() + ")")</dd>
+                        </dl>
+                        <dl class="tn-child">
+                            <dt>所在地：</dt>
+                            <dd>@Formatter.FormatArea(workExperience.CompanyAreaCode)</dd>
+                        </dl>
+                        <dl class="tn-child">
+                            <dt>部门：</dt>
+                            <dd>@workExperience.JobDescription</dd>
+                        </dl>
+                            }
+                        }
+                        else
+                        {
+                        <div class="tn-nodata">
+                            暂时还没有工作经历!
+                        </div>
+                        }
+                    }
+                    else
+                    {
+                        <dl>
+                            <dt>保密</dt></dl>
+                    }
+                </div>
+            </div>
+            <div class="tn-education">
+                <div class="tn-info-part">
+                    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                        @if (currentUser != null)
+                        {
+                            if (Model.UserId == currentUser.UserId || new Authorizer().IsAdministrator(0))
+                            {
+                            <div class="tn-option">
+                                <a href="@SiteUrls.Instance().EditUserEducation(Model.UserName)" class="tn-action"><span
+                                    class="tn-action-text">编辑</span></a>
+                            </div>
+                            }
+                        }
+                        <h4>
+                            教育经历</h4>
+                    </div>
+                    @if (seeEducation)
+                    {
+                        if (educationExperiences != null && educationExperiences.Count() > 0)
+                        {
+                            foreach (EducationExperience educationExperience in educationExperiences)
+                            {
+                        <dl>
+                            <dt>学校：</dt>
+                            <dd>@(educationExperience.School + "(" + educationExperience.StartYear + ")")</dd>
+                        </dl>
+                        <dl class="tn-child">
+                            <dt>院系/班级：</dt>
+                            <dd>@educationExperience.Department</dd>
+                        </dl>
+                        <dl class="tn-child">
+                            <dt>学历：</dt>
+                            <dd>@educationExperience.Degree.EnumMetadataDisplay()</dd>
+                        </dl>
+                            }
+
+                        }
+                        else
+                        {
+                        <div class="tn-nodata">
+                            暂时还没有教育经历!
+                        </div>
+                        }
+                    }
+                    else
+                    {
+                        <dl>
+                            <dt>保密</dt></dl>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="tn-cue-highlight tn-corner-all tnc-noright tn-helper-clearfix">
+                <span class="tn-icon-large tn-largeicon-lock"></span>
+                <div class="tnc-noright-tips">
+                    <div class="tn-tip">
+                        由于空间主人的隐私设置，您不能查看其空间的内容！</div>
+                    <div class="tnc-actions">
+                        @if (seeFollow)
+                        {
+                            if (currentUser == null)
+                            {
+                            <a class="tn-button tn-corner-all tn-button-text-icon-primary tn-button-large tn-button-primary" plugin="dialog" href="@SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal)">
+                                <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">求关注</span>
+                            </a>
+                            }
+                            else
+                            {
+                            <a class="tn-button tn-corner-all tn-button-text-icon-primary tn-button-large tn-button-primary" id = "dialog-inviteFollow" href="@SiteUrls.Instance()._InviteFollow(Url.SpaceKey())">
+                                <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">求关注</span>
+                            </a>
+                            }
+                        }
+                        @if (new Authorizer().Message(Model.UserId))
+                        {
+                            if (seeMessage)
+                            {
+                            <a class="tn-button tn-corner-all tn-button-text-only tn-button-large tn-button-primary" plugin = "dialog" href="@SiteUrls.Instance()._CreateMessage(currentUser.UserName, toUserId: Model.UserId)">
+                                <span class="tn-button-text">发私信</span> </a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("a#dialog-inviteFollow").click(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: $(this).attr("href"),
+                success: function (data) {
+                    art.dialog(data);
+                },
+                error: function (data) {
+                    if (!data.MessageContent) {
+                        data = $.parseJSON(data.responseText);
+                    }
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                }
+            });
+        });
+    });
+</script>

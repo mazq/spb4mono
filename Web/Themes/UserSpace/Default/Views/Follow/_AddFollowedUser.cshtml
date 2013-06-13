@@ -1,0 +1,126 @@
+﻿@model IEnumerable<Category>
+@{
+    long followedUserId = ViewData.Get<long>("followedUserId", 0);
+    long groupId = ViewData.Get<long>("CheckedGroup", 0);
+    string followedUserName = UserIdToUserNameDictionary.GetUserName(followedUserId);
+    string statusMessageData = ViewData.Get<string>("MessageData", null);
+    string title = ViewData.Get<string>("title", "添加关注");
+    IEnumerable<long> categoryIdsOfItem = ViewData.Get<IEnumerable<long>>("categoryIdsOfItem", new List<long>());
+    string url = SiteUrls.Instance()._FollowedUsersOfFollowersList(followedUserName);
+}
+<div id="AddFollowUserDivInForm" class="tnc-group-sort">
+    @if (statusMessageData == null)
+    {
+        using (Html.BeginAjaxForm("AddFollowedUser", "Follow", new { spaceKey = Url.SpaceKey(), followedUserId = followedUserId }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("success"), new { id = "PointSettingsForm" }))
+        {
+        <div class="tnc-dailog-pd">
+            <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                设置分组</div>
+            <ul class="tn-sort tn-helper-clearfix" id="groupContainer">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    foreach (Category category in Model)
+                    {
+                    <li>
+                        <label>
+                            <input type="checkbox" value="@category.CategoryId" name="category" class="tn-checkbox" @if (categoryIdsOfItem.Contains(category.CategoryId))
+                                                                                                                    {@Html.Raw("checked=\"checked\"")}>
+                            @StringUtility.Trim(category.CategoryName, 5)</label></li>
+                    }
+                }
+            </ul>
+            <div class="tn-create">
+                <span id="newGroupDiv" style="display: none">
+                    @Html.TextBox("newGroup", "", new { @class = "tn-textbox tn-input-medium tn-border-gray", @checked = "checked" })
+                    @Html.LinkButton("创建", SiteUrls.Instance().CreateNewGroup(Url.SpaceKey(), null, followedUserId), htmlAttributes: new { @id = "CreateNewGroup" })
+                </span>@*//todo:ful by libsh,为什么不用htmlhelper*@ <a id="CreateGroup" class="tn-action tn-action-text-icon"
+                    href="javascript:;"><span class="tn-icon tn-smallicon-add"></span><span class="tn-action-text">
+                        创建分组</span></a> <a id="CannelCreateGroup" style="display: none" href="javascript:;">
+                            取消</a></div>
+            <div class="tn-remark tn-border-gray tn-border-top">
+                备注名：@Html.TextBox("noteName", "", new { @class = "tn-textbox tn-input-medium tn-border-gray" })
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, null, new { id = "saveButton" })
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close", id = "cancelButton" })
+        </div>
+        
+        }
+        <script type="text/dialog">
+            this.title('@title');
+        </script>
+    }
+    else
+    {
+        <script type="text/dialog">
+            this.hide();
+        </script> 
+        
+        <script type="text/javascript">
+            art.dialog.tips('@statusMessageData', 1.5, -1);
+        </script>
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#CreateNewGroup").bind("click", function (e) {
+                e.preventDefault();
+                $this = $(this);
+                var groupName = $("#newGroup").val();
+                $.post($(this).attr("href"), { groupName: groupName }, function (data) {
+                    $("#groupContainer").append('<li><label><input type="checkbox" value="' + data.Data.groupId + '" name="category" class="tn-checkbox" checked="checked">' + data.Data.groupName + '</lable></li>')
+                    cannelCreateGroup();
+                });
+            });
+
+            function cannelCreateGroup() {
+                $("#newGroup").val("");
+                $("#newGroupDiv").hide();
+                $("#CannelCreateGroup").hide();
+                $("#CreateGroup").show();
+            }
+
+            $("#CreateGroup").click(function () {
+                $("#newGroupDiv").show();
+                $("#CannelCreateGroup").show();
+                $("#CreateGroup").hide();
+            });
+
+            $("#CannelCreateGroup").click(function () {
+                cannelCreateGroup();
+            });
+        });
+
+        if ("@statusMessageData" == "") {
+            var a = $("*[name=\'followed-follower-" + "@followedUserId" + "\']");
+            a.hide();
+            a.parent().find("span").show();
+
+            $("a[name='addFollowed']").hide();
+            $("a[name='aeditFollowed']").show();
+
+            $("a[followedUserId=" + "@followedUserId" + "]").show();
+            $("a[name = 'Follow']").show();
+            $("a[name = 'Follow']").parent().show();
+            $("#FollowedUsersOfFollowersListDiv").load("@url");
+            $("#userFollowerCount").text(parseInt($("#userFollowerCount").text()) + 1);
+            $("a[name='QuietlyFollow']").hide();
+            $("a[name='QuietlyFollow']").parent().hide();
+            $("#isQuietly").val("False")
+        }
+
+        function success(data) {
+            if (data.MessageType == "1") {
+                $("span[id='hasFollowed-" + '@followedUserId' + "']").show();
+                $("a[id='hasFollowed-" + '@followedUserId' + "']").show(); //处理Brisk皮肤下关注按钮
+                $("a[id^='addfollowedUser-" + '@followedUserId' + "']").remove();
+                $("#editFollowedSpan").text(data.MessageContent);
+                art.dialog.tips("操作成功！", 1.5, 1);
+            }
+            else {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+            }
+        }    
+
+    </script>
+</div>

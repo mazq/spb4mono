@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "_UserSpace_Wide";
+    User user = (User)UserContext.CurrentUser;
+    int integrity = user.Profile.Integrity;
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-step-intersted">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-step-wrap">
+            <div class="tn-head">
+                <div class="tn-instructions">
+                    <div class="tn-progress-bar tn-widget-content tn-corner-all">
+                        <div class="tn-progress-bar-value tn-widget-header tn-corner-left tn-border-tbl"
+                            style="width:60%;">
+                        </div>
+                    </div>
+                    <ul class="tn-helper-clearfix tn-step-scale">
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>1、上传头像</span></li>
+                        <li style="width: 19.99%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>2、填写个人资料</span></li>
+                        <li style="width: 19.99%" class="tn-step tn-selected"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>3、填写个人标签</span></li>
+                        <li style="width: 19.98%" class="tn-step"><b class="tn-widget-content tn-widget-header tn-corner-all">
+                        </b><span>4、看看感兴趣的人</span></li>
+                        <li style="width: 19.98%" class="tn-step"><b class="tn-widget-content tn-corner-all">
+                        </b><span>5、完成，进入我的首页</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tn-body">
+                @Html.Action("_EditUserProfileTag", new { spaceKey = Url.SpaceKey() })
+            </div>
+            <div class="tn-foot">
+                <div class="tn-actions tn-border-gray tn-border-top tn-helper-clearfix">
+                    <div class="tn-next">
+                        @Html.Button("保存并继续",ButtonTypes.Button,size:ButtonSizes.Large,url:SiteUrls.Instance().UserProfileGuideInterested(Url.SpaceKey()))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+﻿@model Attachment
+@{
+    bool canDownLoaded = new Authorizer().Attachment_Download(Model);
+    bool canBuy = new Authorizer().Attachment_Buy(Model);
+    var tradePointCategory = new PointService().GetPointCategory("TradePoints");
+    string suffix = Model.FileName.Substring(Model.FileName.LastIndexOf(".") + 1);
+}
+<li class="tn-annex-item"><span class="tn-annex-icon"><span class="tn-mime tn-mime-@suffix tn-icon-inline">
+</span></span>
+    @Html.Raw(!canDownLoaded ? Model.FriendlyFileName : Html.Link(Model.FriendlyFileName, SiteUrls.Instance().AttachmentUrl(Model.AttachmentId, Model.TenantTypeId), Model.FriendlyFileName).ToHtmlString())
+    <em class="tn-count tn-text-note">（@Model.FriendlyFileLength @(Model.Price > 0 ? string.Format("，需要{0}{1}", Model.Price,tradePointCategory.CategoryName) : "")，下载次数：@Model.DownloadCount）</em>
+    <span class="tn-action">
+        @if (canBuy)
+        {
+            if (canDownLoaded)
+            {
+            @Html.Link("下载", SiteUrls.Instance().AttachmentUrl(Model.AttachmentId, Model.TenantTypeId), "下载")
+            }
+            else
+            {
+            @Html.Link("购买", string.Empty, "购买", new { @class = "tn-action", id = "buy-Attachement-link-" + Model.AttachmentId, point = Model.Price, link = SiteUrls.Instance().AttachmentUrl(Model.AttachmentId, Model.TenantTypeId) })
+            }
+        }        
+    </span><span class="tn-action">
+        @Html.Link("记录", SiteUrls.Instance()._BuyAttachementRecord(Model.AttachmentId), "记录", new { @class = "tn-action", plugin = "dialog" })
+    </span></li>
+<div class="spb-download-helper-bubble" style="position: absolute; display: none" id="attachement-artdialog-@Model.AttachmentId">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-widget-content"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-corner-all">
+            <p>
+                点击文件名下载<em class="tn-date tn-text-note">@Model.DateCreated.ToFriendlyDate()</em></p>
+            <p>
+                <span class="tn-count">@(Model.Price > 0 ? string.Format("需要{0}{1}", Model.Price,tradePointCategory.CategoryName) : "免费")</span>
+                @if (canBuy)
+                {
+                    if (canDownLoaded)
+                    {
+                    <text><span class="tn-action">@Html.Link("下载", SiteUrls.Instance().AttachmentUrl(Model.AttachmentId, Model.TenantTypeId), "下载")</span></text>
+                    }
+                    else
+                    {
+                    <text><span class="tn-action">@Html.Link("购买", string.Empty, "购买", new { @class = "tn-action", id = "buy-Attachement-link-" + Model.AttachmentId, point = Model.Price, link = SiteUrls.Instance().AttachmentUrl(Model.AttachmentId, Model.TenantTypeId) })</span></text>
+                    }
+                }
+                <span class="tn-action">@Html.Link("记录", SiteUrls.Instance()._BuyAttachementRecord(Model.AttachmentId), "记录", new { @class = "tn-action", plugin = "dialog" })</span></p>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $("a#buy-Attachement-link-@Model.AttachmentId").click(function (e) {
+        e.preventDefault();
+        $link = $(this);
+        art.dialog.confirm('您确定要购买吗？', function () {
+            window.location.href = $link.attr("link");
+        });
+    });
+</script>

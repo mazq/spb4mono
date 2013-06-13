@@ -1,0 +1,47 @@
+﻿@{
+    long followedUserId = ViewData.Get<long>("followedUserId", 0);
+    string buttonName = ViewData.Get<string>("buttonName", "关注");
+    FollowedButtonTypes followedButtonType = ViewData.Get<FollowedButtonTypes>("followedButtonType", FollowedButtonTypes.Default);
+    FollowButtonTypes followButtonType = ViewData.Get<FollowButtonTypes>("followButtonType", FollowButtonTypes.Button);
+
+    bool isFollowed = false;
+
+    IUser currentUser = UserContext.CurrentUser;
+    if (currentUser != null && currentUser.UserId != followedUserId)
+    {
+        isFollowed = currentUser.IsFollowed(followedUserId);
+    }
+
+    string followedClass = string.Empty;
+
+    if (followedButtonType == FollowedButtonTypes.Button)
+    {
+        followedClass = "tn-button";
+    }
+}
+@if (currentUser != null && currentUser.UserId != followedUserId)
+{
+    if (isFollowed)
+    {
+    <span class="tn-explain-icon @followedClass"><span class="tn-icon tn-smallicon-accept">
+    </span><span class="tn-icon-text">已关注</span> </span> 
+    }
+    else
+    {
+        if (followButtonType == FollowButtonTypes.Button)
+        { 
+    <a class="tn-button tn-corner-all tn-button-default tn-button-hollow tn-button-text-icon-primary" href="@SiteUrls.Instance()._AddFollowedUser(currentUser.UserName, followedUserId)" plugin="dialog" data="@Json.Encode(new { close = "DialogCloseFn" })" id="addfollowedUser-@followedUserId" name="@followedUserId">
+        <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">@buttonName</span>
+    </a>
+        }
+        else if (followButtonType == FollowButtonTypes.Link)
+        { 
+    <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._AddFollowedUser(currentUser.UserName, followedUserId)" plugin="dialog" data="@Json.Encode(new { close = "DialogCloseFn" })" id="addfollowedUser-@followedUserId" name="@followedUserId">
+        <span class="tn-icon tn-smallicon-add"></span><span class="tn-action-text">@buttonName</span>
+    </a>
+        }
+    <span class="tn-explain-icon @followedClass" id="hasFollowed-@followedUserId"  style="display:none">
+        <span class="tn-icon tn-smallicon-accept"></span><span class="tn-icon-text">已关注</span>
+    </span> 
+    }
+}

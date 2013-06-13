@@ -1,0 +1,64 @@
+﻿@model LoginEditModel
+@{
+    Layout = null;
+    bool canRegister = ViewData.Get<bool>("CanRegister", true);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-home-login">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-homelogin-wrapper">
+            <h4 class="tn-border-bottom tn-border-light">
+                登录</h4>
+            @Html.StatusMessage(ViewData["StatusMessage"] as StatusMessageData)
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "tn-helper-flowfix" }))
+            {
+                <div class="tn-form ">
+                    <div class="tn-form-row tnc-user-name">
+                        @Html.TextBoxFor(n => n.UserName, InputWidthTypes.Long, new RouteValueDictionary { { "class", "tnc-watermark-color" } })
+                        <span class="tn-icon tn-icon-user tnc-login-icon"></span>
+                        @if (canRegister)
+                        {
+                            @Html.Link("免费注册", SiteUrls.Instance().Register(Model.ReturnUrl), "免费注册", new { @class = "tn-action-text", tabindex = "-1" })
+                        }<br />
+                        @Html.ValidationMessageFor(n => n.UserName)
+                    </div>
+                    <div class="tn-form-row tnc-user-name">
+                        @Html.TextBoxFor(n => n.Password, InputWidthTypes.Long, new RouteValueDictionary { { "class", "tnc-watermark-color" }, { "type", "password" } })
+                        <span class="tn-icon tn-icon-key tnc-login-icon"></span>
+                        @Html.Link("找回密码", SiteUrls.Instance().FindPassword(), "找回密码", new { @class = "tn-action-text", tabindex = "-1" })<br />
+                        @Html.ValidationMessageFor(n => n.Password)
+                    </div>
+                    <div class="tn-form-row">
+                        @Html.CheckBoxFor(n => n.RememberPassword)
+                        @Html.LabelFor(n => n.RememberPassword)
+                    </div>
+                    <div class="tn-form-row tn-form-row-button">
+                        @Html.Button("登&#12288;录", ButtonTypes.Button, HighlightStyles.Primary, ButtonSizes.Large, htmlAttributes: new { id = "button_submit_Login" })
+                    </div>
+                    @Html.TextBoxFor(n => n.ReturnUrl, new { type = "hidden" })
+                </div>
+              
+                <div class="tn-form tn-border-top tn-border-light tn-helper-clearfix">
+                    <p class="tnc-third-title">
+                        使用第三方帐号登录</p>
+                    @foreach (var accountType in new AccountBindingService().GetAccountTypes(true))
+                    {     
+                        <a href="javascript:;" onclick="window.open('@SiteUrls.Instance().LoginToThird(accountType.AccountTypeKey)', 'ThirdLogin', 'width=600,height=500,menubar=0,scrollbars=0, status=1,titlebar=0,toolbar=0,location=1'); return false;">
+                            <img src="@SiteUrls.Instance().ThirdLoginButtonUrl(accountType.AccountTypeKey)" alt="使用第三方帐号登录" /></a>
+                    }
+                </div>              
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).redady(function () {
+        //点击提交按钮
+        $("button#button_submit_Login").click(function () {
+            $(this).parents("form").submit();
+        });
+
+        $("input").keydown(function () {
+            $(this).parents("form").submit();
+        });
+    });
+</script>

@@ -1,0 +1,40 @@
+﻿@{
+    var advertisingCount = ViewData.Get<long>("advertisingCount", 0);
+    var positionCount = ViewData.Get<long>("positionCount", 0);
+}
+<div class="tnc-rightvar tn-open">
+    <div class="tnc-settings-icon" plugin="ShortcutMenu">
+        <a href="#"></a>
+    </div>
+    <div id="ManageAdvertisingRightMenu">
+        <div class="tnc-settings">
+            <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+                <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+                    <h3 class="tn-helper-reset">
+                        便捷操作</h3>
+                </div>
+                <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                    <ul class="tn-side-menu tnc-operation">
+                        <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().ManageAdvertisings()">
+                            <span class="tn-icon tn-smallicon-slide-next" title="广告管理"></span>广告管理</a> </li>
+                        <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().ManagePositions()">
+                            <span class="tn-icon tn-smallicon-slide-next" title="广告位管理"></span>广告位管理</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+                <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+                    <h3 class="tn-helper-reset">
+                        数据统计</h3>
+                </div>
+                <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                    <ul class="tn-side-menu tnc-operation">
+                        <li>总广告数：@advertisingCount</li>
+                        <li>总广告位数：@positionCount</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

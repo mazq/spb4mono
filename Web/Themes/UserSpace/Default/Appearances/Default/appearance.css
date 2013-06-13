@@ -1,0 +1,96 @@
+/* 
+Offical Style for Spacebuilder
+(c) Tunynet Inc.
+*/ 
+
+/* Theme
+----------------------------------*/
+body{ color: #555; }
+a{ color:#0065a2; }
+a:hover{ color:#0065a2;} 
+.tn-header-bg{ border-bottom:1px solid #d4d4d4; background: url(images/tn-page-bg.png) repeat-x 0 -18px; }
+.tn-content-bg .tn-wrapper { background-image: url(Images/spb-col-line.png); background-repeat: repeat-y; }
+.spb-layout-3-9-4 .tn-content-bg .tn-wrapper { background-position: 170px 0; }
+.spb-layout-5-19 .tn-content-bg .tn-wrapper { background-position: -810px 0; }
+.spb-layout-3-13 .tn-content-bg .tn-wrapper { background-position: -830px 0; }
+.spb-layout-1 .tn-content-bg .tn-wrapper { background-image: none; }
+.tn-box .tn-box-content { background: none ; border-width: 0;}
+.tn-skin{ background-color: #0065a2; }
+.tn-skin a.tnc-skin-link{background-position: -72px -2px;}
+.tn-skin a.tnc-skin-link:hover{background-position: -107px -2px;}
+
+/* Left Navigation
+----------------------------------*/
+.spb-status a{ color:#999;}
+
+/* Font color
+----------------------------------*/
+.spb-status a:hover{ color: #0065a2; text-decoration: none; }
+
+/* Component containers
+----------------------------------*/
+.tn-widget-content,
+.ui-widget-content { border-color: #ddd; background: #fff; }
+.tn-widget-bubble,
+.tn-widget-same { border-color: #fff; }
+.tn-widget-header,
+.ui-widget-header { border-color: #ddd; background: #f8f8f8; }
+
+/* Line Color
+----------------------------------*/
+.tn-border-light { border-color: #e2e7ea ; }
+.tn-border-gray { border-color: #ddd; }
+.tn-border-deep { border-color: #0065a2; }
+
+/* Background 
+----------------------------------*/
+.tn-bg-light { background: #f4f7f9; }
+.tn-bg-gray { background: #f5f5f5; }
+.tn-bg-deep { background-color: #0065a2; }
+
+/* Header
+----------------------------------*/
+.spb-top-menubar a.spb-menu-link,
+.spb-top-menubar a.spb-menu-link:hover { color: #333; font-size: 16px; }
+.spb-top-menubar .tn-drop-menu a.tn-item-link:hover { background-color:#eee; }
+.spb-top-menubar .spb-menu .tn-icon,
+.spb-top-menubar .spb-user-menu .tn-icon { background-image: url(../../../../Shared/Styles/icons/50gray/tn-icon-small.png); }
+.spb-top-menubar .spb-user-menu .tn-icon:hover { background-image: url(../../../../Shared/Styles/icons/75gray/tn-icon-small.png); }
+.spb-user-menu .tn-user-name:hover {padding: 0 2px; line-height: 23px; text-decoration: none; background: #eee; border: #d4d4d4 solid 1px; }
+.spb-user-menu .tn-icon-menu.tn-hover { background: #d4d4d4; }
+
+/* Box
+----------------------------------*/
+.tn-box,
+.tn-box-content,
+.ui-tabs { background: none ; border-width: 0; border-radius: 0;}
+.tn-box .tn-box-header { background: none; border-color: #ddd; }
+.tn-box .tn-box-header h3 { color: #666;}
+.tn-box .tn-box-header .tn-option a { color:#999; }
+
+/* Side Navigation */
+.tn-side-menu li:hover { background: #f5f5f5; }
+.tn-side-menu a { color: #454545; }
+.tn-side-menu a:hover { color: #333; text-decoration: none; _text-decoration: underline; }
+
+/* Publisher box */
+.spb-foot .tn-actions .tn-action a,
+.spb-foot .tn-actions .tn-action a:hover{ color:#666;}
+
+/* Mode Windows */
+.tnc-mode-windows .tn-bubble-arrow .tn-border-gray{ border-color: transparent transparent #aaa; }
+.tnc-mode-windows .tn-bubble-content{ border-color: #ccc; padding:0; }
+.tnc-mode-windows h3{ padding:8px 10px; background:#f4f4f4; margin:0;}
+
+/* my home
+----------------------------------*/
+.spb-home-rtallbox .spb-homertbox-left .ui-tabs-panel{ border-right:1px solid #ddd;}
+.spb-home-photo .tnc-home-photo .tnc-icon-write .tn-icon{ background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png);}
+.spb-user-panel .spb-user-button .tn-button .tn-icon{ background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png);}
+
+.tnc-down-blkarrow a.tn-icon { background-color: #d4d4d4; background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png);  }
+.tnc-down-blkarrow a.tn-icon:hover { background-color: #0065a2; background-image: url(../../../../Shared/Styles/icons/white/tn-icon-small.png); }
+
+/* Footer
+----------------------------------*/
+#tn-footer{ border-top:1px solid #dddddd; color: #666; }

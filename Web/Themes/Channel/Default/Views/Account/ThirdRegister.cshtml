@@ -1,0 +1,141 @@
+﻿@model ThirdRegisterEditModel
+@{
+    Layout = "_Account";
+    ThirdUser thirdUser = ViewData.Get<ThirdUser>("thirdCurrentUser", new ThirdUser());
+
+    ThirdAccountGetter thirdAccountGetter = ThirdAccountGetterFactory.GetThirdAccountGetter(thirdUser.AccountTypeKey);
+    string thirdTypeName = string.Empty;
+    if (thirdAccountGetter != null)
+    {
+        thirdTypeName = thirdAccountGetter.AccountTypeName;
+    }
+
+    string siteName = DIContainer.Resolve<ISiteSettingsManager>().Get().SiteName;
+
+    var accountType = ViewData.Get<AccountType>("AccountType", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-account-bind">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-bind-wrap tn-helper-clearfix">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>
+                    欢迎您！来自@(thirdTypeName)的@(Model.UserName)，完善信息后你也可以使用下面的用户名和密码登录了。</h2>
+            </div>
+            <div class="tnc-bind-aside">
+                <a href="@thirdAccountGetter.AccountTypeUrl" target="_blank">
+                    <img width="50" height="50" src="@SiteUrls.Instance().ThirdLogoUrl(thirdUser.AccountTypeKey)" alt="@thirdTypeName"/><span
+                        class="tnc-friendly-icon"></span><img width="50" height="50" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Images/spb-logo.png"))"
+                                alt="@siteName" /></a>
+            </div>
+            <div class="tnc-bind-main tn-border-gray tn-border-right">
+                <div class="tnc-bind-main-avatar">
+                    <div class="tn-avatar">
+                        <a target="_blank" href="@thirdAccountGetter.GetSpaceHomeUrl(thirdUser.Identification)">
+                            <img width="50" src="@thirdUser.UserAvatarUrl" title="@Model.UserName" alt="@Model.UserName" /></a></div>
+                </div>
+                @using (Html.BeginForm("ThirdRegister", "Account", FormMethod.Post, new { id = "thirdRegisterForm" }))
+                {                    
+                    <div class="tn-form tn-label-right">
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                用户名：</label>
+                            @Html.TextBoxFor(n => n.UserName, InputWidthTypes.Long)
+                            @Html.ValidationMessageFor(n => n.UserName)
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                昵称：</label>
+                            @Html.TextBoxFor(n => n.NickName, InputWidthTypes.Long)
+                            @Html.ValidationMessageFor(n => n.UserName)
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                邮箱：</label>
+                            @Html.TextBoxFor(n => n.AccountEmail, InputWidthTypes.Long)
+                            @Html.ValidationMessageFor(n => n.AccountEmail)
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                密码：</label>
+                            @Html.TextBoxFor(n => n.PassWord, InputWidthTypes.Long, new RouteValueDictionary { { "type", "password" } })
+                            @Html.ValidationMessageFor(n => n.PassWord)
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                确认密码：</label>
+                            @Html.TextBoxFor(n => n.ConfirmPassword, InputWidthTypes.Long, new RouteValueDictionary { { "type", "password" } })
+                            @Html.ValidationMessage("ConfirmPassword")
+                        </div>
+                        @if (accountType.IsFollowMicroBlog)
+                        {
+                            <div class="tn-form-row tnc-attention">
+                                <span class="tn-inner">
+                                    @Html.CheckBoxFor(n => n.FollowOfficial, new { @class = "tn-checkbox" })
+                                    <label for="FollowOfficial">
+                                        关注@(accountType.OfficialMicroBlogAccount)的 @(thirdAccountGetter != null && thirdAccountGetter.AccountTypeKey == AccountTypeKeys.Instance().QQ() ? "腾讯微博" : thirdTypeName)
+                                    </label>
+                                </span>
+                            </div>
+                        }
+                        @if (accountType.IsShareMicroBlog)
+                        {
+                            <div class="tn-form-row tnc-share">
+                                <span class="tn-inner">
+                                    @Html.CheckBoxFor(n => n.ShareToFirend, new { @class = "tn-checkbox" })
+                                    <label for="ShareToFirend">
+                                        分享给@(thirdAccountGetter != null && thirdAccountGetter.AccountTypeKey == AccountTypeKeys.Instance().QQ() ? "腾讯微博" : thirdTypeName)中的好友</label>
+                                </span>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    &nbsp;</label>
+                                @Html.TextArea("Content", ViewData.Get<string>("Content", string.Empty), InputWidthTypes.Long, htmlAttributes: new RouteValueDictionary { { "id", "ShareToFirendContent" } })
+                            </div>
+                        }
+                        <div class="tn-form-row tn-agree">
+                            <span class="tn-inner">
+                                @Html.CheckBox("AcceptableProvision", true, new { @class = "tn-checkbox", id = "AcceptableProvision" })
+                                <label for="AcceptableProvision">
+                                    我已看过并完全同意
+                                </label>
+                                @Html.Link("《会员服务条款》", SiteUrls.Instance()._Provision(), "《会员服务条款》", new { plugin = "dialog" })
+                            </span><span class="field-validation-error" validatefor="AcceptableProvision"></span>
+                        </div>
+                        <div class="tn-form-row tn-form-row-button">
+                            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large, htmlAttributes: new { id = "button-register-submit" })
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //必须同意站点条款
+        $("#thirdRegisterForm").submit(function () {
+            if (!$("#AcceptableProvision:checked").length) {
+                $("span[validatefor='AcceptableProvision']").html("必须同意站点条款");
+                return false;
+            } else {
+                $("span[validatefor='AcceptableProvision']").html("");
+            }
+        });
+
+        //是否分享到微博
+        $("input[name='ShareToFirend']").click(function () {
+            ResetShareToFirendStatus();
+        });
+    });
+
+    ResetShareToFirendStatus();
+
+    //重置微博内容是否显示
+    function ResetShareToFirendStatus() {
+        if ($("input[name='ShareToFirend']:checked").length) {
+            $("#ShareToFirendContent").show();
+        } else {
+            $("#ShareToFirendContent").hide();
+        }
+    }
+</script>

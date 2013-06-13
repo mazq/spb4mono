@@ -1,0 +1,127 @@
+﻿@model BarThread
+@{
+    IEnumerable<BarPost> posts = ViewData.Get<IEnumerable<BarPost>>("BarPosts", new List<BarPost>());
+    string tenantTypeName = ViewData.Get<string>("tenantTypeName", null);
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(Model.TenantTypeId);
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-bar-item">
+    <div class="tn-list-item-area-left">
+        @{
+            HyperLinkTarget hyperLinkTarget;
+            if(Model.User==UserContext.CurrentUser)
+            {
+                hyperLinkTarget = HyperLinkTarget._self;
+            }
+            else
+            {
+                hyperLinkTarget = HyperLinkTarget._blank;
+            }
+            }
+        @Html.ShowUserAvatar(Model.User, SiteUrls.Instance().SpaceHome(Model.UserId), AvatarSizeType.Small, hyperLinkTarget)
+    </div>
+    <div class="tn-list-item-area-main">
+        @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+        <div class="tnc-dynamic-title">
+            @Html.Link(Model.Author, SiteUrls.Instance().SpaceHome(Model.UserId), null, new { @class = "tn-author" }, hyperLinkTarget)
+            @Html.IdentificationType(Model.UserId)
+            @if (!string.IsNullOrEmpty(tenantTypeName))
+            { 
+                <text>在</text> @tenantTypeName @Html.Link(Model.BarSection.Name, urlGetter.SectionDetail(Model.SectionId), Model.BarSection.Name, new { @class = "tn-title" }, HyperLinkTarget._blank) <text>中</text>
+            }
+            @(posts.Count() == 0 ? "发布了帖子" : "的帖子")
+            @Html.Link(Model.Subject, urlGetter.ThreadDetail(Model.ThreadId), Model.Subject, new { @class = "tn-title" }, HyperLinkTarget._blank)
+            @if (posts.Count() != 0)
+            {
+                @:被
+                @Html.Raw(string.Join("、", posts.Select(n => new { Author = n.Author, UserId = n.UserId }).Distinct().Select(n => Html.Link(n.Author, urlGetter.UserSpaceHome(n.UserId, Model.SectionId), n.Author, new { @class = "tn-commenter" }, HyperLinkTarget._blank).ToString() + Html.IdentificationType(n.UserId).ToString())))
+                <text>回复了</text>
+            }
+        </div>
+        <p class="tnc-dynamic-box">
+            @{
+                string body = Model.GetBody();
+                body = HtmlUtility.TrimHtml(body, 105);
+            }
+            @body
+        </p>
+        @{
+            IEnumerable<Attachment> attachments = ViewData.Get<IEnumerable<Attachment>>("Attachments", new List<Attachment>());
+            int imgCount = attachments == null ? 0 : attachments.Count();
+            if (attachments != null)
+            {
+                attachments = attachments.Count() > 7 ? attachments.Take(7) : attachments;
+            }
+        }
+        @if (attachments != null && attachments.Count() > 0)
+        {
+            <div class="tnc-dynamic-imgbox">
+                <a href="@urlGetter.ThreadDetail(Model.ThreadId)" class="tnc-imgbox-bigshow" target="_blank">
+                    <img alt="@attachments.ElementAt(0).FriendlyFileName" src="@SiteUrls.Instance().ImageUrl(attachments.ElementAt(0), attachments.ElementAt(0).TenantTypeId, ImageSizeTypeKeys.Instance().Original())" width="400" />
+                </a>
+                <div class="tnc-imgbox_preview">
+                    @for (int i = 1; i < attachments.Count(); i++)
+                    {
+                        <a href="@urlGetter.ThreadDetail(Model.ThreadId)" target="_blank">
+                            <img width="60" src="@SiteUrls.Instance().ImageUrl(attachments.ElementAt(i), attachments.ElementAt(i).TenantTypeId, ImageSizeTypeKeys.Instance().Small())"/></a>
+                                                                if (i == attachments.Count() - 1)
+                                                                {
+                        <a href="@urlGetter.ThreadDetail(Model.ThreadId)" class="tnc-imgbox-float tn-bg-light" target="_blank">
+                            共 @imgCount 张</a>
+                                                                }
+                    }
+                </div>
+            </div>
+        }
+        <p class="tnc-dynamic-box tnc-textsize-small">
+            @{
+                string replay = Model.PostCount > 0 ? string.Format("回帖（{0}）", Model.PostCount) : "回帖";
+            }
+            @Html.Link(replay, urlGetter.ThreadDetail(Model.ThreadId, isAnchorPostList: true), replay, new { @class = "tnc-mrf" }, HyperLinkTarget._blank)
+            @Html.Link(Model.DateCreated.ToFriendlyDate(), urlGetter.ThreadDetail(Model.ThreadId), Model.DateCreated.ToFriendlyDate(), new { @class = "tn-date tn-secondary-text" }, HyperLinkTarget._blank)
+        </p>
+        @if (posts.Count() > 0)
+        {
+            <div class="tnc-dynamic-commentbox spb-status-textarea tnc-textsize-small spb-bar-comment">
+                <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+                    <div class="tn-bubble-arrow">
+                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                        </b>
+                    </div>
+                    <div class="tn-bubble-content tn-border-gray tn-corner-all">
+                        <ul class="tn-comments">
+                            @foreach (var post in posts)
+                            {
+                                <li class="tn-comment-item">
+                                    <div class="tn-comment tn-helper-clearfix tn-hover">
+                                        <div class="tn-comment-avatar">
+                                            @Html.ShowUserAvatar(post.User, urlGetter.UserSpaceHome(post.UserId, Model.SectionId), AvatarSizeType.Small)
+                                        </div>
+                                        <div class="tn-comment-info">
+                                            <div class="tn-commentator">
+                                                @*//todo:bianchx,by zhengw: 现在都不用显示回帖标题吧？ 
+                                            //回复：如果某天要标题了的话。就显示这段好了。
+                                            *@
+                                                @if (!string.IsNullOrEmpty(post.Subject))
+                                                {
+                                                    <div class="tn-title">
+                                                        @Html.Raw(post.Subject)</div>
+                                                }
+                                                @Html.Link(post.Author, urlGetter.UserSpaceHome(post.UserId, Model.SectionId), post.Author, new { @class = "tn-user-name" }, HyperLinkTarget._blank)
+                                                @Html.Link(post.DateCreated.ToFriendlyDate(), SiteUrls.Instance().ThreadDetailGotoPost(post.PostId), post.DateCreated.ToFriendlyDate(), new { @class = "tn-date tn-secondary-text" }, HyperLinkTarget._blank)
+                                            </div>
+                                            @*//todo:bianchx,by zhengw: 不用Html.Raw，HtmlUtility.TrimHtml方法已剔除标签 
+                                        //回复：已经处理对应的问题
+                                        *@
+                                            <p>
+                                                @HtmlUtility.TrimHtml(post.GetResolvedBody(), 88)</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</li>

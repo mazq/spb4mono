@@ -1,0 +1,148 @@
+﻿@model User
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["HonourMenu"] = HonourMenu.MyRank;
+
+    SortedList<int, UserRank> userRanks = ViewData.Get<SortedList<int, UserRank>>("userRanks", new SortedList<int, UserRank>());
+    List<UserRank> ranks = userRanks.Values.ToList();
+    double leftPoints = ViewData.Get<double>("leftPoints", 0);
+    int totalPoints = ViewData.Get<int>("totalPoints", 0);
+    int leftUpgradeExperiencePoints = ViewData.Get<int>("leftUpgradeExperiencePoints", 0);
+    string userRankName = ViewData.Get<string>("userRankName", "未知等级");
+    string nextRankName = ViewData.Get<string>("nextRankName", "下一级");
+    int moietyCount = ranks.Count % 2 == 0 ? ranks.Count / 2 : ranks.Count / 2 + 1;
+
+}
+@section Aside
+{
+    @Html.Partial("_HonourMenus", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-grade">
+            <div class="tn-instructions tnc-grade-instructions">
+			    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+					<h4>我的等级</h4>
+				</div>
+                @if (userRanks.Count() >= 5)
+                {
+                    int a = (userRanks.Count() - 2) / 3;
+                         
+                    
+                    <ul class="tn-helper-clearfix tn-step-scale">
+                        @for (int i = 0; i < 4; i++)
+                        {
+                            var rank=ranks.ElementAt(a * i);
+                            if ( rank== null)
+                            {
+                                continue;
+                            }
+                            
+                            <li class="tn-step">
+                                <div class="tnc-step-item">
+                                    @Html.UserRankIcon(1 + a * i) （@rank.RankName）
+                                </div>
+                                <div class="tnc-scale">
+                                    <span class="tn-icon tn-smallicon-triangle-down"></span>
+                                </div>
+                            </li>
+                        }
+                        <li class="tn-step">
+                            <div class="tnc-step-item">
+                                @Html.UserRankIcon(userRanks.Count())
+                                (@userRanks.ToArray()[userRanks.Count() - 1].Value.RankName)
+                            </div>
+                            <div class="tnc-scale">
+                                <span class="tn-icon tn-smallicon-triangle-down"></span>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="tn-progress-bar tn-widget-content tn-border-deep tn-corner-all">
+                        <div id="expProgress" style=" width: @(leftPoints * 100)%" class="tn-progress-bar-value tn-widget-header tn-bg-deep tn-border-deep tn-corner-left tn-border-tbl"></div>
+                    </div>
+                }
+                <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+                    <div class="tn-bubble-arrow" style="margin-left:@(leftPoints * 100)%;">
+                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                    </div>
+                    <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                        <p>
+                            当前等级：<strong> @userRankName</strong></p>
+                        @if (leftUpgradeExperiencePoints == 0)
+                        {
+                            <p>
+                            目前已有<strong> @totalPoints</strong>个综合积分，您已经升到了<strong>最高级</strong></p>
+                        }
+                        else
+                        {
+                        <p>
+                            目前已有<strong> @totalPoints</strong>个综合积分，还有<strong> @leftUpgradeExperiencePoints</strong>个综合积分即可升级到 <strong>@nextRankName</strong></p>
+                   
+                        } </div>
+                </div>
+            </div>
+        </div>
+        @Html.Action("_ListPointItems")
+        <div class="tnc-integral-list tn-helper-clearfix">
+		    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+				<h4>等级积分对照表</h4>
+			</div>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-integral-list tn-helper-clearfix">
+                    @if (ranks != null && ranks.Count > 0)
+                    {
+                        for (int i = 0; i < 2; i++)
+                        {
+                            List<UserRank> ranksRange = ranks.ToList().GetRange(i * moietyCount, i == 0 ? moietyCount : ranks.Count / 2);
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                        等级
+                                    </th>
+                                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                        图标
+                                    </th>
+                                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                        综合积分
+                                    </th>
+                                </tr>
+                                @foreach (var item in ranksRange)
+                                {
+                                    
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                            @item.RankName
+                                        </td>
+                                        <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                            @Html.UserRankIcon(item.Rank)
+                                        </td>
+                                        <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                            @item.PointLower
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                                if (userRanks.Count == 1)
+                                {
+                                    break;
+                                }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+    })
+</script>

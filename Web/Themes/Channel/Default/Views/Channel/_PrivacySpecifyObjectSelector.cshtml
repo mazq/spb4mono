@@ -1,0 +1,143 @@
+﻿@{
+    string itemName = ViewData.Get<string>("itemName", string.Empty);
+    long userId = ViewData.Get<long>("userId", 0);
+    string userSpecifyObjectName = itemName + SpecifyObjectTypeIds.Instance().User();
+    string userGroupSpecifyObjectName = itemName + SpecifyObjectTypeIds.Instance().UserGroup();
+    Dictionary<int, IEnumerable<long>> userPrivacySpecifyObjects = ViewData.Get<Dictionary<int, IEnumerable<long>>>("userPrivacySpecifyObjects", new Dictionary<int, IEnumerable<long>>());
+    List<Category> categories = ViewData.Get<IEnumerable<Category>>("categories", new List<Category>()).ToList();
+    string name = itemName + SpecifyObjectTypeIds.Instance().UserGroup();
+    int specifyObjectTypeId_User = SpecifyObjectTypeIds.Instance().User();
+    int specifyUserMaxCount = ViewData.Get<int>("specifyUserMaxCount", 10);
+    int mutual = FollowSpecifyGroupIds.Mutual;
+    bool isHaveMutual = categories.Any(n => n.CategoryId == mutual);
+}
+@using (Html.BeginAjaxForm("_PrivacySpecifyObjectSelectorPost", "Channel", new { area = "Common", userId = userId, itemName = itemName }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("success")))
+{ 
+    <div class="tnc-dailog-pd" style="width: 370px">
+        <div class="tn-form tnc-privacy-custom">
+            <div class="tn-form-row">
+                <ul class="tn-checkbox-list tnc-nominee-setting">
+                    <li>
+                        @{
+    IEnumerable<long> categorySelectValues = new List<long>();
+    if (userPrivacySpecifyObjects.ContainsKey(SpecifyObjectTypeIds.Instance().UserGroup()))
+    {
+        categorySelectValues = userPrivacySpecifyObjects[SpecifyObjectTypeIds.Instance().UserGroup()];
+    }
+    bool isShowUserGroup = categorySelectValues.Count() > 0;
+    bool isCheckAllGroup = categorySelectValues.Contains(FollowSpecifyGroupIds.All);
+                        }
+                        @Html.SipmleCheckBox(itemName + "_SpecifyUserGroup", true, isShowUserGroup, new { id = itemName + "_SpecifyUserGroup", @class = "tn-checkbox" })
+                        <label for="@(itemName)_SpecifyUserGroup">
+                            我关注的人</label>
+                        <ul class="tnc-mynotice-option" id="@(itemName)_SpecifyUserGroupUl" @if (!isShowUserGroup)
+                                                                                            {@Html.Raw("style=\"display: none;\"") }>
+                            <li>
+                                <input type="radio" name="@(itemName)_IsSpecifyAllUser" value="@FollowSpecifyGroupIds.All" class="tn-radiobutton" id="checkAll" @if (isCheckAllGroup)
+                                                                                                                                                                { @Html.Raw("checked=\"checked\"");
+                                                                                                                                                                } />
+                                <label for="checkAll">
+                                    我关注的所有人</label>
+                            </li>
+                            <li>
+                                <input type="radio" name="@(itemName)_IsSpecifyAllUser" value="false" class="tn-radiobutton" id="ChoiceGroup"  @if (!isCheckAllGroup)
+                                                                                                                                               { @Html.Raw("checked=\"checked\"");
+                                                                                                                                               } />
+                                <label for="ChoiceGroup">
+                                    指定分组</label>
+                                <div id="div-ChoiceGroup" class="tn-widget tn-bubble tn-bubble-arrow-top" @if (isCheckAllGroup)
+                                                                                                          { @Html.Raw("style=\"display: none;\"");
+                                                                                                          }>
+                                    <div class="tn-bubble-arrow">
+                                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble"></b>
+                                    </div>
+                                    <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                                        <ul class="tn-list tnc-nominee-list tn-helper-clearfix">
+                                            @if (true)
+                                            {
+                                                <li>
+                                                    @Html.SipmleCheckBox(name, mutual, categorySelectValues.Contains(mutual), new { id = name + mutual })
+                                                    <label for="@(name + mutual)">
+                                                        相互关注
+                                                    </label>
+                                                </li>
+                                            }
+                                            @foreach (Category category in categories)
+                                            {
+                                                <li>
+                                                    @Html.SipmleCheckBox(name, category.CategoryId, categorySelectValues.Contains(category.CategoryId), new { id = name + category.CategoryId })
+                                                    <label for="@(name + category.CategoryId)">
+                                                        @category.CategoryName</label>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        @{
+                                            //todo:限制数量应该从隐私配置中获取
+                                            IEnumerable<long> userSelectValues = new List<long>();
+                                            if (userPrivacySpecifyObjects.ContainsKey(SpecifyObjectTypeIds.Instance().User()))
+                                            {
+                                                userSelectValues = userPrivacySpecifyObjects[SpecifyObjectTypeIds.Instance().User()];
+                                            }
+
+                                            bool isShowUserSelector = (userSelectValues != null && userSelectValues.Count() > 0);
+                        }
+                        @Html.SipmleCheckBox(itemName + "_SpecifyUser", true, isShowUserSelector, new { id = itemName + "_SpecifyUser", calss = "tn-checkbox" })
+                        <label for="@(itemName)_SpecifyUser">
+                            指定人可见</label>
+                        <div id="@(itemName)_UserSelector" @if (!isShowUserSelector)
+                                                           {@Html.Raw("style=\"display: none;\"");
+                                                           }>
+                            @Html.UserSelector(itemName + SpecifyObjectTypeIds.Instance().User(), specifyUserMaxCount, userSelectValues, SelectorWidthType.Longer, UserSelectorSearchScope.Site)
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("关闭", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/javascript">
+    function success(data) {
+        $("#@(itemName)_Container").replaceWith(data);
+    }
+    $(document).ready(function () {
+        //点击选择用户的时候
+        $("input#@(itemName)_SpecifyUser").click(function () {
+            if (this.checked == true) {
+                $("#@(itemName)_UserSelector").show();
+            } else {
+                $("#@(itemName)_UserSelector").hide();
+            }
+        });
+        //点击点击使用分组的时候
+        $("input#@(itemName)_SpecifyUserGroup").click(function () {
+            if (this.checked == true) {
+                $("#@(itemName)_SpecifyUserGroupUl").show();
+            } else {
+                $("#@(itemName)_SpecifyUserGroupUl").hide();
+            }
+        });
+        //点击单选按钮的时候
+        $("input[name='@(itemName)_IsSpecifyAllUser']").click(function () {
+            if ($(this).is("#ChoiceGroup")) {
+                $("div#div-ChoiceGroup").show();
+            } else {
+                $("div#div-ChoiceGroup").hide();
+            }
+        });
+
+    });
+</script>
+<script type="text/dialog">
+    this.title("自定义隐私设置");
+    this.lock();
+</script>

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<LinkEntity>
+@{
+    long ownerId = ViewData.Get<long>("ownerId", 0);
+    int ownerType = ViewData.Get<int>("ownerType", 0);
+    bool isManager = ViewData.Get<bool>("manage", false);
+    IUser currentUser = UserContext.CurrentUser;
+}
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-friendship-link" id="ownerLinks">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <input type="hidden" id="ownerId" value="@ownerId" />
+        <input type="hidden" id="ownerType" value="@ownerType" />
+        <input type="hidden" id="ownerLinksUrl" value="@SiteUrls.Instance()._OwnerLinks(ownerType, ownerId)" />
+        <div class="tn-option">
+            @if (isManager)
+            {
+                <a href="@SiteUrls.Instance()._ManageLinksForOwner(ownerType, ownerId)" id="manageLinks" plugin="dialog">管理</a>
+            }
+        </div>
+        <h3 class="tn-helper-reset">友情链接</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model.Where(n => n.LinkType == LinkType.TextLink).Count() > 0 || Model == null)
+        {
+            <ul class="tn-mini-avatar-list">
+                @foreach (LinkEntity link in Model.Where(n => n.LinkType == LinkType.TextLink && n.IsEnabled == true))
+                {
+                    <li class="tn-helper-clearfix tn-border-bottom tn-border-gray tn-border-dashed"><a href="@link.LinkUrl" title="@link.LinkUrl" target="_blank">@link.LinkName</a></li>
+                }
+            </ul>
+            }
+        @if (Model.Where(n => n.LinkType == LinkType.ImageLink).Count() > 0 || Model == null)
+        {
+            <ul class="tn-mini-avatar-list tnc-links-photo">
+                @foreach (LinkEntity link in Model.Where(n => n.LinkType == LinkType.ImageLink && n.IsEnabled == true))
+                {
+                    string imageUrl = link.ImageUrl.Trim();
+                    if (!imageUrl.ToLower().StartsWith("http"))
+                    {
+                        if (currentUser != null && currentUser.UserId == ownerId)
+                        {
+                            imageUrl = SiteUrls.Instance().LogoUrl(imageUrl, TenantTypeIds.Instance().Link(), ImageSizeTypeKeys.Instance().Medium(), false);
+                        }
+                        else
+                        {
+                            imageUrl = SiteUrls.Instance().LogoUrl(imageUrl, TenantTypeIds.Instance().Link(), ImageSizeTypeKeys.Instance().Medium(), true);
+                        }
+                    }
+                    <li class="tn-helper-clearfix tn-border-bottom tn-border-gray tn-border-dashed">
+                      <a href="@link.LinkUrl" target="_blank">
+                            <img src="@imageUrl" alt="@link.LinkName" title="@link.LinkName" />
+                        </a>
+                   
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

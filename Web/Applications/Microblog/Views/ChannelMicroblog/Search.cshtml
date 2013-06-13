@@ -1,0 +1,206 @@
+﻿@model  PagingDataSet<MicroblogEntity>
+@{
+    Layout = "_Search";
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+    ViewData["searcherCode"] = MicroblogSearcher.CODE;
+
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@section SearchForm{
+    @using (Html.BeginForm("Search", "ChannelMicroblog", FormMethod.Get, new { id = "searchForm" }))
+    {
+        @Html.TextBox("keyword", keyword, new { maxlength = "32", @class = "tn-textbox" })
+        @Html.Hidden("searchTerm", Request.QueryString.GetString("searchTerm", string.Empty))
+        <a id="button-search" href="#" class="tn-button tn-button-text-only tn-button-large tn-button-primary">
+            <span class="tn-button-text">搜索</span></a>
+    }
+}
+@section Aside{
+    @Html.AjaxAction("_TopTopics", "ChannelMicroblog", new { topNum = 10 })
+    @Html.AjaxAction("_SearchHistories", "Channel", new { searcherCode = MicroblogSearcher.CODE, Area = "Common" })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-results">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-microblog-search">
+            <div class="tn-list-header tn-bg-gray tn-border-gray tn-border-bottom">
+                <div class="tn-list-header-row tn-helper-clearfix tn-bg-gray">
+                    <span id="search-term" class="tn-keywords"><a data-search-term="0" href="#">全部</a> <a
+                        data-search-term="1" href="#">原创</a> <a data-search-term="2" href="#">含图</a> <a data-search-term="3"
+                            href="#">含音乐</a> <a data-search-term="4" href="#">含视频</a></span> <span class="tn-count">
+                                共有 <strong>@Model.TotalRecords</strong>个搜索结果（用时 @Model.QueryDuration 秒）</span>
+                </div>
+            </div>
+            @if (Model.TotalRecords > 0)
+            {
+                <ul class="tn-list tnc-dynamic">
+                    @foreach (MicroblogEntity microblog in Model)
+                    {
+                        Html.RenderPartial("~/Applications/Microblog/Views/MicroblogActivity/_Microblog.cshtml", microblog);
+                    }
+                </ul>
+                <div class="tn-pagination">
+                    @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                </div>
+            }
+            else if (string.IsNullOrEmpty(keyword))
+            {
+                <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                    <a class="tn-icon tn-smallicon-cross tn-helper-right" href="#"></a><span class="tn-helper-left">
+                        <span class="tn-icon tn-icon-exclamation"></span></span>
+                    <div class="tn-helper-flowfix">
+                        <strong>提示：</strong>请输入搜索条件</div>
+                </div>
+            }
+            else
+            { 
+                <div class="tnc-search-noresults">
+                    <p class="tn-title">
+                        很抱歉，没有找到符合您搜索条件的结果！</p>
+                    <dl class="tn-support">
+                        <dt><strong>建议：</strong></dt>
+                        <dd>
+                            请确保搜索文字拼写正确</dd>
+                        <dd>
+                            请尝试使用其他关键词或使用近义词</dd>
+                        <dd>
+                            请尝试使用含义更为宽泛的关键词</dd>
+                    </dl>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script id="template-auto-complete" type="text/x-jquery-tmpl">
+    <li class='tn-list-item tn-auto-complete-item tn-helper-clearfix tnc-auto-complete-public'>
+        <a class="tn-user-info">
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row">{{html tagNameWithHighlight}}</div>
+            </div>
+        </a>
+    </li>
+</script>
+<script type="text/javascript">
+     $(function(){ 
+        var MicroblogSearcher = function () {
+            this.init();
+        };
+        MicroblogSearcher.fn = MicroblogSearcher.prototype = {
+            init: function () {
+                var self = this;
+                var cache = {};
+
+                this.resetForm = false;  //是否清楚搜索过滤条件
+
+                this.searchForm = $('#searchForm');
+                this.keyword = $('#keyword', this.searchForm);
+                this.searchTerm = $('#searchTerm', this.searchForm);
+                this.ifMustKeyword=false;
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == ""&&self.ifMustKeyword==true) {
+                        e.preventDefault();
+                         alert("请输入关键字！");
+                        this.keyword.focus();
+                    }
+
+                    if(self.resetForm){
+                        self.clearForm();
+                    }
+                });
+               
+                //注册自动完成响应事件
+                this.keyword.bind("input.autocomplete", function(){
+                    $(this).trigger('keydown.autocomplete');
+                });
+                this.keyword.autocomplete({
+                    minLength: 1,
+                    source: function (request, response) {
+                        //缓存搜索结果
+                        var term = request.term.toLowerCase(),
+                            element = this.element,
+                            cache  = this.element.data('autocompleteCache') || {},
+                            foundInCache = false;
+
+                        $.each(cache, function(key, data){
+                            if (term === key && data.length > 0) {
+                                response(data);
+                                foundInCache = true;
+                                return;
+                            }
+                        });
+
+                        if (foundInCache) return;
+                        var keyword = encodeURIComponent(self.keyword.val());
+                        $.getJSON('@SiteUrls.Instance().SearchAutoComplete()?keyword='+keyword+'&topNumber=10', function (data) {
+                            cache[term] = data;
+                            element.data('autocompleteCache', cache);
+
+                            response(data);
+                        });
+                    },
+                    search: function (event, ui) {                        
+                    },
+                    open: function (event, ui) {                        
+                    },
+                    focus: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        self.searchForm.submit();
+                    }
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $('#template-auto-complete').tmpl(item).data("item.autocomplete", item).appendTo(ul);
+                };
+
+                //注册搜索按钮点击事件
+                $('#button-search').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+
+                //注册点击搜索范围事件
+                $("#search-term a").click(function (e) {
+                    e.preventDefault();
+                    self.searchTerm.val($(this).data('searchTerm'));
+                    if ($(this).data("searchTerm")==0) 
+                        self.ifMustKeyword=true;
+                    else
+                        self.ifMustKeyword=false;
+                    self.resetForm = false;
+                    self.searchForm.submit();
+                });
+
+                //初始化搜索表单中的过滤条件状态
+                self.initSearchForm(); 
+            },
+
+
+            /*
+            * 初始化搜索表单中的过滤条件状态
+            */
+            initSearchForm: function () {
+                //设置搜索范围
+                var searchTerm = @(Request.QueryString.Get<int>("searchTerm", 0));
+                $('#search-term a[data-search-term="'+searchTerm+'"]').addClass('tn-selected');
+
+                },
+
+            /*
+            * 更改关键词搜索前先清除搜索过滤条件
+            */
+            clearForm: function () {
+                this.searchTerm.val("4");
+            }
+        };
+
+        MicroblogSearcher = new MicroblogSearcher();
+     });
+</script>

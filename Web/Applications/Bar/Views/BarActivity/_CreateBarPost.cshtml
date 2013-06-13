@@ -1,0 +1,85 @@
+﻿@model BarPost
+@{
+    BarThread thread = ViewData.Get<BarThread>("BarThread", null);
+    string tenantTypeName = ViewData.Get<string>("tenantTypeName", null);
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(thread.TenantTypeId);
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+    <div class="tn-list-item-area-left">
+        @{
+            HyperLinkTarget hyperLinkTarget;
+            if (Model.User == UserContext.CurrentUser)
+            {
+                hyperLinkTarget = HyperLinkTarget._self;
+            }
+            else
+            {
+                hyperLinkTarget = HyperLinkTarget._blank;
+            }
+        }
+        @Html.ShowUserAvatar(Model.User, SiteUrls.Instance().SpaceHome(Model.UserId), AvatarSizeType.Small, hyperLinkTarget)
+    </div>
+    <div class="tn-list-item-area-main">
+        @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+        <div class="tnc-dynamic-title">
+            @Html.Link(Model.Author, SiteUrls.Instance().SpaceHome(Model.UserId), null, new { @class = "tn-commenter" }, hyperLinkTarget)
+            @Html.IdentificationType(Model.UserId)
+            @if (!string.IsNullOrEmpty(tenantTypeName))
+            { 
+                <text>在</text> @tenantTypeName @Html.Link(thread.BarSection.Name, urlGetter.SectionDetail(thread.SectionId), thread.BarSection.Name, new { @class = "tn-title" }, HyperLinkTarget._blank) <text>中</text>
+            }
+            回复了
+            @Html.Link(thread.Author, urlGetter.UserSpaceHome(thread.UserId, Model.SectionId), thread.Author, new { @class = "tn-author" }, HyperLinkTarget._blank)
+            @Html.IdentificationType(thread.UserId)
+            的帖子
+            @Html.Link(thread.Subject, urlGetter.ThreadDetail(thread.ThreadId), thread.Subject, new { @class = "tn-title" }, HyperLinkTarget._blank)
+        </div>
+        <div class="tnc-dynamic-commentbox spb-status-textarea tnc-textsize-small">
+            <div class="spb-bar-comment">
+                <ul class="tn-comments">
+                    <li class="tn-comment-item">
+                        <div class="tn-comment tn-helper-clearfix tn-hover">
+                            <div class="tn-comment-info">
+                                <div class="tn-commentator">
+                                    @HtmlUtility.TrimHtml(Model.GetResolvedBody(), 88)</div>
+                                @Html.Link(Model.DateCreated.ToFriendlyDate(), SiteUrls.Instance().ThreadDetailGotoPost(Model.PostId), Model.DateCreated.ToFriendlyDate(), new { @class = "tn-date tn-secondary-text" }, HyperLinkTarget._blank)
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-dynamic-quote">
+            <div class="tn-bubble-arrow">
+                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                </b>
+            </div>
+            <div class="tn-bubble-content tn-border-gray tn-corner-all">
+                <p class="tnc-dynamic-box">
+                    @HtmlUtility.TrimHtml(thread.GetResolvedBody(), 105)</p>
+                @{
+                    Attachment attachment = ViewData.Get<Attachment>("Attachments", null);
+                }
+                @if (attachment != null)
+                {
+                    <div class="tnc-dynamic-imgbox">
+                        <a href="@urlGetter.ThreadDetail(thread.ThreadId)" class="tnc-imgbox-bigshow" target="_blank">
+                            <img src="@SiteUrls.Instance().ImageUrl(attachment, attachment.TenantTypeId, ImageSizeTypeKeys.Instance().Original())" alt="@attachment.GetOriginalFileName()" width="400" /></a></div>    
+                }
+                <p class="tnc-dynamic-box tnc-textsize-small">
+                    @*//todo:bianchx,by zhengw: 回帖数是0时，也需要显示括号，并使用英文括号；
+                //回复：已经处理
+                 *@
+                    @{
+                        string postName = string.Format("回帖({0})", thread.PostCount);
+                    }
+                    @Html.Link(postName, urlGetter.ThreadDetail(thread.ThreadId, isAnchorPostList: true), postName, new { @class = "tnc-mrf" }, HyperLinkTarget._blank)
+                    @*//todo:bianchx,by zhengw: 去掉分享按钮，PO说不用加 
+                //回复：已经处理
+                 *@
+                    @Html.Link(thread.DateCreated.ToFriendlyDate(), urlGetter.ThreadDetail(Model.ThreadId), thread.DateCreated.ToFriendlyDate(), new { @class = "tn-date tn-secondary-text" }, HyperLinkTarget._blank)
+                </p>
+            </div>
+        </div>
+    </div>
+</li>

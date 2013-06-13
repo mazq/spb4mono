@@ -1,0 +1,13 @@
+﻿@if (UserContext.CurrentUser != null)
+{
+    bool isSubscribed = ViewData.Get<bool>("isSubscribed", false);
+    long sectionId = ViewData.Get<long>("sectionId", 0);
+    if (isSubscribed)
+    {
+    <span class="tn-explain-icon">@Html.Icon(IconTypes.SmallAccept)<span class="tn-icon-text">已关注</span></span>    
+    }
+    else
+    {
+    @Html.Button("加关注", ButtonTypes.Link, HighlightStyles.Hollow, ButtonSizes.Default, IconTypes.SmallAdd, url: SiteUrls.Instance().SubscribeSection(sectionId), htmlAttributes: new { id = "SubscribeSectionButton_" + sectionId, sectionId = sectionId, @class = "tn-button-default" })
+    }
+}

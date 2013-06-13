@@ -1,0 +1,20 @@
+﻿@model GroupEntity
+@{ long totalRecords = ViewData.Get<long>("totalRecords", 0);}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-user-panel">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-user-panel-wrap">
+            <div class="tn-card tn-helper-clearfix">
+                <div class="tn-avatar"><a target="_blank" href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())"><img width="50" height="50" title="@Model.GroupName" src="@SiteUrls.Instance().LogoUrl(Model.Logo,TenantTypeIds.Instance().Group(),ImageSizeTypeKeys.Instance().Small())" alt="@Model.GroupName"/></a></div>
+                <div class="tn-info">
+                    <p class="tn-user-name">
+                        <a href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())"><strong>@Model.GroupName</strong></a></p>
+                </div>
+            </div>
+            <ul class="tn-side-menu">
+                <li><a href="#" class="tn-menu-text">帖子管理</a></li>
+                <li><a href="@SiteUrls.Instance().ManageMemberApplies(Url.SpaceKey(),null)" class="tn-menu-text">成员管理(@totalRecords)</a></li>
+                <li><a href="@SiteUrls.Instance().EditGroup(Url.SpaceKey())" class="tn-menu-text">群组设置</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

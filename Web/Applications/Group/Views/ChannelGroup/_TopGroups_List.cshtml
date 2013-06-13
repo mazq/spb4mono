@@ -1,0 +1,72 @@
+﻿@model IEnumerable<GroupEntity>
+@{
+    SortBy_Group sortBy = ViewData.Get<SortBy_Group>("SortBy", SortBy_Group.DateCreated_Desc);
+   
+    
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-last-group">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+        <h3 class="tn-helper-reset">
+            @switch (sortBy)
+            {
+                case SortBy_Group.DateCreated_Desc:
+                @:最新群组
+                    break;
+                case SortBy_Group.StageHitTimes:
+                case SortBy_Group.HitTimes:
+                @:热门群组
+                    break;
+                case SortBy_Group.MemberCount_Desc:
+                @:活跃群组  
+                break;
+                case SortBy_Group.GrowthValue_Desc:
+                @:活跃群组
+                break;
+            }
+        </h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+       
+            @if (Model.Count() <= 0)
+            {
+                <div class="tn-no-data">
+                    暂无群组!</div> 
+            }
+            else
+            {
+                <ul class="tn-list ">
+                    @foreach (var item in Model)
+                    {
+                        <li class="tn-list-item tn-helper-clearfix">
+                            <div class="tn-list-item-area-left">
+                                <div class="tn-avatar">
+                                    <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" target="_blank" title="@item.GroupName">
+                                        <img src="@SiteUrls.Instance().LogoUrl(item.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" width="50px" alt="@item.GroupName"/></a></div>
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-list-item-heading">
+                                    <h5 class="tn-helper-reset">
+                                        <a href="@SiteUrls.Instance().GroupHome(item.GroupKey)" target="_blank" title="@item.GroupName">@StringUtility.Trim(item.GroupName,8)</a>
+                                    </h5>                                    
+                                    <span class="tn-actions">
+                                   </span>
+                                </div>
+                                <div class="tn-list-item-row">
+                                    <p>
+                                    @if (item.User != null)
+                                    {
+                                        @:群主：<a href="@SiteUrls.Instance().UserJoinedGroups(item.User.UserName)"  title="@item.User.DisplayName">@item.User.DisplayName</a></p>
+                                        }
+                                    <p>
+                                        成员：@item.MemberCount</p>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>}
+      
+        <div class="tn-more tn-border-gray tn-border-dashed tn-border-top">
+            <a href="@SiteUrls.Instance().FindGroup("", null, null)">更多</a></div>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+﻿@model PagingDataSet<GroupMember>
+@{
+    Layout = "list-2cols";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 13101280;
+
+    var groupOwner = ViewData.Get<User>("groupOwner", null);
+
+}
+@section GroupInfo{
+}
+@section Aside{
+    @Html.AjaxAction("_GroupProfile", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_LastGroupVisitors", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_ListMembers", "GroupSpace", new { spaceKey = Url.SpaceKey(), topNumber = 10 })
+}
+@section ContentHeader{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            @Html.Action("_GroupHeader", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), showManageButton = false })
+        </div>
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-mypost">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().Members(Url.SpaceKey())">
+                    全部</a> </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().MyFollowedUsers(Url.SpaceKey())">
+                    我关注的人</a></li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+                    @if (groupOwner != null)
+                    {
+                        <li class="tn-avatar-item">
+                            @Html.ShowUserAvatar(groupOwner, SiteUrls.Instance().SpaceHome(groupOwner.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                            <a href="@SiteUrls.Instance().SpaceHome(groupOwner.UserId)" title="@Html.ShowUserDisplayName(groupOwner.UserId)" class="tn-user-name" target="_blank">@Html.ShowUserDisplayName(groupOwner.UserId)</a>
+                        </li>                                            
+                    }
+                    @if (Model != null && Model.Count() > 0)
+                    { <ul class="tn-avatar-list">
+                    @foreach (var member in Model)
+                    {
+                        if (member.User == null)
+                        { continue; }
+                        <li class="tn-avatar-item">
+                            @Html.ShowUserAvatar(member.User, SiteUrls.Instance().SpaceHome(member.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                            <a href="@SiteUrls.Instance().SpaceHome(member.UserId)" title="@Html.ShowUserDisplayName(member.UserId)" class="tn-user-name" target="_blank">@Html.ShowUserDisplayName(member.UserId)</a>
+                        </li>                                            
+                    }
+                </ul>
+                        <div class="tn-pagination">
+                            @Html.PagingButton(Model)
+                        </div>
+                    }
+                    else
+                    { 
+                        <div class="tn-no-data">
+                            没有你关注的人</div>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

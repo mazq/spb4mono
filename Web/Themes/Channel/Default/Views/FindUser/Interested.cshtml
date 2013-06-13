@@ -1,0 +1,144 @@
+﻿@model  IEnumerable<IUser>
+@{
+    Layout = "app-manage-2cols";
+    string userName = ViewData.Get<string>("userName", string.Empty);
+}
+@section ContentHeader{
+    @Html.Action("_Header", "FindUser", new { menu = "Interested" })
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <ul class="tn-side-menu">
+                <li class="tn-selected tn-border-gray tn-bg-gray tn-corner-all"><a class="tn-menu-text" href="@SiteUrls.Instance()._InterestedWithFollows()">
+                    有共同关注的人</a></li>
+                <li><a class="tn-menu-text" href="@SiteUrls.Instance()._InterestedWithCompanys()">供职于同一公司</a></li>
+                <li><a class="tn-menu-text" href="@SiteUrls.Instance()._InterestedWithSchools()">毕业于同一学校</a></li>
+                <li><a class="tn-menu-text" href="@SiteUrls.Instance()._InterestedWithTags()">使用了相同标签</a></li>
+            </ul>
+        </div>
+    </div>
+}
+@{    
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-find-user">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-find-user-wrap" style="display: none;">
+            <div class="tnc-user-list">
+                <ul id="user-list" class="tn-list">
+                </ul>
+            </div>
+            <div class="tn-load-more tn-bg-gray tn-border-gray" style="display: none;">
+                <a id="load-more" href="#" class="tn-action tn-action-text-icon-right"><span class="tn-icon tn-smallicon-collapse-open">
+                </span><span class="tn-action-text">更多</span> </a>
+            </div>
+            <div class="tn-loading tn-border-gray tn-corner-all" style="display: none;">
+            </div>
+            <div class="tn-load-end tn-border-gray tn-corner-all" style="display: none;">
+                加载失败，请稍候再试...</div>
+        </div>
+        <div id="recommend-interested" class="tnc-recommend-interested" style="display: none;">
+            <div id="noresults-notice" class="tn-no-data">
+                很遗憾，还没有和您有共同关注的人</div>
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    这些人您也可能感兴趣：</h4>
+            </div>
+            <ul class="tn-list tn-helper-clearfix">
+                @foreach (var user in Model)
+                {
+
+                    <li class="tn-list-item">
+                        <div class="tn-inner tn-border-gray">
+                            <div class="tn-list-item-area-left">
+                                @Html.ShowUserAvatar(user, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-list-item-heading">
+                                    <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(user.UserName)" target="_blank">@user.DisplayName</a>
+                                    @Html.IdentificationType(user.UserId)
+                                </div>
+                                <div class="tn-list-item-row tn-actions">
+                                    @Html.FollowUser(user.UserId, "加关注")
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var url = '@SiteUrls.Instance()._InterestedWithFollows()';
+        var pageIndex = 1;
+
+        //加载页面列表
+        function loadUserList() {
+            $('.tn-load-more').hide();
+            $('.tn-load-end').hide();
+            $('.tn-loading').show();
+
+            $.get(url, { pageIndex: pageIndex }, function (data, status, xhr) {
+                $('.tn-loading').hide();
+                if (status === "success") {
+                    $('#user-list').append(data);
+                    var pageCount = $('#pageCount:last').val();
+                    if (pageCount == 0) {
+                        $('.tnc-find-user-wrap').hide();
+                        $('#recommend-interested').show();
+                    } else if (pageCount <= pageIndex) {
+                        $('#recommend-interested').hide();
+                        $('.tnc-find-user-wrap').show();
+                    } else {
+                        $('.tn-load-more').show();
+                        $('#recommend-interested').hide();
+                        $('.tnc-find-user-wrap').show();
+                        pageIndex++;
+                    }
+                } else {
+                    $('.tn-load-end').show();
+                }
+            });
+        }
+
+        //点击更多
+        $('#load-more').click(function (e) {
+            e.preventDefault();
+            loadUserList();
+        });
+
+        //切换菜单
+        $('.tn-menu-text').click(function (e) {
+            e.preventDefault();
+
+            url = $(this).attr('href');
+            pageIndex = 1;
+            $('.tn-load-more').hide();
+            $('#recommend-interested').hide();
+            $('.tnc-find-user-wrap').hide();
+            $('#user-list').empty();
+            $('.tn-menu-text').closest('li').removeClass();
+            $(this).closest('li').addClass('tn-selected tn-border-gray tn-bg-gray tn-corner-all');
+            if ($(this).text() === "有共同关注的人") {
+                $('#noresults-notice').text("很遗憾，还没有和您有共同关注的人。");
+            } else {
+                $('#noresults-notice').text("很遗憾，还没有和您" + $(this).text() + "的人。");
+                if ($(this).text() === "供职于同一公司") {
+                    $('#noresults-notice').append("<a href=\"" + "@SiteUrls.Instance().EditUserWork(userName)" + "\">修改工作经历</a>");
+                } else if ($(this).text() === "毕业于同一学校") {
+                    $('#noresults-notice').append("<a href=\"" + "@SiteUrls.Instance().EditUserEducation(userName)" + "\">修改教育经历</a>");
+                } else if ($(this).text() === "使用了相同标签") {
+                    $('#noresults-notice').append("<a href=\"" + "@SiteUrls.Instance().EditUserTags(userName)" + "\">修改个人标签</a>");
+
+                }
+            }
+            loadUserList();
+
+        });
+
+        loadUserList();
+    });
+</script>

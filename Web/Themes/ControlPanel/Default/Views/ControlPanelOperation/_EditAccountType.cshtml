@@ -1,0 +1,123 @@
+﻿@model AccountTypeEditModel
+@{
+    string accountTypeName = ViewData.Get<string>("AccountTypeName", string.Empty);
+}
+<div id="editAccountTypeDialog" class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_EditAccountType", "ControlPanelOperation", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+    {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form tn-label-right spb-accountbinding-edit">
+                @Html.HiddenFor(n => n.AccountTypeKey)
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.AppKey)
+                    @Html.TextBoxFor(n => n.AppKey, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.AppKey)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.AppSecret)
+                    @Html.TextBoxFor(n => n.AppSecret, InputWidthTypes.Medium)
+                    @Html.ValidationMessageFor(n => n.AppSecret)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.IsSync)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsSync", true, Model.IsSync, new { @id = "IsSync-true", @class = "tn-radiobutton" })
+                            <label for="IsSync-true">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsSync", false, !Model.IsSync, new { @id = "IsSync-false", @class = "tn-radiobutton" })
+                            <label for="IsSync-false">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.IsShareMicroBlog)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsShareMicroBlog", true, Model.IsShareMicroBlog, new { @id = "IsShareMicroBlog-true", @class = "tn-radiobutton" })
+                            <label for="IsShareMicroBlog-true">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsShareMicroBlog", false, !Model.IsShareMicroBlog, new { @id = "IsShareMicroBlog-false", @class = "tn-radiobutton" })
+                            <label for="IsShareMicroBlog-false">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        &nbsp;</label>
+                    <div class="tn-explain">
+                        <span class="tn-text-note">用户绑定成功后在指定微博发布一条分享微博</span></div>
+                </div>
+                <div class="tn-form-row" id="IsFollowMicroBlog">
+                    @Html.FormLabelFor(n => n.IsFollowMicroBlog)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsFollowMicroBlog", true, Model.IsFollowMicroBlog, new { @id = "IsFollowMicroBlog-true", @class = "tn-radiobutton" })
+                            <label for="IsFollowMicroBlog-true">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsFollowMicroBlog", false, !Model.IsFollowMicroBlog, new { @id = "IsFollowMicroBlog-false", @class = "tn-radiobutton" })
+                            <label for="IsFollowMicroBlog-false">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row" id="OfficialMicroBlogAccount-Container" style="@(Model.IsFollowMicroBlog ? "" : "display:none")">
+                    <label class="tn-form-label">
+                        &nbsp;</label>
+                    @Html.TextBoxFor(n => n.OfficialMicroBlogAccount, InputWidthTypes.Medium, new RouteValueDictionary { { "class", Model.IsFollowMicroBlog ? "" : "ignore" }, { "watermark", Model.AccountTypeKey == AccountTypeKeys.Instance().SinaWeibo() ? "昵称" : "帐号" } })
+                    @Html.ValidationMessageFor(n => n.OfficialMicroBlogAccount)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.IsEnabled)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsEnabled", true, Model.IsEnabled, new { @id = "IsEnabled-true", @class = "tn-radiobutton" })
+                            <label for="IsEnabled-true">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsEnabled", false, !Model.IsEnabled, new { @id = "IsEnabled-false", @class = "tn-radiobutton" })
+                            <label for="IsEnabled-false">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+    <script type="text/dialog">    
+      this.title("编辑@(accountTypeName)");    
+    </script>
+    <script type="text/javascript" language="javascript">
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+        }
+        function OnErrorCallBack(data) {
+            $("#editAccountTypeDialog").replaceWith(data);
+        }
+        $(document).ready(function () {
+            $("#IsFollowMicroBlog-true").click(function () {
+                $("#OfficialMicroBlogAccount-Container").show();
+                $("#OfficialMicroBlogAccount").removeClass("ignore");
+            });
+            $("#IsFollowMicroBlog-false").click(function () {
+                $("#OfficialMicroBlogAccount-Container").hide();
+                $("#OfficialMicroBlogAccount").addClass("ignore");
+            });
+        });
+    </script>
+</div>

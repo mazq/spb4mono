@@ -1,0 +1,209 @@
+﻿@model IEnumerable<LinkEntity>
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+    
+    IEnumerable<Category> categories = ViewData.Get<IEnumerable<Category>>("categories", null);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>友情链接管理</span><a class="tn-action" href="@SiteUrls.Instance().ManageSiteCategories(TenantTypeIds.Instance().Link(),1)" title="" class="tn-action-list">类别管理</a></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加友情链接", SiteUrls.Instance()._EditLinkForAdmin(null), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "add-link", plugin = "dialog" })
+                            @Html.LinkButton("删除", SiteUrls.Instance()._BatchDeleteLink(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-links" })
+                            <span class="tn-helper-right"><select id="categoryId" name="categoryId" class="tn-dropdownlist">
+                                <option value="" selected="selected">链接类别</option>
+                                @foreach (Category category in categories)
+                                {
+                                    <option value="@category.CategoryId" title="@category.CategoryName">@HtmlUtility.TrimHtml(category.CategoryName, 6)</option>    
+                                }
+                            </select></span>
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0)
+                    {
+                        <div class="tn-no-data">
+                            没有搜索到数据</div>
+                    }
+                    else
+                    {
+                        <form method="post" action="#" id="Form-Link">
+                        <table class="tn-table-grid spb-links">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        <input type="checkbox" id="select-all" class="tn-checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        链接名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        链接地址
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        链接说明
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        链接类别
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        是否启用
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note" colspan="3">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var link in Model)
+                                {
+                                    <tr class="tn-table-grid-row" data-id="@link.LinkId">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            <input type="checkbox" name="linkIds" value="@link.LinkId" class="tn-checkbox" />
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto tn-nowrap">
+                                            <span title="@link.LinkName">@HtmlUtility.TrimHtml(link.LinkName, 12)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-pic">
+                                            @if (link.LinkType == LinkType.ImageLink)
+                                            {
+                                                string imageUrl = link.ImageUrl;
+                                                if (!link.ImageUrl.Trim().ToLower().StartsWith("http"))
+                                                {
+                                                    imageUrl = SiteUrls.Instance().LogoUrl(link.ImageUrl, TenantTypeIds.Instance().Link(), ImageSizeTypeKeys.Instance().Original());
+                                                }
+                                                <a href="@link.LinkUrl" target="_blank" class="spb-links-logo">
+                                                    <img src="@imageUrl" alt="@HtmlUtility.TrimHtml(link.LinkName, 12)" />
+                                                </a>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <a href="@link.LinkUrl" target="_blank" title="@link.LinkUrl">@HtmlUtility.TrimHtml(link.LinkUrl, 20)</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto tn-nowrap">
+                                            <span title="@link.Description">@HtmlUtility.TrimHtml(link.Description, 12)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto tn-nowrap">
+                                        @if (link.Categories.Count() > 0)
+                                        {
+                                            <span title="@link.Categories.ElementAt(0).CategoryName">@HtmlUtility.TrimHtml(link.Categories.ElementAt(0).CategoryName, 12)</span>
+                                        }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-avatar">
+                                            @if (link.IsEnabled)
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-pass" title="启用"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-stop" title="不启用"></span>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            <a href="@SiteUrls.Instance()._ChangeLinkDisplayOrder()" title="上移" class="tn-item-link tn-icon tn-smallicon-upload" name="@link.LinkId">上移</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            <a href="@SiteUrls.Instance()._ChangeLinkDisplayOrder()" title="下移" class="tn-item-link tn-icon tn-smallicon-download" name="@link.LinkId">下移</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2">
+                                            <a href="@SiteUrls.Instance()._EditLinkForAdmin(link.LinkId)" title="编辑" class="tn-item-link" plugin="dialog">编辑</a> <a href="@SiteUrls.Instance()._DeleteLinkForAdmin(link.LinkId)" title="删除" class="tn-item-link tn-item-delete">删除</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //解决火狐刷新仍被选中的问题
+        if ($(".tn-checkbox").length) {
+            $(".tn-checkbox").each(function () {
+                this.checked = false;
+            });
+        }
+        if ($("#select-all").length) {
+            $("#select-all")[0].checked = false;
+        }
+
+        //全选
+        $("#select-all").click(function () {
+            if (this.checked) {
+                $(".tn-checkbox").each(function () {
+                    this.checked = true;
+                });
+            }
+            else {
+                $(".tn-checkbox").each(function () {
+                    this.checked = false;
+                });
+            }
+        });
+
+        //删除单个
+        $(".tn-item-delete").each(function () {
+            $(this).click(function (e) {
+                e.preventDefault();
+
+                var url = this.href;
+                art.dialog.confirm("您确认要删除吗？", function () {
+                    $.post(url, function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            window.location.reload(true);
+                        });
+                    });
+                });
+            });
+        });
+
+        //批量删除
+        $("#delete-links").click(function (e) {
+            e.preventDefault();
+
+            if (!$("input[name='linkIds']:checked").length) {
+                alert("请至少选择一条友情链接进行操作！");
+            }
+            else {
+                var url = this.href;
+                art.dialog.confirm("您确认要删除吗？", function () {
+                    $.post(url, $("#Form-Link").serialize(), function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            window.location.reload(true);
+                        });
+                    });
+                });
+            }
+        });
+
+        //按类别搜索
+        $("#categoryId").change(function () {
+            if ($(this).children(":selected").text() != "链接类别") {
+                window.location.href = "@SiteUrls.Instance().ManageLinksForAdmin()" + "?categoryId=" + $("#categoryId").val();
+            }
+            else {
+                window.location.href = "@SiteUrls.Instance().ManageLinksForAdmin()";
+            }
+        });
+
+        //类别下拉列表的title处理
+        var urlSearch = window.location.search;
+        if (urlSearch) {
+            var urlSearchArr = urlSearch.split("=");
+            var categoryId = $.trim(urlSearchArr[1]);
+            if (categoryId) {
+                $("select option[value=" + categoryId + "]")[0].selected = true;
+            }
+        }
+    }); 
+</script>

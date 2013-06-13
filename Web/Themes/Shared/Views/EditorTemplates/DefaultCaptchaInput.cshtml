@@ -1,0 +1,25 @@
+﻿@{
+    string inputName = ViewData.Get<string>("InputName", string.Empty);
+    string captchaImageUrl = SiteUrls.Instance().CaptchaImage();
+    bool showCaptchaImage = ViewData.Get("ShowCaptchaImage", false);
+}
+<input autocomplete="off" class="tn-textbox tn-border-gray" id="@inputName" name="@inputName" type="text" value="" />
+@if (showCaptchaImage)
+{ 
+    <span class="tnc-reg-input">
+        <img id="CaptchaInputTextImg" src="@(captchaImageUrl + "?date=" + new Random().Next())" title="点击换一换" />
+        <span class="tn-action"><a href="javascript:;" id="@(inputName)_refresh">看不清？</a> </span></span>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#CaptchaInputText").focus(function () {
+            if ($('#CaptchaInputTextImg').attr('src') == '')
+                $('#CaptchaInputTextImg').attr('src', '@captchaImageUrl' + "?date=" + new Date()).parent().show();
+            $('#CaptchaInputText').val($.trim($('#CaptchaInputText').val()));
+        });
+        $("#CaptchaInputTextImg,#@(inputName)_refresh").click(function () {
+            $('#CaptchaInputTextImg').attr('src', '@captchaImageUrl' + "?isremove=true&date=" + new Date());
+            return false;
+        });
+    });
+</script>

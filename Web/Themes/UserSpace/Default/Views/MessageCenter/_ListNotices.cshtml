@@ -1,0 +1,73 @@
+﻿@model PagingDataSet<Notice>
+@{
+    long? userId = ViewData["userId"] as long?;
+    NoticeStatus? status = ViewData["status"] as NoticeStatus?;
+    int? pageIndex = ViewData["pageIndex"] as int?;
+}
+@if (Model != null && Model.TotalRecords > 0)
+{
+    <ul class="tn-list">
+        @foreach (var notice in Model)
+        {
+            <li id="notice_@(notice.Id)" class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                @Html.Hidden("noticeId", notice.Id)
+                <div class="tn-list-item-area-main">
+                    <p class="tnc-info-content">
+                        通知内容： @Html.Raw(notice.ResolvedBody)
+                    </p>
+                    <div class="tn-list-item-row tn-helper-align-right tn-helper-clearfix">
+                        <em class="tn-date tn-text-note tn-helper-left">@(notice.DateCreated.ToFriendlyDate())</em>
+                        <span name = "operate_@(notice.Id)" class="tn-action" style=" display:none">
+                            @if (notice.Status == NoticeStatus.Unhandled)
+                            {
+                                @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除通知吗").SetText("删除").SetTooltip("删除通知").SetDeleteTarget("#notice_" + notice.Id).SetUrl(SiteUrls.Instance().DeleteNotice(Url.SpaceKey(), notice.Id, status, pageIndex)).SetOnSuccessCallBack("DeleteNoticeSuccess"))
+                            }
+                            else
+                            {
+                                @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除通知吗").SetText("删除").SetTooltip("删除通知").SetDeleteTarget("#notice_" + notice.Id).SetUrl(SiteUrls.Instance().DeleteNotice(Url.SpaceKey(), notice.Id, status, pageIndex)))
+                            }
+                        </span><span class="tn-action">
+                            <script type="text/javascript">
+                                $(document).ready(function () {
+                                    $("a[id='SetIsHandled_@(notice.Id)']").click(function () {
+                                        $this = $(this);
+                                        $.get('@Html.Raw(SiteUrls.Instance().SetIsHandled(Url.SpaceKey(), notice.Id, status, pageIndex))', function (data) {
+
+                                            if ('@status' == 'Unhandled') {
+                                                $("li[id='notice_@(notice.Id)']").remove();
+                                                DeleteNoticeSuccess();
+                                            }
+                                            else {
+                                                $this.remove();
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+                            @if (notice.Status == NoticeStatus.Unhandled)
+                            {
+                                <a href="javascript:;" id="SetIsHandled_@(notice.Id)">我知道了</a>
+                            }
+                        </span>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+<script type="text/javascript">
+
+    function DeleteNoticeSuccess() {
+        var count = $("#noticeCount").html();
+        $("#noticeCount").html(count - 1);
+    }
+
+    $("li[id^='notice_']", $("ul.tn-list")).livequery(function () {
+        $(this).hover(function () {
+            $("span[name='operate_" + $(this).attr("id").replace(/[^0-9]/ig, "") + "']").show();
+        }, function () {
+            $("span[name='operate_" + $(this).attr("id").replace(/[^0-9]/ig, "") + "']").hide();
+        });
+    });
+
+</script>

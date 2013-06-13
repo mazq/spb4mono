@@ -1,0 +1,145 @@
+﻿@model  PagingDataSet<User>
+@{
+    Layout = "_Follow";
+    GenderType gender = ViewData.Get<GenderType>("Gender", GenderType.NotSet);
+    Follow_SortBy sortBy = ViewData.Get<Follow_SortBy>("sortBy", Follow_SortBy.DateCreated_Desc);
+    FollowService followService = new FollowService();
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-profile">
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            @Html.Action("_UserInfo", "UserSpace")
+            <div class="tnc-user-menu">
+                @Html.Action("_SelectMenu", "UserSpace")
+            </div>
+            <div class="tn-info-part">
+                @Html.Action("_UserStatus", "UserSpace")
+            </div>
+        </div>
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-tags">
+        @Html.Action("_TopUserTags", "UserSpace")
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-other-users">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().ListFollowedUsers(Url.SpaceKey())">关注</a></li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().ListFollowers(Url.SpaceKey())">粉丝</a></li>
+                <li class="tn-option">
+                    @if (Model != null && Model.TotalRecords > 0)
+                    {
+                        if (gender == GenderType.FeMale)
+                        {@Html.Raw("有<strong>" + Model.TotalRecords + "</strong>人关注了她")}
+                        else
+                        {@Html.Raw("有 <strong>" + Model.TotalRecords + "</strong>人关注了他")}
+                    }
+                </li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="tn-list-header tn-border-gray tn-border-bottom">
+                    <div class="tn-list-header-row">
+                        <div class="tn-filter">
+                            排序方式： <a href="@SiteUrls.Instance().ListFollowers(Url.SpaceKey())"  
+                                @if (sortBy == Follow_SortBy.DateCreated_Desc)
+                                { @Html.Raw("class=\"tn-action tn-selected\"");
+                                }
+                                else
+                                {@Html.Raw("class=\"tn-action\"");
+                                }><span class="tn-action-text">关注时间</span></a> <span class="tn-spacer tn-text-note">|</span> <a href="@SiteUrls.Instance().ListFollowers(Url.SpaceKey(), 2)" 
+                                 @if (sortBy == Follow_SortBy.FollowerCount_Desc)
+                                 { @Html.Raw("class=\"tn-action tn-selected\"");
+                                 }
+                                 else
+                                 {@Html.Raw("class=\"tn-action\"");
+                                 }><span class="tn-action-text">粉丝数</span></a> <span class="tn-spacer tn-text-note">|</span> <a href="@SiteUrls.Instance().ListFollowers(Url.SpaceKey(), 1)" 
+                                   @if (sortBy == Follow_SortBy.LastContent_Desc)
+                                   { @Html.Raw("class=\"tn-action tn-selected\"");
+                                   }
+                                   else
+                                   {@Html.Raw("class=\"tn-action\"");
+                                   }><span class="tn-action-text">最近更新的时间</span> </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tnc-user-list">
+                    @if (Model != null && Model.TotalRecords > 0)
+                    {
+                        <ul class="tn-list">
+                            @foreach (var user in Model)
+                            {
+                              
+                                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                                    <div class="tn-list-item-area-left">
+                                        @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                                    </div>
+                                    <div class="tn-list-item-area-main">
+                                        <div class="tn-list-item-row tn-helper-clearfix">
+                                            @if (UserContext.CurrentUser == null || UserContext.CurrentUser.UserId != user.UserId)
+                                            {
+                                                <div class="tnc-relationship">
+                                                    @Html.FollowUser(user.UserId,"加关注",followButtonType:FollowButtonTypes.Link)
+                                                </div>
+                                            }
+                                            <div class="tnc-user-notename">
+                                                <a href="@SiteUrls.Instance().SpaceHome(user.UserName)"   class="tn-user-name" title="@user.DisplayName" target="_blank">@StringUtility.Trim(user.DisplayName, 20)</a>
+                                            </div>
+                                        </div>
+                                        <div class="tnc-userinfo-content tn-helper-clearfix">
+                                            @if (UserContext.CurrentUser == null || UserContext.CurrentUser.UserId != user.UserId)
+                                            {
+                                                <ul class="tn-actions-list tn-helper-right">
+                                                <li>
+                                                    @if(UserContext.CurrentUser!=null){
+                                                        @Html.Link("发私信", SiteUrls.Instance()._CreateMessage(UserContext.CurrentUser.UserName, toUserId: user.UserId), "发私信", htmlAttributes: new { id = "messageUserIdLink", plugin = "dialog" })
+                                                        }else{
+                                                        <a title="发私信" href="@SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal)"  plugin="dialog">发私信</a>
+                                                        }
+                                                    </li>                                                    
+                                                    <li class="tn-report"><a href="@SiteUrls.Instance()._ImpeachReport(user.UserId, SiteUrls.Instance().SpaceHome(user.UserId), user.DisplayName)" plugin="dialog">举报</a></li>
+                                                </ul>
+                                            }
+                                            <div class="tnc-userinfo-item">
+                                                @if (user.Profile != null)
+                                                { 
+                                                    <div class="tn-list-item-row">
+                                                        <div class="tn-location">
+                                                            @if (user.Profile.Gender == GenderType.FeMale)
+                                                            {@Html.Icon(IconTypes.SmallFemale, "女")}
+                                                            @if (user.Profile.Gender == GenderType.Male)
+                                                            {@Html.Icon(IconTypes.SmallMale, "男")}
+                                                            @Formatter.FormatArea(user.Profile.NowAreaCode, true)
+                                                        </div>
+                                                    </div>
+                                                }
+                                                <div class="tn-list-item-row tnc-usernums">
+                                                    <span>关注 <a href="@SiteUrls.Instance().ListFollowedUsers(user.UserName)"><strong>@user.FollowedCount</strong></a></span> <span class="tn-spacer tn-text-note">|</span> <span>粉丝 <a href="@SiteUrls.Instance().ListFollowers(user.UserName)"  ><strong>@user.FollowerCount</strong></a></span> <span class="tn-spacer tn-text-note">|</span> <span>内容 <strong>@user.ContentCount</strong></span>
+                                                </div>
+                                                @if (user.Profile != null && !string.IsNullOrEmpty(user.Profile.Introduction.Trim()))
+                                                {
+                                                    <div class="tn-list-item-row">
+                                                        简介：
+                                                        @HtmlUtility.TrimHtml(user.Profile.Introduction,100)
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                        <div class="tn-pagination">
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                        </div>
+                    }
+                    else
+                    { 
+                        <div class="tn-no-data">
+                            该用户目前没有粉丝</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

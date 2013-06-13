@@ -1,0 +1,317 @@
+﻿@model  PagingDataSet<BlogThread>
+@{
+    Layout = "_Search";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    ViewData["searcherCode"] = BlogSearcher.CODE;
+
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+
+    var userId = Request.QueryString.Get<long>("userId", 0);
+    var username = "";
+    if (userId != 0)
+    {
+        username = new UserService().GetUser(userId).DisplayName;
+    }
+    var selectNum = Request.QueryString.Get<long>("selectNum", 0);
+    var currentUser = UserContext.CurrentUser;
+    SelectList list = ViewData.Get<SelectList>("siteCategoryList", null);
+}
+@section SearchForm{
+    @using (Html.BeginForm("Search", "ChannelBlog", FormMethod.Get, new { id = "searchForm" }))
+    {
+        @Html.TextBox("keyword", keyword, new { maxlength = "32", @class = "tn-textbox" })
+        @Html.Hidden("allId", Request.QueryString.Get<int>("allId", -1))
+        @Html.Hidden("loginId", Request.QueryString.Get<int>("loginId", 0))
+        @Html.Hidden("userId", Request.QueryString.Get<int>("userId", 0))
+        @Html.Hidden("selectNum", Request.QueryString.Get<int>("selectNum", 0))
+        @Html.Hidden("range", Request.QueryString.Get<int>("range", 0))
+        @Html.Hidden("blogRange", Request.QueryString.Get<int>("blogRange",0))
+        @Html.Hidden("siteCategoryId")
+        <a id="button-search" href="#" class="tn-button tn-button-text-only tn-button-large tn-button-primary"><span class="tn-button-text">搜索</span></a>
+    }
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                热门标签</h3>
+        </div>
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().BlogThread(), Area = "Common" })
+    </div>
+    @Html.AjaxAction("_SearchHistories", "Channel", new { searcherCode = BlogSearcher.CODE, Area = "Common" })
+}
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-results">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-microblog-search">
+            <div class="tn-list-header tn-bg-gray tn-border-gray tn-border-bottom">
+                <div class="tn-list-header-row tn-helper-clearfix tn-bg-gray">
+                <span class="tn-count">共有 <strong>@Model.TotalRecords</strong>个搜索结果（用时 @Model.QueryDuration 秒）</span>
+                    <span id="user-id" class="tn-filter">
+                    @if (currentUser != null || userId != 0)
+                    {
+                        <em>范围：</em>
+                        <a data-num="0" id="all-id" data-all-id="0" href="#">全部</a>
+                    }
+                    @if (currentUser != null)
+                    {  
+                    <a data-num="1" id="login-id" title="" data-login-id="@currentUser.UserId" href="#">我的日志</a>
+                    }
+                    @if (userId != 0)
+                    {
+                    <a data-num="2" id="vice-user-id" title="" data-user-id="@userId" href="#">@(username)的日志</a>
+                    }
+                    </span>
+                </div>
+                <div class="tn-list-header-row">
+                    <span id="search-range" class="tn-keywords">
+                        <em>筛选：</em> 
+                        <a data-search-range="0" href="#">全部</a> 
+                        <a data-search-range="1" href="#">标题</a> 
+                        <a data-search-range="2" href="#">内容</a>  
+                        <a data-search-range="3" href="#">作者</a> 
+                        <a data-search-range="4" href="#">标签</a> 
+                        <a data-search-range="5" href="#">用户分类</a> 
+                    </span>
+                    <text>&nbsp;&nbsp;&nbsp;站点分类</text>
+                    @Html.DropDownList("siteCategory", list, "全部")
+                </div>
+            </div>
+            @if (Model.TotalRecords > 0)
+            {
+                <div class=" spb-blog-list-wrap">
+                <ul class="tn-list">
+                    @foreach (BlogThread blogThread in Model)
+                    {
+                        @Html.Partial("_BlogItemSearch", blogThread)
+                    }
+                </ul>
+                </div>
+                <div class="tn-pagination">
+                    @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                </div>
+            }
+            else if (string.IsNullOrEmpty(keyword))
+            {
+                <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                    <a class="tn-icon tn-smallicon-cross tn-helper-right" href="#"></a><span class="tn-helper-left">
+                        <span class="tn-icon tn-icon-exclamation"></span></span>
+                    <div class="tn-helper-flowfix">
+                        <strong>提示：</strong>请输入搜索条件</div>
+                </div>
+            }
+            else
+            { 
+                <div class="tnc-search-noresults">
+                    <p class="tn-title">
+                        很抱歉，没有找到符合您搜索条件的结果！</p>
+                    <dl class="tn-support">
+                        <dt><strong>建议：</strong></dt>
+                        <dd>
+                            请确保搜索文字拼写正确</dd>
+                        <dd>
+                            请尝试使用其他关键词或使用近义词</dd>
+                        <dd>
+                            请尝试使用含义更为宽泛的关键词</dd>
+                    </dl>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script id="template-auto-complete" type="text/x-jquery-tmpl">
+    <li class='tn-list-item tn-auto-complete-item tn-helper-clearfix tnc-auto-complete-public'>
+        <a class="tn-user-info">
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row">{{html tagNameWithHighlight}}</div>
+            </div>
+        </a>
+    </li>
+</script>
+<script type="text/javascript">
+     $(function(){ 
+        var BlogSearcher = function () {
+            this.init();
+        };
+        BlogSearcher.fn = BlogSearcher.prototype = {
+            init: function () {
+                var self = this;
+                var cache = {};
+
+                this.resetForm = false;  //是否清除搜索过滤条件
+
+                this.searchForm = $('#searchForm');
+                this.keyword = $('#keyword', this.searchForm);
+                this.allId = $('#allId', this.searchForm);
+                this.loginId = $('#loginId', this.searchForm);
+                this.userId = $('#userId', this.searchForm);
+                this.selectNum=$('#selectNum', this.searchForm);
+                this.range = $('#range', this.searchForm);
+                this.blogRange=$('#blogRange',this.searchForm);
+                this.siteCategoryId = $('#siteCategoryId', this.searchForm);
+                this.ifMustKeyword=true;
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == ""&&self.ifMustKeyword==true) {
+                        e.preventDefault();
+                         alert("请输入关键字！");
+                        this.keyword.focus();
+                    }
+
+                    if(self.resetForm){
+                        self.clearForm();
+                    }
+                });
+               
+                //注册自动完成响应事件
+                this.keyword.bind("input.autocomplete", function(){
+                    $(this).trigger('keydown.autocomplete');
+                });
+                this.keyword.autocomplete({
+                    minLength: 1,
+                    source: function (request, response) {
+                        //缓存搜索结果
+                        var term = request.term.toLowerCase(),
+                            element = this.element,
+                            cache  = this.element.data('autocompleteCache') || {},
+                            foundInCache = false;
+
+                        $.each(cache, function(key, data){
+                            if (term === key && data.length > 0) {
+                                response(data);
+                                foundInCache = true;
+                                return;
+                            }
+                        });
+
+                        if (foundInCache) return;
+                        var keyword = encodeURIComponent(self.keyword.val());
+                        $.getJSON('@SiteUrls.Instance().BlogSearchAutoComplete()?keyword='+keyword+'&topNumber=10', function (data) {
+                            cache[term] = data;
+                            element.data('autocompleteCache', cache);
+
+                            response(data);
+                        });
+                    },
+                    search: function (event, ui) {                        
+                    },
+                    open: function (event, ui) {                        
+                    },
+                    focus: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        self.searchForm.submit();
+                    }
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $('#template-auto-complete').tmpl(item).data("item.autocomplete", item).appendTo(ul);
+                };
+
+                //注册搜索按钮点击事件
+                $('#button-search').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+
+                //注册清除搜索历史事件
+                $('#clear-histories').click(function (e) {
+                    e.preventDefault();
+                    self.getSearchHistories(true);
+                });
+
+                //搜标签、类别
+                $(".tnui-blog-tags").click(function(e){
+                    e.preventDefault();
+                    self.keyword.val($(this).text());
+                    self.range.val("4");
+                    self.searchForm.submit();
+                })
+                 $(".tnui-blog-categoryname").click(function(e){
+                    e.preventDefault();
+                    self.keyword.val($(this).text());
+                    self.range.val("5");
+                    self.searchForm.submit();
+                })
+
+                //注册点击搜索范围事件
+                $("#all-id","#user-id").click(function (e) {
+                    e.preventDefault();
+                    self.allId.val($("#all-id").data('allId'));
+                    self.selectNum.val($(this).data('num'));
+                    self.resetForm = false;
+                    self.ifMustKeyword=true;
+                    if (self.range.val()==6||self.range.val()==7||self.range.val()==8) {
+                        self.range.val(0);
+                    }
+                    self.blogRange.val(0);
+                    self.searchForm.submit();
+                });
+                $("#login-id","#user-id").click(function (e) {
+                    e.preventDefault();
+                    self.allId.val('-1');
+                    self.loginId.val($("#login-id").data('loginId'));
+                    self.selectNum.val($(this).data('num'));
+                    self.resetForm = false;
+                    self.ifMustKeyword=false;
+                    self.blogRange.val(1);
+                    self.searchForm.submit();
+                });
+                $("#vice-user-id","#user-id").click(function (e) {
+                    e.preventDefault();
+                    self.allId.val('-1');
+                    self.loginId.val('0');
+                    self.userId.val($("#vice-user-id").data('userId'));
+                    self.selectNum.val($(this).data('num'));
+                    self.resetForm = false;
+                    self.ifMustKeyword=false;
+                    self.blogRange.val(2);
+                    self.searchForm.submit();
+                });
+
+                //注册点击搜索筛选事件
+                $("#search-range a").click(function(e){
+                    e.preventDefault();
+                    //设置相应隐藏域的值
+                    self.range.val($(this).data('searchRange'));
+                    self.resetForm = false;
+                    self.ifMustKeyword=true;
+                    self.searchForm.submit();
+                })
+
+                //注册选择站点分类事件
+                $("#siteCategory").change(function(){
+                    //设置相应隐藏域的值
+                    self.siteCategoryId.val($(this).val());
+                    self.resetForm = false;
+                    self.ifMustKeyword=false;
+                    self.blogRange.val(3);
+                    self.searchForm.submit();
+                })
+
+                //初始化搜索表单中的过滤条件状态
+                self.initSearchForm(); 
+            
+            },
+
+
+            /*
+            * 初始化搜索表单中的过滤条件状态
+            */
+            initSearchForm: function () {
+                //设置搜索范围
+                $('#user-id a[data-num="'+@(selectNum)+'"]').addClass('tn-selected');
+                //设置筛选
+                var range=@(Request.QueryString.Get<int>("range", 0));
+                $('#search-range a[data-search-range="'+range+'"]').addClass('tn-selected');
+                }
+        };
+
+        BlogSearcher = new BlogSearcher();
+     });
+</script>

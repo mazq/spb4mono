@@ -1,0 +1,294 @@
+﻿@model PagingDataSet<Identification>
+@{
+    Layout = "_ControlPanel";
+
+    IdentificationStatus? status = Request.QueryString.Get<IdentificationStatus?>("identificationStatus", null);
+    SelectList selectList = ViewData.Get<SelectList>("typeSelectList", null);
+    Dictionary<long, string> identificationTypesDic = ViewData.Get<Dictionary<long, string>>("identificationTypesDic", null);
+    long? userId = ViewData.Get<long?>("userId", null);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <a href="@SiteUrls.Instance().ManageIdentificationTypes()" class="tn-action">认证标识管理</a><span>认证申请管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageIdentifications", "ControlPanelUser", FormMethod.Get))
+                        {                     
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    申请人：</label>
+                                @Html.UserSelector("userId", userId)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    申请时间：</label>
+                                @Html.DatePicker("startTime", Request.QueryString.Get<DateTime?>("startTime"), "-10Y", "+0D")
+                                到
+                                @Html.DatePicker("endTime", Request.QueryString.Get<DateTime?>("endTime"), "-10Y", "+0D")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    状态：</label>
+                                @(Html.EnumDropDownList<IdentificationStatus?>("identificationStatus", status, "全部", new { @class = "tn-dropdownlist tn-input-medium" }))
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    认证标识：</label>
+                                @Html.DropDownList("IdentificationTypeId", selectList, "全部", new { @class = "tn-dropdownlist tn-input-medium" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("通过", SiteUrls.Instance()._DisposeIdentification(0, IdentificationStatus.success), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "pass-all-identification" })
+                            @Html.LinkButton("不通过", SiteUrls.Instance()._DisposeIdentification(0, IdentificationStatus.fail), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "unpass-all-identification" })
+                            @Html.LinkButton("删除", SiteUrls.Instance()._DeleteIdentification(0), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-all-identification" })
+                        </div>
+                    </div>
+                    @if (Model == null || Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    {
+                        <form action="#" method="post" id="Form-BatchSet">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom">
+                                        <input type="checkbox" id="select-all" class="tn-radiobutton" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        申请人
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        申请人信息
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        状态
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        申请时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        处理人
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        处理时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        认证标识
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var identification in Model)
+                                {
+                                    if (identification.User == null)
+                                    {
+                                        continue;
+                                    }
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("identificationIds", identification.IdentificationId, htmlAttributes: new { @class = "tnui-identification-id" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @Html.Link(identification.User.DisplayName, SiteUrls.Instance().SpaceHome(identification.UserId), identification.User.DisplayName + "的主页", new { target = "_blank" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @Html.Link("查看", SiteUrls.Instance()._ViewIdentification(identification.IdentificationId), "查看详细信息", htmlAttributes: new { @class = "tn-button-text", plugin = "dialog" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @switch (identification.Status)
+                                            {
+                                                case IdentificationStatus.fail:
+                                                @Html.AuditStatusIcon(AuditStatus.Fail)
+                                           break;
+                                                case IdentificationStatus.success:
+                                                @Html.AuditStatusIcon(AuditStatus.Success)
+                                           break;
+                                                case IdentificationStatus.pending:
+                                                @Html.AuditStatusIcon(AuditStatus.Pending)
+                                           break;
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @identification.DateCreated.ToLocalTime()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @if (identification.Status == IdentificationStatus.pending)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                @Html.Link(identification.DisposerUser.DisplayName, SiteUrls.Instance().SpaceHome(identification.DisposerId), identification.DisposerUser.DisplayName + "的主页", new { target = "_blank" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @if (identification.Status == IdentificationStatus.pending)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                @identification.LastModified.ToLocalTime()
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @if (identification.IdentificationType != null)
+                                            { 
+                                                <img src="@SiteUrls.Instance().LogoUrl(identification.IdentificationType.IdentificationTypeLogo, TenantTypeIds.Instance().IdentificationType(), ImageSizeTypeKeys.Instance().Small())" />
+                                                @identificationTypesDic[identification.IdentificationTypeId]
+                                            }                                            
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("通过", SiteUrls.Instance()._DisposeIdentification(identification.IdentificationId, IdentificationStatus.success), "通过", new { @class = "tnui-pass-identification" })
+                                            <span class="tn-action tn-action-text-icon-right tn-action-has-drop-menu tn-border-trl" menu="#moreOptions3@(identification.IdentificationId)">
+                                                <span class="tn-icon tn-smallicon-triangle-down"></span><a href="javascript:;" class="tn-action-text">
+                                                    更多</a> </span>
+                                            <div class="tn-more-options tn-widget-content tn-border-gray" style="display: none;" id="moreOptions3@(identification.IdentificationId)">
+                                                <ul class="tn-more-list">
+                                                    <li>
+                                                        @Html.Link("不通过", SiteUrls.Instance()._DisposeIdentification(identification.IdentificationId, IdentificationStatus.fail), "不通过", new { @class = "tn-item-link tnui-unpass-identification" })
+                                                    </li>
+                                                    <li>
+                                                        @Html.Link("删除", SiteUrls.Instance()._DeleteIdentification(identification.IdentificationId), "删除", new { @class = "tn-item-link tnui-delete-identification" })
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("PageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //处理火狐下浏览器刷新后复选框仍然选中
+        removechecked();
+        function removechecked() {
+            $(".tnui-identification-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //全选按钮
+        $("#select-all").click(function () {
+            checkAll(this, "identificationIds");
+        });
+
+
+        //批量删除
+        $("#delete-all-identification").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='identificationIds']:checked").length) {
+                alert("至少选择一个认证申请");
+                return false;
+            }
+            var url = $(this).attr("href");
+            art.dialog.confirm('确定要删除选中的申请吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                });
+            });
+        });
+
+        //批量通过
+        $("#pass-all-identification").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='identificationIds']:checked").length) {
+                alert("至少选择一个认证申请");
+                return false;
+            }
+            var url = $(this).attr("href");
+            $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+            });
+        });
+
+        //批量不通过
+        $("#unpass-all-identification").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='identificationIds']:checked").length) {
+                alert("至少选择一个认证申请");
+                return false;
+            }
+            var url = $(this).attr("href");
+            $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+            });
+        });
+
+        //单个删除
+        $(".tnui-delete-identification").click(function (e) {
+            e.preventDefault();  //阻止删除操作进行，添加删除提示
+            var url = $(this).attr("href");
+            art.dialog.confirm('确定要删除该申请吗？', function () {
+                $.post(url, function (data) {
+                    if (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                    }
+                });
+            });
+        });
+
+        //单个通过
+        $(".tnui-pass-identification").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            $.post(url, function (data) {
+                if (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                }
+            });
+        });
+
+        // 单个不通过
+        $(".tnui-unpass-identification").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            $.post(url, function (data) {
+                if (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                }
+            });
+        });
+    });
+</script>

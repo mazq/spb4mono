@@ -1,0 +1,16 @@
+﻿@{
+    IEnumerable<Attachment> attachments = ViewData.Get<IEnumerable<Attachment>>("Attachments", new List<Attachment>());
+    if (attachments != null && attachments.Count() > 0)
+    {
+        attachments = attachments.Where(n => n.MediaType != MediaType.Image);
+    }
+}
+@if (attachments != null && attachments.Count() > 0)
+{
+    <ul class="tn-list tn-annex-list tn-border-gray tn-border-top">
+        @foreach (var item in attachments)
+        {
+            @Html.Action("_BuyAttachement", "Channel", new RouteValueDictionary { { "attachementId", item.AttachmentId }, { "tenantTypeId", item.TenantTypeId } })
+        }
+    </ul>
+}

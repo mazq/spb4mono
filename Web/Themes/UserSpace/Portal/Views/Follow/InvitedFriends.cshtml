@@ -1,0 +1,77 @@
+﻿@model PagingDataSet<InvitedFriendViewModel>
+@{
+    Layout = "_Follow";
+}
+@section ContentHeader{
+    <div class="spb-po-my-profile">
+        <div class="spb-po-my-profile-wrap tn-helper-clearfix">
+            @Html.Action("_MyHomeUserInfo", "UserSpace", new { spaceKey = Url.SpaceKey() })
+            @Html.Action("_SelectMenu", "UserSpace")
+        </div>
+    </div>
+}
+@section Aside{
+    @Html.Action("_FollowUser_Menu", "Follow", new { menu = FollowUserMenu.InviteFriend })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-invitation-friend">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            我邀请的好友</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model != null && Model.Count > 0)
+        {
+
+            <ul class="tn-list">
+                @foreach (var item in Model)
+                {
+                    <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-dashed tn-bg-gray">
+                        <div class="tn-list-item-area-left">
+                            @Html.ShowUserAvatar(item.UserId, AvatarSizeType.Small, true)
+                        </div>
+                        <div class="tn-list-item-area-main">
+                            <div class="tn-list-item-row">
+                                <h5 class="tn-helper-reset">
+                                    @Html.Link(item.DisplayName, SiteUrls.Instance().SpaceHome(item.UserName), item.DisplayName)
+                                </h5>
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.AreaName) || item.GenderType != GenderType.NotSet)
+                            {
+                                <div class="tn-list-item-row">
+                                    <text>@if (item.GenderType == GenderType.Male)
+                                          {
+                                          <span class="tn-icon tn-smallicon-male"></span>
+                                          }
+                                          else if (item.GenderType == GenderType.FeMale)
+                                          {
+                                          <span class="tn-icon tn-smallicon-female"></span>
+                                          }
+                                          <span class="tn-location" title="@item.AreaName">@item.AreaName</span></text>
+                                </div>
+                            }
+                            <div class="tn-list-item-row">
+                                @*//todo：bianchx:等待内容完成，添加跳转链接*@
+                                <text>关注 @Html.Link(item.FollowedCount.ToString(), SiteUrls.Instance().ListFollowedUsers(item.UserName), item.FollowedCount.ToString()) 粉丝 @Html.Link(item.FollowerCount.ToString(), SiteUrls.Instance().ListFollowers(item.UserName), item.FollowerCount.ToString()) 内容 @(item.User == null ? 0 : item.User.ContentCount)</text>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="tn-no-data">
+                您还有没有邀请过任何人哦，现在就去 @Html.Link("邀请", SiteUrls.Instance().InviteFriend(Url.SpaceKey()), "邀请好友")
+            </div>
+        }
+        <div class="tn-pagination">
+            @Html.PagingButton(Model)
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    //表单异步提交成功之后用来显示提示窗口
+    function SuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

@@ -1,0 +1,246 @@
+﻿@model IEnumerable<Category>
+@{
+    Layout = "_ControlPanel";
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", string.Empty);
+    int level = Request.QueryString.Get<int>("level", int.MaxValue);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>站点类别管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            <div class="tn-filter tn-helper-right">
+                                <label class="tn-form-label">
+                                    所属：</label>
+                                @Html.DropDownList("tenantList", null, new { @class = "tn-dropdownlist", id = "tenant-ids" })
+                            </div>
+                            @Html.LinkButton("添加类别", SiteUrls.Instance()._EditSiteCategory(tenantTypeId), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "add-site-category", plugin = "dialog" })
+                            
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    {
+                        int count = Model.Count();
+
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        类别名
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        内容数
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                </tr>
+                                @for (int i = 0; i < count; i++)
+                                {
+                                    Category category = Model.ElementAt(i);
+                                    <tr class="tn-table-grid-row @category.ParentId-@category.Depth" name="@category.ParentId-@category.Depth" id="@category.CategoryId">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto ">
+                                            @if (category.Depth > 0)
+                                            {
+                                                for (int j = 0; j < category.Depth; j++)
+                                                {
+                                                <span class="tnc-empty-c"></span>     
+                                                }
+                                                if (i + 1 < count)
+                                                {
+                                                    if (category.Depth > Model.ElementAt(i + 1).Depth)
+                                                    { 
+                                                <span class="tn-text-note">└─</span>
+                                                        
+                                                    }
+
+                                                    else
+                                                    {
+                                                <span class="tn-text-note">├─</span>  
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                <span class="tn-text-note">└─</span>
+                                                }
+                                            }
+                                            <label title ="@category.CategoryName">@category.CategoryName</label>
+                                            @if (category.Depth < level - 1)
+                                            {
+                                                @Html.LinkButton("", SiteUrls.Instance()._EditSiteCategory(category.TenantTypeId, 0, category.CategoryId), highlightStyle: HighlightStyles.Lite, iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "dialog1", plugin = "dialog", title = "添加子分类" })
+                                            }
+                                            
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @category.CumulateItemCount
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @if (i > 0 && category.Depth <= Model.ElementAt(i - 1).Depth)
+                                            { 
+                                                @Html.Link("上移", SiteUrls.Instance().ChangeSiteCategoryOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @if (Model.Where(n => n.ParentId == category.ParentId && n.Depth == category.Depth && category.DisplayOrder < n.DisplayOrder).Count() > 0)
+                                            {
+                                                @Html.Link("下移", SiteUrls.Instance().ChangeSiteCategoryOrder(), "下移", new { @class = "tn-icon tn-smallicon-download" })
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditSiteCategory(category.TenantTypeId, category.CategoryId), "编辑分类", htmlAttributes: new { id = "edit-site-category", plugin = "dialog", @class = "tn-item-link" })                                            
+                                            <span class="tn-action tn-action-text-icon-right tn-action-has-drop-menu tn-border-trl" menu="#moreOptions@(category.CategoryId)">
+                                                <span class="tn-icon tn-smallicon-triangle-down"></span><a href="javascript:;" class="tn-action-text">更多</a> </span>
+                                            <div id="moreOptions@(category.CategoryId)" class="tn-more-options tn-widget-content tn-border-gray" style="display:none">
+                                                <ul class="tn-more-list">
+                                                    <li>@Html.Link("删除", SiteUrls.Instance().DeleteSiteCategory(category.CategoryId), "删除分类", new { @class = "tn-item-link delete-category" })</li>                                                    
+                                                    @if (category.Depth < level - 1)
+                                                    { 
+                                                    <li>@Html.Link("添加子分类", SiteUrls.Instance()._EditSiteCategory(category.TenantTypeId, 0, category.CategoryId), "添加子分类", htmlAttributes: new { id = "dialog1", plugin = "dialog", @class = "tn-item-link" })</li>
+                                                    }                                                       
+                                                    <li>@Html.Link("合并", SiteUrls.Instance()._MoveSiteCategory(category.CategoryId, "merge"), "合并分类", htmlAttributes: new { id = "dialog1", plugin = "dialog", @class = "tn-item-link" })</li>
+                                                    @if (category.MaxDepth <= level - 1)
+                                                    {
+                                                        var levels = string.Empty;
+                                                        if (level != int.MaxValue)
+                                                        {
+                                                            levels = "&level=" + level;
+                                                        }
+                                                    <li>@Html.Link("移动", SiteUrls.Instance()._MoveSiteCategory(category.CategoryId, "move")+levels, "移动分类", htmlAttributes: new { id = "dialog1", plugin = "dialog", @class = "tn-item-link" })</li>                                                    
+                                                    }
+                                                </ul>
+                                            </div>                                           
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var manageUrl = '@(SiteUrls.Instance().ManageSiteCategories())';
+        //给更多里的链接添加样式
+        $(".tn-more-options ul a.tn-item-link").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+        //点击删除
+        $('.delete-category').click(function (e) {
+            e.preventDefault();
+
+            var self = $(this);
+            art.dialog.confirm('你确认要删除吗？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: self.attr("href"),
+                    success: function (msg) {
+                        art.dialog.tips("删除成功！", 1.5, 1);
+                        setTimeout(function () { window.location.reload(true); }, 500);
+                    },
+                    error: function () {
+                        alert("删除失败！");
+                    }
+                });
+            });
+        });
+        //租户类型改变时触发
+        $("#tenant-ids").change(function (e) {
+            e.preventDefault();
+            var val = $(this).val();
+
+            if (val == "000071") {
+                window.location.href = manageUrl + '?tenantTypeId=' + val + '&level=1';
+            }
+            else if (val == "200101") {
+                window.location.href = manageUrl + '?tenantTypeId=' + val + '&level=2';
+            }
+            else {
+                window.location.href = manageUrl + '?tenantTypeId=' + val;
+            }
+        });
+        //点击上移按钮
+        $(".tn-smallicon-upload").click(function (e) {
+            e.preventDefault();
+
+            var tr = $(this).closest('tr');
+            var name = tr.attr("name");
+            var fromCategoryId = tr.attr("id");
+            var toCategoryId;
+            var trs = $('.' + name);
+            for (var i = 0; i < trs.length; i++) {
+                if ($(trs[i]).attr("id") === fromCategoryId) {
+                    toCategoryId = $(trs[i - 1]).attr("id")
+                    break;
+                }
+            }
+
+            $.ajax({
+                type: "GET",
+                url: $(this).attr("href"),
+                data: { fromCategoryId: fromCategoryId, toCategoryId: toCategoryId },
+                success: function () {
+                    window.location.reload(true);
+                }
+            })
+
+        });
+        //点击下移按钮
+        $(".tn-smallicon-download").click(function (e) {
+            e.preventDefault();
+
+            var tr = $(this).closest('tr');
+            var name = tr.attr("name");
+            var fromCategoryId = tr.attr("id");
+            var toCategoryId;
+            var trs = $('.' + name);
+            for (var i = 0; i < trs.length; i++) {
+                if ($(trs[i]).attr("id") == fromCategoryId) {
+                    toCategoryId = $(trs[i + 1]).attr("id")
+                    break;
+                }
+            }
+
+            $.ajax({
+                type: "GET",
+                url: $(this).attr("href"),
+                data: { fromCategoryId: fromCategoryId, toCategoryId: toCategoryId },
+                success: function () {
+                    window.location.reload(true);
+                }
+            })
+
+        });
+
+    })
+</script>

@@ -1,0 +1,108 @@
+﻿@{
+    Layout = "_Square";
+    IEnumerable<IUser> hotUsers = ViewData.Get<IEnumerable<IUser>>("hotUsers", null);
+    IEnumerable<Activity> activities = ViewData.Get<IEnumerable<Activity>>("activities", null);
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+}
+@section Aside
+{
+    @Html.AjaxAction("_TopTopics", "ChannelMicroblog", new { area = "Microblog", topNum = 10 })
+    @Html.AjaxAction("_RecommendTopic", "ChannelMicroblog", new { area = "Microblog", topNum = 10 })
+    @Html.AdvertisingPosition("10000000003")
+    @Html.Action("_RecommendUser", "FindUser", new { topNumber = 5 })
+    @Html.AjaxAction("_HotFollower", "ChannelMicroblog", new { area = "Microblog", topNum = 10 })
+    @Html.Action("_AnnouncementList", "Channel")
+    @Html.AdvertisingPosition("10000000004")
+}
+<script src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js")" type="text/javascript"></script>
+@Html.Action("_AnnouncementItem", "Channel", new { displayArea = Announcement_DisplayArea.Home })
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-recent-popularusers">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <div class="tn-option">@Html.Link("更多", SiteUrls.Instance().FindUserRanking(SortBy_User.HitTimes), "更多")</div>
+        <h3 class="tn-helper-reset">
+            近期人气用户</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+            @if (hotUsers.Count() > 0)
+            {
+                foreach (var hotUser in hotUsers)
+                {
+                <li class="tn-avatar-item">
+                    @Html.ShowUserAvatar(hotUser.UserId, AvatarSizeType.Small, navigateTarget: HyperLinkTarget._blank)
+                    <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(hotUser.UserId)" target="_blank">
+                        @hotUser.DisplayName
+                    </a></li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+@Html.Action("_RecommendSections", "Bar", new { area = "Bar", topNumber = 12, recommendTypeId = "10120101", displayTemplate = Spacebuilder.Bar.Controllers.DisplayTemplate_RecommendSections.Slide })
+@Html.AdvertisingPosition("10000000002")
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            看看大家在做什么</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul id="tnc-dynamic" class="tn-list tnc-dynamic">
+        </ul>
+        <div id="tn-load-more-oldmicroblog" class="tn-load-more tn-bg-gray tn-border-gray"
+            style="display: none;">
+            <a id="load-more" href="#" class="tn-action tn-action-text-icon-right"><span class="tn-icon tn-smallicon-collapse-open">
+            </span><span class="tn-action-text">更多</span> </a>
+        </div>
+        <div id="tn-loading-oldmicroblog" class="tn-loading tn-border-gray tn-corner-all"
+            style="display: none;">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var url = '@(SiteUrls.Instance()._ActivitiesList())';
+        var pageIndex = 1;
+        //加载页面列表
+        function loadList() {
+            $('#tn-load-more-oldmicroblog').hide();
+            $('#tn-load-end-oldmicroblog').hide();
+            $('#tn-loading-oldmicroblog').show();
+            $.get(url, { pageIndex: pageIndex }, function (data, status, xhr) {
+                $('#tn-loading-oldmicroblog').hide();
+                if (status === "success") {
+                    $('#tnc-dynamic').append(data);
+                    var haveData = $('.tnui-havedata:last').val();
+                    if (haveData == 'False') {
+                        $('#tn-load-more-oldmicroblog').hide();
+                        $('#tn-loading-oldmicroblog').hide();
+                    } else {
+                        if ($('.tnui-havedata').val() == 'False' || $('.tnui-havedata').val() == undefined) {
+                            $('#tn-load-more-oldmicroblog').hide();
+                            $('#tn-loading-oldmicroblog').hide();
+                        }
+                        else {
+                            $('#tn-load-more-oldmicroblog').show();
+                            pageIndex++;
+                        }
+                    }
+                }
+                else {
+                    $('#tn-loading-oldmicroblog').hide();
+                    $('#tn-load-more-oldmicroblog').hide();
+                }
+            });
+        }
+
+        loadList();
+
+        //点击更多
+//        $('#load-more').click(function (e) {
+//            e.preventDefault();
+//            loadList();
+//        });
+        $('#tn-load-more-oldmicroblog').click(function (e) {
+            e.preventDefault();
+            loadList();
+        });
+    })
+</script>

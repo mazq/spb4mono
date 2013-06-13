@@ -1,0 +1,73 @@
+﻿@{
+    User user = ViewData.Get<User>("user", null);
+    int integrity = ViewData.Get<int>("integrity", 0);
+    //List<OwnerStatisticData> OwnerStatisticDataList = ViewData.Get<List<OwnerStatisticData>>("OwnerStatisticDataList", null);
+    Dictionary<int, List<OwnerStatisticData>> OwnerStatisticDataDictionary = ViewData.Get<Dictionary<int, List<OwnerStatisticData>>>("OwnerStatisticDataDictionary", null);
+    Dictionary<int, string> dictionary = ViewData.Get<Dictionary<int, string>>("dictionary", null);
+    IEnumerable<ApplicationBase> applicationBase = ViewData.Get<IEnumerable<ApplicationBase>>("applicationBase", null);
+}
+<div class="spb-profile-card tn-helper-clearfix">
+    @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small, true, HyperLinkTarget._self, enableCachingInClient: false, isShowUserCard: false)
+    <div class="tn-info">
+        <div class="spb-profile">
+            <h1 class="tn-user-name">
+                <a href="@SiteUrls.Instance().SpaceHome(user.UserId)">@user.DisplayName</a>
+                @Html.IdentificationType(user.UserId)
+            </h1>
+        </div>
+        @if (integrity > 30)
+        {
+            <div class="spb-status">
+                <a href="@SiteUrls.Instance().MyRank(Url.SpaceKey())">
+                    @Html.UserRankIcon(user.Rank)
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="spb-status">
+                <a class="tn-action tn-action-text-icon-right" href="@SiteUrls.Instance().EditUserProfile(Url.SpaceKey())">
+                    <span class="tn-icon tn-smallicon-write"></span><span class="tn-action-text">编辑资料</span></a>
+            </div>
+            <div class="spb-progress-bar-pad tn-helper-clear" title="资料完整度为@(integrity)%">
+                <div class="tn-progress-bar tn-widget-content tn-corner-all">
+                    <div style="width: @(integrity)%;" class="tn-progress-bar-value tn-border-deep tn-bg-deep tn-corner-left tn-border-tbl" >
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<ul class="spb-user-atten tn-helper-clearfix">
+    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ManageFollowedUsers(Url.SpaceKey())">
+        <strong class="tn-count">@user.FollowedCount</strong><span>关注</span></a> </li>
+    <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ManageFollowers(Url.SpaceKey())">
+        <strong class="tn-count">@user.FollowerCount</strong><span>粉丝</span></a> </li>
+    <li><a href="#"  menu="#@(user.UserId)"><strong class="tn-count">@user.ContentCount</strong><span>内容</span></a>
+    </li>
+</ul>
+<div class="spb-content-pop-bubbles" id = "@user.UserId" style="display:none">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+            <ul class="tn-helper-clearfix">
+               @foreach (var item in applicationBase)
+                    {
+                        <li>@dictionary[item.ApplicationId]：
+                        @for (int i = 0; i < OwnerStatisticDataDictionary[item.ApplicationId].Count(); i++)
+			            {
+                            if (i != 0)
+                            {
+                                <span>/</span>
+                            }
+                            <a href="@OwnerStatisticDataDictionary[item.ApplicationId][i].DataUrl" title="@OwnerStatisticDataDictionary[item.ApplicationId][i].DataName">@OwnerStatisticDataDictionary[item.ApplicationId][i].ContentCount</a>
+                        }
+                        </li>
+                    }
+            </ul>
+        </div>
+    </div>
+</div>

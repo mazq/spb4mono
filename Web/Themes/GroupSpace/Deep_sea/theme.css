@@ -1,0 +1,42 @@
+/* 
+Offical Style for Spacebuilder
+(C) 2007-2012 Tunynet Inc.
+*/ 
+
+/* ---------------------------------------------------------------------------- */
+/* Will be moved to the Common.css */
+
+
+.tnc-blog-header .tn-button{ margin:0; padding:0 10px;}
+.tnc-blog-header .tn-button .tn-icon{ margin-left:10px; background-image: url(../../Shared/Styles/icons/white/tn-icon-small.png); }
+
+/* Will be moved to the Common.css end */
+/* ---------------------------------------------------------------------------- */
+/* Page Layout
+----------------------------------*/
+#tn-content .tn-wrapper{ width: 950px; margin:50px auto; }
+#tn-footer{ text-align: center; font-size: 12px; padding:10px 0; }
+#tn-footer .tn-wrapper{ width: 950px; margin:0 auto; }
+
+/* Global navigation */
+.spb-top-menubar .tn-inner { width: 950px; margin: 0 auto; }
+.spb-top-menubar .spb-logo a { width: 170px; height:36px; }
+.spb-top-menubar .spb-menu a.spb-menu-link { line-height: 35px;}
+.spb-top-menubar .tn-search-box{ padding-top:6px;}
+.spb-user-menu{ padding-top:6px;}
+.spb-user-menu .tn-msg-bubble{ top:-6px;}
+.spb-user-menu .spb-user-link { line-height: 25px; }
+.tnc-aside,
+.tnc-aside-first,
+.tnc-aside-second,
+.tnc-main { margin: 10px; }
+.tn-grid-5-19 .tnc-main { padding-left: 10px; padding-right: 10px;  }
+
+/* Side */
+.tnc-aside{ padding:5px; }
+.tnc-aside .tn-box-header { padding: 5px 0; }
+.tnc-aside .tn-box-content { padding: 10px 0; }
+.tnc-aside .spb-group-panel .tn-box-content { padding: 10px; }
+
+.spb-group-space .tn-cue-highlight .tn-icon-notice{ float:left; margin:1px 10px 0 0; }
+.spb-group-page .spb-content-search .tn-box-content{ padding:0; }

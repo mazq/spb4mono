@@ -1,0 +1,151 @@
+﻿@model IEnumerable<SensitiveWordType>
+@{
+    Layout = "_ControlPanel";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000074;
+
+    Dictionary<string, string> tenantsDictionary = ViewData.Get<Dictionary<string, string>>("tenantsDictionary", null);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+                <div class="tnc-settings">
+                    @Html.Partial("_RightSensitiveWords")
+                </div>
+            </div>
+        </div>
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>敏感词类别管理</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            @Html.LinkButton("删除", SiteUrls.Instance().DeleteSensitiveWordTypes(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-sensitiveWordTypes" })
+                            @Html.LinkButton("添加分类", SiteUrls.Instance()._AddSensitiveWordType(), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "add-sensitiveWordType", plugin = "dialog" })
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0)
+                    {
+                        <div class="tn-no-data">
+                            暂无敏感词分类</div>
+                    }
+                    else
+                    {
+                        <form id="batchform" method="post">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-width-check">
+                                        <input id="select-all" type="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        分类名
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @foreach (var sensitiveWordType in Model)
+                                {
+                                    <tr class="tn-table-grid-row" id="@sensitiveWordType.TypeId">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("ids", sensitiveWordType.TypeId, false, new { @class = "sensitiveWordType-id", value = @sensitiveWordType.TypeId })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @sensitiveWordType.Name
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._AddSensitiveWordType(sensitiveWordType.TypeId), "编辑", new { plugin = "dialog" })
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetUrl(SiteUrls.Instance().DeleteSensitiveWordTypes(sensitiveWordType.TypeId)).SetConfirm("确认要删除吗？").SetText("删除").SetTooltip("删除").SetDeleteTarget("#" + sensitiveWordType.TypeId).SetOnErrorCallBack("error").SetOnSuccessCallBack("success"))
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(function () {
+        removeChecked();
+        //处理火狐下浏览器刷新后复选框仍然选中
+        function removeChecked() {
+            $(".sensitiveWordType-id").each(function () {
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                }
+            });
+            $("#select-all").removeAttr("checked");
+        }
+
+
+
+        // 全选 全不选
+        $("#select-all").click(function () {
+            //设置下面复选框的状态
+            if ($(this).attr("checked")) {
+                $(".sensitiveWordType-id").each(function () {
+                    $(this).attr("checked", true);
+                });
+            } else {
+                $(".sensitiveWordType-id").each(function () {
+                    $(this).removeAttr("checked");
+                });
+            }
+        });
+
+
+
+        //点批量删除
+        $("#delete-sensitiveWordTypes").click(function (e) {
+            e.preventDefault();
+            if (!$("form input[name='ids']:checked").length) {
+                alert("请至少选择一个敏感词类别！");
+                return;
+            }
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $("#batchform").ajaxSubmit({
+                    success: function (data) {
+                        window.location.reload(true);
+                    },
+                    url: url,
+                    error: function (XMLResponse) {
+                        //alert(XMLResponse.responseText);   
+                        alert('操作失败！');
+                    }
+                });
+            });
+        });
+
+
+
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+    });
+    function error() {
+        art.dialog.tips("删除失败！", 2, -1);
+    }
+
+    function success() {
+        art.dialog.tips("删除成功！", 2, 1);
+    }
+</script>

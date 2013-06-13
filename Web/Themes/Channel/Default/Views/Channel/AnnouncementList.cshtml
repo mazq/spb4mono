@@ -1,0 +1,61 @@
+﻿@model PagingDataSet<Announcement>
+@{
+    Layout = "announcement-layout";
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all ">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+                    <div class="tn-main-heading"><h2>公告列表</h2></div>
+                        @using (Html.BeginForm("AnnouncementList", "ChannelController", FormMethod.Get, new { id = "AnnouncementListForm" }))
+                        {
+                            
+                                if (Model != null && Model.Count() > 0)
+                                {
+                                    <table class="tn-table-grid">
+                                        <tr class="tn-table-grid-header">
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                公告名称
+                                            </th>
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                发布日期
+                                            </th>
+                                        </tr>
+                                        @foreach (var announcement in Model)
+                                        {                                            
+                                            <tr class="tn-table-grid-row">
+                                                <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                                                    @if(announcement.IsHyperLink)
+                                                    {
+                                                         <a href="@announcement.HyperLinkUrl" title="@announcement.Subject" style="@announcement.SubjectStyle" target="_blank">@announcement.Subject</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (announcement.EnabledDescription)
+                                                        {
+                                                            <a href="@SiteUrls.Instance().AnnouncementDetail(announcement.Id)" title="@announcement.Subject" style="@announcement.SubjectStyle" target="_blank">@announcement.Subject</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div title="@announcement.Subject" style="@announcement.SubjectStyle">@announcement.Subject</div>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td class="tn-border-bottom tn-border-gray tn-width-date tn-nowrap">
+                                                    @announcement.ReleaseDate
+                                                </td>
+                                            </tr>                                            
+                                        }
+                                    </table>
+                                }
+                                else
+                                {
+                                    <div class="tn-no-data">
+                                        搜索不到数据!</div> 
+                                }
+                                <div class="tn-pagination">                                    
+                                    @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                                    @Html.PagingResults(Model)
+                                </div>
+                            
+                        }
+    </div>
+</div>

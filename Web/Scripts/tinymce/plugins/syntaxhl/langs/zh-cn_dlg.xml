@@ -1,0 +1,13 @@
+﻿tinyMCE.addI18n('zh-cn.syntaxhl_dlg',{
+	title : '插入源代码',
+	highlight_options : '显示选项',
+	paste : '粘贴代码',
+	choose_lang : '选择语言',
+	nogutter : '不显示行号',
+	toolbar : '显示工具条',
+	collapse : '默认折叠',
+	fontsize : '字体大小',
+	first_line : '开始行号',
+	highlight : '高亮行号',
+  highlight_explain : '多个行号用逗号分隔'
+});

@@ -1,0 +1,144 @@
+﻿@model TagEditModel
+@{
+    Layout = "_ControlPanel";
+
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+    SelectList topicGroups = ViewData.Get<SelectList>("topicGroups", null);
+    string editTopicTitle = ViewData.Get<string>("editTopicTitle", null);
+    bool enable = editTopicTitle == "编辑话题" ? true : false;
+    IEnumerable<string> seletedUserIds = ViewData.Get<IEnumerable<string>>("seletedUserIds", null);
+}
+
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>@editTopicTitle</span>
+            </h1>
+            <div>
+            @Html.StatusMessage()
+            </div>
+            @using (Html.BeginForm("EditTopic", "ControlPanelMicroblog", FormMethod.Post, new { enctype = "MULTIPART/FORM-DATA" }))
+            {
+                @Html.HiddenFor(n => n.TagId)
+                @Html.HiddenFor(n => n.FeaturedImage)
+                @Html.Hidden("TenantTypeId",TenantTypeIds.Instance().Microblog())
+                <div class="tnc-ctnright-list">
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        显示文字：
+                                    </th>
+                                    <td>
+                                        @{
+                                            RouteValueDictionary dic = new RouteValueDictionary { { "maxlength", 32 }, { "class", "tn-textbox tn-input-medium tn-border-gray" } };
+                                            if (enable)
+                                            {
+                                                dic.Add("readonly", true);
+                                            }
+
+                                          }
+                                        @Html.TextBoxFor(n => n.TagName, dic)
+                                        @Html.ValidationMessage("TagName")
+                                    </td>
+                                </tr>
+                                @*<tr>
+                                    <th>
+                                        话题摘要：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.DisplayName, new RouteValueDictionary { { "maxlength", 32 }, { "class", "tn-textbox tn-input-medium tn-border-gray" } })
+                                        @Html.ValidationMessage("DisplayName")
+                                    </td>
+                                </tr>*@
+                                <tr>
+                                    <th>
+                                        话题分组：
+                                    </th>
+                                    <td>@Html.DropDownList("TopicGroupId", topicGroups, new { @class = "tn-dropdownlist tn-input-medium" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        相关微博：
+                                    </th>
+                                    <td>
+                                        <div class="tn-expand-control tn-expand-has-icon">
+                                            @Html.UserSelector("RelatedObjectIds", 5, ViewData.Get<IEnumerable<long>>("seletedUserIds", null), searchScope: UserSelectorSearchScope.Site, showDropDownMenu: true)
+                                        </div>
+                                        <div class="tn-explain">
+                                        <span class="tn-text-note">请填写关联微博所属用户的用户名，用户名之间用英文逗号隔开</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        特色话题：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButton("IsFeatured", true, Model.IsFeatured, new { @class = "IsFeatured" })<label>是</label>&nbsp;&nbsp;
+                                        @Html.RadioButton("IsFeatured", false, !Model.IsFeatured, new { @class = "IsFeatured" })<label>否</label>
+                                    </td>
+                                </tr>
+                                <tr class="special-tag-display" style="display: none">
+                                    <th>
+                                        标识图片：
+                                    </th>
+                                    <td>
+                                        <input id="tagLogo" name="tagLogo" type="file" />
+                                    </td>
+                                </tr>
+                                <tr class="special-tag-display" style="display: none">
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(Model.FeaturedImage))
+                                        {
+                                            <img alt="" src="@SiteUrls.Instance().LogoUrl(Model.FeaturedImage,TenantTypeIds.Instance().Tag(), ImageSizeTypeKeys.Instance().Medium())" />
+                                        }
+                                    </td>
+                                </tr>
+                                <tr class="special-tag-display" style="display: none">
+                                    <th>
+                                        详细描述：
+                                    </th>
+                                    <td>@Html.HtmlEditor("Description", @Model.Description, new HtmlEditorOptions(HtmlEditorMode.Simple))
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                                        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary,url:@SiteUrls.Instance().ManageMicroblogTopics(),htmlAttributes: new { id = "btnCancel"})
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script id="template-tag-group" type="text/x-jquery-tmpl">
+    <option value='${value}'>${text}</option>
+</script>
+<script type="text/javascript">
+    $(function () {
+        if ('@(Model.IsFeatured)' == 'True') {
+            $(".special-tag-display").show();
+        }
+
+        $(".IsFeatured").click(function () {
+            if ($(this).val() === "True") {
+                $(".special-tag-display").show();
+            } else {
+                $(".special-tag-display").hide();
+            }
+        });
+    });
+</script>

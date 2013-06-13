@@ -1,0 +1,162 @@
+﻿@model PagingDataSet<BarPost>
+@{
+    bool ReAnchor = ViewData.Get<bool>("ReAnchor", false);
+    long postParentId = ViewData.Get<long>("parentId", 0);
+    bool onlyLandlord = Request.QueryString.Get<bool>("onlyLandlord", false);
+    SortBy_BarPost sortBy = Request.QueryString.Get<SortBy_BarPost>("sortBy", SortBy_BarPost.DateCreated);
+    bool sortByIsDateCreated = sortBy == SortBy_BarPost.DateCreated;
+    int floorNum = sortByIsDateCreated ? 1 : 0;
+
+    BarThread barThread = ViewData.Get<BarThread>("BarThread", new BarThread());
+    long threadId = barThread.ThreadId;
+
+    long? postId = Request.QueryString.Get<long?>("postId", null);
+    long? childPostIndex = Request.QueryString.Get<long?>("childPostIndex", null);
+    //是否显示之前的内容（向下的箭头）此条记录之前的内容
+    bool showBeforPage = Request.QueryString.Get<bool>("showBeforPage", false);
+    //是否显示之后的内容（向上的箭头）此条记录之后的内容
+    bool showAfterPage = Request.QueryString.Get<bool>("showAfterPage", true);
+
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+
+    bool canPost = new Authorizer().BarPost_Create(barThread == null ? 0 : barThread.SectionId);
+}
+@if (Model.PageCount > Model.PageIndex && showAfterPage && postParentId > 0)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        @Html.Link("更多↑", SiteUrls.Instance()._ListBarPost(threadId, postParentId, Model.PageIndex + 1), "更多↑")
+    </div>
+}
+<div id="posts-paging-postParentId-@postParentId">
+    @if (Model != null && Model.Count > 0 || postParentId > 0)
+    {
+        <ul class="tn-comments" id="comments-parent-@postParentId">
+            @foreach (var item in Model)
+            {
+                <a name="@item.PostId"></a>
+                <li class="tn-comment-item tn-border-gray tn-border-bottom">
+                    <div class="tn-comment tn-helper-clearfix tn-hover">
+                        <div class="tn-comment-avatar">
+                            @Html.ShowUserAvatar(item.User, urlGetter.UserSpaceHome(item.UserId, barThread.SectionId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                        </div>
+                        <div class="tn-comment-info">
+                            @if (item.ParentId == 0 && !onlyLandlord)
+                            {
+                                long floor = sortByIsDateCreated ? Model.PageSize * (Model.PageIndex - 1) + floorNum : Model.TotalRecords - (Model.PageSize * (Model.PageIndex - 1) + floorNum);
+                                string floorName = string.Format("#{0}楼", floor);
+                                floorName = floor == 1 ? "沙发" : floorName;
+                                floorName = floor == 2 ? "板凳" : floorName;
+                                string className = floor < 3 ? "tn-border-gray spb-post-floor tn-corner-all" : "spb-post-floor";
+                                floorNum++;
+                                <div class="@className">
+                                    <span>@floorName</span></div>
+                            }
+                            <div class="tn-commentator">
+                                @if (!string.IsNullOrEmpty(item.Subject))
+                                {
+                                    <div class="tn-title">
+                                        @item.Subject</div>
+                                }
+                                <h5>
+                                    @Html.Link(item.Author, urlGetter.UserSpaceHome(item.UserId, barThread.SectionId), item.Author, new { @class = "tn-author" }, HyperLinkTarget._blank)</h5>
+                                <em class="tn-text-note tn-date">@item.DateCreated.ToFriendlyDate()</em></div>
+                            <div class="tn-detail-text">
+                                @Html.DisplayHtmlEditorContent(TenantTypeIds.Instance().BarPost(), item.GetResolvedBody(), 635)
+                            </div>
+                            @Html.Action("_ListAttachement", "Channel", new { area = "common", teantTypeId = TenantTypeIds.Instance().BarPost(), threadId = item.PostId })
+                            <div class="tn-comment-feed tn-helper-clearfix">
+                                @if (new Authorizer().BarPost_Delete(item) || new Authorizer().BarPost_Edit(item))
+                                {
+                                    <div class="tn-helper-right tn-state-hidden">
+                                        @if (new Authorizer().BarPost_Delete(item))
+                                        {
+                                            <span class="tn-action">
+                                                @Html.Link("删除", SiteUrls.Instance().DeletePost(item.PostId), "删除", new { @class = "tn-action-text", id = "post-delete-" + item.PostId })
+                                            </span>
+                                        }
+                                        @if (new Authorizer().BarPost_Delete(item) && new Authorizer().BarPost_Edit(item))
+                                        {
+                                            <span class="tn-spacer tn-text-note tn-action">|</span>
+                                        }
+                                        @if (new Authorizer().BarPost_Edit(item))
+                                        {
+                                            <span class="tn-action tn-edit">
+                                                @Html.Link("编辑", urlGetter.EditPost(item.ThreadId, item.PostId), "编辑", new { @class = "tn-action-text" })
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                                @if (item.ChildPostCount > 0 || UserContext.CurrentUser != null)
+                                {
+                                    if (item.ParentId == 0)
+                                    {
+                                    <span class="tn-reply"><a href="@SiteUrls.Instance()._ChildPost(item.PostId)" id="barpost-id-@item.PostId" class="tn-action tn-action-text-icon-right">
+                                        <span class="tn-icon tn-smallicon-triangle-down"></span>
+                                        @{
+                                                                                                                            string replay = item.ChildPostCount > 0 ? string.Format("回复（{0}）", item.ChildPostCount) : "回复";
+                                        }
+                                        <span class="tn-action-text">@replay</span> </a></span>
+                                    }
+                                    else if (canPost)
+                                    {
+                                    <span class="tn-reply"><a href="javascript:;" id="three-level-post-@item.PostId" foruser = "@item.User.NickName" class="tn-action tn-action-text-icon-right">
+                                        <span class="tn-action-text">回复</span> </a></span>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (item.ParentId == 0)
+                    {
+                        <div class="tn-replies">
+                            @Html.Action("_ChildPost", "Bar", new { ReAnchor = ReAnchor, parentId = item.PostId, childPostIndex = item.PostId == postId ? childPostIndex : 1, showBeforPage = item.PostId == postId })
+                            @*给二级回复预留的位置*@
+                        </div>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <ul class="tn-comments" id="comments-parent-@postParentId">
+        </ul>
+        <div class="tn-no-data">
+            暂无回帖
+        </div>
+    }
+    @if (showBeforPage && postParentId > 0 && Model.PageIndex > 1)
+    {
+        <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+            @Html.Link("更多↓", SiteUrls.Instance()._ListBarPost(threadId, postParentId, Model.PageIndex - 1, true, false), "更多↓")
+        </div>
+    }
+    @if (postParentId <= 0)
+    {     
+        <div class="tn-pagination">
+            @Html.AjaxPagingButton(Model, "posts-paging-postParentId-" + postParentId)
+        </div>   
+    }
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //删除的方法
+        $("a[id^='post-delete-']").click(function (e) {
+            e.preventDefault();
+
+            $linkA = $(this);
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post($linkA.attr("href"), function (data) {
+                    if (data.MessageType == -1) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+                    } else {
+                        $linkA.parents("li").first().slideUp("fast").remove();
+                    }
+                });
+            });
+
+            return false;
+        });
+    });
+</script>

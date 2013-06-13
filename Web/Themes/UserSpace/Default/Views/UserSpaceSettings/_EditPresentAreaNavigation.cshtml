@@ -1,0 +1,100 @@
+﻿@model PresentAreaNavigationEditModel
+@{
+    string spaceKey = UserContext.CurrentUser.UserName;
+}
+@using (Html.BeginAjaxForm("_EditPresentAreaNavigation", "UserSpaceSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.HiddenFor(n => n.Id)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    名称：</label>
+                @Html.TextBoxFor(n => n.NavigationText, new RouteValueDictionary { { "maxlength", 32 }, { "class", "tn-textbox tn-input-short tn-border-gray" } })
+                @Html.ValidationMessage("NavigationText")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    链接：</label>
+                @if (Model.Id == 0)
+                {
+                    @Html.TextBoxFor(n => n.NavigationUrl, new RouteValueDictionary { { "type", "url" }, { "maxlength", 127 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                    @Html.ValidationMessage("NavigationUrl")
+                    <input type="hidden" name="NavigationType" value="@Model.NavigationType"/>
+                }
+                else
+                {
+                    if (Model.NavigationType == NavigationType.AddedByOwner)
+                    {
+                    @Html.TextBoxFor(n => n.NavigationUrl, new RouteValueDictionary { { "type", "url" }, { "maxlength", 127 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                    @Html.ValidationMessage("NavigationUrl")
+                    <input type="hidden" name="NavigationType" value="@Model.NavigationType"/>
+                    }
+                    else
+                    {
+                    @Model.AsPresentAreaNavigation().GetUrl(Url.SpaceKey())
+                    <input type="hidden" name="NavigationUrl" value="@Model.AsPresentAreaNavigation().GetUrl(Url.SpaceKey())"/>
+                    }
+                }
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    图片链接：</label>
+                @Html.TextBoxFor(n => n.ImageUrl, new RouteValueDictionary { { "type", "url" }, { "maxlength", 127 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                @Html.ValidationMessage("ImageUrl")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    新窗：</label>
+                @{object checkBlank = null; object checkSelf = null;}
+                @if (Model.NavigationTarget == "_blank")
+                { checkBlank = new { @checked = "checked", groupname = "navigationtarget", id = "target-blank" }; }
+                else { checkBlank = new { groupname = "navigationtarget", id = "target-blank" }; }
+                @if (Model.NavigationTarget == "_self")
+                { checkSelf = new { @checked = "checked", groupname = "navigationtarget", id = "target-self" }; }
+                else { checkSelf = new { groupname = "navigationtarget", id = "target-self" }; }
+                @if (Model.Id == 0)
+                { checkSelf = new { @checked = "checked", groupname = "navigationtarget", id = "target-blank" }; }
+                @Html.RadioButtonFor(n => n.NavigationTarget, "_blank", checkBlank)
+                @Html.Label("target-blank", "是")
+                @Html.RadioButtonFor(n => n.NavigationTarget, "_self", checkSelf)
+                @Html.Label("target-self", "否")
+            </div>
+            @if (!Model.IsLocked)
+            {
+             <div class="tn-form-row">
+                <label class="tn-form-label">
+                    启用：</label>
+                @Html.RadioButtonFor(n => n.IsEnabled, true, new { groupname = "isenabled", id = "enable-ture" })
+                @Html.Label("enable-ture", "是")
+                @Html.RadioButtonFor(n => n.IsEnabled, false, new { groupname = "isenabled", id = "enable-false" })
+                @Html.Label("enable-false", "否")
+            </div>   
+            }
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+@if (Model.Id == 0)
+{
+    @:this.title("创建导航");
+}
+else
+{ 
+    @:this.title("编辑导航");
+}
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            var url = '@(SiteUrls.Instance().ManagePresentAreaNavigations(spaceKey))';
+            $.post(url, function (data) {
+                $("#presentAreaNavigation").replaceWith($(data).find("#presentAreaNavigation").parent().html());
+            })
+        });
+    }
+</script>

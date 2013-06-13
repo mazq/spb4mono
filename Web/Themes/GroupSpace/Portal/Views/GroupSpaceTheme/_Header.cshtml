@@ -1,0 +1,366 @@
+﻿@{
+    IEnumerable<Navigation> navigations = ViewData.Get<IEnumerable<Navigation>>("Navigations", null);
+    List<Spacebuilder.Search.ISearcher> searchersQuickSearch = ViewData.Get<IEnumerable<Spacebuilder.Search.ISearcher>>("searchersQuickSearch", null).ToList<Spacebuilder.Search.ISearcher>();
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    var currentUser = UserContext.CurrentUser;
+}
+<!--[if IE 6]>
+<script type="text/javascript" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Scripts/jquery/DD_belatedPNG/jquery.DD_belatedPNG-0.0.8a.js"))"></script>
+<![endif]-->
+<div class="spb-top-menubar">
+    <div class="tn-inner tn-helper-clearfix">
+        <div class="spb-user-menu">
+            @if (currentUser != null)
+            {
+                <ul id="spb-user-menu" class="spb-user-act tn-drop-menu">
+                    <li class="tn-icon-menu"><a class="tn-icon tn-icon-set" title="设置" href="@SiteUrls.Instance().EditUserProfile(currentUser.UserName)">
+                        设置</a>
+                        <ul class="tn-widget-content tn-border-gray spb-set-menu">
+                            <li><a class="tn-item-link" href="@SiteUrls.Instance().EditUserProfile(currentUser.UserName)">
+                                编辑资料</a></li>
+                            <li><a class="tn-item-link" href="@SiteUrls.Instance().UserPrivacyItemsSettings(currentUser.UserName)">
+                                隐私设置</a></li>
+                            @if (currentUser.IsAllowEntryControlPannel())
+                            {
+                                <li><a class="tn-item-link" target="_blank" href="@SiteUrls.Instance().ManageHome()">
+                                    后台管理</a></li>
+                            }
+                        </ul>
+                    </li>
+                    <li class="tn-icon-menu"><a class="tn-icon tn-icon-email tn-msg-bubble-fix" title="消息"  name="messagePrompt" menu="#messagePrompt" url='@SiteUrls.Instance()._ListPrompt()'  href="@SiteUrls.Instance().ListMessageSessions(currentUser.UserName, null)">
+                        消息
+                        @{int count = ViewData.Get<int>("PromptCount", 0);
+                          if (count > 0)
+                          {
+                            <span class="tn-msg-bubble">@(count)</span>
+                          }
+                        }
+                    </a>
+                        @if (count > 0)
+                        { 
+                            <div id="messagePrompt" style="display: none" class="tn-widget tn-bubble tn-bubble-arrow-top tnc-prompt">
+                                <div class="tn-bubble-arrow">
+                                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                                    </b>
+                                </div>
+                                <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+                                    <div class="tn-loading">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        { 
+                            <ul class="tn-widget-content tn-border-gray spb-set-menu">
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().ListMessageSessions(currentUser.UserName, null)">
+                                    私信</a></li>
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().ListInvitations(currentUser.UserName)">
+                                    请求</a></li>
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().ListNotices(currentUser.UserName, null, null)">
+                                    通知</a></li>
+                                <li><a class="tn-item-link" href="#">@@我的内容</a></li>
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().AtMeComments(currentUser.UserName, null)">
+                                    @@我的评论</a></li>
+                            </ul>
+                        }
+                    </li>
+                    <li class="tn-icon-menu">@Html.Link("注销", SiteUrls.Instance().Logout(), "退出", new { @class = "tn-icon tn-icon-quit" })</li>
+                    <li class="spb-current-user"><a class="tn-user-name" href="@SiteUrls.Instance().MyHome(currentUser.UserName)"  title="@currentUser.DisplayName">@Html.ShowUserDisplayName(currentUser.DisplayName, 6)</a></li>
+                </ul>
+            }
+            else
+            {
+                <ul class="spb-sign-menu">
+                    <li>@Html.Link("登录", SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal), "登录", new { id = "login", plugin = "dialog" })</li>
+                    <li>@Html.Link("注册", SiteUrls.Instance().Register(), "注册")</li>
+                </ul>
+            }
+        </div>
+        <div class="spb-logo">
+            <h1>
+                <a href="@SiteUrls.Instance().SiteHome()">spacebuilder</a></h1>
+        </div>
+        <ul id="spb-global-nav" class="spb-menu tn-drop-menu">
+            @{
+                var homeUrl = currentUser != null ? SiteUrls.Instance().MyHome(currentUser.UserId) : SiteUrls.Instance().Login();
+                string currentNavigationId = string.Empty;
+                if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+                {
+                    currentNavigationId = Html.ViewContext.RouteData.Values["CurrentNavigationId"].ToString();
+                }
+            }
+            <li><a class="spb-menu-link" href="@SiteUrls.Instance().SiteHome()">首页</a></li>
+            @for (int i = 0; i < Math.Min(7, navigations.Count()); i++)
+            {
+                var navigation = navigations.ElementAt(i);
+                if (!navigation.IsVisible(UserContext.CurrentUser))
+                {
+                    continue;
+                }
+                <li><a class="spb-menu-link" href="@navigation.GetUrl()" target="@navigation.NavigationTarget">@navigation.NavigationText</a>
+                </li>
+            }
+            @if (navigations.Count() > 7)
+            { 
+                <li><a class="spb-menu-link" href="javascript:;">更多</a>
+                    @{navigations = navigations.Skip(7);}
+                    @if (navigations != null)
+                    {
+                        <ul class="tn-widget-content tn-border-gray spb-app-menu">
+                            @foreach (var nav in navigations)
+                            {
+                                if (!nav.IsVisible(UserContext.CurrentUser))
+                                {
+                                    continue;
+                                }
+                                <li><a class="tn-item-link" href="@nav.GetUrl()" target="@nav.NavigationTarget">
+                                    @if (!string.IsNullOrEmpty(nav.IconName))
+                                    {
+                                        @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), nav.IconName, false))
+                                    }
+                                    @nav.NavigationText
+                                </a></li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+        </ul>
+        <div class="tn-search-box">
+            @using (Html.BeginForm("GlobalSearch", "Channel", FormMethod.Get, new { id = "quickSearchForm" }))
+            {
+                <input type="text" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl"
+                    id="keyword" name="keyword" autocomplete="off" />
+                <span id="button-search-header" class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray required">
+                    <button>
+                        <span class="tn-icon tn-smallicon-find">搜索</span></button>
+                </span>
+            }
+        </div>
+    </div>
+</div>
+<div id="quickSearchDisplay" class="spb-search-accord spb-search-accord-top" style="display: none;">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+            @for (int i = 0; i < searchersQuickSearch.Count(); i++)
+            {
+                Spacebuilder.Search.ISearcher searcher = searchersQuickSearch[i];
+                <div class="quickSearchList" data-url='@searcher.QuickSearchActionUrl("")'>
+                </div>
+            }
+            <div id="allResult" class="tn-foot option" data-search-url="@(SiteUrls.Instance().GlobalSearch(""))">
+                所有搜索结果：<a id="all-search-a" href="@(SiteUrls.Instance().GlobalSearch(""))">“<span
+                    id="all-search-span" class="tn-text-bright">@keyword</span>”</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#spb-global-nav').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+
+        $('#spb-user-menu').dcMegaMenu({
+            rowItems: '2',
+            speed: 'fast',
+            effect: 'fade',
+            fullWidth: true
+        });
+
+        $(".tn-drop-menu ul a.tn-item-link").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            });
+
+        /*
+        * 快捷搜索
+        */
+
+        var QuickSearcher = function () {
+            this.init();
+        };
+
+        QuickSearcher.fn = QuickSearcher.prototype = {
+            init: function () {
+                var self = this;
+
+                this.searchForm = $('#quickSearchForm');
+                this.keyword = $('#keyword', this.searchForm);
+                //先存储下全局搜索链接
+                var globalSearchHref = $("#all-search-a").attr("href");
+                //快捷搜索智能提示
+                this.keyword.keyup(function (e) {
+
+                    //搜索提示
+                    if (e.keyCode == 38 || e.keyCode == 40) {
+                        return;
+                    }
+
+                    var quickSearchDisplay = $("#quickSearchDisplay");
+                    var quickSearchList = $(".quickSearchList");
+
+                    if (quickSearchList.length > 0) {
+                        if ($(this).val() == "") {
+                            quickSearchDisplay.hide();
+                        } else {
+                            var keyword = $(this).val();
+                            quickSearchDisplay.show();
+
+                            //定位
+                            var left = $(this).offset().left;
+                            var top = $(this).offset().top;
+                            quickSearchDisplay.css("z-index", "999").css("position", "absolute").offset({ left: left, top: top + 19 });
+
+                            $("#all-search-span").text(keyword);
+                            $("#all-search-a").attr("href", "");
+                            $("#all-search-a").attr("href", globalSearchHref + keyword);
+                            $("#allResult").data("search-url", "");
+                            $("#allResult").data("search-url", globalSearchHref + keyword);
+                            keyword = encodeURIComponent(keyword);
+                            //加载各应用搜索结果
+                            quickSearchList.each(function () {
+                                $(this).load($(this).data("url") + keyword + "&topNumber=3");
+                            })
+                        }
+                    }
+
+                })
+
+                //当前项号
+                var termNum = 0;
+                //鼠标按键及Enter事件响应
+                this.keyword.keydown(function (e) {
+                    if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
+                        //获取项的总数目
+                        var termSum = $(".option").length - 1;
+                        $(".option").removeClass("tn-bg-gray");
+                        var keyType;
+                        switch (e.keyCode) {
+                            case 38: // up
+                                e.preventDefault();
+                                keyType = "up";
+                                break;
+                            case 40: // down
+                                e.preventDefault();
+                                keyType = "down";
+                                break;
+                            case 13: // enter
+                                e.preventDefault();
+                                keyType = "enter";
+                                break;
+                        }
+
+                        var selfOption = $(".option[iskeyon=1]");
+                        //按回车跳到相应的url
+                        if (keyType == "enter") {
+                            //当前选中的项
+                            var goUrl = selfOption.data("search-url");
+                            if (selfOption.length == 0) {
+                                $('#quickSearchForm').submit();
+                            } else {
+                                window.location.href = goUrl;
+                            }
+                        }
+                        else if (keyType == "down") {
+                            //如果没有一个项选中，就选中第一个项，否则就向下移一项
+                            if (selfOption.length == 0) {
+                                $(".option:first").attr("iskeyon", "1").addClass("tn-bg-gray");
+                            } else {
+                                termNum++;
+                                //如果到了最后一个，就依然选中第一个项
+                                if (termNum > termSum) {
+                                    termNum = 0;
+                                }
+                                selfOption.attr("iskeyon", "0").removeClass("tn-bg-gray");
+                                $(".option").eq(termNum).attr("iskeyon", "1").addClass("tn-bg-gray");
+                            }
+                        }
+                        else if (keyType == "up") {
+                            //如果没有一个项选中，就选中最后一个项，否则就向上移一项
+                            if (selfOption.length == 0) {
+                                $(".option:last").attr("iskeyon", "1").addClass("tn-bg-gray");
+                                termNum = termSum;
+                            } else {
+                                //如果到了第一个，就选中最后一个项
+                                if (termNum == 0) {
+                                    termNum = termSum + 1;
+                                }
+                                termNum--;
+                                selfOption.attr("iskeyon", "0").removeClass("tn-bg-gray");
+                                $(".option").eq(termNum).attr("iskeyon", "1").addClass("tn-bg-gray");
+                            }
+                        }
+                    }
+
+                })
+
+                //快捷搜索鼠标划过事件
+                $(".quickSearchList").delegate(".option", "mouseover", function () {
+                    $(".option").removeClass("tn-bg-gray");
+                    $(this).addClass("tn-bg-gray");
+                    //self.keyword.val("");
+                })
+                $(".quickSearchList").delegate(".option", "mouseout", function () {
+                    $(this).removeClass("tn-bg-gray");
+                })
+                $("#allResult").mouseover(function () {
+                    $(".option").removeClass("tn-bg-gray");
+                    $(this).addClass("tn-bg-gray");
+                    //self.keyword.val("");
+                })
+                $("#allResult").mouseout(function () {
+                    $(this).removeClass("tn-bg-gray");
+                })
+
+                //快捷搜索鼠标点击事件
+                $(".quickSearchList").delegate("li", "click", function () {
+                    window.location.href = $(this).data("search-url");
+                })
+
+                //点击页面隐藏智能提示框
+                $(document).click(function (e) {
+                    e = e || window.event;
+                    if ($(e.target).attr("id") == "keyword") { return false };
+                    $("#quickSearchDisplay").hide();
+                })
+
+                //点击文本框显示智能提示框
+                this.keyword.click(function (e) {
+                    e = e || window.event;
+                    var element = $(e.target);
+                    if (element.attr("id") == "keyword" && element.val() == "") { return false };
+                    $("#quickSearchDisplay").show();
+                })
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == "") {
+                        e.preventDefault();
+                    }
+                });
+
+                //注册搜索按钮点击事件
+                $('#button-search-header').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+            }
+        }
+
+        QuickSearcher = new QuickSearcher();
+    });
+
+</script>

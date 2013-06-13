@@ -1,0 +1,58 @@
+﻿@model List<ApplicationStatisticItem>
+@{
+    Layout = "_ControlPanel";
+    List<ApplicationStatisticData> statisticDatas = ViewData.Get<List<ApplicationStatisticData>>("allManageableDatas", null);
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>后台内容管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td valign="top">
+                            <div class="tnc-list">
+                                <h2>
+                                    <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-pending"></span><span class="tn-action-text">待处理事项</span></span>
+                                </h2>
+                                <div class="tnc-list-text">
+                                    <ul class="tnc-pending">
+                                        <li>
+                                            @for (int i = 0; i < statisticDatas.Count; i++)
+                                            {
+                                                <span>
+                                                    @Html.Raw(string.Format(statisticDatas[i].DescriptionPattern, Html.Link(statisticDatas[i].Value.ToString(), statisticDatas[i].Url, string.Empty)))
+                                                </span>
+                                               if (i != 0 && i != (statisticDatas.Count - 1) && i % 2 == 1)
+                                               {
+                                                @Html.Raw("</li><li>")
+                                               }
+                                            }
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td valign="top">
+                            <div class="tnc-list">
+                                <h2>
+                                    <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-datasheet"></span><span class="tn-action-text">数据统计</span></span>
+                                </h2>
+                                <div class="tnc-list-text">
+                                    <ul class="tnc-date">
+                                        <li class="tnc-date-bom"><span>项目</span><span>总数</span><span>24小时新增</span></li>
+                                        @foreach (var application in Model)
+                                        {
+                                            <li><span><a href="@application.Url">@application.ShortName</a></span><span>@application.TotalCount</span><span>@application.Last24HCount</span></li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>                            
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+@{
+    string url = Request.QueryString.GetString("url", string.Empty); //正则过滤列表页面 
+
+    ParsedMedia entity = ParsedMedia.New();
+    entity.MediaType = MediaType.Video;
+    entity.Url = url;
+
+    string playListVideoIdRexString = @"^http://v.youku.com/v_playlist/f(?<videoid>[a-zA-Z\d=]+).html$";
+    Regex videoRex = new Regex(playListVideoIdRexString, RegexOptions.IgnoreCase);
+    Match videoMatch = videoRex.Match(url);
+
+    if (videoMatch.Success)
+    {
+        string webMetter1 = HttpCollects.GetHTMLContent(url, "var videoId2= '(?<videoId>[a-zA-Z0-9]+)';");
+        Regex videoIdRegex = new Regex("var videoId2= '(?<videoId>[a-zA-Z0-9]+)';", RegexOptions.IgnoreCase);
+        Match videoIdMatch = videoIdRegex.Match(webMetter1);
+        if (videoIdMatch.Success)
+        {
+            url = string.Format(@"http://v.youku.com/v_show/id_{0}.html", videoIdMatch.Groups["videoId"].Value);
+        }
+    }
+    string playerUrlVideoIdRexString = @"^http://player.youku.com/player.php/sid/(?<videoId>[a-zA-Z\d=]+)/v.swf$";
+    videoRex = new Regex(playerUrlVideoIdRexString, RegexOptions.IgnoreCase);
+    videoMatch = videoRex.Match(url);
+    if (videoMatch.Success)
+    {
+        url = string.Format(@"http://v.youku.com/v_show/id_{0}.html", videoMatch.Groups["videoId"].Value);
+    }
+    //正则过滤播放页面
+    string videoIdRexString = @"^http://v.youku.com/v_show/id_(?<videoId>[a-zA-Z\d=]+).html";
+
+    videoRex = new Regex(videoIdRexString, RegexOptions.IgnoreCase);
+    videoMatch = videoRex.Match(url);
+    if (videoMatch.Success)
+    {
+        url = url.Remove(url.ToLower().IndexOf(".html"));
+        entity.PlayerUrl = string.Format(@"http://player.youku.com/player.php/sid/{0}&isAutoPlay=true/v.swf", videoMatch.Groups["videoId"].Value);
+
+        //todo:bianchx,by zhengw: 推荐添加第二个参数
+        string webMetter = HttpCollects.GetHTMLContent(url, @"&screenshot=(?<img>[\s\S]*?)""");
+
+        //匹配标题
+        string titleRexString = @"<h1 class=""title"">(?<title>[\s\S]*?)</h1>";
+        videoRex = new Regex(titleRexString, RegexOptions.IgnoreCase);
+        videoMatch = videoRex.Match(webMetter);
+        if (videoMatch.Success)
+        {
+            entity.Name = HtmlUtility.StripHtml(videoMatch.Groups["title"].Value, true, false);
+            if (!string.IsNullOrEmpty(entity.Name))
+            {
+                entity.Name = entity.Name.Replace("\r\n", string.Empty).Replace("\t", string.Empty).Replace(" ", string.Empty);
+            }
+            entity.Name = StringUtility.Trim(entity.Name, 30);
+        }
+
+        //匹配缩略图
+        string imgRexString = @"&screenshot=(?<img>[\s\S]*?)""";
+        videoRex = new Regex(imgRexString, RegexOptions.IgnoreCase);
+        videoMatch = videoRex.Match(webMetter);
+        if (videoMatch.Success)
+        {
+            entity.ThumbnailUrl = videoMatch.Groups["img"].Value;
+        }
+        entity.Description = HttpCollects.GetDescription(webMetter, true);
+        ParsedMediaService parsedMediaService = new ParsedMediaService();
+        parsedMediaService.Create(entity);
+    }
+}
+@Html.Raw(Json.Encode(entity))

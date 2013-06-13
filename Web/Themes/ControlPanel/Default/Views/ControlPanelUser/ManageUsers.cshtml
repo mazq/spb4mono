@@ -1,0 +1,279 @@
+﻿@model PagingDataSet<User>
+@{
+    Layout = "_ControlPanel";
+    Authorizer authorizer = new Authorizer();
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+                @Html.Action("_ManageUserRightMenu", "ControlPanelUser")
+            </div>
+        </div>
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>用户管理</span></h1>
+            <div class="tnc-ctnright-list">
+                @using (Html.BeginForm("ManageUsers", "ControlPanelUser", FormMethod.Get))
+                {
+                    <div class="tn-manager-search tn-helper-clearfix">
+                        <div class="tnc-search-adminform">
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    名 称：</label>
+                                @Html.TextBox("uname", Request.QueryString.GetString("uname", string.Empty), InputWidthTypes.Medium)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    邮 箱：</label>
+                                @Html.TextBox("uemail", Request.QueryString.GetString("uemail", string.Empty), InputWidthTypes.Medium)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    注册时间：</label>
+                                @Html.DatePicker("startdate", Request.QueryString.Get<DateTime>("startdate"), "-5Y", "+0D")
+                                -
+                                @Html.DatePicker("enddate", Request.QueryString.Get<DateTime>("enddate"), "-5Y", "+0D")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    角 色：</label>
+                                @Html.DropDownList("RoleName", "全部")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    用户状态：</label>
+                                @Html.DropDownList("IsActivated", "全部")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    用户等级：</label>
+                                @Html.TextBox("rankstart", Request.QueryString.Get("rankstart"), InputWidthTypes.Short)
+                                -
+                                @Html.TextBox("rankend", Request.QueryString.Get("rankend"), InputWidthTypes.Short)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否管制：</label>
+                                @Html.DropDownList("IsModerated", "全部")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否封禁：</label>
+                                @Html.DropDownList("IsBanned", "全部")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="tnc-content-manage">
+                    @using (Html.BeginForm("", "", FormMethod.Post, htmlAttributes: new { id = "ManageUsersForm" }))
+                    {
+                        <div class="tn-list-header">
+                            <div class="tn-toolbar-area">
+                                @Html.LinkButton("添加用户", SiteUrls.Instance()._CreateUser(), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog", @title = "添加新用户" })
+                                @Html.LinkButton("激活", "javascript:;", iconType: IconTypes.SmallAccept, htmlAttributes: new { @id = "jihuo", @title = "把选中的用户激活" })
+                                @Html.LinkButton("取消激活", "javascript:;", iconType: IconTypes.SmallCross, htmlAttributes: new { @id = "qxjihuo", @title = "把选中的用户取消激活" })
+                                @Html.LinkButton("封禁", SiteUrls.Instance()._BannedUser(), iconType: IconTypes.SmallStop, htmlAttributes: new { @id = "BanUsers", @title = "把选中的用户封禁", plugin = "dialog" })
+                                @Html.LinkButton("取消封禁", "javascript:;", iconType: IconTypes.SmallCross, htmlAttributes: new { @id = "UnbanUsers", @title = "把选中的用户取消封禁" })
+                                @Html.LinkButton("删除", SiteUrls.Instance()._DeleteUser(null), iconType: IconTypes.SmallCross, htmlAttributes: new { @id = "DeleteUsers", @title = "把选中的用户删除", plugin = "dialog" })
+                                @Html.LinkButton("批量奖惩用户", SiteUrls.Instance()._RewardUsers(), htmlAttributes: new { @id = "RewardUsers", @title = "奖惩用户" })
+                            </div>
+                        </div>
+                        @Html.Hidden("returnUrl", Request.RawUrl)
+                   if (Model.TotalRecords > 0)
+                   {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header ">
+                                    <th class="tn-border-gray tn-border-bottom">
+                                        <input type="checkbox" id="TopCheckBox" class="tn-radiobutton" onclick="checkAll(this,'CheckBoxGroup')" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        用户Id
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        用户名
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        显示名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        等级
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        上次登录
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        注册日期
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @if (Model != null && Model.TotalRecords > 0)
+                                {
+                                    RoleService roleService = new RoleService();
+                                    foreach (User user in Model)
+                                    {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("CheckBoxGroup", user.UserId)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @(user.UserId)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-user-name tn-nowrap">
+                                            <a href="@(SiteUrls.Instance().SpaceHome(user.UserId))" title="@(user.UserName)" target="_blank">
+                                                @(StringUtility.Trim(user.UserName, 10))</a>
+                                            @{IEnumerable<Role> rolesOfUser = roleService.GetRolesOfUser(user.UserId);
+                                              foreach (var item in rolesOfUser)
+                                              {
+                                                <img title="@(item.FriendlyRoleName)" src="@SiteUrls.Instance().LogoUrl(item.RoleImage, TenantTypeIds.Instance().Role(), ImageSizeTypeKeys.Instance().Small())" width="16" height="16"  />
+                                              }
+                                              if (user.IsBanned)
+                                              {
+                                                @Html.Icon(IconTypes.Banned, "封禁", new { @class = "tn-icon-inline" })
+                                              }
+                                              if (user.IsModerated || user.IsForceModerated)
+                                              {
+                                                @Html.Icon(IconTypes.Moderated, "管制", new { @class = "tn-icon-inline" })
+                                              }
+                                              if (!user.IsActivated)
+                                              { 
+                                                <span class="tn-icon-inline tn-icon-colorful tn-icon-colorful-stop" title="未激活">
+                                                </span>
+                                              }
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <a  title="@(user.DisplayName)" href="@(SiteUrls.Instance().SpaceHome(user.UserId))" target="_blank">@(StringUtility.Trim(user.DisplayName, 10))</a>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @(user.Rank)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-date tn-nowrap">
+                                            @(user.LastActivityTime.ToUserDateString())
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-date tn-nowrap">
+                                            @(user.DateCreated.ToUserDateString())
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                                            @if (authorizer.User_Manage(user.UserId))
+                                            {
+                                                @Html.Link("修改", SiteUrls.Instance().EditUser(user.UserId), "修改", new { target = "_blank", @class = "tn-item-link", plugin = "dialog" })
+                                                <span class="tn-action tn-action-text-icon-right tn-action-has-drop-menu tn-border-trl" menu="#moreOptions3@(user.UserId)">
+                                                    <span class="tn-icon tn-smallicon-triangle-down"></span><a href="javascript:;" class="tn-action-text">
+                                                        更多</a></span>
+                                                <div id="moreOptions3@(user.UserId)" class="tn-more-options tn-widget-content tn-border-gray" style="display: none;">
+                                                    <ul class="tn-more-list">
+                                                        <li>
+                                                            @Html.Link("改角色", SiteUrls.Instance()._SetUserRoles(user.UserId, Request.RawUrl), "改角色", new { plugin = "dialog", @class = "tn-item-link" })
+                                                        </li>
+                                                        <li>
+                                                            @Html.Link("改密码", SiteUrls.Instance()._ResetUserPassword(user.UserId), "改密码", new { plugin = "dialog", @class = "tn-item-link" })
+                                                        </li>
+                                                        <li>
+                                                            @Html.Link("奖惩", SiteUrls.Instance()._RewardUsers(user.UserId), "奖惩", new { plugin = "dialog", @class = "tn-item-link" })
+                                                        </li>
+                                                        <li>
+                                                            @Html.Link("删除", SiteUrls.Instance()._DeleteUser(user.UserId), "删除", new { plugin = "dialog", @class = "tn-item-link" })
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model)
+                            @Html.PagingResults(Model)
+                        </div>
+                   }
+                   else
+                   {
+                        <div class="tn-no-data">
+                            搜索不到数据</div> 
+                   }
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("tr span[menu]").menuButton();
+        $("#ManageUserRightMenu").load('@(Url.Action("_ManageUserRightMenu", "ControlPanelUser"))');
+
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () { $(this).removeClass('tn-bg-gray'); });
+    });
+    function VerifyChoose() {
+        if ($("input[name='CheckBoxGroup']:checked").length <= 0) {
+            alert("至少选择一位用户！"); return false;
+        } return true;
+    }
+    function UserIdChoose() {
+        if ($("input[name='CheckBoxGroup']:checked").length <= 0) {
+            return true;
+        } return true;
+    }
+    $("#jihuo").click(function () {
+        if (!VerifyChoose())
+            return false;
+        $('#ManageUsersForm').attr('action', '@SiteUrls.Instance().ActivatedUser(true)');
+        $('#ManageUsersForm').submit();
+    });
+
+    $("#qxjihuo").click(function () {
+        if (!VerifyChoose())
+            return false;
+        $('#ManageUsersForm').attr('action', '@SiteUrls.Instance().ActivatedUser(false)');
+        $('#ManageUsersForm').submit();
+    });
+
+    $("#UnbanUsers").click(function () {
+        if (!VerifyChoose())
+            return false;
+        $('#ManageUsersForm').attr('action', '@SiteUrls.Instance().UnbanUser(Request.RawUrl)');
+        $('#ManageUsersForm').submit();
+    });
+
+    $("#BanUsers").click(function () {
+        if (!VerifyChoose())
+            return false;
+    });
+
+    $("#DeleteUsers").click(function () {
+        if (!VerifyChoose())
+            return false;
+    });
+    //批量奖惩
+    $("#RewardUsers").click(function (e) {
+        $this = $(this);
+        if (!UserIdChoose())
+            return false;
+        $.get($this.attr("href"), $("#ManageUsersForm").serialize(), function (data) {
+            art.dialog(data);
+        });
+
+        return false;
+    });
+    function success()
+    { location.reload(true); } 
+</script>

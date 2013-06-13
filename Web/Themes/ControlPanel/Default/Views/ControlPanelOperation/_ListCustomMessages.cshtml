@@ -1,0 +1,122 @@
+﻿@model MessageEditModel
+@{
+    Layout = null;
+    MessageSession session = ViewData.Get<MessageSession>("session", null);
+    string displayName = ViewData["displayName"].ToString();
+}
+    <div class="tnc-dailog-pd">
+        <div class="tnc-custom-message-mod">
+            <div  class="tnc-letter" id ="msg_session_@(session.SessionId)" >
+                @if (!string.IsNullOrEmpty(displayName))
+                {
+                    <dl class="tnc-letter-replay">
+                        <dt>
+                            @Html.ShowUserAvatar(session.UserId, AvatarSizeType.Small, true)
+                        </dt>
+                        @using (Html.BeginAjaxForm("_CustomCreateMessage", "ControlPanelOperation", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("ReplaySuccess").SetCloseDialog(false)))
+                        {
+                            <dd class="tnc-sender-content">
+                                <div class="tn-widget tn-bubble tn-bubble-arrow-right">
+                                    <div class="tn-bubble-arrow">
+                                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                                        </b>
+                                    </div>
+                                    <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-top">
+                                        <div>
+                                            @Html.Hidden("ToUserIds", session.OtherUserId)
+                                            @Html.TextAreaFor(model => model.Body, InputWidthTypes.Long, htmlAttributes: new RouteValueDictionary { { "id", "ReplayMessageBody" } })</div>
+                                    </div>
+                                </div>
+                                <div class="tnc-send-handle tn-border-gray tn-border-rbl tn-corner-buttom tn-helper-clearfix">
+                                    <div class="tnc-but-resend">
+                                        <span id="Note" class="tn-text-note tn-action">0/300</span>
+                                        @Html.Button("发送", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "submitMessage" })
+                                    </div>
+                                </div>
+                            </dd> }
+                    </dl>
+                }
+                else
+                {
+                    <div class="tn-blank20"></div>
+                }
+                <div id="session_@(session.SessionId)">
+                    @{
+
+                        Html.RenderAction("_ListMessages", new { sessionId = session.SessionId, userId = session.UserId });
+
+                    }
+                </div>
+                @if (session.MessageCount > 50)
+                {
+                    <div name="showAll" class="tn-load-more tn-bg-gray tn-border-gray">
+                        <a href="javascript:;" class="tn-action tn-action-text-icon-right"><span class="tn-action-text">
+                            显示全部 </span>@Html.Icon(IconTypes.SmallCollapseOpen)</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var countInterval;
+        function blength(value) {
+            return parseInt((value.replace(/[^\x00-\xff]/g, "**").length + 1) / 2);
+        }
+               var length = blength($("#ReplayMessageBody").val());
+        function count() {
+            length = blength($("#ReplayMessageBody").val());
+            var $ps = $('#Note');
+
+            $("#Note").html(length + "/300");
+        }
+        $("#Note").html(blength($("#ReplayMessageBody").val()) + "/300");
+
+        $("#ReplayMessageBody").focus(function () {
+            countInterval = setInterval(function () { count(); }, 360);
+        }).blur(function () {
+            clearInterval(countInterval);
+            count();
+        });
+        count();
+         $("#submitMessage").click(function () {
+            if (length > 300) {
+            art.dialog.tips("内容超出字数限制！", 1.5, 0);
+                return false;
+            }
+
+        })
+        $("a[name='replay']").livequery(function () {
+            $(this).click(function () {
+                $("#ReplayMessageBody").focus();
+            });
+        });
+
+
+    });
+    
+    function DeleteMessageSuccess() {
+        var count = $("#messagesCount").html();
+        $("#messagesCount").html(count - 1);
+
+    }
+
+    function ReplaySuccess(response) {
+    if(response.hint){
+            art.dialog.tips(response.hint.MessageContent, 2, response.hint.MessageType);}
+            $("#ReplayMessageBody").attr("value", '');
+
+            $.get('@Html.Raw(SiteUrls.Instance()._Message( null, null))',
+             { messageId: response.messageId,sessionId:@(session.SessionId) },
+              function (data) {
+//                $("#session_@(session.SessionId)").children("dl.tnc-letter-to").first().find('div[id^=msg_message_]').first().before(data);
+//            });
+//              $("#session_@(session.SessionId)").children("dl").first().find('div[id^=msg_message_]').first().before(data);
+              $("#session_@(session.SessionId)").children("div[class='tnc-letter']").children("dl:first").before(data);
+              }
+              );
+
+
+    }
+
+</script>

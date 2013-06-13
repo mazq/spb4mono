@@ -1,0 +1,616 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D9BC9674-69DE-4742-AF24-E35C43DE84CE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tunynet</RootNamespace>
+    <AssemblyName>Tunynet.BusinessComponents</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Tunynet.BusinessComponents.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Tunynet.BusinessComponents.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mvc, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.Mvc3.2.6.3.862\lib\NET40\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="C5, Version=1.1.0.0, Culture=neutral, PublicKeyToken=06a1b38866503b69, processorArchitecture=MSIL">
+      <HintPath>..\packages\Quartz.2.0.1\lib\net40\C5.dll</HintPath>
+    </Reference>
+    <Reference Include="CodeKicker.BBCode, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BBCode.5.0.0\lib\CodeKicker.BBCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres, Version=2.2.2.6, Culture=neutral, PublicKeyToken=1ca6b37997dd7536, processorArchitecture=MSIL">
+      <HintPath>..\packages\combres.2.2.2.6\lib\net40\Combres.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.2.0.0\lib\2.0\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching, Version=2.11.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <HintPath>..\packages\EnyimMemcached.2.11\lib\net35\Enyim.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Fasterflect, Version=2.1.0.8328, Culture=neutral, PublicKeyToken=38d18473284c1ca7, processorArchitecture=MSIL">
+      <HintPath>..\packages\fasterflect.2.1.0\lib\net40\Fasterflect.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.0\lib\Net40\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.1.2.11\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=2.9.4.2, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lucene.Net.2.9.4.2\lib\net40\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPinyin">
+      <HintPath>..\packages\NPinyin.0.2.0\lib\NPinyin.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PanGu.2.3.1.0\lib\PanGu.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.HighLight, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PanGu.2.3.1.0\lib\PanGu.HighLight.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.Lucene.Analyzer, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PanGu.2.3.1.0\lib\PanGu.Lucene.Analyzer.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz, Version=2.0.1.100, Culture=neutral, PublicKeyToken=f6b8c98a402cc8a4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Quartz.2.0.1\lib\net40\Quartz.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine, Version=3.0.8.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\packages\RazorEngine.3.0.8\lib\net40\RazorEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tunynet.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Tunynet.Infrastructure.1.0.0\lib\net40\Tunynet.Infrastructure.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Common\Advertisings\Advertising.cs" />
+    <Compile Include="Common\Advertisings\AdvertisingEnum.cs" />
+    <Compile Include="Common\Advertisings\AdvertisingPosition.cs" />
+    <Compile Include="Common\Advertisings\AdvertisingService.cs" />
+    <Compile Include="Common\Advertisings\Repositories\AdvertisingPositionRepository.cs" />
+    <Compile Include="Common\Advertisings\Repositories\AdvertisingRepository.cs" />
+    <Compile Include="Common\Advertisings\Repositories\IAdvertisingPositionRepository.cs" />
+    <Compile Include="Common\Advertisings\Repositories\IAdvertisingRepository.cs" />
+    <Compile Include="Common\ApplicationData\ApplicationData.cs" />
+    <Compile Include="Common\ApplicationData\ApplicationDataKeys.cs" />
+    <Compile Include="Common\ApplicationData\ApplicationDataService.cs" />
+    <Compile Include="Common\ApplicationData\IApplicationDataCalculater.cs" />
+    <Compile Include="Common\ApplicationData\Repositories\ApplicationDataRepository.cs" />
+    <Compile Include="Common\ApplicationData\Repositories\IApplicationDataRepository.cs" />
+    <Compile Include="Common\ApplicationData\Task\ApplicationDataCalculaterTask.cs" />
+    <Compile Include="Common\Applications\ApplicationBase.cs" />
+    <Compile Include="Common\Applications\ApplicationConfig.cs" />
+    <Compile Include="Common\Applications\ApplicationInPresentAreaInstallation.cs" />
+    <Compile Include="Common\Applications\ApplicationInPresentAreaSetting.cs" />
+    <Compile Include="Common\Applications\ApplicationModel.cs" />
+    <Compile Include="Common\Applications\ApplicationService.cs" />
+    <Compile Include="Common\Applications\Repositories\ApplicationInPresentAreaInstallationRepository.cs" />
+    <Compile Include="Common\Applications\Repositories\IApplicationInPresentAreaInstallationRepository.cs" />
+    <Compile Include="Common\Area\Area.cs" />
+    <Compile Include="Common\Area\AreaService.cs" />
+    <Compile Include="Common\Area\Configuration\AreaSettings.cs" />
+    <Compile Include="Common\Area\Configuration\IAreaSettingsManager.cs" />
+    <Compile Include="Common\Area\Repositories\AreaRepository.cs" />
+    <Compile Include="Common\Area\Repositories\IAreaRepository.cs" />
+    <Compile Include="Common\Attachments\Attachment.cs" />
+    <Compile Include="Common\Attachments\AttachmentDownloadRecord.cs" />
+    <Compile Include="Common\Attachments\AttachmentDownloadService.cs" />
+    <Compile Include="Common\Attachments\AttachmentEnum.cs" />
+    <Compile Include="Common\Attachments\AttachmentService`1.cs" />
+    <Compile Include="Common\Attachments\Configuration\AttachmentSettings.cs" />
+    <Compile Include="Common\Attachments\Configuration\IAttachmentSettingsManager.cs" />
+    <Compile Include="Common\Attachments\Configuration\MimeTypeConfiguration.cs" />
+    <Compile Include="Common\Attachments\Configuration\TenantAttachmentSettings.cs" />
+    <Compile Include="Common\Attachments\Configuration\WatermarkSettings.cs" />
+    <Compile Include="Common\Attachments\ImageSizeType.cs" />
+    <Compile Include="Common\Attachments\ImageSizeTypeKeys.cs" />
+    <Compile Include="Common\Attachments\Repositories\AttachmentRepository.cs" />
+    <Compile Include="Common\Attachments\Repositories\IAttachmentRepository.cs" />
+    <Compile Include="Common\Attachments\Repositories\AttachmentDownloadRepository.cs" />
+    <Compile Include="Common\Attachments\Repositories\IAttachmentDownloadRepository.cs" />
+    <Compile Include="Common\Attachments\AttachmentService.cs" />
+    <Compile Include="Common\Attachments\Tasks\DeleteTrashTemporaryAttachmentsTask.cs" />
+    <Compile Include="Common\PauseSite\IPauseSiteSettingsManager.cs" />
+    <Compile Include="Common\PauseSite\PauseSiteSettings.cs" />
+    <Compile Include="Common\Tasks\DeleteTrashDataTask.cs" />
+    <Compile Include="Common\Favorite\Favorite.cs" />
+    <Compile Include="Common\Favorite\FavoriteEventArgs.cs" />
+    <Compile Include="Common\Favorite\FavoriteService.cs" />
+    <Compile Include="Common\Favorite\Repositories\FavoriteRepository.cs" />
+    <Compile Include="Common\Favorite\Repositories\IFavoriteRepository.cs" />
+    <Compile Include="Common\Linktimeliness\ILinktimelinessSettingsManager.cs" />
+    <Compile Include="Common\Linktimeliness\LinktimelinessSettings.cs" />
+    <Compile Include="Common\Logo\Configuration\ILogoSettingsManager.cs" />
+    <Compile Include="Common\Logo\Configuration\LogoSettings.cs" />
+    <Compile Include="Common\Logo\Configuration\TenantLogoSettings.cs" />
+    <Compile Include="Common\Logo\LogoService.cs" />
+    <Compile Include="Common\OwnerData\OwnerDataEnum.cs" />
+    <Compile Include="Common\ParsedMedia\ParsedMedia.cs" />
+    <Compile Include="Common\ParsedMedia\ParsedMediaService.cs" />
+    <Compile Include="Common\ParsedMedia\Repositories\IParsedMediaRepository.cs" />
+    <Compile Include="Common\ParsedMedia\Repositories\ParsedMediaRepository.cs" />
+    <Compile Include="Common\School\SchoolEnum.cs" />
+    <Compile Include="Common\SensitiveWord\Repositories\ISensitiveWordRepository.cs" />
+    <Compile Include="Common\SensitiveWord\Repositories\SensitiveWordRepository.cs" />
+    <Compile Include="Common\SensitiveWord\Repositories\SensitiveWordTypeRepository.cs" />
+    <Compile Include="Common\SensitiveWord\SensitiveWord.cs" />
+    <Compile Include="Common\SensitiveWord\SensitiveWordService.cs" />
+    <Compile Include="Common\SensitiveWord\SensitiveWordType.cs" />
+    <Compile Include="Common\ShortUrl\IShortUrlSettingsManager.cs" />
+    <Compile Include="Common\ShortUrl\IUrlShortner.cs" />
+    <Compile Include="Common\ShortUrl\Repositories\IShortUrlRepository.cs" />
+    <Compile Include="Common\ShortUrl\Repositories\ShortUrlRepository.cs" />
+    <Compile Include="Common\ShortUrl\ShortUrlEntity.cs" />
+    <Compile Include="Common\ShortUrl\ShortUrlService.cs" />
+    <Compile Include="Common\ShortUrl\ShortUrlSettings.cs" />
+    <Compile Include="Common\SiteSettings\ISiteSettingsManager.cs" />
+    <Compile Include="Common\SiteSettings\SiteSettings.cs" />
+    <Compile Include="Common\Subscribe\SubscribeEventArgs.cs" />
+    <Compile Include="Common\Subscribe\SubscribeService.cs" />
+    <Compile Include="Common\SystemData\Repositories\ISystemDataRepository.cs" />
+    <Compile Include="Common\SystemData\Repositories\SystemDataRepository.cs" />
+    <Compile Include="Common\SystemData\SystemData.cs" />
+    <Compile Include="Common\SystemData\SystemDataKeys.cs" />
+    <Compile Include="Common\SystemData\SystemDataService.cs" />
+    <Compile Include="Common\TenantType\MultiTenantServiceKeys.cs" />
+    <Compile Include="Common\TenantType\Repositories\TenantTypeRepository.cs" />
+    <Compile Include="Common\TenantType\Repositories\ITenantTypeRepository.cs" />
+    <Compile Include="Common\TenantType\TenantType.cs" />
+    <Compile Include="Common\TenantType\TenantTypeIds.cs" />
+    <Compile Include="Common\TenantType\TenantTypeService.cs" />
+    <Compile Include="Common\School\School.cs" />
+    <Compile Include="Common\School\SchoolService.cs" />
+    <Compile Include="Common\School\Repositories\SchoolRepository.cs" />
+    <Compile Include="Common\School\Repositories\ISchoolRepository.cs" />
+    <Compile Include="Communication\Activity\Activity.cs" />
+    <Compile Include="Communication\Activity\ActivityItem.cs" />
+    <Compile Include="Communication\Activity\ActivityItemKeys.cs" />
+    <Compile Include="Communication\Activity\ActivityItemUserSetting.cs" />
+    <Compile Include="Communication\Activity\ActivityOwnerTypes.cs" />
+    <Compile Include="Communication\Activity\ActivityService.cs" />
+    <Compile Include="Communication\Activity\ActivitySiteInboxItem.cs" />
+    <Compile Include="Communication\Activity\ActivityUserInboxItem.cs" />
+    <Compile Include="Communication\Activity\Configuration\ActivitySettings.cs" />
+    <Compile Include="Communication\Activity\Configuration\IActivitySettingsManager.cs" />
+    <Compile Include="Communication\Activity\IActivityReceiverGetter.cs" />
+    <Compile Include="Communication\Activity\Repositories\ActivityItemRepository.cs" />
+    <Compile Include="Communication\Activity\Repositories\ActivityItemUserSettingRepository.cs" />
+    <Compile Include="Communication\Activity\Repositories\ActivityRepository.cs" />
+    <Compile Include="Communication\Activity\Repositories\IActivityItemRepository.cs" />
+    <Compile Include="Communication\Activity\Repositories\IActivityItemUserSettingRepository.cs" />
+    <Compile Include="Communication\Activity\Repositories\IActivityRepository.cs" />
+    <Compile Include="Communication\Activity\UserActivityReceiverGetter.cs" />
+    <Compile Include="Communication\Invitation\Configuration\IInvitationSettingsManager.cs" />
+    <Compile Include="Communication\Invitation\Configuration\InvitationSettings.cs" />
+    <Compile Include="Communication\Invitation\Configuration\InvitationTypeSettings.cs" />
+    <Compile Include="Communication\Invitation\Invitation.cs" />
+    <Compile Include="Communication\Invitation\InvitationBuilder.cs" />
+    <Compile Include="Communication\Invitation\InvitationService.cs" />
+    <Compile Include="Communication\Invitation\InvitationStatus.cs" />
+    <Compile Include="Communication\Invitation\InvitationTemplate.cs" />
+    <Compile Include="Communication\Invitation\InvitationType.cs" />
+    <Compile Include="Communication\Invitation\InvitationTypeKeys.cs" />
+    <Compile Include="Communication\Invitation\Repositories\IInvitationRepository.cs" />
+    <Compile Include="Communication\Invitation\Repositories\InvitationRepository.cs" />
+    <Compile Include="Communication\Invitation\Repositories\IUserInvitationSettingsRepository.cs" />
+    <Compile Include="Communication\Invitation\Repositories\UserInvitationSettingsRepository.cs" />
+    <Compile Include="Communication\Invitation\UserInvitationSettings.cs" />
+    <Compile Include="Communication\InviteFriend\Configuration\IInviteFriendSettingsManager.cs" />
+    <Compile Include="Communication\InviteFriend\Configuration\InviteFriendSettings.cs" />
+    <Compile Include="Communication\InviteFriend\CSVParser.cs" />
+    <Compile Include="Communication\InviteFriend\IEmailContactAccessor.cs" />
+    <Compile Include="Communication\InviteFriend\IMsnContactAccessor.cs" />
+    <Compile Include="Communication\InviteFriend\InvitationCode.cs" />
+    <Compile Include="Communication\InviteFriend\InvitationCodeStatistic.cs" />
+    <Compile Include="Communication\InviteFriend\InviteFriendRecord.cs" />
+    <Compile Include="Communication\InviteFriend\InviteFriendService.cs" />
+    <Compile Include="Communication\InviteFriend\Repositories\IInvitationCodesRepository.cs" />
+    <Compile Include="Communication\InviteFriend\Repositories\IInvitationCodeStatisticsRepository.cs" />
+    <Compile Include="Communication\InviteFriend\Repositories\IInviteFriendRecordsRepository.cs" />
+    <Compile Include="Communication\InviteFriend\Repositories\InvitationCodesRepository.cs" />
+    <Compile Include="Communication\InviteFriend\Repositories\InvitationCodeStatisticsRepository.cs" />
+    <Compile Include="Communication\InviteFriend\Repositories\InviteFriendRecordsRepository.cs" />
+    <Compile Include="Communication\InviteFriend\Tasks\DeleteTrashInvitationCodesTask.cs" />
+    <Compile Include="Communication\Message\IMessageSettingsManager.cs" />
+    <Compile Include="Communication\Message\Message.cs" />
+    <Compile Include="Communication\Message\MessageEnum.cs" />
+    <Compile Include="Communication\Message\MessageInSession.cs" />
+    <Compile Include="Communication\Message\MessageService.cs" />
+    <Compile Include="Communication\Message\MessageSession.cs" />
+    <Compile Include="Communication\Message\Repositories\IMessageInSessionRepository.cs" />
+    <Compile Include="Communication\Message\Repositories\IMessageRepository.cs" />
+    <Compile Include="Communication\Message\Repositories\IMessageSessionRepository.cs" />
+    <Compile Include="Communication\Message\Repositories\MessageInSessionRepository.cs" />
+    <Compile Include="Communication\Message\Repositories\MessageRepository.cs" />
+    <Compile Include="Communication\Message\Repositories\MessageSessionRepository.cs" />
+    <Compile Include="Communication\Message\MessageSettings.cs" />
+    <Compile Include="Communication\Notice\Configuration\INoticeSettingsManager.cs" />
+    <Compile Include="Communication\Notice\Configuration\NoticeSettings.cs" />
+    <Compile Include="Communication\Notice\Configuration\NoticeTypeSettings.cs" />
+    <Compile Include="Communication\Notice\Notice.cs" />
+    <Compile Include="Communication\Notice\NoticeBuilder.cs" />
+    <Compile Include="Communication\Notice\NoticeService.cs" />
+    <Compile Include="Communication\Notice\NoticeStatus.cs" />
+    <Compile Include="Communication\Notice\NoticeTemplateNames.cs" />
+    <Compile Include="Communication\Notice\NoticeType.cs" />
+    <Compile Include="Communication\Notice\NoticeTypeIds.cs" />
+    <Compile Include="Communication\Notice\Repositories\INoticeRepository.cs" />
+    <Compile Include="Communication\Notice\Repositories\IUserNoticeSettingsRepository.cs" />
+    <Compile Include="Communication\Notice\Repositories\NoticeRepository.cs" />
+    <Compile Include="Communication\Notice\Repositories\UserNoticeSettingsRepository.cs" />
+    <Compile Include="Communication\Notice\UserNoticeSettings.cs" />
+    <Compile Include="Communication\Reminder\Configuration\IReminderSettingsManager.cs" />
+    <Compile Include="Communication\Reminder\Configuration\ReminderSettings.cs" />
+    <Compile Include="Communication\Reminder\IReminderInfoAccessor.cs" />
+    <Compile Include="Communication\Reminder\IReminderSender.cs" />
+    <Compile Include="Communication\Reminder\ReminderInfo.cs" />
+    <Compile Include="Communication\Reminder\ReminderInfoType.cs" />
+    <Compile Include="Communication\Reminder\ReminderInfoTypeIds.cs" />
+    <Compile Include="Communication\Reminder\ReminderInfoTypeSettings.cs" />
+    <Compile Include="Communication\Reminder\ReminderMode.cs" />
+    <Compile Include="Communication\Reminder\ReminderModeIds.cs" />
+    <Compile Include="Communication\Reminder\ReminderRecord.cs" />
+    <Compile Include="Communication\Reminder\ReminderService.cs" />
+    <Compile Include="Communication\Reminder\Repositories\IReminderRecordRepository.cs" />
+    <Compile Include="Communication\Reminder\Repositories\IUserReminderSettingsRepository.cs" />
+    <Compile Include="Communication\Reminder\Repositories\ReminderRecordRepository.cs" />
+    <Compile Include="Communication\Reminder\Repositories\UserReminderSettingsRepository.cs" />
+    <Compile Include="Communication\Reminder\Tasks\DeleteTrashReminderRecordsTask.cs" />
+    <Compile Include="Communication\Reminder\Tasks\SendReminderTask.cs" />
+    <Compile Include="Communication\Reminder\UserReminderInfo.cs" />
+    <Compile Include="Communication\Reminder\UserReminderSettings.cs" />
+    <Compile Include="Communication\Reminder\ReminderModeSettings.cs" />
+    <Compile Include="ContentOrganization\Announcements\Announcement.cs" />
+    <Compile Include="ContentOrganization\Announcements\AnnouncementEnum.cs" />
+    <Compile Include="ContentOrganization\Announcements\AnnouncementService.cs" />
+    <Compile Include="ContentOrganization\Announcements\Repositories\AnnouncementRepository.cs" />
+    <Compile Include="ContentOrganization\Announcements\Repositories\IAnnouncementRepository.cs" />
+    <Compile Include="ContentOrganization\Categories\Category.cs" />
+    <Compile Include="ContentOrganization\Categories\CategoryEventArgs.cs" />
+    <Compile Include="ContentOrganization\Categories\CategoryService.cs" />
+    <Compile Include="ContentOrganization\Categories\CategoryService`1.cs" />
+    <Compile Include="ContentOrganization\Categories\ItemInCategory.cs" />
+    <Compile Include="ContentOrganization\Categories\Repositories\CategoryRepository.cs" />
+    <Compile Include="ContentOrganization\Categories\Repositories\ICategoryRepository.cs" />
+    <Compile Include="ContentOrganization\Categories\Repositories\IItemInCategoryRepository.cs" />
+    <Compile Include="ContentOrganization\Categories\Repositories\ItemInCategoryRepository.cs" />
+    <Compile Include="ContentOrganization\Recommend\Configuration\IRecommendUrlGetter.cs" />
+    <Compile Include="ContentOrganization\Recommend\Configuration\RecommendUrlGetterFactory.cs" />
+    <Compile Include="ContentOrganization\Recommend\RecommendItem.cs" />
+    <Compile Include="ContentOrganization\Recommend\RecommendItemType.cs" />
+    <Compile Include="ContentOrganization\Recommend\RecommendService.cs" />
+    <Compile Include="ContentOrganization\Recommend\Repositories\IRecommendItemRepository.cs" />
+    <Compile Include="ContentOrganization\Recommend\Repositories\IRecommendItemTypeRepository.cs" />
+    <Compile Include="ContentOrganization\Recommend\Repositories\RecommendItemRepository.cs" />
+    <Compile Include="ContentOrganization\Recommend\Repositories\RecommendItemTypeRepository.cs" />
+    <Compile Include="ContentOrganization\Recommend\Tasks\DeleteExpiredRecommendItemsTask.cs" />
+    <Compile Include="ContentOrganization\Tags\CountTypesExtension.cs" />
+    <Compile Include="ContentOrganization\Tags\ITagSettingsManager.cs" />
+    <Compile Include="ContentOrganization\Tags\ItemInTag.cs" />
+    <Compile Include="ContentOrganization\Tags\RelatedTag.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\IItemInTagRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\IRelatedTagRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\ITagGroupRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\ITagInGroupRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\ITagInOwnerRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\ITagRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\ItemInTagRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\RelatedTagRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\TagGroupRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\TagInGroupRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\TagInOwnerRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Repositories\TagRepository.cs" />
+    <Compile Include="ContentOrganization\Tags\Tag.cs" />
+    <Compile Include="ContentOrganization\Tags\TagEnum.cs" />
+    <Compile Include="ContentOrganization\Tags\TagEventArgs.cs" />
+    <Compile Include="ContentOrganization\Tags\TagGroup.cs" />
+    <Compile Include="ContentOrganization\Tags\TagInGroup.cs" />
+    <Compile Include="ContentOrganization\Tags\TagInOwner.cs" />
+    <Compile Include="ContentOrganization\Tags\TagService.cs" />
+    <Compile Include="ContentOrganization\Tags\TagService`1.cs" />
+    <Compile Include="ContentOrganization\Tags\TagSettings.cs" />
+    <Compile Include="ContentOrganization\Tags\Configuration\ITagUrlGetter.cs" />
+    <Compile Include="ContentOrganization\Tags\Configuration\TagUrlGetterManager.cs" />
+    <Compile Include="ContentOrganization\Tags\TagQuery.cs" />
+    <Compile Include="Interaction\Attitude\Attitude.cs" />
+    <Compile Include="Interaction\Attitude\AttitudeEnum.cs" />
+    <Compile Include="Interaction\Attitude\AttitudeOnlySupportSettings.cs" />
+    <Compile Include="Interaction\Attitude\AttitudeRecord.cs" />
+    <Compile Include="Interaction\Attitude\AttitudeService.cs" />
+    <Compile Include="Interaction\Attitude\AttitudeSettings.cs" />
+    <Compile Include="Interaction\Attitude\Configuration\IAttitudeOnlySupportSettingsManager.cs" />
+    <Compile Include="Interaction\Attitude\Configuration\IAttitudeSettingsManager.cs" />
+    <Compile Include="Interaction\Attitude\EventOperationType.cs" />
+    <Compile Include="Interaction\Attitude\Repositories\AttitudeRecordRepository.cs" />
+    <Compile Include="Interaction\Attitude\Repositories\AttitudeRepository.cs" />
+    <Compile Include="Interaction\Attitude\Repositories\IAttitudeRecordRepository.cs" />
+    <Compile Include="Interaction\Attitude\Repositories\IAttitudeRepository.cs" />
+    <Compile Include="Interaction\Comment\CommentUrlGetterFactory.cs" />
+    <Compile Include="Interaction\Comment\Configuration\ICommentSettingsManager.cs" />
+    <Compile Include="Interaction\Comment\Configuration\CommentSettings.cs" />
+    <Compile Include="Interaction\Comment\Configuration\TenantCommentSettings.cs" />
+    <Compile Include="Interaction\Comment\ICommentBodyProcessor.cs" />
+    <Compile Include="Interaction\Comment\ICommentUrlGetter.cs" />
+    <Compile Include="Interaction\Count\CountEntity.cs" />
+    <Compile Include="Interaction\Count\CountPerDayEntity.cs" />
+    <Compile Include="Interaction\Count\CountQueueItem.cs" />
+    <Compile Include="Interaction\Count\CountService.cs" />
+    <Compile Include="Interaction\Count\CountTypes.cs" />
+    <Compile Include="Interaction\Count\Repositories\CountRepository.cs" />
+    <Compile Include="Interaction\Count\Repositories\ICountRepository.cs" />
+    <Compile Include="Interaction\Count\StageCountTypeManager.cs" />
+    <Compile Include="Interaction\Count\Tasks\ExecCountQueueTask.cs" />
+    <Compile Include="Interaction\Count\Tasks\UpdateStageCountTask.cs" />
+    <Compile Include="Interaction\Emotion\Emotion.cs" />
+    <Compile Include="Interaction\Emotion\EmotionCategory.cs" />
+    <Compile Include="Interaction\Emotion\EmotionService.cs" />
+    <Compile Include="Interaction\Emotion\EmotionSettings.cs" />
+    <Compile Include="Interaction\Emotion\IEmotionSettingsManager.cs" />
+    <Compile Include="Interaction\Rating\Configuration\IRatingSettingsManager.cs" />
+    <Compile Include="Interaction\Rating\Rating.cs" />
+    <Compile Include="Interaction\Rating\RatingGrade.cs" />
+    <Compile Include="Interaction\Rating\RatingRecord.cs" />
+    <Compile Include="Interaction\Rating\RatingService.cs" />
+    <Compile Include="Interaction\Rating\RatingSettings.cs" />
+    <Compile Include="Interaction\Rating\Repositories\IRatingGradeRepository.cs" />
+    <Compile Include="Interaction\Rating\Repositories\IRatingRecordRepository.cs" />
+    <Compile Include="Interaction\Rating\Repositories\IRatingRepository.cs" />
+    <Compile Include="Interaction\Rating\Repositories\RatingGradeRepository.cs" />
+    <Compile Include="Interaction\Rating\Repositories\RatingRecordRepository.cs" />
+    <Compile Include="Interaction\Rating\Repositories\RatingRepository.cs" />
+    <Compile Include="Interaction\Attitude\SupportOpposeEventArgs.cs" />
+    <Compile Include="Regulate\Audit\ApplicationDataKeysExtensions.cs" />
+    <Compile Include="Regulate\Audit\AuditEnum.cs" />
+    <Compile Include="Regulate\Audit\AuditEventArgs.cs" />
+    <Compile Include="Regulate\Audit\AuditItem.cs" />
+    <Compile Include="Regulate\Audit\AuditItemInUserRole.cs" />
+    <Compile Include="Regulate\Audit\AuditItemKeys.cs" />
+    <Compile Include="Regulate\Audit\AuditService.cs" />
+    <Compile Include="Regulate\Audit\IAuditable.cs" />
+    <Compile Include="Regulate\Audit\Repositories\AuditItemInUserRoleRepository.cs" />
+    <Compile Include="Regulate\Audit\Repositories\IAuditItemInUserRoleRepository.cs" />
+    <Compile Include="Regulate\Permission\ApplicationAdministratorRoleNames.cs" />
+    <Compile Include="Regulate\Permission\AuthorizationService.cs" />
+    <Compile Include="Regulate\Permission\IAuthorizationService.cs" />
+    <Compile Include="Regulate\Permission\ITenantAuthorizationHandler.cs" />
+    <Compile Include="Regulate\Permission\PermissionEnum.cs" />
+    <Compile Include="Regulate\Permission\PermissionItem.cs" />
+    <Compile Include="Regulate\Permission\PermissionItemInUserRole.cs" />
+    <Compile Include="Regulate\Permission\PermissionItemKeys.cs" />
+    <Compile Include="Regulate\Permission\PermissionService.cs" />
+    <Compile Include="Regulate\Permission\Repositories\IPermissionItemInUserRoleRepository.cs" />
+    <Compile Include="Regulate\Permission\Repositories\PermissionItemInUserRoleRepository.cs" />
+    <Compile Include="Regulate\Permission\ResolvedUserPermission.cs" />
+    <Compile Include="Regulate\PrivacyStatus.cs" />
+    <Compile Include="Interaction\Comment\Comment.cs" />
+    <Compile Include="Interaction\Comment\CommentEnum.cs" />
+    <Compile Include="Interaction\Comment\CommentService.cs" />
+    <Compile Include="Interaction\Comment\Repositories\CommentRepository.cs" />
+    <Compile Include="Interaction\Comment\Repositories\ICommentRepository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Common\PresentAreas\PresentArea.cs" />
+    <Compile Include="Common\PresentAreas\PresentAreaKeysOfBuiltIn.cs" />
+    <Compile Include="Common\PresentAreas\PresentAreaService.cs" />
+    <Compile Include="Regulate\Privacy\Configuration\IPrivacySettingsManager.cs" />
+    <Compile Include="Regulate\Privacy\Configuration\PrivacySettings.cs" />
+    <Compile Include="Regulate\Privacy\ContentPrivacyService.cs" />
+    <Compile Include="Regulate\Privacy\ContentPrivacySpecifyObject.cs" />
+    <Compile Include="Regulate\Privacy\IPrivacyable.cs" />
+    <Compile Include="Regulate\Privacy\IPrivacySpecifyObjectValidator.cs" />
+    <Compile Include="Regulate\Privacy\PrivacyItem.cs" />
+    <Compile Include="Regulate\Privacy\PrivacyItemGroup.cs" />
+    <Compile Include="Regulate\Privacy\PrivacyItemGroupIds.cs" />
+    <Compile Include="Regulate\Privacy\PrivacyItemKeys.cs" />
+    <Compile Include="Regulate\Privacy\PrivacyService.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\ContentPrivacySpecifyObjectsRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\IContentPrivacySpecifyObjectsRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\IPrivacyItemRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\IStopedUserRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\IUserPrivacySettingRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\IUserPrivacySpecifyObjectRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\PrivacyItemRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\StopedUserRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\UserPrivacySettingRepository.cs" />
+    <Compile Include="Regulate\Privacy\Repositories\UserPrivacySpecifyObjectRepository.cs" />
+    <Compile Include="Regulate\Privacy\SpecifyObjectType.cs" />
+    <Compile Include="Regulate\Privacy\SpecifyObjectTypeIds.cs" />
+    <Compile Include="Regulate\Privacy\StopedUser.cs" />
+    <Compile Include="Regulate\Privacy\UserGroupPrivacySpecifyObjectValidator.cs" />
+    <Compile Include="Regulate\Privacy\UserPrivacySetting.cs" />
+    <Compile Include="Regulate\Privacy\UserPrivacySpecifyObject.cs" />
+    <Compile Include="Regulate\Privacy\UserPrivacySpecifyObjectValidator.cs" />
+    <Compile Include="Regulate\UserBlock\BlockedObjectTypes.cs" />
+    <Compile Include="Regulate\UserBlock\Repositories\IUserBlockRepository.cs" />
+    <Compile Include="Regulate\UserBlock\Repositories\UserBlockRepository.cs" />
+    <Compile Include="Regulate\UserBlock\UserBlockedObject.cs" />
+    <Compile Include="Regulate\UserBlock\UserBlockService.cs" />
+    <Compile Include="Search\CountTypesExtension.cs" />
+    <Compile Include="Search\Repositories\ISearchedTermRepository.cs" />
+    <Compile Include="Search\Repositories\ISearchHistoryRepository.cs" />
+    <Compile Include="Search\Repositories\SearchedTermRepository.cs" />
+    <Compile Include="Search\Repositories\SearchHistoryRepository.cs" />
+    <Compile Include="Search\SearchedTerm.cs" />
+    <Compile Include="Search\SearchedTermService.cs" />
+    <Compile Include="Search\SearchHistoryService.cs" />
+    <Compile Include="UI\ManagementOperations\ApplicationManagementOperation.cs" />
+    <Compile Include="UI\ManagementOperations\ManagementOperationService.cs" />
+    <Compile Include="UI\ManagementOperations\ManagementOperationType.cs" />
+    <Compile Include="UI\Navigations\CommonOperation.cs" />
+    <Compile Include="UI\Navigations\Navigation.cs" />
+    <Compile Include="UI\Navigations\NavigationService.cs" />
+    <Compile Include="UI\Navigations\NavigationType.cs" />
+    <Compile Include="UI\Navigations\InitialNavigation.cs" />
+    <Compile Include="UI\Navigations\PresentAreaNavigation.cs" />
+    <Compile Include="UI\Navigations\Repositories\CommonOperationRepository.cs" />
+    <Compile Include="UI\Navigations\Repositories\ICommonOperationRepository.cs" />
+    <Compile Include="UI\Navigations\Repositories\IInitialNavigationRepository.cs" />
+    <Compile Include="UI\Navigations\Repositories\InitialNavigationRepository.cs" />
+    <Compile Include="UI\Navigations\Repositories\IPresentAreaNavigationRepository.cs" />
+    <Compile Include="UI\Navigations\Repositories\PresentAreaNavigationRepository.cs" />
+    <Compile Include="UI\Resources\IPageResourceManager.cs" />
+    <Compile Include="UI\Resources\MetaEntry.cs" />
+    <Compile Include="UI\Resources\ResourceEntry.cs" />
+    <Compile Include="UI\Resources\PageResourceManager.cs" />
+    <Compile Include="UI\Resources\ResourceRenderLocation.cs" />
+    <Compile Include="UI\Resources\ResourceRenderPriority.cs" />
+    <Compile Include="UI\Resources\PageResourceType.cs" />
+    <Compile Include="UI\Resources\TitleFilterAttribute.cs" />
+    <Compile Include="UI\Themes\IThemeResolver.cs" />
+    <Compile Include="UI\Themes\Theme.cs" />
+    <Compile Include="UI\Themes\ThemeAppearance.cs" />
+    <Compile Include="UI\Themes\ThemedAttribute.cs" />
+    <Compile Include="UI\Themes\ThemedRazorView.cs" />
+    <Compile Include="UI\Themes\ThemedViewEngine.cs" />
+    <Compile Include="UI\Themes\ThemedWebViewPage.cs" />
+    <Compile Include="UI\Themes\ThemedWebViewPage`1.cs" />
+    <Compile Include="UI\Themes\ThemeService.cs" />
+    <Compile Include="Common\OwnerData\Configuration\OwnerDataSettings.cs" />
+    <Compile Include="Common\OwnerData\Repositories\IOwnerDataRepository.cs" />
+    <Compile Include="Common\OwnerData\Repositories\OwnerDataRepository.cs" />
+    <Compile Include="Common\OwnerData\OwnerData.cs" />
+    <Compile Include="Common\OwnerData\OwnerDataKeys.cs" />
+    <Compile Include="Common\OwnerData\OwnerDataService.cs" />
+    <Compile Include="User\AccountBindings\AccountBinding.cs" />
+    <Compile Include="User\AccountBindings\AccountBindingService.cs" />
+    <Compile Include="User\AccountBindings\AccountType.cs" />
+    <Compile Include="User\AccountBindings\AccountTypeKeys.cs" />
+    <Compile Include="User\AccountBindings\Repositories\AccountBindingRepository.cs" />
+    <Compile Include="User\AccountBindings\Repositories\IAccountBindingRepository.cs" />
+    <Compile Include="User\Account\ChangePointsEventArgs.cs" />
+    <Compile Include="User\Account\Configuration\IUserSettingsManager.cs" />
+    <Compile Include="User\Account\RewardAndPunishmentUserEventArgs.cs" />
+    <Compile Include="User\Account\Configuration\UserSettings.cs" />
+    <Compile Include="User\Account\CreateUserEventArgs.cs" />
+    <Compile Include="User\Account\DeleteUserEventArgs.cs" />
+    <Compile Include="User\Account\IAuthenticationService.cs" />
+    <Compile Include="User\Account\IMembershipService.cs" />
+    <Compile Include="User\Account\IUser.cs" />
+    <Compile Include="User\Account\IUserService.cs" />
+    <Compile Include="User\Account\UpdateRankEventArgs.cs" />
+    <Compile Include="User\Account\UserEnum.cs" />
+    <Compile Include="User\AtUser\AtUser.cs" />
+    <Compile Include="User\AtUser\AtUserEventArgs.cs" />
+    <Compile Include="User\AtUser\AtUserService.cs" />
+    <Compile Include="User\AtUser\AtUserAssociatedUrlGetterFactory.cs" />
+    <Compile Include="User\AtUser\IAtUserAssociatedUrlGetter.cs" />
+    <Compile Include="User\AtUser\Repositories\AtUserRepository.cs" />
+    <Compile Include="User\AtUser\Repositories\IAtUserRepository.cs" />
+    <Compile Include="User\Follow\BatchFollowEventArgs.cs" />
+    <Compile Include="User\Follow\Follow.cs" />
+    <Compile Include="User\Follow\FollowEnum.cs" />
+    <Compile Include="User\Follow\FollowService.cs" />
+    <Compile Include="User\Follow\Repositories\FollowRepository.cs" />
+    <Compile Include="User\Follow\Repositories\IFollowRepository.cs" />
+    <Compile Include="User\Follow\UserExtensionByFollow.cs" />
+    <Compile Include="User\OnlineUser\OnlineUser.cs" />
+    <Compile Include="User\OnlineUser\OnlineUserService.cs" />
+    <Compile Include="User\OnlineUser\OnlineUserStatistic.cs" />
+    <Compile Include="User\OnlineUser\Repositories\IOnlineUserRepository.cs" />
+    <Compile Include="User\OnlineUser\Repositories\IOnlineUserStatisticRepository.cs" />
+    <Compile Include="User\OnlineUser\Repositories\OnlineUserRepository.cs" />
+    <Compile Include="User\OnlineUser\Repositories\OnlineUserStatisticRepository.cs" />
+    <Compile Include="User\OnlineUser\Tasks\OnlineUserTask.cs" />
+    <Compile Include="Common\OwnerData\OwnerDataGetterFactory.cs" />
+    <Compile Include="Common\OwnerData\IOwnerDataGetter.cs" />
+    <Compile Include="User\Point\Configuration\IPointSettingsManager.cs" />
+    <Compile Include="User\Point\Configuration\PointSettings.cs" />
+    <Compile Include="User\Point\PointCategory.cs" />
+    <Compile Include="User\Point\PointCategoryKeys.cs" />
+    <Compile Include="User\Point\PointItem.cs" />
+    <Compile Include="User\Point\PointItemKeys.cs" />
+    <Compile Include="User\Point\PointRecord.cs" />
+    <Compile Include="User\Point\PointService.cs" />
+    <Compile Include="User\Point\PointStatistic.cs" />
+    <Compile Include="User\Point\Repositories\IPointItemRepository.cs" />
+    <Compile Include="User\Point\Repositories\IPointRecordRepository.cs" />
+    <Compile Include="User\Point\Repositories\IPointStatisticRepository.cs" />
+    <Compile Include="User\Point\Repositories\PointCategoryRepository.cs" />
+    <Compile Include="User\Point\Repositories\PointItemRepository.cs" />
+    <Compile Include="User\Point\Repositories\PointRecordRepository.cs" />
+    <Compile Include="User\Point\Repositories\PointStatisticRepository.cs" />
+    <Compile Include="User\Role\Repositories\IUserInRoleRepository.cs" />
+    <Compile Include="User\Role\Repositories\RoleRepository.cs" />
+    <Compile Include="User\Role\Repositories\UserInRoleRepository.cs" />
+    <Compile Include="User\Role\Role.cs" />
+    <Compile Include="User\Role\RoleNames.cs" />
+    <Compile Include="User\Role\RoleService.cs" />
+    <Compile Include="User\Role\UserExtensionByRole.cs" />
+    <Compile Include="User\Role\UserInRole.cs" />
+    <Compile Include="User\UserRank\Repositories\IUserRankRepository.cs" />
+    <Compile Include="User\UserRank\Repositories\UserRankRepository.cs" />
+    <Compile Include="User\UserRank\UserRank.cs" />
+    <Compile Include="User\UserRank\UserRankService.cs" />
+    <Compile Include="User\Visit\Repositories\IVisitRepository.cs" />
+    <Compile Include="User\Visit\Repositories\VisitRepository.cs" />
+    <Compile Include="User\Visit\Tasks\ExecVisitQueueTask.cs" />
+    <Compile Include="User\Visit\Visit.cs" />
+    <Compile Include="User\Visit\VisitService.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,136 @@
+﻿@model CommentEditModel
+@{
+    TenantCommentSettings settings = TenantCommentSettings.GetRegisteredSettings(ViewData.Get<string>("tenantType", string.Empty));
+    bool enableComment = ViewData.Get<bool>("enableComment", true);
+    string commentClass = ViewData.Get<string>("CommentClass", null);
+
+    int randomNum = new Random().Next(100000, 999999);
+}
+<div class="tn-comment-wrap @settings.CommentClass @commentClass">
+    @Html.Action("_CommentList", "Channel", new { tenantType = Model.TenantTypeId, commentedObjectId = Model.CommentedObjectId, pageIndex = ViewData.Get<int>("CommentIndex", 1), commentId = ViewData.Get<long>("CommentId", 0), childIndex = ViewData.Get<int?>("ChildIndex", null), showAfter = true, showBefor = true, enableComment = enableComment, subject = Model.Subject })
+    @if (new Authorizer().Comment_Create(Model.TenantTypeId, Model.ToUserId) && settings.EnableComment && enableComment)
+    { 
+        <div class="tn-comment-form tn-comment-expand tn-comment-focus">
+            @*//todo:bianchx,by zhengw: 建议forulid = "ul-comment-" 改为 listId = "commentList-"
+            //回复：已经处理
+             *@
+            @using (Html.BeginAjaxForm("Comment", "Channel", null, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "commentOnErrorCallBack", OnSuccessCallBack = "commentOnSuccessCallBack", ClearForm = true, CloseDialog = false }, new { listId = "commentList-" + Model.CommentedObjectId + "-0" }))
+            {
+                if (UserContext.CurrentUser == null)
+                {
+                <div class="tn-comment-anonym tn-helper-clearfix">
+                    <div class="tn-name">
+                        @Html.TextBoxFor(n => n.Author, new { @class = "tn-textbox tn-border-gray", id = "Author-0" })
+                    </div>
+                    <div class="tn-email">
+                        @Html.TextBoxFor(m => m.Contact, new { @class = "tn-textbox tn-border-gray", id = "Contact-0" })
+                    </div>
+                    <a href="@SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal, callBack: "CommentLoginCallBack")" plugin="dialog" class="tn-action">
+                        <span class="tn-action-text">登录</span></a>
+                    @Html.ValidationMessageFor(n => n.Author)
+                    @Html.ValidationMessageFor(n => n.Contact)
+                </div>
+                }
+                <div class="tn-comment-text-wrap">
+                    <div class="tn-comment-form-avatar">
+                        @Html.ShowUserAvatar(UserContext.CurrentUser != null ? UserContext.CurrentUser.UserId : 0, AvatarSizeType.Small)
+                    </div>
+                    <div class="tn-comment-text-inner tn-border-gray">
+                        @*//todo:bianchx,by zhengw: 建议Body-comment- 改为commentBody- *@
+                        @Html.TextArea("Body", new { id = "Body-comment-" + Model.CommentedObjectId, plugin = "ShortcutSubmit", @class = "tn-comment-text-area" })
+                    </div>
+                </div>
+                <div class="tn-comment-form-act tn-helper-clearfix" id="publisher-@randomNum.ToString()">
+                    @Html.EmotionSelector()
+                    @*   <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-at"></span>
+                        <a id="atFriend" class="tn-action-text" href="javascript:;">朋友</a> </span>
+                    @Html.AtUser("#Body-comment-" + Model.CommentedObjectId, "#publisher-" + randomNum.ToString() + " #atFriend")*@
+                    @Html.AtUser("#Body-comment-" + Model.CommentedObjectId) <span class="tn-count tn-text-note" id="comment-count-@Model.CommentedObjectId">
+                        0/@settings.MaxCommentLength</span>
+                    @if (settings.EnablePrivate && UserContext.CurrentUser != null)
+                    {
+                        <span class="tn-private">
+                            <label>
+                                @Html.CheckBoxFor(n => n.IsPrivate, new { @class = "tn-checkbox" })
+                                悄悄话
+                            </label>
+                        </span>
+                    }
+                    @Html.Button("评论", ButtonTypes.Submit, HighlightStyles.Primary)
+                </div>
+                @Html.HiddenFor(n => n.Subject);
+                @Html.HiddenFor(n => n.CommentedObjectId)
+                @Html.HiddenFor(n => n.TenantTypeId)
+                @Html.HiddenFor(n => n.OwnerId)
+                @Html.HiddenFor(n => n.ToUserId)
+            }
+        </div>
+    }
+</div>
+<script type="text/javascript" language="javascript">
+
+    //评论异步登录之后重新加载评论控件
+    function CommentLoginCallBack()
+    {
+        $("div.tn-comment-anonym").remove();
+        $.get("@SiteUrls.Instance()._UserAvatarLink()",function(data){
+        if(data.MessageType)
+            $(".tn-comment-form-avatar img").attr("src",data.MessageContent);
+        });
+    }
+
+    $(document).ready(function () {
+
+        $("div[id^='childComment-']").livequery(function () {
+            $(this).OnFocusChange();
+        });
+
+        $("textarea#Body-comment-@Model.CommentedObjectId").watermark('请输入回复');
+        
+        $("input#Contact-0").watermark("请输入手机号码");
+        $("input#Author-0").watermark("请输入姓名");
+        
+        //首级评论录入框的截字方法
+        $("#Body-comment-@Model.CommentedObjectId").GetTextCount('comment-count-@Model.CommentedObjectId', @settings.MaxCommentLength, true, @settings.EntryBoxAutoHeight.ToString().ToLower());
+        //三级回复的脚本
+        $("a[id^='three-level-comment-']").live('click', function (e) {
+            $link = $(this);
+            $textarea = $(this).parents(".tn-replies").find("textarea");
+            $textarea.val("@@" + $link.attr("foruser") + " " + $textarea.val().replace(/@@[^' ']*? /g, ""));
+            $textarea.click().focusEnd();
+            e.stopImmediatePropagation();
+        });
+    });
+
+
+    //回复失败的回调函数
+    function commentOnErrorCallBack(data) {
+        //todo:bianchx,by zhengw:应先parseJSON，再if (!data.MessageContent)输出tips
+        if (!data.MessageContent) {
+            data = $.parseJSON(data);
+        }
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+
+    function commentOnSuccessCallBack(data, status, webStatus, form) {
+        form.find("span[id^='comment-count']").html('0/@settings.MaxCommentLength');
+
+        $isPrivate = form.find("[disabled='disabled']");
+        if ($isPrivate && $isPrivate.is(".tn-checkbox")) {
+            $isPrivate[0].checked = true;
+        }
+        var parentId = data.parentId;
+
+        $.get('@SiteUrls.Instance()._OneComment()', { id: data.commentId }, function (data) {
+            if (parentId > 0)
+                $("ul[id='" + form.attr("listId") + "']:last").append(data);
+            else
+            //                $('#' + form.attr("forulid")).prepend(data);
+                $("ul[id='" + form.attr("listId") + "']:last").append(data);
+        });
+        form.find("textarea").focus();
+        form.find("button").focus();
+        $(document).click();
+    }
+    
+</script>

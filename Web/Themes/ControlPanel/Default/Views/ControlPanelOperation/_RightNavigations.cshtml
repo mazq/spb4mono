@@ -1,0 +1,27 @@
+﻿<div class="tnc-rightvar tn-open">
+    <div class="tnc-settings-icon" plugin="ShortcutMenu">
+        <a href="javascript:;"></a>
+    </div>
+    <div id="ManageUserRightMenu">
+        <div class="tnc-settings">
+            @Html.AjaxAction("_ManageableDataDetail", "ControlPanel", new { area = "Common", applicationKey = BlogConfig.Instance().ApplicationKey })
+            <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+                <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+                    <h3 class="tn-helper-reset">
+                        便捷操作</h3>
+                </div>
+                <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                    <ul class="tn-side-menu tnc-operation">
+                        <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().ManageSiteCategories(TenantTypeIds.Instance().BlogThread())" target="_blank">
+                            <span class="tn-icon tn-smallicon-slide-next" title="日志类别管理"></span>日志类别管理</a>
+                        </li>
+                        <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@SiteUrls.Instance().ManageTags(TenantTypeIds.Instance().BlogThread())" target="_blank">
+                            <span class="tn-icon tn-smallicon-slide-next" title="日志标签管理"></span>日志标签管理</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @Html.AjaxAction("_StatisticDataDetail", "ControlPanel", new { area = "Common", applicationKey = BlogConfig.Instance().ApplicationKey })
+        </div>
+    </div>
+</div>

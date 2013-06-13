@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Tag>
+@if (Model != null && Model.Count() > 0)
+{
+
+    SortBy_Tag sortBy = Request.QueryString.Get<SortBy_Tag>("sortBy", SortBy_Tag.DateCreatedDesc);
+    string title = "";
+    switch (sortBy)
+    {
+        case SortBy_Tag.DateCreatedDesc:
+            title = "最新话题";
+            break;
+        case SortBy_Tag.PreWeekItemCountDesc:
+            title = "热门话题";
+            break;
+    }
+    
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-hot-topic">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom ">
+            <h3 class="tn-helper-reset">
+                @(title)</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom ">
+            <ul class="tn-list">
+                @foreach (var tag in Model)
+                {
+                    <li>
+                        @Html.Link(StringUtility.Trim(tag.TagName, 10, ""), SiteUrls.Instance().GroupTopic(tag.TagName, Url.SpaceKey()), tag.TagName)
+                        <span class="tn-text-note">(@tag.ItemCount)</span> </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

@@ -1,0 +1,82 @@
+﻿@model  PagingDataSet<Activity>
+@{
+    ViewBag.Title = "我的主页";
+    Layout = "_UserSpace_Common";
+
+    IEnumerable<ApplicationBase> applications = ViewData.Get<IEnumerable<ApplicationBase>>("applications", null);
+}
+@section ContentHeader{
+    <div class="spb-po-user-profile">
+        <div class="spb-po-profile-wrap tn-helper-clearfix">
+            <div class="spb-po-face-info">
+                @Html.Action("_UserInfo", new { spaceKey = Url.SpaceKey() })
+            </div>
+            <div class="spb-po-user-info">
+                @Html.Action("UserInfo", new { spaceKey = Url.SpaceKey() })
+                @Html.Action("_SelectMenu", new { spaceKey = Url.SpaceKey() })
+            </div>
+        </div>
+    </div>
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-profile">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="tn-info-part">
+                @Html.Action("_UserStatus", new { spaceKey = Url.SpaceKey() })
+            </div>
+        </div>
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-tags">
+        @Html.Action("_TopUserTags", new { spaceKey = Url.SpaceKey() })
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-followed">
+        @Html.Action("_FollowedUserList", new { spaceKey = Url.SpaceKey() })
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-fans">
+        @Html.Action("_FollowerList", new { spaceKey = Url.SpaceKey() })
+    </div>
+}
+<script src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js")" type="text/javascript"></script>
+<div class="tn-grid">
+    <div class="tn-unit tn-first">
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+            <div class="tn-box-content tn-widget-content tn-corner-all">
+                <div class="tn-tabs">
+                    <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                        <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().SpaceHome(Url.SpaceKey())">
+                            全部</a></li>
+                        @if (applications != null)
+                        {
+                            foreach (var app in applications)
+                            { 
+                            <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().SpaceHome(Url.SpaceKey(), app.ApplicationId)" id="ActivitiesByApplication-@app.ApplicationId">@app.Config.ApplicationName</a>
+                            </li>
+                            }
+                        }
+                    </ul>
+                    <div class="tn-tabs-panel" id="ActivitiesByApplication">
+                        @Html.Partial("_Activities", Model)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Action("_SpaceHomeAside", new { spaceKey = Url.SpaceKey() })
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        //切换应用
+        $("a[id^='ActivitiesByApplication-']").click(function (e) {
+            e.preventDefault();
+            $("a[id^='ActivitiesByApplication-']").parents("ul:first").find("li").removeClass("tn-tabs-selected");
+
+            $(this).parents("li:first").addClass("tn-tabs-selected");
+
+            $("#ActivitiesByApplication").empty().html("<div class='tn-loading'></div>");
+
+            $.get($(this).attr("href"), function (data) {
+                $("#ActivitiesByApplication").html(data);
+            });
+        });
+    });
+</script>

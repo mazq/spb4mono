@@ -1,0 +1,48 @@
+﻿@model GroupEntity
+@{User user = Model.User;}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-info">
+  <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <h3 class="tn-helper-reset">群资料</h3>
+  </div>
+  <div class="tn-box-content tn-widget-content tn-corner-bottom">
+    <div class="tn-info-part">
+      <dl>
+        <dt>管理员：</dt>
+        <dd> 
+            <span class="tn-icon-colorful tn-icon-colorful-manager tn-icon-inline" title="群主"></span>
+            @Html.Link(user.DisplayName, SiteUrls.Instance().SpaceHome(user.UserName), user.DisplayName, navigateTarget: HyperLinkTarget._blank) <span>&nbsp;</span> 
+            @foreach (var manager in Model.GroupManagers)
+            { 
+                @Html.Link(manager.DisplayName, SiteUrls.Instance().SpaceHome(manager.UserName), manager.DisplayName, navigateTarget: HyperLinkTarget._blank) 
+                <span>&nbsp;</span> 
+            } 
+        </dd>
+      </dl>
+      <dl>
+        <dt>所属分类：</dt>
+        <dd> @if (Model.Category == null)
+          { 
+          @:无分组
+          }
+          else
+          { 
+          @Html.Link(Model.Category.CategoryName, SiteUrls.Instance().FindGroup(categoryId: Model.Category.CategoryId), Model.Category.CategoryName, navigateTarget: HyperLinkTarget._blank)
+          } </dd>
+      </dl>
+      <dl>
+        <dt>群组标签：</dt>
+        <dd> @foreach (var tagName in Model.TagNames)
+          { 
+          @Html.Link(tagName, SiteUrls.Instance().ListByTag(tagName, null), tagName, navigateTarget: HyperLinkTarget._blank) <span>&nbsp;</span> } </dd>
+      </dl>
+      <dl>
+        <dt>创建日期：</dt>
+        <dd> @Model.DateCreated.ToUserDateString(false)</dd>
+      </dl>
+      <dl>
+        <dt>浏览次数：</dt>
+        <dd> @Model.Last7DaysHitTimes/@Model.HitTimes</dd>
+      </dl>
+    </div>
+  </div>
+</div>

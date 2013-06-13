@@ -1,0 +1,57 @@
+﻿@model AreaCreateModel
+@{
+    Area parentArea = ViewData.Get<Area>("parentCreateArea",null);
+    string parentCode = null;
+    string parentName = null;
+    if (parentArea != null) {
+        parentCode = parentArea.AreaCode;
+        parentName = parentArea.Name;
+        
+    }
+}
+@using (Html.BeginAjaxForm("_CreateArea", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short tnc-tips-location">
+            @if (!string.IsNullOrEmpty(parentCode))
+            { 
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(model=>model.ParentCode) @parentName 
+                    @Html.HiddenFor(model=>model.ParentCode)
+                </div>
+           }
+            <div class="tn-form-row">
+                @Html.FormLabelFor(model=>model.AreaCode)
+                @Html.TextBoxFor(model=>model.AreaCode, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(mdoel=>Model.AreaCode)
+            </div>
+            <div class="tn-form-row">
+               @Html.FormLabelFor(model=>model.AreaName)
+               @Html.TextBoxFor(model=>model.AreaName, InputWidthTypes.Medium)
+               @Html.ValidationMessageFor(model=>model.AreaName)
+            </div>
+            <div class="tn-form-row">
+               @Html.FormLabelFor(model=>model.PostCode)
+               @Html.TextBoxFor(area=>area.PostCode, InputWidthTypes.Medium)
+               @Html.ValidationMessageFor(model=>model.PostCode)
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+       this.title("添加地区");
+</script>
+<script type="text/javascript">
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+    }
+          
+</script>

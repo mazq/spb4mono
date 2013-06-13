@@ -1,0 +1,28 @@
+﻿@model Dictionary<TagInOwner, int>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        @if (Model != null && Model.Count > 0)
+        {
+        <div class="tn-option">
+            <a href="@SiteUrls.Instance().Tags(Url.SpaceKey())">更多</a>
+        </div>
+        }
+        <h3 class="tn-helper-reset">
+            热门标签</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @if (Model != null && Model.Count > 0)
+        {
+            <p id="hot-tags" class="tn-tags-hot">
+                @foreach (var tag in Model)
+                { <span class="tn-font-size-@tag.Value"><a href="@SiteUrls.Instance().GroupThreadListByTag(Url.SpaceKey(), tag.Key.TagName)" 
+            title="共有@(tag.Key.ItemCount)个帖子">@tag.Key.TagName</a> </span>}
+            </p>
+        }
+        else
+        {
+            <div class="tn-no-data">
+                暂无标签</div>
+        }
+    </div>
+</div>

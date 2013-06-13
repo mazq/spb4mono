@@ -1,0 +1,43 @@
+﻿@model SchoolEditModel
+@using (Html.BeginAjaxForm("_EditSchool", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success", OnErrorCallBack = "error" }, new { id = "EditSchoolForm" }))
+{
+    @Html.HiddenFor(n => n.Id)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short">
+            <div class="tn-form-row">
+                @Html.FormLabelFor(n => n.SchoolName)
+                @Html.TextBoxFor(n => n.SchoolName, InputWidthTypes.Medium)
+                @Html.ValidationMessageFor(n => n.SchoolName)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(n => n.AreaCode)
+                @Html.AreaDropDownListFor(n => n.AreaCode, null, string.Empty)
+                @Html.ValidationMessageFor(n => n.AreaCode)
+            </div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(n => n.SchoolType)
+                @Html.EnumDropDownListFor(n => n.SchoolType)
+                @Html.ValidationMessageFor(n => n.SchoolType)
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+       this.title("@(Model.Id > 0 ? "编辑学校" : "添加学校")");
+</script>
+<script type="text/javascript">
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+    }
+    function error(reponse) {
+        $("#EditSchoolForm").replaceWith(reponse);
+    }
+</script>

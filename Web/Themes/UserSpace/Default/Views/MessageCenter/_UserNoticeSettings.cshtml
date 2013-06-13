@@ -1,0 +1,46 @@
+﻿@model Dictionary<int, bool> 
+@using (Html.BeginAjaxForm("UserNoticeSettings", "MessageCenter", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "invitationSettingSuccess", OnErrorCallBack = "invitationSettingError" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tnc-mode-box">
+            <div class="tn-form">
+                <div class="tn-form-row">
+                    <span>接收通知的类型：</span>
+                </div>
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                    <div class="tn-form-row">
+                        @Html.CheckBox("noticeType", item.Value, new { @class = "tn-radiobutton", value = item.Key })
+                        @{
+                        NoticeType noticeType = NoticeType.Get(item.Key);
+                        if (noticeType == null)
+                        { continue; }
+                        }
+                        @(noticeType.TypeName)
+                        <span class="tn-text-note">@(noticeType.Description)</span>
+                    </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        <div class="tn-form-row">
+            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    this.title("通知设置");
+</script>
+
+<script type="text/javascript" language="javascript">
+    function invitationSettingSuccess(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    function invitationSettingError(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

@@ -1,0 +1,154 @@
+﻿@*@model GroupEntity
+@{
+    Layout = "home-2cols";
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    string announcement = StringUtility.Trim(Model.Announcement, 100);
+    List<MediaType> mediaTypes = new List<MediaType>();
+    PagingDataSet<Activity> activities = ViewData.Get<PagingDataSet<Activity>>("activities", null);
+    IEnumerable<ApplicationBase> applications = ViewData.Get<IEnumerable<ApplicationBase>>("applications", null);
+
+    string content = string.Format("@{0} 的群组 \"{1}\" {2} 很不错 推荐给大家看看", Model.User.UserName, Model.GroupName,
+                                   SiteUrls.FullUrl(SiteUrls.Instance().GroupHome(Model.GroupId)));
+    string url = SiteUrls.Instance()._ShareToMicroblog(content, SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium()));
+}
+@section Aside{
+    @if (new Authorizer().Group_View(Model))
+    {
+        @Html.AjaxAction("_GroupProfile", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.AjaxAction("_ListMembers", "GroupSpace", new { spaceKey = Url.SpaceKey(), topNumber = 6 })
+        @Html.AjaxAction("_LastGroupVisitors", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.AjaxAction("_OnlineGroupMember", "GroupSpace", new { spaceKey = Url.SpaceKey(), topNumber = 12 })
+        @Html.AjaxAction("_GroupMemberAlsoJoinedGroups", "GroupSpace", new { spaceKey = Url.SpaceKey() })
+        @Html.AjaxAction("_OwnerLinks", "Channel", new { ownerId = Model.GroupId, area = "Common", ownerType = OwnerTypes.Instance().Group() })
+    }
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-space">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_GroupHeader", "GroupSpace", new { spaceKey = Url.SpaceKey(), showManageButton = true })
+        @if (!string.IsNullOrEmpty(Model.Announcement))
+        {
+            <div class="tn-cue-highlight tn-corner-all tn-message-box tn-helper-clearfix">
+                @if (new Authorizer().Group_Manage(Model))
+                { 
+                    <a class="tn-icon tn-smallicon-write tn-helper-right" href="@SiteUrls.Instance()._EditAnnouncement(Url.SpaceKey())" plugin="dialog" title="编辑公告"></a>
+                }
+                <div class="tn-helper-flowfix">
+                    <span class="tn-icon tn-icon-notice" title="群公告"></span>
+                    <label id="shortAnnouncement">@announcement</label>
+                    <label id="longAnnouncement" style="display: none">@Model.Announcement</label>
+                </div>
+                <span id="announcementSwitchButton" class="tn-helper-right" style="@(Model.Announcement.Length <= 100 ? "display:none" : "")"><a class="tn-action tn-action-text-icon-right" href="#" id="editAnnouncement"><span class="tn-icon tn-smallicon-collapse-open"></span><span class="tn-action-text">展开</span></a></span>
+            </div>
+        }
+        else if (new Authorizer().Group_Manage(Model))
+        {
+            <div class="tn-cue-highlight tn-corner-all tn-message-box tn-helper-clearfix">
+                <a class="tn-icon tn-smallicon-write tn-helper-right" href="@SiteUrls.Instance()._EditAnnouncement(Url.SpaceKey())" plugin="dialog" title="添加公告" id="addAnnouncement"></a>
+                <div class="tn-helper-flowfix">
+                    <label id="shortAnnouncement">
+                        可添加公告</label>
+                    <label id="longAnnouncement" style="display: none">
+                    </label>
+                </div>
+                <span id="announcementSwitchButton" class="tn-helper-right" style="display: none"><a class="tn-action tn-action-text-icon-right" href="#" id="editAnnouncement"><span class="tn-icon tn-smallicon-collapse-open"></span><span class="tn-action-text">展开</span></a></span>
+            </div>
+        }
+        @Html.AdvertisingPosition("10101100003")
+        @if (UserContext.CurrentUser != null)
+        { 
+            @Html.Action("_Create", "Microblog", new RouteValueDictionary { { "spaceKey", UserContext.CurrentUser.UserName }, { "tenantTypeId", TenantTypeIds.Instance().Group() }, { "ownerId", Model.GroupId }, { "area", "Microblog" } })
+        }
+        <div class="tn-tabs spb-new-activities">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl" name="application-all"><a
+                            href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey())">全部</a> </li>
+                @if (applications != null)
+                {
+                    foreach (var application in applications)
+                    { 
+                    <li class="tn-widget-content tn-border-gray tn-border-trl" name="application-@(application.ApplicationKey)"><a
+                            href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: application.ApplicationId)">@Tunynet.Globalization.ResourceAccessor.GetString(string.Format("ApplicationName_GroupSpace_{0}", application.ApplicationKey), application.ApplicationId)</a></li>
+                    }
+                }
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="tn-directory tn-border-gray tn-border-rbl" id="microblogType">
+                    <div class="tn-directory-level">
+                        <span class="tn-directory-item  tn-text-note" name="microblogType-all"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001)">全部 </a></span><span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-original"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, isOriginal: true)">原创</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-image"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, mediaType: MediaType.Image)">图片</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-video"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, mediaType: MediaType.Video)">视频</a></span> <span class="tn-spacer tn-text-note">|</span> <span class="tn-directory-item" name="microblogType-audio"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, mediaType: MediaType.Audio)">音乐</a></span>
+                        @if (UserContext.CurrentUser != null)
+                        { 
+                            <span class="tn-spacer tn-text-note">|</span>
+                            <span class="tn-directory-item" name="microblogType-my"><a href="@SiteUrls.Instance()._ListActivities(Url.SpaceKey(), applicationId: 1001, userId: UserContext.CurrentUser.UserId)">我的发言</a> </span>
+                        }
+                    </div>
+                </div>
+                <div id="activitiesForLoadDiv">
+                    @Html.AjaxAction("_ListActivities", "GroupSpace", new { spaceKey = Url.SpaceKey(), area = "Group" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function JoinGroupSuccessCallBack() {
+        window.location.reload(true);
+    }
+    $(function () {        
+        $("li[name='application-all']").addClass("tn-tabs-selected");
+        $("#microblogType").hide();
+
+        $("li[name^='application-']").click(function () {
+            if ($(this).attr("name") == 'application-Microblog') {
+                $("#microblogType").show();
+            }
+            else {
+                $("#microblogType").hide();
+            }
+            var $this = $(this);
+            var url = $(this).children("a").attr("href");
+            $("#activitiesForLoadDiv").load(url, function () {
+                $("li[name^='application-']").removeClass("tn-tabs-selected");
+                $this.addClass("tn-tabs-selected");
+            });
+            return false;
+        });
+
+        $("span[name^='microblogType-']").click(function () {
+            var $this = $(this);
+            var url = $(this).children("a").attr("href");
+            $("#activitiesForLoadDiv").load(url, function () {
+                $("span[name^='microblogType-']").removeClass("tn-selected");
+                $this.addClass("tn-selected");
+            });
+            return false;
+        });
+        $("#editAnnouncement").toggle(function () {
+            var $span = $(this).children("span.tn-icon");
+            $span.removeClass("tn-smallicon-collapse-open").addClass("tn-smallicon-collapse-close");
+            $(this).children("span.tn-action-text").html("折叠");
+            $("#shortAnnouncement").hide();
+            $("#longAnnouncement").show();
+        }, function () {
+            var $span = $(this).children("span.tn-icon");
+            $span.removeClass("tn-smallicon-collapse-close").addClass("tn-smallicon-collapse-open");
+            $(this).children("span.tn-action-text").html("展开");
+            $("#shortAnnouncement").show();
+            $("#longAnnouncement").hide();
+        });
+    });
+    //发布微博 表单提交成功 调用函数
+    var microblogCreateSuccess = function (data) {
+        $('#msg-sussess').show();
+        setTimeout(function () { $('#msg-sussess').hide(); }, 700);
+        $.get('@(SiteUrls.Instance()._NewGroupActivities(Url.SpaceKey()))', function (data) {
+            var lastActivityId = $("#lastActivityId").val(), newActivityId = $(data).last().val();
+            $(data).remove('#NewActivityId');
+            if (newActivityId > lastActivityId) {
+                $('#activitiesForLoadDiv ul.tnc-dynamic').children(':first').after(data);
+                $("#lastActivityId").val(newActivityId);
+            }
+        })
+        $("#microblogBody").val("");
+    }
+</script>
+*@

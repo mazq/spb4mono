@@ -1,0 +1,152 @@
+﻿@model PagingDataSet<GroupMember>
+@{
+    Layout = "manage-2cols";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 13900190;
+
+    GroupEntity group = ViewData.Get<GroupEntity>("group", null);
+    bool canSetManager = new Authorizer().Group_SetManager(group);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-members">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                成员管理</h2>
+        </div>
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().ManageMemberApplies(Url.SpaceKey())">
+                    申请处理</a></li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().ManageMembers(Url.SpaceKey())">
+                    成员管理</a></li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="tn-list-header">
+                    <div class="tn-toolbar-area tn-helper-clearfix">
+                        @if (canSetManager)
+                        {
+                            <span class="tn-option">
+                                @Html.LinkButton("转让群组", SiteUrls.Instance()._ChangeGroupOwner(Url.SpaceKey(), SiteUrls.Instance().GroupHome(Url.SpaceKey())), HighlightStyles.Secondary, htmlAttributes: new { plugin = "dialog" })
+                            </span>
+                        }
+                        @Html.LinkButton("移除成员", SiteUrls.Instance().BatchRemoveMember(Url.SpaceKey()), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "BatchRemoveMember" })
+                    </div>
+                </div>
+                @if (Model != null && Model.Count() > 0)
+                {
+                    <form action="#" method="post" id="Form-BatchSet">
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header">
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    @Html.CheckBox("memberIds-checkAll", false)
+                                </td>
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    名称
+                                </td>
+                                @*<td class="tn-border-bottom tn-border-gray tn-text-note">
+                                        邀请人
+                                    </td>*@
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    加入时间
+                                </td>
+                                @if (canSetManager)
+                                {
+                                    <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                        操作
+                                    </td>
+                                }
+                            </tr>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="tn-table-grid-row" id="ManageMembers_@(item.Id)">
+                                    <td class="tn-border-bottom tn-border-gray tn-width-check">
+                                        @if (!(!canSetManager && new GroupService().IsManager(group.GroupId, item.UserId)))
+                                        {
+                                            <input type="checkbox" value="@item.UserId" name="userIds" id="userIds-@item.Id" />
+                                        }
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-user-name tn-nowrap">
+                                        @if (item.IsManager)
+                                        {<span title="群管理员" class="tn-icon-colorful tn-icon-colorful-assistant tn-icon-inline"></span>}
+                                        <a href="@SiteUrls.Instance().SpaceHome(item.UserId)" title="@Html.ShowUserDisplayName(item.UserId)" target="_blank">@Html.ShowUserDisplayName(item.UserId)</a>
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                                        @item.JoinDate.ToFriendlyDate()
+                                    </td>
+                                    @if (canSetManager)
+                                    {
+                                        <td class="tn-border-bottom tn-border-gray tn-width-action2 tn-nowrap">
+                                            @if (item.IsManager)
+                                            {
+                                                @Html.Link("取消管理员", SiteUrls.Instance().SetManager(item.UserId, false, Url.SpaceKey()), "取消管理员", htmlAttributes: new { id = "IsManager-" + item.Id })
+                                            }
+                                            else
+                                            {
+                                                @Html.Link("设为管理员", SiteUrls.Instance().SetManager(item.UserId, true, Url.SpaceKey()), "设为管理员", htmlAttributes: new { id = "IsManager-" + item.Id })
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="tn-pagination">
+                        @Html.PageSizeDropdownList("PageSize")
+                        @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 7)
+                        @Html.PagingResults(Model)
+                    </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="tn-no-data">
+                        搜索不到群组成员
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+
+    $(document).ready(function () {
+        //全选按钮
+        $("input#memberIds-checkAll").click(function () {
+            checkAll(this, "userIds");
+        });
+        //设置管理员
+        $("a[id^='IsManager-']").click(function () {
+            var url = this.href;
+            $.post(url, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+                function () {
+                    window.location.reload(true);
+                });
+            });
+            return false;
+        });
+
+
+        //批量删除
+        $("a#BatchRemoveMember").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='userIds']:checked").length) {
+                alert("至少选择一位成员操作");
+                return false;
+            }
+
+            url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除这些成员吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+                    function () {
+                        window.location.reload(true);
+                    });
+                });
+            });
+        });
+
+    });
+
+</script>

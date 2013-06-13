@@ -1,0 +1,116 @@
+﻿@{
+    User currentUser = UserContext.CurrentUser as User; //获取当前登录用户 
+    string nowAreaCode = string.Empty;
+    string nowAreaName = string.Empty;
+    string homeAreaCode = string.Empty;
+    string homeAreaName = string.Empty;
+    string companyName = string.Empty;
+    string schoolName = string.Empty;
+
+    if (currentUser != null && currentUser.Profile!=null)
+    {    
+        UserProfile userProfile = currentUser.Profile;
+
+        nowAreaCode=userProfile.NowAreaCode;
+        nowAreaName = @Formatter.FormatArea(userProfile.NowAreaCode, false);
+        homeAreaCode = userProfile.HomeAreaCode;
+        homeAreaName = @Formatter.FormatArea(userProfile.HomeAreaCode, false);
+
+        if (userProfile.WorkExperience != null && userProfile.WorkExperience.Count()>0)
+        {
+            companyName=userProfile.WorkExperience.ElementAt(0).CompanyName;
+        }
+
+        if (userProfile.EducationExperience != null && userProfile.EducationExperience.Count() > 0)
+        {
+            schoolName = userProfile.EducationExperience.ElementAt(0).School;
+        }
+    }
+
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-quick-search">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">快捷搜索</h3>
+    </div>
+    <div id="finduser-quick-search" class="tn-box-content tn-widget-content tn-corner-bottom">
+        <form action="@SiteUrls.Instance().UserSearch()" method="get">
+            <div class="tn-form tn-form-single">
+                <input type="hidden" name="searchRange" value="@((int)UserSearchRange.NOWAREACODE)" />
+                <input type="hidden" id="nowAreaCode" name="nowAreaCode" value="@nowAreaCode" />
+                <input type="text" id="nowAreaName" name="nowAreaName" autocomplete="off" class="tn-textbox tn-border-gray tn-input-medium {required:true}" readonly="readonly" value="@nowAreaName" />
+                @Html.Button("搜同城", ButtonTypes.Submit, HighlightStyles.Primary)
+            </div>
+        </form>
+        <form action="@SiteUrls.Instance().UserSearch()" method="get">
+            <div class="tn-form tn-form-single">            
+                <input type="hidden" name="searchRange" value="@((int)UserSearchRange.HOMEAREACODE)" />
+                <input type="hidden" id="homeAreaCode" name="homeAreaCode" value="@homeAreaCode"" />
+                <input type="text" id="homeAreaName" name="homeAreaName" autocomplete="off" class="tn-textbox tn-border-gray tn-input-medium {required:true}" readonly="readonly" value="@homeAreaName" />
+                @Html.Button("搜同乡", ButtonTypes.Submit, HighlightStyles.Primary)
+            </div>
+        </form>
+        <form id="form-search-school" action="@SiteUrls.Instance().UserSearch()" method="get">
+            <input type="hidden" name="searchRange" value="@((int)UserSearchRange.SCHOOL)" />
+            <div class="tn-form tn-form-single">
+                <input type="text" name="keyword" class="tn-textbox tn-border-gray tn-input-medium {required:true}" value="@schoolName" />
+                @Html.Button("搜同学", ButtonTypes.Submit, HighlightStyles.Primary)
+            </div>
+        </form>
+        <form id="form-search-company" action="@SiteUrls.Instance().UserSearch()" method="get">
+            <div class="tn-form tn-form-single">
+                <input type="hidden" name="searchRange" value="@((int)UserSearchRange.COMPANY)" />
+                <input type="text" id="keyword" name="keyword" class="tn-textbox tn-border-gray tn-input-medium {required:true}" value="@companyName" />
+                @Html.Button("搜同事",ButtonTypes.Submit,HighlightStyles.Primary)
+            </div>
+        </form>
+        @Html.AreaSelector("areaSelector", "A1560000", "", "", 2, "quickSearcher.areaSelected",false)
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var areaCode;
+        var areaName;
+
+        //注册选择地区事件
+        $('#nowAreaName').click(function (e) {
+            areaSelector.toggle();
+
+            //定位
+            var left = $(this).offset().left;
+            var top = $(this).offset().top;
+            areaSelector.position(left, top);
+
+            areaCode = $('#nowAreaCode');
+            areaName = $(this);
+        });
+
+        $('#homeAreaName').click(function (e) {
+            areaSelector.toggle();
+
+            //定位
+            var left = $(this).offset().left;
+            var top = $(this).offset().top;
+            areaSelector.position(left, top);
+
+            areaCode = $('#homeAreaCode');
+            areaName = $(this);
+        });
+
+        var QuickSearcher = function () {//地区选择器回调函数
+            this.areaSelected = function (data) {
+                var nowAreaName = data.areaName;
+                if (data.parentAreaCode != data.areaCode && data.parentAreaCode != data.topAreaCode) {
+                    nowAreaName = data.parentAreaName + "-" + data.areaName;
+                }
+
+                areaCode.val(data.areaCode);
+                areaName.val(nowAreaName);
+                areaName.focus();
+
+                areaSelector.hide();
+            }
+        };
+
+        quickSearcher = new QuickSearcher();
+    });
+</script>

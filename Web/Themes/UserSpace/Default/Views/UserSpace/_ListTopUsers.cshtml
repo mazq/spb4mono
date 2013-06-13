@@ -1,0 +1,30 @@
+﻿@model List<User>
+@if (Model != null && Model.Count > 0)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-popularity-users"
+        id="popularUsersDiv">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option">
+                @Html.Link("更多", SiteUrls.Instance().FindUserRanking(SortBy_User.HitTimes), "更多")</div>
+            <h3 class="tn-helper-reset">
+                人气用户</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    bool status = false;
+                    string followStyle, followedStyle, url;
+                    foreach (var user in Model)
+                    {
+                        followStyle = followedStyle = string.Empty;
+                    <li class="tn-avatar-item">
+                        @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small)
+                        <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(user.UserId)" title="@user.DisplayName">@user.DisplayName</a>
+                    </li> 
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+}

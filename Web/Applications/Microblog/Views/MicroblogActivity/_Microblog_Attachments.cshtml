@@ -1,0 +1,45 @@
+﻿@model MicroblogEntity
+@{
+    string imageUrl = ViewData.Get<string>("imageUrl", string.Empty);
+    int imageCount = ViewData.Get<int>("imageCount", 0);
+    string videoThumbnailUrl = ViewData.Get<string>("videoThumbnailUrl", string.Empty);
+    long? forwardMicroblogId = ViewData.Get<long?>("ForwardMicroblogId", null);
+}
+@if (Model != null && (Model.HasMusic || Model.HasPhoto || Model.HasVideo))
+{
+    long microblogId = forwardMicroblogId.HasValue ? forwardMicroblogId.Value : Model.MicroblogId;
+    
+    <ul class="tnc-dynamic-imgbox tn-helper-clearfix" id="attachmentsListUl-@microblogId">
+        @if (Model.HasPhoto)
+        {
+
+            string liClass = string.Empty;
+            string photoCount = string.Empty;
+
+            if (imageCount > 1)
+            {
+                liClass = "tn-border-gray";
+                photoCount = "<span class=\"tn-more\">还有 " + (imageCount - 1).ToString() + " 张图片</span>";
+            }
+            <li class="tnc-imgbox-min @(liClass)"><a id="attachmentsListLiImage-@microblogId" href="@SiteUrls.Instance()._Microblog_Attachments_Images(Model.UserId, Model.MicroblogId, forwardMicroblogId)" data-microblogId="@microblogId" >
+                <img src="@Model.ImageUrl" />@Html.Raw(photoCount)</a></li>
+        }
+        @if (Model.HasVideo)
+        {
+            <li class="tnc-videobox-min tn-border-gray"><a id="attachmentsListLiVideo-A-@microblogId" href="@SiteUrls.Instance()._Microblog_Attachments_Video(Model.UserId, Model.MicroblogId, Model.VideoAlias, forwardMicroblogId)" data-microblogId="@microblogId" class="tn-video">
+            </a><a id="attachmentsListLiVideo-@microblogId" href="@SiteUrls.Instance()._Microblog_Attachments_Video(Model.UserId, Model.MicroblogId, Model.VideoAlias, forwardMicroblogId)" data-microblogId="@microblogId">
+                <img src="@videoThumbnailUrl" />
+            </a></li>
+        }
+        @if (Model.HasMusic)
+        {
+            <li class="tnc-musicbox-min"><a class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary" id="attachmentsListLiMusic-@microblogId" href="@SiteUrls.Instance()._Microblog_Attachments_Music(Model.UserId, Model.MicroblogId, Model.AudioAlias, forwardMicroblogId)" data-microblogId="@microblogId" >
+                <span class="tn-icon tn-icon-triangle-right"></span><span class="tn-button-text">音乐播放</span>
+            </a></li>
+        }
+    </ul>
+    <div id="microblogAttachmentContainer-@microblogId">
+    </div>
+
+    
+}

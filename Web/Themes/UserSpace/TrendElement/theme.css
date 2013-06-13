@@ -1,0 +1,72 @@
+/* 
+Offical Style for Spacebuilder
+(C) 2007-2012 Tunynet Inc.
+*/ 
+
+/* Page Layout
+----------------------------------*/
+#tn-header .tn-wrapper,
+#tn-content .tn-wrapper,
+#tn-footer .tn-wrapper{ width: 950px;margin: 0 auto; }
+#tn-header { margin-bottom: 20px; }
+#tn-header .tn-wrapper {height: 36px;}
+
+/* Content Layout
+----------------------------------*/
+.tnc-aside,
+.tnc-aside-first,
+.tnc-aside-second,
+.tnc-main { padding-top: 20px; }
+.tnc-aside-second .tn-skin { top: -20px; }
+.spb-layout-5-19 .tnc-main { padding-left: 10px; }
+.spb-layout-3-13 .tnc-main { padding-left: 10px; padding-right: 20px; }
+.spb-layout-5-19 .tnc-main{ padding-right:15px;}
+.spb-layout-1 .tnc-main { padding: 20px; }
+.tnc-aside .tn-box-content{ padding-left:10px; padding-right:10px;}
+#UserSpace_SpaceHome .tnc-user-intro-area .tn-box-content { padding: 10px 5px 10px 0; }
+#UserSpace_SpaceHome .tnc-main div.tn-first .tn-box-content { padding: 10px 0; }
+#UserSpace_SpaceHome .tnc-myhome-proside { padding: 0 5px 0 10px; }
+#UserSpace_SpaceHome .tnc-myhome-proside .tn-box-header { padding: 5px 0; }
+#UserSpace_SpaceHome .tnc-myhome-proside .tn-box-content { padding: 10px 0; }
+
+/* Global navigation */
+.spb-top-menubar .spb-logo a{height:36px; width:170px;} 
+.spb-top-menubar .spb-menu li a{ line-height:36px;} 
+.spb-top-menubar .tn-search-box{ padding-top:6px;}
+.spb-top-menubar .spb-user-menu{ padding-top:6px;}
+.tn-drop-menu li.tn-icon-menu .tn-msg-bubble{top: -6px;}
+
+/* Box
+----------------------------------*/
+.tn-box .tn-box-header { margin: 0; font-size: 14px; }
+.tnc-aside .tn-box-content,
+.tnc-aside-first .tn-box-content { padding: 10px; }
+.spb-user-panel .tn-box-content { padding: 10px 0; }
+.spb-layout-3-13 .tnc-main .tn-box-content { padding: 10px 0; }
+.spb-layout-3-13 .tnc-aside .tn-content-heading { padding: 10px; }
+.spb-layout-3-13 .tnc-aside .tn-side-menu { padding: 0 10px; }
+.spb-layout-3-9-4 .tnc-aside-second .tn-avatar-item{ width:69px;}
+.spb-layout-5-19 .tnc-aside .tn-avatar-item{ width:56px;}
+.spb-layout-5-19 .tn-side-menu .tn-menu-text{ padding-left:29px;}
+.spb-layout-5-19 .tnc-aside .tn-info-part,
+.spb-layout-5-19 .tnc-aside .spb-declist{ padding-left:15px;}
+
+/* User Center
+----------------------------------*/
+.spb-user-panel .spb-profile-card { padding: 0 10px; }
+.spb-user-panel .spb-declist,
+.spb-user-panel .tn-actions { padding-left:15px;}
+.spb-user-panel .tn-side-menu .tn-menu-text { padding-left: 34px; }
+.spb-user-panel .tnc-user-menu li .tn-icon { left:15px;}
+.spb-user-panel .tnc-app-menu li,
+.spb-user-panel .tnc-app-menu a { float: none; }
+.spb-user-panel .tn-message-box { margin: 10px; }
+
+/* Main Content */
+.spb-layout-5-19 .tnc-myhome-proside .tn-avatar-item { width: 56px; }
+.spb-layout-5-19 .tnc-main .spb-photo-waterfall .spb-photo-unit { width: 168px; }
+.spb-layout-5-19 .tnc-main .spb-photo-waterfall .spb-photo-unit .tn-img { width: 146px; }
+.spb-layout-5-19 .tnc-main .spb-thumbnail-falls .spb-photo-unit { width: 156px; }
+
+/* User Menu */
+.spb-app-panel .tnc-user-menu li .tn-action { display: none; }

@@ -1,0 +1,80 @@
+﻿@model IEnumerable<User>
+@{
+    long groupId = ViewData.Get<long>("groupId", 0);
+    Dictionary<long, long> userId_FollowIdDict = ViewData.Get<Dictionary<long, long>>("UserId_FollowIdDict", new Dictionary<long, long>());
+}
+@using (Html.BeginAjaxForm("BatchFollow", "Follow", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "success" }))
+{
+    <div class="tnc-add-user-to tn-filter-user tn-widget-content">
+
+        <div class="tnc-dailog-pd">
+            <div class="tn-scroll-content">
+                <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+    <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+      <div class="tn-helper-flowfix"> 
+      <strong>提示：</strong>请点击头像选择要添加的用户</div>
+     </div>
+                @Html.Hidden("groupId", groupId)
+                <ul class="tn-avatar-list tn-flow-list tn-helper-clearfix">
+                    @if (Model == null || Model.Count() == 0)
+                    {
+                        @Html.Raw("暂无可添加用户")
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                        
+                        <li class="tn-avatar-item tn-widget-content tn-widget-same tn-corner-all">
+                            @Html.CheckBox("CheckBoxGroup", new { style = "display:none;", value = userId_FollowIdDict.ContainsKey(item.UserId) ? userId_FollowIdDict[item.UserId] : 0 })
+                            <div class="tn-avatar" data-id="@item.UserId">
+                                @Html.ShowUserAvatar(item.UserId, AvatarSizeType.Small,enableNavigate:false)</div>
+                            <a href="#" class="tn-user-name">@(item.DisplayName)</a> </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "batchsubmit" })
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    </div>
+}
+<script type="text/dialog">
+this.title("批量添加");
+
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("li").click(function () {
+            $this = $(this);
+            if ($(this).hasClass("tn-selected tn-bg-deep tn-border-deep")) {
+                $(this).removeClass("tn-tn-selected tn-bg-deep tn-border-deep");
+                $(this).children("input[id='CheckBoxGroup']").attr("checked", false);
+            }
+            else {
+                $(this).children("input[id='CheckBoxGroup']").attr("checked", true);
+
+                var id = $(this).children(".tn-avatar").data("id");
+
+                $(this).addClass("tn-selected tn-bg-deep tn-border-deep");
+                $(this).val(id);
+
+            }
+
+        });
+
+
+    })
+
+    function success() {
+        window.location.reload(true);
+    }
+    function error() {
+        art.dialog.tips("添加失败", 1.5, -1);
+    }
+
+
+</script>

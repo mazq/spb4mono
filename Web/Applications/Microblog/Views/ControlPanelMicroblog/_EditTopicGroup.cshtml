@@ -1,0 +1,43 @@
+﻿@model TagGroupEditModel
+@{}
+@using (Html.BeginAjaxForm("_EditTopicGroup", "ControlPanelMicroblog", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    @Html.HiddenFor(n => n.GroupId)
+    @Html.Hidden("TenantTypeId", TenantTypeIds.Instance().Microblog())
+    <div class="tnc-dailog-pd">
+        <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            分组名：
+                        </th>
+                        <td>
+                            @Html.TextBoxFor(n => n.GroupName, InputWidthTypes.Medium, new RouteValueDictionary { { "maxlength", 32 } })
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+    </div>
+}
+<script type="text/dialog">
+@if (Model.GroupId == 0)
+{
+    @:this.title("创建话题分组");
+}
+else
+{ 
+    @:this.title("编辑话题分组");
+}
+</script>
+<script language="javascript" type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        setTimeout(function () { window.location.reload(); }, 500); 
+    }
+</script>

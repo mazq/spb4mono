@@ -1,0 +1,120 @@
+﻿@model IdentificationEditModel
+@{
+    Layout = "_UserSpaceSettings";
+    SelectList identificationTypeList = ViewData.Get<SelectList>("identificationTypeList", null);
+    bool haveApplyAll = ViewData.Get<bool>("haveApplyAll", false);
+    string name = ViewData.Get<string>("identificationTypeName",null);
+    bool boolValue=Model.IdentificationTypeId!=0?true:false;
+}
+@section Aside
+{
+ @{ViewData["menu"] = "applyfor";}
+ @Html.Partial("_IdentificationMenu", ViewData)
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-edit-identify">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @using (Html.BeginForm("EditIdentification", "UserSpace", FormMethod.Post, new { enctype = "MULTIPART/FORM-DATA" }))
+        {
+          <div class="tn-form tn-label-right">
+            <div id="errorMessage" class="tn-form-row">
+                  @Html.StatusMessage()
+            </div>
+            @if (!haveApplyAll)
+            {
+                 <div class="tn-form-row">
+                <label class="tn-form-label">
+                    认证类型：</label>
+                  @if (Model.IdentificationTypeId != 0)
+                  {
+                      @name
+                  }
+                  else
+                  {
+                  @Html.DropDownListFor(n => n.IdentificationTypeId, identificationTypeList, new { @class = "tn-dropdownlist" })
+                  }
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    真实姓名：</label>
+                  @Html.TextBoxFor(n => n.TrueName, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                  @Html.ValidationMessage("TrueName")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    证件号码：</label>
+                 @Html.TextBoxFor(n => n.IdNumber, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                 @Html.ValidationMessage("IdNumber")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    认证说明：</label>
+                 @Html.TextAreaFor(n => n.Description, new { @class = "tn-textarea tn-input-long tn-border-gray" })
+                 @Html.ValidationMessage("Description")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label"></label>
+                @*<span class="tn-text-note">请认真填写,验证通过后会现在你的认证介绍中</span>*@
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                   电子邮箱：</label>
+                 @Html.TextBoxFor(n => n.Email, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                 @Html.ValidationMessage("Email")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    手机：</label>
+                 @Html.TextBoxFor(n => n.Mobile, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                 @Html.ValidationMessage("Mobile")
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    证件扫描件：</label>
+                <input name="identificationFile" type="file" />
+            </div>
+             if (!string.IsNullOrEmpty(Model.IdentificationLogo))
+             {
+            <div class="tn-form-row">
+                <label class="tn-form-label"></label>
+                <img src="@SiteUrls.Instance().LogoUrl(Model.IdentificationLogo, TenantTypeIds.Instance().Identification(), ImageSizeTypeKeys.Instance().Medium())" />
+            </div>
+             }
+               <div class="tn-form-row">
+               <label class="tn-form-label"></label>
+                @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+            </div>   
+            }    
+        </div>
+                @Html.HiddenFor(n => n.IdentificationId)
+                @Html.HiddenFor(n=>n.IdentificationTypeId)
+        }
+    </div>
+</div>
+<script>
+    $(function () {
+        $(".tn-dropdownlist").change(function () {
+            var identificationTypeId = $(this).val();
+            var url = '@(SiteUrls.Instance().IsApplied(Url.SpaceKey()))?identificationTypeId=' + identificationTypeId;
+            $.get(url, function (data) {
+                if (data == "1") {
+                    $("#errorMessage").show();
+                    $("div[name='StatusMessageDiv']").show();
+                } else {
+                    $("#errorMessage").hide();
+                    $("div[name='StatusMessageDiv']").hide();
+                }
+            })
+        })
+
+        if ('@(boolValue)'=='True')
+        {
+            $("#btnSave").click(function (e) {
+            e.preventDefault();
+            art.dialog.confirm('提交后，该认证将被设为待审核状态！', function () { 
+                $("form").submit();  
+            });
+          })
+        }
+
+    })
+</script>

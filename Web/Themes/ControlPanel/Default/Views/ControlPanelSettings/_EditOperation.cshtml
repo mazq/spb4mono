@@ -1,0 +1,312 @@
+﻿@model OperationEditModel
+@{
+    ManagementOperationType? operationType = ViewData.Get<ManagementOperationType?>("operationType", null);
+    var applicationName = ViewData.Get<string>("applicationName", string.Empty);
+}
+<div id="editUserRankDialog" class="tnc-edit-rec-type">
+    @Html.StatusMessage()
+    @using (Html.BeginAjaxForm("_EditOperation", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+    {
+        @Html.HiddenFor(n => n.PresentAreaKey)
+        @Html.HiddenFor(n => n.OperationType)
+        <div class="tnc-dailog-pd">
+            <div class="spb-nav-editcreate tn-form tn-label-right">
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.OperationId)
+                    @Model.OperationId
+                    @Html.HiddenFor(n => n.OperationId)
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.AssociatedNavigationId)
+                    @Html.TextBoxFor(n => n.AssociatedNavigationId, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", 8 } })
+                    @Html.ValidationMessageFor(n => n.AssociatedNavigationId)
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        所属应用：
+                    </label>
+                    @if (applicationName == string.Empty)
+                    { 
+                        @: 未设置
+                    }
+                    else
+                    { 
+                        @Html.HiddenFor(n => n.ApplicationId)
+                        @applicationName
+                    }
+                </div>
+                <div class="tn-form-row">
+                    <span id = "nameOption" @if (Model.IsUseResourceItem)
+                                            { <text>style="display: none;"</text>} >
+                        <label class="tn-form-label">
+                            名称：</label>
+                        @Html.TextBoxFor(n => n.OperationText, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", TextLengthSettings.TEXT_NAME_MAXLENGTH } })
+                        @Html.ValidationMessageFor(n => n.OperationText)
+                    </span><span id = "resourceOption"  @if (!Model.IsUseResourceItem)
+                                                        { <text>style="display: none"</text>}>
+                        <label class="tn-form-label">
+                            resourceKey：</label>
+                        @Html.TextBoxFor(n => n.ResourceName, InputWidthTypes.Medium)
+                        @Html.ValidationMessageFor(n => n.ResourceName)
+                    </span>
+                    <label>@Html.CheckBoxFor(n => n.IsUseResourceItem)使用资源项</label>
+                </div>
+                <div class="tn-form-row">
+                    <span id="linkOption"  @if (Model.IsUseRoute)
+                                           {<text>style="display: none"</text>}>
+                        <label class="tn-form-label">
+                            链接：</label>
+                        @Html.TextBoxFor(n => n.NavigationUrl, InputWidthTypes.Medium, new RouteValueDictionary { { "type", "url" }, { "maxLength", TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH } })
+                    </span><span id="routeOption" @if (!Model.IsUseRoute)
+                                                  {<text>style="display: none"</text>} >
+                        <label class="tn-form-label">
+                            路由名：</label>
+                        @Html.TextBoxFor(n => n.UrlRouteName, InputWidthTypes.Medium, new RouteValueDictionary { { "maxLength", TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH } })
+                        @Html.HiddenFor(n => n.UrlRouteName)
+                    </span>
+                    <label>@Html.SipmleCheckBox("IsUseRoute", true, Model.IsUseRoute, new { id = "IsUseRoute" })使用路由</label>
+                    @if (Model.IsLocked)
+                    {
+                        @Html.Hidden("IsUseRoute", true)
+                        @Html.Hidden("IsLocked", true)
+                    }
+                </div>
+                <div class="tn-form-row">
+                    @Html.ValidationMessageFor(n => n.NavigationUrl)                    
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        使用站内图标：</label>
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IconNameOption", "true", Model.IconNameOption, new { @id = "IconNameOption-T", @class = "tn-radiobutton" })
+                            <label for="IconNameOption-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IconNameOption", "false", !Model.IconNameOption, new { @id = "IconNameOption-F", @class = "tn-radiobutton" })
+                            <label for="IconNameOption-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div id="siteInIcon" class="tn-form-row">
+                    <label class="tn-form-label">
+                        站内图标：</label>
+                    <div class="spb-station-icon">
+                        <a class="tn-action tn-action-text-icon-right" menu="#icon_list"><span class="tn-action-text" id="showIcon">
+                            @if (Model != null && !string.IsNullOrEmpty(Model.IconName))
+                            {
+                                @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), Model.IconName, false))
+                            }
+                            else
+                            {
+                                @("未设置")
+                            }
+                        </span>
+                            @Html.Hidden("IconName")
+                        </a>
+                        <div id="icon_list" class="spb-station-icon-dropdown tn-menu tn-widget-content tn-border-gray tn-corner-all"
+                            style="z-index: 999999; display: none">
+                            <ul class="tn-menu-list">
+                                @foreach (int value in Enum.GetValues(typeof(IconTypes)))
+                                {
+                                    <li class="tn-menu-item">
+                                        @{ IconTypes type = (IconTypes)value;}
+                                        @Html.Icon(type, type.ToString())</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.NavigationTarget)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("NavigationTarget", "_blank", Model.NavigationTarget == "_blank" ? true : false, new { @id = "NavigationTarget-T", @class = "tn-radiobutton" })
+                            <label for="NavigationTarget-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("NavigationTarget", "_self", Model.NavigationTarget == "_self" ? true : false, new { @id = "NavigationTarget-F", @class = "tn-radiobutton" })
+                            <label for="NavigationTarget-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.OnlyOwnerVisible)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("OnlyOwnerVisible", true, Model.OnlyOwnerVisible, new { @id = "OnlyOwnerVisible-T", @class = "tn-radiobutton" })
+                            <label for="OnlyOwnerVisible-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("OnlyOwnerVisible", false, !Model.OnlyOwnerVisible, new { @id = "OnlyOwnerVisible-F", @class = "tn-radiobutton" })
+                            <label for="OnlyOwnerVisible-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tn-form-row">
+                    @Html.FormLabelFor(n => n.IsEnabled)
+                    <ul class="tn-radiobutton-list">
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsEnabled", true, Model.IsEnabled, new { @id = "IsEnabled-T", @class = "tn-radiobutton" })
+                            <label for="IsEnabled-T">
+                                是</label>
+                        </li>
+                        <li class="tn-inline-list">
+                            @Html.RadioButton("IsEnabled", false, !Model.IsEnabled, new { @id = "IsEnabled-F", @class = "tn-radiobutton" })
+                            <label for="IsEnabled-F">
+                                否</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+            @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+       
+    }
+    <script type="text/dialog">
+    
+      this.title("@(operationType == ManagementOperationType.Shortcut ? "编辑快捷操作" : "编辑管理菜单")");
+    
+    </script>
+    <script type="text/javascript" language="javascript"> 
+        $(document).ready(function () {
+            
+            //默认忽略操作id验证
+            $("#OperationId").addClass("ignore");
+
+            //判断是否已经使用资源项
+            if ("@(Model.IsUseResourceItem)" == "True") {
+                $("#nameOption").find("#OperationText").addClass("ignore");
+                $("#resourceOption").find("#ResourceName").removeClass("ignore");
+            } else {
+                $("#nameOption").find("#OperationText").removeClass("ignore");
+                $("#resourceOption").find("#ResourceName").addClass("ignore");
+            }
+
+            //判断是否使用资源项
+            $("#IsUseResourceItem").click(function () {
+                if ($(this).attr("checked")) {
+                    $("#nameOption").hide().find("#OperationText").addClass("ignore");
+                    $("#resourceOption").show().find("#ResourceName").removeClass("ignore");
+                } else {
+                    $("#nameOption").show().find("#OperationText").removeClass("ignore");
+                    $("#resourceOption").hide().find("#ResourceName").addClass("ignore");
+                }
+            });
+
+            //判断是否已经使用路由
+            if ("@(Model.IsUseRoute)" == "True") {
+                $("#linkOption").find("#NavigationUrl").addClass("ignore");
+                $("#routeOption").find("#UrlRouteName").removeClass("ignore");
+            } else {
+                $("#linkOption").find("#NavigationUrl").removeClass("ignore");
+                $("#routeOption").find("#UrlRouteName").addClass("ignore");
+            }
+
+            //判断是否使用路由
+            $("#IsUseRoute").click(function () {
+                if ($(this).attr("checked")) {
+                    $("#linkOption").hide().find("#NavigationUrl").addClass("ignore");
+                    $("#routeOption").show().find("#UrlRouteName").removeClass("ignore");
+                } else {
+                    $("#linkOption").show().find("#NavigationUrl").removeClass("ignore");
+                    $("#routeOption").hide().find("#UrlRouteName").addClass("ignore");
+                }
+            });
+
+            //判断是否已经使用图片链接
+            if ("@(Model.IsWholeLink)" == "True") {
+                $("#imageNameOption").find("#ImageName").addClass("ignore");
+                $("#imageLinkOption").find("#ImageUrl").removeClass("ignore");
+                $("#image").hide();
+            } else {
+                $("#imageNameOption").find("#ImageName").removeClass("ignore");
+                $("#imageLinkOption").find("#ImageUrl").addClass("ignore");
+                $("#imagePosition").text($("#ImageName").val());
+            }
+
+            //判断是否使用图片链接
+            $("#IsWholeLink").click(function () {
+                if ($(this).attr("checked")) {
+                    $("#imageNameOption").hide().find("#ImageName").addClass("ignore");
+                    $("#imageLinkOption").show().find("#ImageUrl").removeClass("ignore");
+                    $("#image").hide();
+                } else {
+                    $("#imageNameOption").show().find("#ImageName").removeClass("ignore");
+                    $("#imageLinkOption").hide().find("#ImageUrl").addClass("ignore");
+                    $("#image").show();
+                }
+            });
+
+
+
+            //判断导航是否已经锁定
+            if ("@Model.IsLocked" == "True") {
+                if ($("#OperationText").val() != "") {
+                    $("#IsUseResourceItem").attr("disabled", true);
+                }
+                $("#IsUseRoute").attr("disabled", "disabled");
+                $("#ResourceName").attr("readonly", "readonly");
+                $("#NavigationUrl").attr("readonly", "readonly");
+                $("#UrlRouteName").attr("readonly", "readonly");
+                $("#OnlyOwnerVisible-T").attr("disabled", "disabled");
+                $("#OnlyOwnerVisible-F").attr("disabled", "disabled");
+                $("#ForceOwnerUpdate-T").attr("disabled", "disabled");
+                $("#ForceOwnerUpdate-F").attr("disabled", "disabled");
+            }
+
+            //判断使用站内还是站外
+            if ("@Model.IconNameOption" == "True") {
+                $("#image").hide();
+                $("#siteInIcon").show();
+                $("#siteOutIcon").hide();
+            }
+            else {
+                $("#siteInIcon").hide();
+                $("#siteOutIcon").show();
+            }
+
+            //使用站内图标
+            $("#IconNameOption-T").click(function () {
+                $("#image").hide();
+                $("#siteInIcon").show();
+                $("#siteOutIcon").hide();
+            })
+
+            //使用站外图标
+            $("#IconNameOption-F").click(function () {
+                if ($("#IsWholeLink").attr("checked")) {
+                    $("#image").hide();
+                } else {
+                    $("#image").show();
+                }
+                $("#siteInIcon").hide();
+                $("#siteOutIcon").show();
+            })
+
+            //点击站内图标选中图标
+            $('#icon_list span.tn-icon').click(function () {
+                $('#showIcon').html($(this).parent().html());
+                $("input[name='IconName']").val($(this).attr('title'));
+            });
+
+        });
+
+        function OnSuccessCallBack(data) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+        }
+        function OnErrorCallBack(data) {
+            alert(data.MessageContent, function () { window.location.reload(true); })
+        }
+    </script>
+</div>

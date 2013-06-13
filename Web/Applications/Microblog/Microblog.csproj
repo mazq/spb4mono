@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{05CE5E94-2342-4B8F-8173-B406907969E2}</ProjectGuid>
+    <ProjectTypeGuids>{E53F8FEA-EAE0-44A6-8774-FFD645390401};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Spacebuilder.Microblog</RootNamespace>
+    <AssemblyName>Spacebuilder.Microblog</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <UseIISExpress>false</UseIISExpress>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\Spacebuilder.Microblog.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\Spacebuilder.Microblog.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Autofac.2.6.3.862\lib\NET40\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mvc, Version=2.6.3.862, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Autofac.Mvc3.2.6.3.862\lib\NET40\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="C5, Version=1.1.0.0, Culture=neutral, PublicKeyToken=06a1b38866503b69, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Quartz.2.0.1\lib\net40\C5.dll</HintPath>
+    </Reference>
+    <Reference Include="CodeKicker.BBCode, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\BBCode.5.0.0\lib\CodeKicker.BBCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres, Version=2.2.2.6, Culture=neutral, PublicKeyToken=1ca6b37997dd7536, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\combres.2.2.2.6\lib\net40\Combres.dll</HintPath>
+    </Reference>
+    <Reference Include="Combres.Mvc, Version=2.2.2.6, Culture=neutral, PublicKeyToken=1ca6b37997dd7536, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\combres.mvc.2.2.2.6\lib\net40\Combres.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Common.Logging.2.0.0\lib\2.0\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching, Version=2.11.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EnyimMemcached.2.11\lib\net35\Enyim.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Fasterflect, Version=2.1.0.8328, Culture=neutral, PublicKeyToken=38d18473284c1ca7, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\fasterflect.2.1.0\lib\net40\Fasterflect.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\HtmlAgilityPack.1.4.0\lib\Net40\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\log4net.1.2.11\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=2.9.4.2, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Lucene.Net.2.9.4.2\lib\net40\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPinyin, Version=0.2.4588.20158, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NPinyin.0.2.0\lib\NPinyin.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PanGu.2.3.1.0\lib\PanGu.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.HighLight, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PanGu.2.3.1.0\lib\PanGu.HighLight.dll</HintPath>
+    </Reference>
+    <Reference Include="PanGu.Lucene.Analyzer, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\PanGu.2.3.1.0\lib\PanGu.Lucene.Analyzer.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz, Version=2.0.1.100, Culture=neutral, PublicKeyToken=f6b8c98a402cc8a4, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Quartz.2.0.1\lib\net40\Quartz.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine, Version=3.0.8.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RazorEngine.3.0.8\lib\net40\RazorEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Spacebuilder.Identifier, Version=4.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Spacebuilder.Identifier.1.0.0\Spacebuilder.Identifier.dll</HintPath>
+    </Reference>
+    <Reference Include="Spacebuilder.Microblog.Service">
+      <HintPath>..\..\..\packages\Spacebuilder.MicroBlog.Service.4.0.0.1\Spacebuilder.Microblog.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages" />
+    <Reference Include="System.Web.Helpers" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Tunynet.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Tunynet.Infrastructure.1.0.0\lib\net40\Tunynet.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Tunynet.MvcExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Tunynet.MvcExtensions.1.0.0\lib\net40\Tunynet.MvcExtensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Configuration\MicroblogAtUserAssociatedUrlGetter.cs" />
+    <Compile Include="Configuration\MicroblogOwnerDataGetter.cs" />
+    <Compile Include="Configuration\MicroblogTopicRecommendUrlGetter.cs" />
+    <Compile Include="Configuration\MicroblogTenantAuthorizationHandler.cs" />
+    <Compile Include="Configuration\MicroblogApplicationStatisticDataGetter.cs" />
+    <Compile Include="Configuration\MicroblogTagUrlGetter.cs" />
+    <Compile Include="Configuration\MicroblogCommentUrlGetter.cs" />
+    <Compile Include="Controllers\ChannelMicroblogController.cs" />
+    <Compile Include="Controllers\GroupSpaceMicroblogController.cs" />
+    <Compile Include="Controllers\MicroblogController.cs" />
+    <Compile Include="Controllers\MicroblogActivityController.cs" />
+    <Compile Include="Controllers\ControlPanelMicroblogController.cs" />
+    <Compile Include="EventModules\MicroblogOperationLogEventModule.cs" />
+    <Compile Include="EventModules\MicroblogIndexEventModule.cs" />
+    <Compile Include="EventModules\MicroblogEventModule.cs" />
+    <Compile Include="Extensions\Authorizer.cs" />
+    <Compile Include="MicroblogApplication.cs" />
+    <Compile Include="MicroblogConfig.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Search\MicroblogFullTextQuery.cs" />
+    <Compile Include="Search\MicroblogIndexDocument.cs" />
+    <Compile Include="Search\MicroblogSearcher.cs" />
+    <Compile Include="Configuration\GroupUrlGetter.cs" />
+    <Compile Include="Configuration\IMicroblogUrlGetter.cs" />
+    <Compile Include="Configuration\MicroblogBodyProcessor.cs" />
+    <Compile Include="Extensions\SiteUrls.cs" />
+    <Compile Include="Configuration\MicroblogUrlGetter.cs" />
+    <Compile Include="Configuration\MicroblogUrlGetterFactory.cs" />
+    <Compile Include="UrlRoutingRegistration.cs" />
+    <Compile Include="ViewModels\MicroblogCommentEditModel.cs" />
+    <Content Include="Scripts\tunynet\jquery.spb.microblog.Create.js" />
+    <Content Include="Scripts\tunynet\jquery.spb.microblog.List.js" />
+    <Content Include="Setup\Install\SqlServer\01_Install_Microblog_Schema.sql" />
+    <Content Include="Setup\Install\SqlServer\02_Install_Microblog_InitialData.sql" />
+    <Content Include="Setup\Upgrade\SqlServer\01_upgrade_Microblog_v3.2_to_v4.0.sql" />
+    <Content Include="Views\ChannelMicroblog\Search.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\ChannelMicroblog\_ShowMicroblogInList.cshtml" />
+    <Content Include="Views\Microblog\Detail.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_GlobalSearch.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_QuickSearch.cshtml" />
+    <Content Include="Views\ChannelMicroblog\Ranking.cshtml" />
+    <Content Include="Views\ChannelMicroblog\Microblog.cshtml" />
+    <Content Include="Views\ChannelMicroblog\Waterfall.cshtml" />
+    <Content Include="Views\ChannelMicroblog\Topic.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_Header.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_RelevantMicroblog.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_RecommendTopic.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_TopTopics.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_HotFollower.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_NewMicroblogList.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_TopicMicroblogList.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_Waterfall.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\ManageMicroblogs.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\_ManageMicroblogRightMenu.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\ManageMicroblogTopics.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\EditTopic.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\_SetTopicGroup.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\ManageTopicGroups.cshtml" />
+    <Content Include="Views\ControlPanelMicroblog\_EditTopicGroup.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_CommentList.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_OneComment.cshtml" />
+    <Content Include="Views\MicroblogActivity\_Microblog.cshtml" />
+    <Content Include="Views\MicroblogActivity\_Microblog_Attachments.cshtml" />
+    <Content Include="Views\MicroblogActivity\_Microblog_Attachments_Images.cshtml" />
+    <Content Include="Views\MicroblogActivity\_Microblog_Attachments_Music.cshtml" />
+    <Content Include="Views\MicroblogActivity\_Microblog_Attachments_Video.cshtml" />
+    <Content Include="Views\GroupSpaceMicroblog\Detail.cshtml" />
+    <Content Include="Views\GroupSpaceMicroblog\TopicDetail.cshtml" />
+    <Content Include="Views\GroupSpaceMicroblog\_TopGroupTopics.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_Topic.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_HotTopic.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\ControlPanelMicroblog\_ManageMicroblogSideMenuShortcut.cshtml" />
+    <None Include="Views\Microblog\ListReferred.cshtml" />
+    <Content Include="Views\Microblog\_Create.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\ChannelMicroblog\_Comment.cshtml" />
+    <Content Include="Views\Microblog\_Detail.cshtml" />
+    <Content Include="Views\Microblog\_FollowTopics.cshtml" />
+    <None Include="Views\Microblog\_TopFollowTopics.cshtml" />
+    <Content Include="Views\Microblog\_ForwardMicroblog.cshtml" />
+    <Content Include="Views\Microblog\Mine.cshtml" />
+    <Content Include="Views\Microblog\ListFavorites.cshtml" />
+    <Content Include="Views\Microblog\_ListMyMicroblogs.cshtml" />
+    <Content Include="Views\ChannelMicroblog\_BindThirdAccount.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+    <Folder Include="Setup\UnInstall\MySQL\" />
+    <Folder Include="Setup\UnInstall\SqlServer\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Application.Config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Microblog\_Create_ListImages.cshtml" />
+    <Content Include="Views\Microblog\_Create_UploadImages.cshtml" />
+    <Content Include="Views\Microblog\_Create_AddTopic.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Microblog\_Create_AddMusic.cshtml" />
+    <Content Include="Views\Microblog\_Create_AddVideo.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BusinessComponents\Tunynet.BusinessComponents.csproj">
+      <Project>{D9BC9674-69DE-4742-AF24-E35C43DE84CE}</Project>
+      <Name>Tunynet.BusinessComponents</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.csproj">
+      <Project>{4FE558F7-2E94-49C3-8A8A-50F52FBFBBC6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Group\Group.csproj">
+      <Project>{2C7B182F-8ACC-4890-ACA7-532F8546FFB5}</Project>
+      <Name>Group</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>35522</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

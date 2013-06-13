@@ -1,0 +1,55 @@
+﻿@model IEnumerable<InitialNavigation>
+@{
+    Layout = "_ControlPanel";
+    string keyword = Request.QueryString.GetString("searchOperationKeyword", string.Empty);
+    IUser currentUser = UserContext.CurrentUser;
+}
+@section Aside
+{
+    @Html.Action("_CommonOperationMenu", "ControlPanel")
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h5>
+                <span>关于“<span style="color: red">@keyword</span>”的搜索结果</span></h5>
+            <div class="tnc-ctnright-list">
+                @Html.StatusMessage()
+                <div class="tn-directory">
+                    @foreach (InitialNavigation navigation in Model)
+                    {
+                        if (!navigation.IsControlPanelManageable(currentUser))
+                        {
+                            continue;
+                        }
+
+                        if (navigation.Depth != 1)
+                        {
+                        <div class="tn-border-gray tn-border-bottom">
+                            <h3 class="tn-directory-path">
+                                <a href="@if (!string.IsNullOrWhiteSpace(navigation.NavigationUrl))
+                                         {
+                                            @navigation.NavigationUrl
+                                         }
+                                         else
+                                         {
+                                            @CachedUrlHelper.RouteUrl(navigation.UrlRouteName)                                                    
+                                         }">
+                                    @if (!string.IsNullOrEmpty(keyword))
+                                    {
+                                        @Html.Raw(navigation.NavigationText.Replace(keyword, "<span style=\"color:red\">" + keyword + "</span>"))
+                                    }
+                                    else
+                                    { 
+                                        @navigation.NavigationText
+                                    }
+                                </a>
+                            </h3>
+                        </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Navigation>
+@{
+    int currentNavigationId = 0;
+    if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+    {
+        currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+    }
+}
+<ul class="tn-side-menu">
+    @foreach (var navigation in Model)
+    {
+
+        string selectedStatus = "";
+        if (navigation.NavigationId == currentNavigationId)
+        {
+            selectedStatus = "tn-selected tn-widget-content tn-border-gray tn-corner-all";
+        }
+        
+        <li class="@Html.Raw(selectedStatus)"><a class="tn-menu-text"
+        href="@navigation.GetUrl()" title="@navigation.Text">@navigation.Text</a></li>
+    }
+</ul>

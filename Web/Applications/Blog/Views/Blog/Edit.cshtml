@@ -1,0 +1,280 @@
+﻿@model BlogThreadEditModel
+@{
+    Layout = "_UserSpace_Wide";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+
+    string title = Model.ThreadId > 0 ? "编辑日志" : "写日志";
+    string buttonText = Model.ThreadId > 0 && !Model.IsDraft ? "保存" : "发布";
+
+    int subjectCount = Model.Subject == null ? 0 : Model.Subject.Length;
+    int summaryCount = Model.Summary == null ? 0 : Model.Summary.Length;
+
+    IEnumerable<Category> ownerCategories = ViewData.Get<IEnumerable<Category>>("ownerCategories", null);
+    Dictionary<long, Category> ownerCategoryDic = ViewData.Get<Dictionary<long, Category>>("ownerCategoryDic", new Dictionary<long, Category>());
+    SelectList siteCategories = ViewData.Get<SelectList>("siteCategories", null);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-edit">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="spb-blog-edit-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                    <a class="tn-action" href="@SiteUrls.Instance().BlogDraft(Url.SpaceKey())"><span
+                        class="tn-action-text">草稿箱</span></a><span class="tn-spacer tn-text-note">|</span><a class="tn-action" href="@SiteUrls.Instance().BlogHome(Url.SpaceKey())"><span
+                            class="tn-action-text">日志首页</span></a></div>
+                <h2>@title</h2>
+            </div>
+            @Html.StatusMessage()
+            @using (Html.BeginForm("Edit", "Blog", FormMethod.Post, new { id = "form-blog-edit", redirect = SiteUrls.Instance().BlogDetail(Url.SpaceKey(), Model.ThreadId) }))
+            {
+                <div class="tn-publish">
+                    @Html.HiddenFor(n => n.ThreadId)
+                    @Html.HiddenFor(n => n.OwnerId)
+                    @Html.HiddenFor(n => n.IsDraft)
+                    @Html.HiddenFor(n => n.OwnerCategoryIds)
+                    <div class="tn-write-title">
+                        @Html.TextBoxFor(n => n.Subject, InputWidthTypes.Longest)
+                        <span id="SubjectCount" class="tn-count tn-text-note">@subjectCount/@TextLengthSettings.TEXT_SUBJECT_MAXLENGTH</span>
+                        @Html.ValidationMessageFor(n => n.Subject)
+                    </div>
+                    <div class="tn-editor">
+                        @Html.HtmlEditorFor(n => n.Body, new HtmlEditorOptions(HtmlEditorMode.Enhanced).MergeHtmlAttribute("style", "height:400px;")
+                                                                    .AddPhotoButton(TenantTypeIds.Instance().BlogThread(), Model.ThreadId)
+                                                                    .AddFileButton(TenantTypeIds.Instance().BlogThread(), Model.ThreadId)
+                                                                    .AddAtUserButton()
+                                                                    .AddMusicButton()
+                                                                    .AddVideoButton())
+                    </div>
+                    @Html.ValidationMessageFor(n => n.Body)
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr class="tn-select-categories">
+                                    <th>
+                                        我的分类：
+                                    </th>
+                                    <td>
+                                        <a class="tn-action tn-action-text-icon-right" href="javascript:;" menu="#select-categories">
+                                            <span class="tn-icon tn-smallicon-triangle-down"></span><span id="selected-categories"
+                                                class="tn-action-text">请选择</span> </a>
+                                        <div id="select-categories" class="tn-more-options tn-widget-content tn-border-gray"
+                                            style="display: none">
+                                            <ul id="category-list" class="tn-menu-list tn-form-list">
+                                                @if (ownerCategories != null && ownerCategories.Count() > 0)
+                                                {
+                                                    foreach (var category in ownerCategories)
+                                                    {
+                                                    <li class="tn-menu-item tn-form-item tn-widget-content tn-widget-same">
+                                                        @if (ownerCategoryDic.ContainsKey(category.CategoryId))
+                                                        {
+                                                            @Html.SipmleCheckBox("OwnerCategoryId", category.CategoryId, true, new { id = "ownerCategoryId-" + category.CategoryId })
+                                                        }
+                                                        else
+                                                        { 
+                                                            @Html.SipmleCheckBox("OwnerCategoryId", category.CategoryId, false, new { id = "ownerCategoryId-" + category.CategoryId })
+                                                        }
+                                                        <label id="ownerCategoryName-@(category.CategoryId)" for="ownerCategoryId-@(category.CategoryId)" title="@category.CategoryName">@StringUtility.Trim(category.CategoryName, 7)</label>
+                                                    </li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </div>
+                                        <a class="tn-create" href="@SiteUrls.Instance()._CreateMyCategory(Url.SpaceKey(), TenantTypeIds.Instance().BlogThread(), "CreateCategoryCallback")" plugin = "dialog">
+                                            新建分类</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        设置标签：
+                                    </th>
+                                    <td>
+                                        @Html.TagSelector("TagNames", TenantTypeIds.Instance().BlogThread(), Model.ThreadId, UserIdToUserNameDictionary.GetUserId(Url.SpaceKey()))
+                                        @Html.ValidationMessageFor(n => n.TagNames)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tn-collapsible tn-collapsible-closed">
+                        <div style="cursor: pointer;" class="tn-border-bottom tn-border-gray tn-border-dashed tn-collapsible-header tn-switch-left">
+                            <h4>
+                                <a href="###">更多设置</a></h4>
+                        </div>
+                        <div class="tn-collapsible-content tn-border-bottom tn-border-gray tn-border-dashed"
+                            style="display: block;">
+                            <div class="tn-form-box">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                标题图：
+                                            </th>
+                                            <td>
+                                                @Html.SetTitleImageFor(n => n.FeaturedImageAttachmentId, TenantTypeIds.Instance().BlogThread(), Model.ThreadId)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                设置：
+                                            </th>
+                                            <td>
+                                                <ul class="tn-checkbox-list">
+                                                    <li>
+                                                        @Html.CheckBoxFor(n => n.IsSticky, new { @class = "tn-checkbox" })
+                                                        @Html.LabelFor(n => n.IsSticky)
+                                                    </li>
+                                                    <li>
+                                                        @Html.CheckBoxFor(n => n.IsLocked, new { @class = "tn-checkbox" })
+                                                        @Html.LabelFor(n => n.IsLocked)
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                隐私设置：
+                                            </th>
+                                            <td>
+                                                @Html.Action("_PrivacyStatusSetter", "Channel", new
+                                                {
+                                                    area = "Common",
+                                                    userId = UserContext.CurrentUser.UserId,
+                                                    itemName = "PrivacyStatus",
+                                                    itemPrivacyStatus = Model.PrivacyStatus,
+                                                    selectedUserIds = ViewData["userPrivacySpecifyObjects"] as string,
+                                                    selectedUserGroupIds = ViewData["userGroupPrivacySpecifyObjects"] as string,
+                                                })
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(n => n.Keywords)：
+                                            </th>
+                                            <td>
+                                                @Html.TextBoxFor(n => n.Keywords, InputWidthTypes.Longest)
+                                                @Html.ValidationMessageFor(n => n.Keywords)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(n => n.Summary)：
+                                            </th>
+                                            <td>
+                                                @Html.TextAreaFor(n => n.Summary, InputWidthTypes.Longest)
+                                                <span id="SummaryCount" class="tn-count tn-text-note">@summaryCount/@TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH</span>
+                                                @Html.ValidationMessageFor(n => n.Summary)
+                                            </td>
+                                        </tr>
+                                        @if (siteCategories != null && siteCategories.Count() > 0)
+                                        { 
+                                            <tr>
+                                                <th>
+                                                    投稿到：
+                                                </th>
+                                                <td>
+                                                    @Html.DropDownList("SiteCategoryId", ViewData["siteCategories"] as SelectList, "请选择", new { @class = "tn-dropdownlist" })
+                                                    <span class="tn-text-note">增加在频道显示的机会</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tn-publish-btn">
+                        @Html.Button(buttonText, ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large, null, TextIconLayout.IconText, null, new { id = "submit-publish" })
+                        @if (Model.ThreadId == 0 || Model.IsDraft)
+                        {
+                            @Html.Button("保存草稿", ButtonTypes.Button, HighlightStyles.Secondary, ButtonSizes.Large, null, TextIconLayout.IconText, null, new { id = "submit-draft" })
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    //新建分类
+    function CreateCategoryCallback(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function(){
+            if (data.MessageType == 1) {
+                var li=$('<li class="tn-menu-item tn-form-item tn-widget-content tn-widget-same"><input id="ownerCategoryId-'+data.CategoryId+'" name="OwnerCategoryId" type="checkbox" checked="checked" value="'+data.CategoryId+'" _value="off"><label id="ownerCategoryName-'+data.CategoryId+'" for="ownerCategoryId-'+data.CategoryId+'">'+data.CategoryName+'</label></li>');
+                $("#category-list").append(li);
+                getOwnerCategories();
+            }
+        });
+    }
+
+    //选择用户分类
+    function getOwnerCategories() {
+        var categoryIds = "";
+        var categoryNames = "";
+        var i = 1;
+        $("input[id^='ownerCategoryId-']").each(function () {
+            if ($(this).attr("checked")) {
+                categoryIds += $(this).val() + ",";
+                if(i == 1){
+                    categoryNames += $("label[id^='ownerCategoryName-" + $(this).val() + "']").html();
+                }else if(i < 4){
+                    categoryNames += "，" + $("label[id^='ownerCategoryName-" + $(this).val() + "']").html() ;
+                }else if(i == 4){
+                    categoryNames += " 等"
+                }
+                i++;
+            }
+        });
+        var form = $('form#form-blog-edit');
+        $("#OwnerCategoryIds", form).val(categoryIds);
+        if (categoryNames) {
+            $("#selected-categories", form).html(categoryNames);
+        } else {
+            $("#selected-categories", form).html("请选择");
+        }
+    }
+
+    $(function () {
+        var form = $('form#form-blog-edit');
+        //截字
+        $("#Subject", form).GetTextCount('SubjectCount', @(TextLengthSettings.TEXT_SUBJECT_MAXLENGTH), true);
+        $("#Summary", form).GetTextCount('SummaryCount', @(TextLengthSettings.TEXT_DESCRIPTION_MAXLENGTH), true, true);
+
+        //选择用户分类
+        getOwnerCategories();
+
+        $("input[id^='ownerCategoryId-']").live("click",function () {
+            getOwnerCategories();
+        });        
+
+        //点击"发布/保存日志"按钮
+        $("#submit-publish",form).click(function(e){
+            e.preventDefault();
+            $("#IsDraft", form).val(false);
+            if (form.valid()){
+                form.submit();
+            }
+        })
+
+        //点击“保存草稿”按钮
+        $("#submit-draft", form).click(function () {
+            $("#IsDraft", form).val(true);
+            if (form.valid()) {
+                form.ajaxSubmit({
+                    success: function (data) {
+                        if (data.MessageType === "@(StatusMessageType.Error)") {
+                            art.dialog.tips(data.MessageContent, 3, data.MessageType);
+                        } else {
+                            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                                $("#ThreadId", form).val(data.ThreadId);
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+        //表单有录入内容但未保存时，用户离开页面提示
+        form.enable_changed_form_confirm("");
+    });
+    
+</script>

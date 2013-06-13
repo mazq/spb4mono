@@ -1,0 +1,51 @@
+﻿@model  Tag
+@{
+    PagingDataSet<MicroblogEntity> microblogEntities = ViewData.Get<PagingDataSet<MicroblogEntity>>("microblogEntities", null);            
+}
+
+<div class="tn-content-heading tn-border-gray tn-border-bottom">
+    <h4>
+        网友热议</h4>
+</div>
+@if (microblogEntities != null && microblogEntities.Count() > 0)
+{
+<ul id="microblog-list-container" class="tn-list tnc-dynamic">
+    
+    @Html.AjaxAction("_TopicMicroblogList", "ChannelMicroblog", new { tagId =Model.TagId})
+</ul>
+}
+else
+{
+   <div class="tn-no-data">本话题下暂无微博</div> 
+}
+
+<script type="text/javascript">
+    $(function () {
+        //添加关注
+        $("#add-follow-topic").click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr('href');
+
+            $.getJSON(url, function () {
+                $("#add-follow-topic").hide();
+                $("#cancel-follow-topic").show();
+            });
+        });
+
+        //取消关注
+        $("#cancel-follow-topic").click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr('href');
+
+            $.getJSON(url, function () {
+                $("#cancel-follow-topic").hide();
+                $("#add-follow-topic").show();
+            });
+        });
+
+        //页面加载时初始化微博录入框
+        $('#microblogBody').val("#@(Model.TagName)#");
+    });
+</script>

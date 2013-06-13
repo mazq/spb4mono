@@ -1,0 +1,16 @@
+﻿@model PagingDataSet<BarThread>
+@{
+    
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+    
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    ViewData["ShowFollowBar"] = false;
+    ViewData["TenantTypeId"] = TenantTypeIds.Instance().Group();
+}
+@section Aside{
+    @Html.AjaxAction("_BarThreadSearch", "GroupSpaceBar", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_TagCloud", "GroupSpaceBar", new { spaceKey = Url.SpaceKey() })
+}
+@Html.Partial("~/Applications/Bar/Views/Bar/_UserThreads.cshtml", Model)

@@ -1,0 +1,29 @@
+﻿@{
+    string tagInputName = ViewData.Get<string>("tagInputName", "TagSelector");
+    string selectedTagNames = ViewData.Get<string>("selectedTagNames", string.Empty);
+    var ownerTagNames = ViewData.Get<IEnumerable<string>>("ownerTagNames", new List<string>());
+    long? ownerId = ViewData.Get<long?>("ownerId", null);
+    string getTagsJosnUrl = SiteUrls.Instance().GetSuggestTags(ViewData.Get<string>("tenantTypeId", string.Empty), ownerId);
+    TagSettings tagSettings = ViewData.Get<TagSettings>("tagSettings", new TagSettings());
+    
+}
+<div class="tn-expand-control tn-expand-has-icon">
+    <input id="@tagInputName" name="@tagInputName" type="text" maxlength="@TextLengthSettings.TEXT_NAME_MAXLENGTH" />
+    <div class="tn-explain">
+        <span class="tn-text-note">多个标签请用空格隔开，最多添加@(tagSettings.MaxTagsCount)个标签，每个标签长度最长为@(TextLengthSettings.TEXT_NAME_MAXLENGTH)个字符</span></div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#@tagInputName").autoSuggest("@getTagsJosnUrl",
+        {
+            asHtmlID: "@tagInputName",
+            minChars: 1,
+            keyDelay: 600,
+            selectionLimit: @(tagSettings.MaxTagsCount),
+            preFill: "@Html.Raw(selectedTagNames)",
+            allSelectData: @Html.Raw(Json.Encode(ownerTagNames)),
+            enableManualAdd: true
+        });
+    });
+
+</script>

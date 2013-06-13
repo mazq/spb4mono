@@ -1,0 +1,107 @@
+﻿@{
+    Layout = "~/Applications/Setup/Layouts/Upgrade.cshtml";
+    string log = ViewData.Get<string>("log", null);
+    string logFile = ViewData.Get<string>("logFile", null);
+    IEnumerable<string> applicationKeys = Request.QueryString.Gets<string>("applicationKeys", new List<string>());
+}
+<div class="spb-form">
+    <div class="spb-title">
+        <strong>完成升级：</strong></div>
+    <ul class="spb-text">
+        <li><span>
+            @if (applicationKeys.Contains("Microblog"))
+            {
+                if (!Request.QueryString.Get<bool>("Microblog", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            }
+            else
+            { 
+                <span style="float: right;">未处理</span>
+            }
+        </span>微博升级 </li>
+        <li><span>
+            @if (applicationKeys.Contains("Bar"))
+            {
+                if (!Request.QueryString.Get<bool>("Bar", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            }
+            else
+            { 
+                <span style="float: right;">未处理</span>
+            }
+        </span>帖吧升级 </li>
+        <li><span>
+            @if (applicationKeys.Contains("Blog"))
+            {
+                if (!Request.QueryString.Get<bool>("Blog", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            }
+            else
+            { 
+                <span style="float: right;">未处理</span>
+            }
+        </span>日志升级 </li>
+        <li><span>
+            @if (applicationKeys.Contains("Group"))
+            {
+                if (!Request.QueryString.Get<bool>("Group", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            }
+            else
+            { 
+                <span style="float: right;">未处理</span>
+            }
+        </span>群组升级 </li>
+        @if (applicationKeys.Contains("Ask"))
+        { 
+            <li><span>
+                @if (!Request.QueryString.Get<bool>("Ask", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            </span>问答升级 </li>
+        }
+        @if (applicationKeys.Contains("PointMall"))
+        {
+            <li><span>
+                @if (!Request.QueryString.Get<bool>("PointMall", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            </span>积分商城升级</li>
+        }
+        @if (applicationKeys.Contains("Photo"))
+        {
+            <li><span>
+                @if (!Request.QueryString.Get<bool>("Photo", false))
+                {<text><span class="tn-abnormal">异常</span></text>}
+                else
+                {<text><span class="tn-success">成功</span></text>}
+            </span>相册升级 </li>
+        }
+    </ul>
+</div>
+<div class="spb-ft">
+    接下来可以： <a class="spb-btn" id="siteHome" href="javascript:;">访问首页</a> <a class="spb-btn"
+        id="controlPanelHome" href="javascript:;">访问后台</a> <a href="@Url.Action("_UpgradeLog", "Upgrade")" target="_blank">
+            查看升级日志</a> &nbsp;&nbsp; <a href="@Url.Action("_ResetPasswordLog", "Upgrade")" target="_blank">
+                查看重设密码日志</a>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.post('@Url.Action("UnloadAppDomain", "Upgrade")', function () {
+            var href = window.location.href;
+            var domain = href.substring(0, href.indexOf('\Upgrade'));
+            $('#siteHome').attr('href', domain + 'Home' + (href.indexOf('.aspx') > 0 ? '.aspx' : ''));
+            $('#controlPanelHome').attr('href', domain + 'ControlPanel/Home' + (href.indexOf('.aspx') > 0 ? '.aspx' : ''));
+        });
+    });   
+</script>

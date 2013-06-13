@@ -1,0 +1,92 @@
+﻿@model UserProfileEditModel
+@{
+    Layout = "_UserSpaceSettings";
+    string userName = ViewData["UserName"] as string;
+    //StatusMessageData statusMessageData = TempData.Get<StatusMessageData>("StatusMessageData", null);
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.UserProfile;
+    bool sendEmailStatus = TempData.Get<bool>("SendEmailStatus", true);
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-set tnc-basic-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-basic-info-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                    <a href="@SiteUrls.Instance().UserProfileGuideAvatar(Url.SpaceKey())" class="tn-action">
+                        <span class="tn-action-text">进入向导</span></a></div>
+                <h2>
+                    编辑资料</h2>
+            </div>
+            @*@Html.StatusMessage(statusMessageData)*@
+            @if (!Model.IsEmailVerified && sendEmailStatus)
+            {
+                <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                    <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+                    <div class="tn-helper-flowfix">
+                        <strong>提示：</strong>您的帐号邮箱尚未激活，激活后才可以使用帐号邮箱登录、接收到邮件形式的站外提醒， @Html.Link("点击激活", SiteUrls.Instance().SendAsyn(Url.SpaceKey()), "点击激活")</div>
+                </div>
+            }
+            @if (!sendEmailStatus)
+            {
+                <div name="StatusMessageDiv" class="tn-cue-error tn-corner-all tn-message-box">
+                    <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right"></a><span class="tn-helper-left">
+                        <span class="tn-icon tn-icon-cross-circle"></span></span>
+                    <div class="tn-helper-flowfix">
+                        <strong>错误：</strong>发送激活邮件失败，请尝试 @Html.Link("重新发送", SiteUrls.Instance().SendAsyn(Url.SpaceKey()), "重新发送")</div>
+                </div>
+            }
+            @using (Html.BeginAjaxForm("EditUserProfile", "UserSpaceSettings", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, htmlAttributes: new { id = "CreateWork" }))
+            {
+                <div class="tn-form-box">
+                    <table>
+                        @Html.HiddenFor(model => model.UserId)
+                        <tr>
+                            <th>
+                                用户名：
+                            </th>
+                            <td>
+                                <span class="tn-user-name"><strong>@userName</strong>
+                                    @Html.Link("修改密码", SiteUrls.Instance().ChangePassword(Url.SpaceKey()), "修改密码")</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                邮箱：
+                            </th>
+                            <td>
+                                @Html.TextBoxFor(model => model.AccountEmail, InputWidthTypes.Long, new RouteValueDictionary { { "id ", "AccountEmail" }, { "ReadOnly ", "ReadOnly" } })
+                                @Html.ValidationMessageFor(model => model.AccountEmail)
+                            </td>
+                            <td>
+                                @Html.Link("修改", SiteUrls.Instance()._EditUserAccountEmail(Url.SpaceKey()) + "?email=" + Model.AccountEmail, "修改", new { plugin = "dialog" })
+                            </td>
+                            @Html.HiddenFor(model => model.AccountEmail, new { id = "hiddenEmail" })
+                        </tr>
+                        @Html.Action("_EditUserProfileDetail", new { spaceKey = Url.SpaceKey() })
+                        <tr>
+                            <th>
+                                &nbsp;
+                            </th>
+                            <td>@Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "saveProfile" })
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+    $(document).ready(function () {
+        window.location.href = "#StatusMessage";
+        $("div[name='StatusMessageDiv'] a.tn-smallicon-cross").click(function () {
+            $(this).parents("div[name='StatusMessageDiv']:first").fadeOut("normal");
+        });
+    });
+</script>

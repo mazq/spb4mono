@@ -1,0 +1,30 @@
+﻿@model List<UserBlockedObjectViewModel>
+@if (Model != null && Model.Count() > 0)
+{
+    <ul class="tn-list tn-helper-clearfix">
+        @foreach (var item in Model)
+        {
+            <li class="tn-list-item tn-helper-clearfix"  id="blocked-groups-@item.ObjectId">
+                <div class="tn-list-item-area-left">
+                    <div class="tn-avatar">
+                        <a href="@SiteUrls.Instance().GroupHome(item.ObjectId)">
+                            <img src="@SiteUrls.Instance().LogoUrl(item.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" width="50px" height="50px" alt="@item.ObjectName"/>
+                        </a>
+                    </div>
+                </div>
+                <div class="tn-list-item-area-main">
+                    <div class="tn-list-item-row tn-list-item-heading">
+                        @Html.Link(item.ObjectName, SiteUrls.Instance().GroupHome(item.ObjectId), item.ObjectName, null, HyperLinkTarget._blank)</div>
+                    <div class="tn-list-item-row tn-list-item-summary">
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetText("解除 × ").SetConfirm("确定要解除屏蔽？").SetDeleteTarget("#blocked-groups-" + item.ObjectId).SetUrl(SiteUrls.Instance().UnBlock(Url.SpaceKey(), item.Id)).MergeHtmlAttribute("class", "tn-secondary-text"))
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="tn-no-data">
+        目前还没有群组进入您的屏蔽列表</div>
+}

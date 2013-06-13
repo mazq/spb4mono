@@ -1,0 +1,20 @@
+﻿@{
+    string url = Request.QueryString.Get<string>("url", string.Empty);
+    Regex urlRegex = new Regex(@"^.*\.(mp3|wma|wav|mp4|aif|cd|mid|vqf)$", RegexOptions.IgnoreCase);
+    Match urlMatch = urlRegex.Match(url);
+
+    if (urlMatch.Success)
+    {
+        ParsedMedia entity = ParsedMedia.New();
+        entity.MediaType = MediaType.Audio;
+        entity.Url = url;
+        entity.Name = Tunynet.Utilities.WebUtility.UrlDecode(url.Remove(url.LastIndexOf('.')).Substring(url.LastIndexOf('/') + 1));
+        entity.SourceFileUrl = url;
+        ParsedMediaService parsedMediaService = new ParsedMediaService(); parsedMediaService.Create(entity);
+    @Html.Raw(Json.Encode(entity))
+    }
+    else
+    { 
+    @Html.Raw(Json.Encode(new { errorMessage = "可能暂时不支持类音频解析" }))
+    }
+}

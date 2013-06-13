@@ -1,0 +1,51 @@
+﻿@model GroupEntity
+@{
+    bool isMember = ViewData.Get<bool>("isMember", false);
+    bool showQuit = ViewData.Get<bool>("showQuit", false);
+    string buttonName = ViewData.Get<string>("buttonName", "加入");
+    bool isOwner = ViewData.Get<bool>("isOwner", false);
+    bool isApplied = ViewData.Get<bool>("isApplied", false);
+    bool isManager = ViewData.Get<bool>("isManager", false);
+    string url = string.Empty;
+    string plugin = string.Empty;
+    if (Model.JoinWay == JoinWay.ByApply)
+    {
+        url = SiteUrls.Instance()._EditApply(Model.GroupId);
+        if (!isApplied)
+        {
+            plugin = "dialog";
+        }
+    }
+    if (Model.JoinWay == JoinWay.Direct)
+    {
+        url = SiteUrls.Instance().JoinGroup(Model.GroupId);
+    }
+    if (Model.JoinWay == JoinWay.ByQuestion)
+    {
+        url = SiteUrls.Instance()._ValidateQuestion(Model.GroupId);
+        plugin = "dialog";
+    }
+    bool isPrivate = (Model.JoinWay == JoinWay.ByInvite);
+}
+@if (isMember)
+{
+    if (!isOwner||!isManager)
+    { 
+    <span class="tn-explain-icon"><span class="tn-icon tn-icon-accept"></span><span class="tn-icon-text">已加入</span></span>
+    }
+    if (showQuit && !isOwner)
+    {
+    <span class="tn-action"><span class="tn-action-text"><a id="quitGroup-@(Model.GroupId)" href="@SiteUrls.Instance()._QuitGroup(Model.GroupId)">退出</a></span></span>
+    }
+}
+else
+{
+    if (!isPrivate)
+    { 
+        <a data-joinway="@(Model.JoinWay)" data-success="JoinGroupSuccessCallBack" data-isApplied="@isApplied" id="applyJoin-@(Model.GroupId)" href="@url" plugin="@plugin" class="tn-button tn-corner-all tn-button-default tn-button-text-icon-primary"><span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">@buttonName</span> </a>
+    }
+    if (Model.JoinWay == JoinWay.Direct)
+    { 
+        <span class="tn-explain-icon" style="display:none"><span class="tn-icon tn-icon-accept"></span><span class="tn-icon-text">已加入</span></span>
+    }
+}

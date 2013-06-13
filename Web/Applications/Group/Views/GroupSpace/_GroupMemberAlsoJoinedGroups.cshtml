@@ -1,0 +1,29 @@
+﻿@model IEnumerable<GroupEntity>
+@if(Model!=null && Model.Count()>0)
+{
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-maybe">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            群友还喜欢去</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-list">
+            @foreach (var group in Model)
+            {
+                <li class="tn-list-item tn-helper-clearfix tn-border-bottom">
+                    <div class="tn-list-item-area-left">
+                        <a target="_blank" href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())"><img title="@group.GroupName" src="@SiteUrls.Instance().LogoUrl(group.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Small())" width="50" height="50" alt="@group.GroupName"></a>
+                    </div>
+                    <div class="tn-list-item-area-main">
+                        <div class="tn-list-item-row tn-list-item-heading">
+                            <h5>
+                                @Html.Link(group.GroupName, SiteUrls.Instance().GroupHome(Url.SpaceKey()), group.GroupName, navigateTarget: HyperLinkTarget._blank)
+                            </h5>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+}

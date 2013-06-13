@@ -1,0 +1,19 @@
+﻿@model IEnumerable<Spacebuilder.Search.ISearcher>
+@{
+    Layout = "_ControlPanel";
+    string message = Request.QueryString.GetString("message", "执行失败");
+    string backUrl = Request.QueryString.GetString("backUrl", "javascript:window.history.go(-1)");
+    string operationUrl = Request.QueryString.GetString("operationUrl", "javascript:window.history.go(-1)");
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+    <div class="tnc-ctn-center">
+        <div class="tnc-run-state tnc-run-failure">
+        <div class="tn-heading tn-helper-clearfix"> <span class="tn-icon-large tn-largeicon-cross-circle"></span><strong>@message</strong> </div>
+        <p class="tn-actions">您可以<a href="@operationUrl" class="tn-action"> <span class="tn-action-text">重新执行</span></a>，或<a href="@backUrl" class="tn-action"><span class="tn-action-text">返回上一页</span></a>!</p>
+        </div>
+    </div>
+    </div>
+</div>
+      

@@ -1,0 +1,51 @@
+﻿@model SystemMessageViewModel
+@{
+    Layout = "_Account";
+}
+@{
+    SystemMessageViewModel systemMessageViewModel = TempData["SystemMessageViewModel"] as SystemMessageViewModel;
+    TempData.Remove("SystemMessageViewModel");
+    TempData["SystemMessageViewModel"] = systemMessageViewModel;
+}
+@helper GetLink(KeyValuePair<string, string> pair)
+    {
+    <a href="@pair.Value" plugin = "dialog">@pair.Key</a>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-activation">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-activation-wrapper">
+            <div class="tnc-activation-icon">
+                @switch (Model.StatusMessageType)
+                {
+                    case StatusMessageType.Success:
+                    <text><span class="tn-icon-large tn-largeicon-accept-circle"></span></text>
+                        break;
+                    case StatusMessageType.Error:
+                    <text><span class="tn-icon-large tn-largeicon-cross-circle"></span></text>
+                        break;
+                    default:
+                    <text><span class="tn-icon-large tn-largeicon-exclamation"></span></text>
+                        break;
+                }
+            </div>
+            <div class="tnc-adcivation-box">
+                <h4>
+                    @Model.Title</h4>
+                <p class="tnc-activation-text">
+                    @Html.Raw(string.Format(Tunynet.Utilities.WebUtility.HtmlEncode(Model.Body), Model.BodyLink.Select(n => GetLink(n)).ToArray()))
+                </p>
+                @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                {
+                    <p>
+                        @Html.Link("返回上一页", Model.ReturnUrl, "返回上一页", new { @class = "tn-action" })</p>
+                }
+                <p>
+                    @foreach (var item in Model.ButtonLink)
+                    {
+                        @Html.Button(item.Key, ButtonTypes.Button, HighlightStyles.Primary, ButtonSizes.Large, url: item.Value)
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

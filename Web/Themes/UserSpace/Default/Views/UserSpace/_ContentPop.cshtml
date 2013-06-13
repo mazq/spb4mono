@@ -1,0 +1,33 @@
+﻿@model User
+@{
+    Layout = null;
+    Dictionary<int, List<OwnerStatisticData>> OwnerStatisticDataDictionary = ViewData.Get<Dictionary<int, List<OwnerStatisticData>>>("OwnerStatisticDataDictionary", null);
+    Dictionary<int, string> dictionary = ViewData.Get<Dictionary<int, string>>("dictionary", null);
+    IEnumerable<ApplicationBase> applicationBase = ViewData.Get<IEnumerable<ApplicationBase>>("applicationBase", null);
+}
+
+<div class="spb-content-pop-bubbles" >
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all">
+            <ul class="tn-helper-clearfix">
+               @foreach (var item in applicationBase)
+                    {
+                        <li>@dictionary[item.ApplicationId]：
+                        @for (int i = 0; i < OwnerStatisticDataDictionary[item.ApplicationId].Count(); i++)
+			            {
+                            if (i != 0)
+                            {
+                                <span>/</span>
+                            }
+                            <a href="@OwnerStatisticDataDictionary[item.ApplicationId][i].DataUrl"  title="@OwnerStatisticDataDictionary[item.ApplicationId][i].DataName">@OwnerStatisticDataDictionary[item.ApplicationId][i].ContentCount</a>
+                        }
+                        </li>
+                    }
+            </ul>
+        </div>
+    </div>
+</div>

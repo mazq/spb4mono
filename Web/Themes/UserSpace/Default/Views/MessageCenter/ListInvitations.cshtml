@@ -1,0 +1,32 @@
+﻿@model PagingDataSet<Invitation>
+@{
+    Layout = "_MessageCenter";
+}
+@section Aside{
+    @Html.Action("_MessageCenter_Menu", "MessageCenter", new { subMenu = MessageCenterMenu.Invitation })
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        //处理接受拒绝连接的js
+        $("a[id^='invitation-setstatus-']").live('click', function (e) {
+            e.preventDefault();
+            $this = $(this);
+            $.post($(this).attr("href"), function (data) {
+                $liParent = $this.parents("li").after(data);
+                $liParent.remove();
+            });
+        });
+        //全选按钮
+        $("input#invitations-checkall").live("click", function () {
+            var checkeds = document.getElementsByName("invitationIds");
+            for (var i = 0; i < checkeds.length; i++) {
+                checkeds[i].checked = this.checked;
+            }
+        });
+    })
+</script>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-request">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Partial("_ListInvitation", Model)
+    </div>
+</div>

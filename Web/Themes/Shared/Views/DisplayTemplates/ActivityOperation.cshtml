@@ -1,0 +1,59 @@
+﻿@{
+    var activity = ViewData.Get<Activity>("activity", Activity.New());
+    var isSiteActivity = Request.QueryString.Get<bool>("isSiteActivity", false);
+    var isOwnerActivity = Request.QueryString.Get<bool>("isOwnerActivity", false);
+    var isMyTimeline = Request.QueryString.Get<bool>("isMyTimeline", false);
+}
+@if (isSiteActivity)
+{
+    if (new Authorizer().IsAdministrator(activity.ApplicationId))
+    {           
+    <div class="tnc-down-blkarrow">
+        <a href="@Html.Raw(SiteUrls.Instance().DeleteActivityFromSiteInbox(activity.ActivityId))" class="tn-icon tn-smallicon-cross" title="删除站点动态" plugin="activityOperation" name="activityId_@(activity.ActivityId)">
+        </a>
+    </div>
+    }
+}
+else if (isOwnerActivity)
+{
+    if (activity.OwnerType == ActivityOwnerTypes.Instance().User() && UserContext.CurrentUser != null && activity.UserId == UserContext.CurrentUser.UserId)
+    {
+    <div class="tnc-down-blkarrow">
+        <a href="@Html.Raw(SiteUrls.Instance()._DeleteUserActivity(UserIdToUserNameDictionary.GetUserName(activity.UserId), activity.ActivityId))" title="删除用户动态" class="tn-icon tn-smallicon-cross" plugin="activityOperation" name="activityId_@(activity.ActivityId)">
+        </a>
+    </div>
+    }
+    else if (activity.OwnerType == ActivityOwnerTypes.Instance().Group() && new Authorizer().Group_DeleteGroupActivity(activity))
+    { 
+    <div class="tnc-down-blkarrow">
+        <a href="@Html.Raw(SiteUrls.Instance()._DeleteGroupActivity(GroupIdToGroupKeyDictionary.GetGroupKey(activity.OwnerId), activity.ActivityId))" title="删除群动态" class="tn-icon tn-smallicon-cross" plugin="activityOperation" name="activityId_@(activity.ActivityId)">
+        </a>
+    </div>
+    }
+}
+else if (isMyTimeline)
+{ 
+    <div class="tnc-down-blkarrow">
+        <a href="javascript:;" class="tn-icon tn-smallicon-triangle-down" menu="#more_@(activity.ActivityId)">
+        </a>
+        <div class="tn-more-options tn-widget-content tn-border-gray" id="more_@(activity.ActivityId)" style="display: none;">
+            <ul class="tn-menu-list">
+                <li><a href="@Html.Raw(SiteUrls.Instance().DeleteActivityFromUserInbox(activity.ActivityId))" plugin="activityOperation" name="activityId_@(activity.ActivityId)" class="tn-item-link">
+                    隐藏这条信息</a></li>
+                @if (activity.OwnerType == ActivityOwnerTypes.Instance().User() && UserContext.CurrentUser != null && activity.UserId != UserContext.CurrentUser.UserId)
+                { 
+                    <li><a href="@Html.Raw(SiteUrls.Instance().BlockUser(activity.UserId))" plugin="activityOperation" name="userId_@(activity.UserId)" class="tn-item-link">
+                        屏蔽此人信息</a></li>
+                }
+                else if (activity.OwnerType == ActivityOwnerTypes.Instance().Group())
+                { 
+                    <li><a href="@Html.Raw(CachedUrlHelper.Action("BlockGroup", "ChannelGroup", "Group", new RouteValueDictionary { { "groupId", activity.OwnerId } }))" plugin="activityOperation" name="groupId_@(activity.OwnerId)" class="tn-item-link">
+                        屏蔽此群信息</a></li>
+                }
+            </ul>
+        </div>
+        <input type="hidden" name="userId_@(activity.UserId)" />
+        <input type="hidden" name="groupId_@(activity.OwnerId)" />
+    </div>
+}
+<input type="hidden" name="activityId_@(activity.ActivityId)" />

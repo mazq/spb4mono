@@ -1,0 +1,52 @@
+﻿@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.Blocked;
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-user-blacklist">
+            <div class="tn-tabs">
+                <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                    <li class="tn-widget-content tn-border-gray tn-border-trl">@Html.Link("屏蔽用户", SiteUrls.Instance().BlockUsers(Url.SpaceKey()), "屏蔽用户")</li>
+                    <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected">@Html.Link("屏蔽群组", SiteUrls.Instance().BlockGroups(Url.SpaceKey()), "屏蔽群组")</li>
+                </ul>
+                <div class="tn-tabs-panel">
+                    @Html.StatusMessage(TempData["StatusMessageData"] as StatusMessageData)
+                    <div class="tnc-blanklist">
+                        @if (TempData["StatusMessageData"] == null)
+                        {
+                            @Html.PresetMessage("您可以将自己关注的群组加入屏蔽名单，屏蔽后将不再接受该群组的动态", true)
+                        }
+                        @using (Html.BeginForm("BlockGroups", "ChannelGroup", new { spaceKey = Url.SpaceKey(), area = Spacebuilder.Group.GroupConfig.Instance().ApplicationKey }, FormMethod.Post, new { id = "blockgroups-form" }))
+                        { 
+                            <div class="tnc-selector-blanklist tn-helper-clearfix">
+                                @Html.Action("_BarSetionSelector", "Bar", new { name = "groupIds", area = Spacebuilder.Bar.BarConfig.Instance().ApplicationKey, tenantTypeId = TenantTypeIds.Instance().Group() })
+                                <div class="tnc-addbtn-blacklist">
+                                    @Html.Button("添加", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "blockgroups-button" })
+                                </div>
+                            </div>
+                        }
+                        <div class="tnc-blacklist-list">
+                            @Html.Action("_BlockGroups", "ChannelGroup", new { spaceKey = Url.SpaceKey(), area = Spacebuilder.Group.GroupConfig.Instance().ApplicationKey })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("button#blockgroups-button").click(function () {
+            if ($("input#groupIds").val() == "") {
+
+            } else {
+                $("form#blockgroups-form").submit();
+            }
+        });
+    });
+</script>

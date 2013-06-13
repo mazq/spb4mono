@@ -1,0 +1,123 @@
+﻿@model PagingDataSet<GroupMemberApply>
+@{
+    Layout = "manage-2cols";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 13900190;
+    long groupId = ViewData.Get<long>("groupId", 0);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-members">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>成员管理</h2>
+        </div>
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().ManageMemberApplies(Url.SpaceKey())">
+                    申请处理</a></li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().ManageMembers(Url.SpaceKey())" id="manageMember">
+                    成员管理</a></li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="tn-list-header">
+                    <div class="tn-toolbar-area tn-helper-clearfix">
+                        @Html.LinkButton("接受申请", SiteUrls.Instance().BatchUpdateMemberAuditStatus(Url.SpaceKey(), true), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus" })
+                        @Html.LinkButton("拒绝申请", SiteUrls.Instance().BatchUpdateMemberAuditStatus(Url.SpaceKey(), false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus-false" })
+                    </div>
+                </div>
+                @if (Model != null && Model.Count() > 0)
+                {
+                    <form action="#" method="post" id="Form-BatchSet">
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header">
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    @Html.CheckBox("memberAppliesIds-checkAll", false)
+                                </td>
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    申请人
+                                </td>
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    状态
+                                </td>
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    理由
+                                </td>
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    申请时间
+                                </td>
+                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                    操作
+                                </td>
+                            </tr>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="tn-table-grid-row" id="ManageMemberApplies_@(item.Id)">
+                                    <td class="tn-border-bottom tn-border-gray tn-width-check">
+                                        @if (item.ApplyStatus == GroupMemberApplyStatus.Pending)
+                                        {
+                                            <input type="checkbox" value="@item.Id" name="applyIds" id="memberAppliesIds-@(item.Id)" />
+                                        }
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-user-name tn-nowrap">
+                                        <a href= "@SiteUrls.Instance().SpaceHome(item.UserId)" title="@Html.ShowUserDisplayName(item.UserId)" target="_blank">@Html.ShowUserDisplayName(item.UserId)</a>
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-icon1">
+                                        @Html.AuditStatusIcon(item.ApplyStatus == GroupMemberApplyStatus.Approved ? AuditStatus.Success : (item.ApplyStatus == GroupMemberApplyStatus.Pending ? AuditStatus.Pending : AuditStatus.Fail))
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                                        @item.ApplyReason
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-datetime tn-nowrap">
+                                        @item.ApplyDate.ToFriendlyDate()
+                                    </td>
+                                    <td class="tn-border-bottom tn-border-gray tn-width-action1 tn-nowrap">
+                                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除此申请吗？").SetText("删除").SetTooltip("删除申请").SetDeleteTarget("#ManageMemberApplies_" + item.Id).SetUrl(SiteUrls.Instance().DeleteMemberApply(Url.SpaceKey(), item.Id)))
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="tn-pagination">
+                        @Html.PageSizeDropdownList("PageSize")
+                        @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 7)
+                        @Html.PagingResults(Model)
+                    </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="tn-no-data">
+                        搜索不到申请处理
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //批量操作 
+        $("a[id^='BatchSet-']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='applyIds']:checked").length) {
+                alert("至少选择一条申请信息操作");
+                return false;
+            }
+
+            $("form#Form-BatchSet").ajaxSubmit({
+                url: $(this).attr("href"),
+                success: function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                }
+            });
+        });
+
+        //全选按钮
+        $("input#memberAppliesIds-checkAll").click(function () {
+            checkAll(this, "applyIds");
+        });
+    });
+
+
+</script>

@@ -1,0 +1,3134 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Tunynet.MvcExtensions</name>
+    </assembly>
+    <members>
+        <member name="T:Tunynet.Mvc.ModelClientValidationRangeDateRule">
+            <summary>
+            日期范围客户端规则
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.ModelClientValidationRangeDateRule.#ctor(System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            构造器
+            </summary>
+            <param name="errorMessage">出错信息</param>
+            <param name="minValue">最小值</param>
+            <param name="maxValue">最大值</param>
+        </member>
+        <member name="T:Tunynet.Mvc.TabControl">
+            <summary>
+            Tabs控件
+            </summary>
+            <remarks> 
+            <para>基于jQuery UI Tabs （V1.8.7）插件构建，更多信息请参见：http://jqueryui.com/demos/tabs/ </para>     
+            <para>如果需要更多option设置，可以通过设置AdditionalParameters属性来实现</para>
+            <para>依赖文件：jquery.cookie.js、jquery-ui.js</para>
+            </remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.#ctor">
+            <summary>
+            构造器
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetName(System.String)">
+            <summary>
+            设置Tabs控件的Id
+            </summary>
+            <param name="name">Tabs控件Id</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetIsSimple(System.Boolean)">
+            <summary>
+            设置Tabs控件的Id
+            </summary>
+            <param name="name">Tabs控件Id</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetOnSelectCallBack(System.String)">
+            <summary>
+            设置选中事件的Javascript回调函数<br/>
+            原型为 function(event, ui)
+            </summary>
+            <param name="onSelectCallBack">Javascript回调函数名</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetCacheEnabled(System.Boolean)">
+            <summary>
+            设置是否需要缓存远程内容
+            </summary>
+            <param name="cacheEnabled">是否缓存</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetEvent(System.String)">
+            <summary>
+            触发Tab页切换的Javascript事件名
+            </summary>
+            <example>click,表示点击触发；mouseover表示鼠标移上去时就触发</example>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetPersistenceExpires(System.Int32)">
+            <summary>
+            通过cookie保持tab页的选择状态
+            </summary>
+            <example>30,表示使用cookie保持选中状态30天</example>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetSpinner(System.String)">
+            <summary>
+            设置Tab按钮加载时的显示文字
+            </summary>
+            <param name="spinner">加载提示文字</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.MergeAdditionalOption(System.String,System.Object)">
+            <summary>
+            设置额外的选项
+            </summary>
+            <param name="optionName">选项名</param>
+            <param name="optionValue">选项值</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.SetContainerCss(System.String)">
+            <summary>
+            设置Tabs控件的自定义样式名
+            </summary>
+            <param name="containerCss">容器样式</param>---
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.AddTabItem(Tunynet.Mvc.TabItem)">
+            <summary>
+            增加一个Tab按钮
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.ToHtmlAttributes">
+            <summary>
+            转为Html属性集合
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.Render(System.Web.Mvc.HtmlHelper)">
+            <summary>
+            呈现控件
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabControl.GetSelected">
+            <summary>
+            获取被选中的Tabs按钮数
+            </summary>
+            <returns>选中数量</returns>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.Name">
+            <summary>
+            tab控件名
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.CacheEnabled">
+            <summary>
+            是否需要缓存远程内容
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.IsSimple">
+            <summary>
+            是否使用简洁样式的Tab分页
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.Event">
+            <summary>
+            触发Tab页切换的Javascript事件名
+            </summary>
+            <value>默认为click</value>
+            <example>click,表示点击触发；mouseover表示鼠标移上去时就触发</example>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.PersistenceExpires">
+            <summary>
+            通过cookie保持tab页的选择状态
+            </summary>
+            <example>30,表示使用cookie保持选中状态30天</example>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.Spinner">
+            <summary>
+            内容加载提示信息
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.AdditionalOptions">
+            <summary>
+            额外的插件选项
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.ContainerCss">
+            <summary>
+            控件容器选中样式
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.OnSelectCallBack">
+            <summary>
+            tab选中事件
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabControl.TabItems">
+            <summary>
+            Tab项集合
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.HtmlHelperPaginationExtensions">
+            <summary>
+            分页按钮控件
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperPaginationExtensions.PagingButton(System.Web.Mvc.HtmlHelper,Tunynet.IPagingDataSet,Tunynet.Mvc.PaginationMode,System.Int32)">
+            <summary>
+            呈现普通分页按钮
+            </summary>
+            <param name="paginationMode">分页按钮显示模式</param>
+            <param name="html">被扩展的HtmlHelper</param>
+            <param name="pagingDataSet">数据集</param>
+            <param name="numericPagingButtonCount">数字分页按钮显示个数</param>
+            <returns>分页按钮html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperPaginationExtensions.AjaxPagingButton(System.Web.Mvc.HtmlHelper,Tunynet.IPagingDataSet,System.String,Tunynet.Mvc.PaginationMode,System.Int32)">
+            <summary>
+            呈现异步分页按钮
+            </summary>
+            <param name="paginationMode">分页按钮显示模式</param>
+            <param name="html">被扩展的HtmlHelper</param>
+            <param name="pagingDataSet">数据集</param>
+            <param name="updateTargetId">异步分页时，被更新的目标元素Id</param>
+            <param name="numericPagingButtonCount">数字分页按钮显示个数</param>
+            <returns>分页按钮html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperPaginationExtensions.PagingButton(System.Web.Mvc.HtmlHelper,Tunynet.IPagingDataSet,System.Boolean,System.String,Tunynet.Mvc.PaginationMode,System.Int32)">
+            <summary>
+            呈现分页按钮
+            </summary>
+            <param name="html">被扩展的HtmlHelper</param>
+            <param name="pagingDataSet">数据集</param>
+            <param name="updateTargetId">异步分页时，被更新的目标元素Id</param>
+            <param name="paginationMode">分页按钮显示模式</param>
+            <param name="numericPagingButtonCount">数字分页按钮显示个数</param>
+            <param name="enableAjax">是否使用ajax分页</param>
+            <returns>分页按钮html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperPaginationExtensions.GetPagingNavigateUrl(System.Web.Mvc.HtmlHelper,System.Int32)">
+            <summary>
+            构建分页按钮的链接
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper</param>
+            <param name="pageIndex">当前页码</param>
+            <returns>分页按钮的url字符串</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperPaginationExtensions.BuildLink(System.String,System.String,System.String)">
+            <summary>
+            生成带Href的链接
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.PaginationMode">
+            <summary>
+            分页按钮显示模式
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.PaginationMode.NextPrevious">
+            <summary>
+            上一页/下一页 模式
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.PaginationMode.NextPreviousFirstLast">
+            <summary>
+            首页/末页/上一页/下一页 模式
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.PaginationMode.NumericNextPrevious">
+            <summary>
+            上一页/下一页 + 数字 模式，例如： 上一页 1 2 3 4 5 下一页
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.IDictionaryExtensions">
+            <summary>
+            对IDictionary的扩展方法
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.IDictionaryExtensions.TryAdd``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)">
+            <summary>
+             尝试将键和值添加到字典中：如果不存在，才添加；存在，不添加也不抛导常
+            </summary>
+            <param name="dictionary">字典</param>
+            <param name="key">键</param>
+            <param name="value">值</param>
+        </member>
+        <member name="M:Tunynet.Mvc.IDictionaryExtensions.AddOrReplace``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)">
+            <summary>
+            将键和值添加或替换到字典中：如果不存在，则添加；存在，则替换
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.IDictionaryExtensions.AddRange``2(System.Collections.Generic.IDictionary{``0,``1},System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{``0,``1}},System.Boolean)">
+            <summary>
+            向字典中批量添加键值对
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.TabItem">
+            <summary>
+            tab项
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.#ctor(System.String)">
+            <summary>
+            构造器
+            </summary>
+            <param name="title">Tab项标题</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetName(System.String)">
+            <summary>
+            设置Tabs控件的Id
+            </summary>
+            <param name="name">Tabs控件Id</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetCss(System.String)">
+            <summary>
+            设置tab页的css class
+            </summary>
+            <param name="css">css class</param>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetSelected">
+            <summary>
+            设为选中状态
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetUrl(System.String)">
+            <summary>
+            设置当前标签页的内容
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetTabTarget(Tunynet.Mvc.TabTargetType)">
+            <summary>
+            设置Tab项链接打开方式
+            </summary>
+            <param name="targetType">Tab项链接打开方式</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetContent(System.Web.Mvc.MvcHtmlString)">
+            <summary>
+            设置当前标签页的MvcHtmlString内容
+            </summary>
+            <param name="content">MvcHtmlString内容</param>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.SetContent(System.Func{System.Object,System.Object})">
+            <summary>
+            使用内联模板参数来设置当前标签页的内容
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.TabItem.Render(System.Web.Mvc.HtmlHelper,System.Int32)">
+            <summary>
+            呈现Tab项
+            </summary>
+            <param name="htmlHelper">htmlHelper</param>
+            <param name="index">Tab项序号</param>
+            <returns>Tab项</returns>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.Name">
+            <summary>
+            链接标签A的Id
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.Title">
+            <summary>
+            标题
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.Css">
+            <summary>
+            额外的class
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.Selected">
+            <summary>
+            是否选中
+            </summary>
+            <value>false</value>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.Url">
+            <summary>
+            异步获取内容的地址
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.TabTarget">
+            <summary>
+            Tab项链接打开方式
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.TabItem.HTMLContent">
+            <summary>
+            静态内容
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.HtmlHelperControlExtensions">
+            <summary>
+            扩展对js控件的HtmlHelper输出方法
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperControlExtensions.DateTimePickerFor``1(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,System.DateTime}},Tunynet.Mvc.DateTimePicker)">
+            <summary>
+            输出日期时间选择器
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="expression">选取model中属性的lamda表达式</param>
+            <param name="dateTimePicker">日期时间选择器控件</param>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperControlExtensions.DatePicker(System.Web.Mvc.HtmlHelper,System.String,System.Nullable{System.DateTime},System.String,System.String)">
+            <summary>
+            输出日期选择器
+            </summary>
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="name">name属性</param>
+            <param name="selectedDate">选中日期</param>
+            <param name="minDate">最小允许选择日期</param>
+            <param name="maxDate">最大允许选择日期</param>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperControlExtensions.DateTimePicker(System.Web.Mvc.HtmlHelper,System.String,System.Nullable{System.DateTime},System.String,System.String)">
+            <summary>
+            输出日期时间选择器
+            </summary>
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="name">name属性</param>
+            <param name="selectedDate">选中日期时间</param>
+            <param name="minDate">最小可选时间</param>
+            <param name="maxDate">最大可选时间</param>
+            <remarks>
+            <para>最小可选时间和最大可选时间的赋值说明如下：</para>
+            </remarks>
+            <remarks>
+                <para>
+                    可为其设置以下情况的数值：
+                </para>
+                <list type="number">
+                    <item>
+                        <term>静态日期</term>
+                        <description>需要符合当前日期格式，比如："2012-12-12"</description>
+                    </item>
+                    <item>
+                        <term>整数</term>
+                        <description>是指相对于当前日期加多少天，比如：其值为"-2"，当前日期为"2012-01-05",则其对应日期为"2012-01-03"</description>
+                    </item>
+                    <item>
+                        <term>空</term>
+                        <description>表示无限制</description>
+                    </item>
+                    <item>
+                        <term>日期表达式</term>
+                        <description>
+                            <para>
+                                是指基于当前日期进行计算的表达式，使用表达式我们可以很方便的控制日期范围。其有以下特点：
+                            </para>
+                            <list type="bullet">
+                                <item>表达式可以看作是由多个子项拼接在一起的，允许子项之间有空格</item>
+                                <item>每个子项的形式为[符号位][数字位][日期单位]，其中符号位可选值为"+"或"-"，并可以省略符号位</item>
+                                <item>日期单位不区分大小写</item>
+                                <item>不填日期单位，默认为天</item>
+                            </list>
+                            <para>
+                                允许使用的日期单位说明如下：
+                            </para>
+                            <list type="bullet">
+                                <item>
+                                    <term>Y/y</term>
+                                    <description>在当前年份的基础上增加多少年，比如："+12Y"，当前日期为"2012-01-05",表示"2024-01-05"</description>
+                                </item>
+                                <item>
+                                    <term>M/m</term>
+                                    <description>在当前月份的基础上增加几个月，比如："+2M"，当前日期为"2012-01-05",表示"2012-03-05"</description>
+                                </item>
+                                <item>
+                                    <term>W/w</term>
+                                    <description>在当前日期的基础上增加多少个周，比如："+1W"，当前日期为"2012-01-05",表示"2012-01-12"</description>
+                                </item>
+                                <item>
+                                    <term>D/d</term>
+                                    <description>在当前年份的基础上增加多少天，比如："-2D"，当前日期为"2012-01-05",表示"2012-01-03"</description>
+                                </item>
+                            </list>
+                        </description>
+                    </item>
+                </list>
+            </remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperControlExtensions.DateTimePicker(System.Web.Mvc.HtmlHelper,System.String,Tunynet.Mvc.DateTimePicker)">
+            <summary>
+            输出日期时间选择器
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="name">name属性</param>
+            <param name="dateTimePicker">日期时间选择器控件</param> 
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperControlExtensions.Tabs(System.Web.Mvc.HtmlHelper,Tunynet.Mvc.TabControl)">
+            <summary>
+            输出Tabs控件
+            </summary> 
+            <param name="htmlHelper">htmlHelper</param>
+            <param name="tabControl">Tabs控件</param> 
+        </member>
+        <member name="T:Tunynet.Mvc.HttpHandlerRouteHandler`1">
+            <summary>
+            用于IHttpHandler的RouteHandler
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HttpHandlerRouteHandler`1.#ctor(System.Func{System.Web.Routing.RequestContext,`0})">
+            <summary>
+            构造函数
+            </summary>
+            <param name="handlerFactory"></param>
+        </member>
+        <member name="M:Tunynet.Mvc.HttpHandlerRouteHandler`1.GetHttpHandler(System.Web.Routing.RequestContext)">
+            <summary>
+            获取IHttpHandler
+            </summary>
+            <param name="requestContext"><see cref="T:System.Web.Routing.RequestContext"/></param>
+            <returns></returns>
+        </member>
+        <member name="T:Tunynet.Mvc.AjaxFormOptions">
+            <summary>
+            异步提交表单选项
+            </summary>
+            <remarks> 
+            <para>已实现以下功能：</para>
+            <list type="number">
+            <item>内置block功能防止用户多次提交表单</item>
+            <item>利用服务器端返回的数据类型不同，区别开表单是否成功提交，并提供了提交表单成功/失败回调函数</item>
+            </list>
+            <para>基于jquery.form 插件构建，更多信息请参见：</para> 
+            <list type="number">
+            <item>http://jquery.malsup.com/form/</item>
+            </list>    
+            <para>依赖文件：</para>
+            <list type="number">
+            <item>jquery.form.js</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.#ctor">
+            <summary>
+            构造器
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetUrl(System.String)">
+            <summary>
+            设置提交表单的请求地址
+            </summary>
+            <param name="url">提交表单的请求地址</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetMethod(System.Nullable{System.Web.Mvc.FormMethod})">
+            <summary>
+            设置提交表单的请求方式
+            </summary>
+            <param name="method">提交表单的请求方式</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetDataType(System.Nullable{Tunynet.Mvc.AjaxDataType})">
+            <summary>
+            设置服务器端返回异步内容的数据类型
+            </summary>
+            <param name="dataType">服务器端返回异步内容的数据类型</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetExtraData(System.Object)">
+            <summary>
+            设置提交表单时，额外传递的数据集合
+            </summary>
+            <param name="extraData">提交表单时，额外传递的数据集合</param>
+            <example>new{a=1,b=3}</example>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetTarget(System.String)">
+            <summary>
+            设置成功提交表单后，需要更新的目标元素Id
+            </summary>
+            <param name="target">成功提交表单后，需要更新的目标元素Id</param>
+            <example>"listComments"</example>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetReplaceTarget(System.Boolean)">
+            <summary>
+            设置是否替换目标元素
+            </summary>
+            <param name="replaceTarget">是否替换目标元素</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetClearForm(System.Boolean)">
+            <summary>
+            设置成功时是否自动清除表单
+            </summary>
+            <param name="clearForm">是否清除表单</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetResetForm(System.Boolean)">
+            <summary>
+            设置成功时是否自动重置表单
+            </summary>
+            <param name="resetForm">是否重置表单</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetCloseDialog(System.Boolean)">
+            <summary>
+            设置成功时是否自动关闭模式框
+            </summary>
+            <param name="closeDialog">是否自动关闭模式框</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetBeforeSubmitCallBack(System.String)">
+            <summary>
+            设置提交表单前的Javascript回调函数<br/>
+            原型为 function(arr, $form, options)
+            </summary>
+            <param name="beforeSubmitCallBack">提交表单前的Javascript回调函数</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetOnSuccessCallBack(System.String)">
+            <summary>
+            设置提交表单成功时的Javascript回调函数<br/>
+            原型为 function(response, statusText, xhr, $form)
+            </summary>
+            <param name="onSuccessCallBack">提交表单成功时的Javascript回调函数</param>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.SetOnErrorCallBack(System.String)">
+            <summary>
+            设置提交表单失败时的Javascript回调函数<br/>
+            若不赋值，则默认自动加载服务器返回的html内容<br/>
+            原型为 function(response, statusText, xhr, $form)
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.AjaxFormOptions.ToHtmlAttributes">
+            <summary>
+            转为Html属性集合
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.Url">
+            <summary>
+            提交表单的请求地址
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.Method">
+            <summary>
+            提交表单的请求方式
+            </summary>        
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.ExtraData">
+            <summary>
+            提交表单时，额外传递的数据集合
+            </summary>
+            <example>new{a=1,b=3}</example>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.DataType">
+            <summary>
+            服务器端返回异步内容的数据类型<br/>
+            <b>强烈建议不要轻易设置该值，因为该值为null时，会自动检测服务器返回数据的类型</b>
+            </summary>
+            <example>AjaxDataType.Html</example>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.Target">
+            <summary>
+            成功提交表单后，需要更新的目标元素
+            </summary>
+            <example>"#listComments"</example>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.ReplaceTarget">
+            <summary>
+            是否替换目标元素
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.ClearForm">
+            <summary>
+            成功提交表单后，是否自动清除表单内容
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.ResetForm">
+            <summary>
+            成功提交表单后，是否自动重置表单
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.CloseDialog">
+            <summary>
+            成功提交表单后，是否自动关闭对话框
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.BeforeSubmitCallBack">
+            <summary>
+            提交表单前的Javascript回调函数<br/>
+            原型为 function(arr, $form, options)
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.OnSuccessCallBack">
+            <summary>
+            成功提交表单时的Javascript回调函数，若不想自动更新<br/>
+            原型为 function(response, statusText, xhr, $form)
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.AjaxFormOptions.OnErrorCallBack">
+            <summary>
+            提交表单失败时的Javascript回调函数，若不想自动更新<br/>
+            原型为 function(data, statusText, xhr, $form),其中data为字符串类型，若需要其他类型，请自行转换
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.MenuItem">
+            <summary>
+            菜单项
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.MenuItem.Checked">
+            <summary>
+            是否选中
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.MenuItem.IconType">
+            <summary>
+            图标类型
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.MenuItem.Text">
+            <summary>
+            文本
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.MenuItem.Value">
+            <summary>
+            值
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.MenuItem.Url">
+            <summary>
+            链接地址
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.HtmlHelperExtensions">
+            <summary>
+            封装对HtmlHelper的扩展方法
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.GenerateBodyId(System.Web.Mvc.HtmlHelper)">
+            <summary>
+            生成BodyId
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.Icon(System.Web.Mvc.HtmlHelper,Tunynet.Mvc.IconTypes,System.String,System.Object)">
+            <summary>
+            输出图标
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="type">图标类型</param>
+            <param name="title">鼠标提示文字</param>
+            <param name="htmlAttributes">html属性集合</param>
+            <returns>图标的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.MenuButton(System.Web.Mvc.HtmlHelper,System.String,System.String,Tunynet.Mvc.MenuItemType,System.Collections.Generic.IEnumerable{Tunynet.Mvc.MenuItem},System.String,System.Boolean,Tunynet.Mvc.HighlightStyles,System.Object)">
+            <summary>
+            带下拉菜单的按钮
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="name">按钮的name属性</param>
+            <param name="buttonText">按钮文字</param>
+            <param name="menuItemType">菜单项类型</param>
+            <param name="menuItems">菜单项列表</param>
+            <param name="buttonUrl">按钮链接地址</param>        
+            <param name="disabled">是否禁用按钮</param> 
+            <param name="highlightStyle">按钮高亮显示类型</param>
+            <param name="buttonHtmlAttributes">按钮html属性集合</param>
+            <remarks>表单中只有一个表示名称的数据,返回的数据类型：{id：XX,name:XX}</remarks>
+            <returns>按钮的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.ConvertMenuItemToLi(Tunynet.Mvc.MenuItem,System.Web.Mvc.HtmlHelper,Tunynet.Mvc.MenuItemType,System.String)">
+            <summary>
+            将菜单项实体转为Li元素
+            </summary>
+            <param name="item">菜单项</param>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="menuItemType">菜单项类型</param>
+            <param name="fullName">菜单项Id</param>
+            <returns>Li元素的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.GetMenuData(System.Web.Mvc.HtmlHelper,System.String)">
+            <summary>
+            从ViewData中获取菜单列表数据
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="name">菜单项Id</param>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.LinkButton(System.Web.Mvc.HtmlHelper,System.String,System.String,Tunynet.Mvc.HighlightStyles,Tunynet.Mvc.ButtonSizes,System.Nullable{Tunynet.Mvc.IconTypes},Tunynet.Mvc.TextIconLayout,System.Object)">
+            <summary>
+            链接按钮
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="text">链接文字</param>
+            <param name="url">链接地址</param>
+            <param name="highlightStyle">高亮显示类型</param>
+            <param name="size">按钮尺寸</param>
+            <param name="iconType">包含图标的类型</param>
+            <param name="textIconLayout">文字图标排列顺序</param>
+            <param name="htmlAttributes">按钮的html属性</param>  
+            <returns>链接的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.Button(System.Web.Mvc.HtmlHelper,System.String,Tunynet.Mvc.ButtonTypes,Tunynet.Mvc.HighlightStyles,Tunynet.Mvc.ButtonSizes,System.Nullable{Tunynet.Mvc.IconTypes},Tunynet.Mvc.TextIconLayout,System.String,System.Object)">
+            <summary>
+            输出按钮
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="text">文本内容</param>
+            <param name="url">点击跳转向的地址</param>
+            <param name="iconType">图标类型</param>
+            <param name="textIconLayout">图标和文本排列顺序</param>
+            <param name="buttonType">按钮类型</param>
+            <param name="size">按钮大小</param>
+            <param name="highlightStyle">高亮显示类型</param>
+            <param name="htmlAttributes">按钮Html属性集合</param>
+            <returns>按钮的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.Button(System.Web.Mvc.HtmlHelper,System.String,Tunynet.Mvc.ButtonTypes,Tunynet.Mvc.HighlightStyles,Tunynet.Mvc.ButtonSizes,System.Nullable{Tunynet.Mvc.IconTypes},Tunynet.Mvc.TextIconLayout,System.String,System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            输出按钮
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="text">文本内容</param>
+            <param name="url">点击跳转向的地址</param>
+            <param name="iconType">图标类型</param>
+            <param name="textIconLayout">图标和文本排列顺序</param>
+            <param name="buttonType">按钮类型</param>
+            <param name="size">按钮大小</param>
+            <param name="highlightStyle">高亮显示类型</param>
+            <param name="htmlAttributes">按钮Html属性集合</param>
+            <returns>按钮的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.TextBox(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Nullable{Tunynet.Mvc.InputWidthTypes},System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            录入框
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="name">录入框的name属性</param>
+            <param name="value">录入框的value属性</param>
+            <param name="widthType">宽度类型</param>
+            <param name="htmlAttributes">html属性集合</param>
+            <returns>录入框的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.TextBoxFor``2(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Nullable{Tunynet.Mvc.InputWidthTypes},System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            模型中的录入框
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <typeparam name="TModel">模型的类型</typeparam>
+            <typeparam name="TProperty">模型中对应输出的属性</typeparam>
+            <param name="expression">获取模型中的对应的属性</param>
+            <param name="widthType">录入框的宽度类型</param>
+            <param name="htmlAttributes">html属性集合</param>
+            <returns>录入框的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.TextArea(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Nullable{Tunynet.Mvc.InputWidthTypes},System.Int32,System.Int32,System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            输出文本域
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="name">文本域的name属性</param>
+            <param name="value">文本域的value属性</param>
+            <param name="widthType">宽度类型</param>
+            <param name="rows">行数</param>
+            <param name="columns">列数</param>
+            <param name="htmlAttributes">html属性集合</param>
+            <returns>文本域的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.TextAreaFor``2(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Nullable{Tunynet.Mvc.InputWidthTypes},System.Int32,System.Int32,System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            在模型中输出文本域
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="expression">获取模型中的对应的属性</param>
+            <param name="widthType">宽度类型</param>
+            <param name="rows">行数</param>
+            <param name="columns">列数</param>
+            <param name="htmlAttributes">html属性集合</param>
+            <returns>文本域的html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.ResolveWidth(System.Nullable{Tunynet.Mvc.InputWidthTypes})">
+            <summary>
+            根据宽度类型解析出相应的cssClass值
+            </summary>
+            <param name="widthType">宽度类型</param>
+            <returns>cssClass值</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.FormLabelFor``2(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            输出Label标签(自带class="tn-form-label")
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TValue"></typeparam>
+            <param name="html"></param>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.LabelFor``2(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Object)">
+            <summary>
+            输出Label标签
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TValue"></typeparam>
+            <param name="html"></param>
+            <param name="expression"></param>
+            <param name="htmlAttributes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.LabelFor``2(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            输出Label标签
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TValue"></typeparam>
+            <param name="html"></param>
+            <param name="expression"></param>
+            <param name="htmlAttributes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.LinkageDropDownListFor``2(System.Web.Mvc.HtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}},``1,System.Int32,System.Collections.Generic.Dictionary{``1,System.String},System.Func{``1,``1},System.Func{``1,System.Collections.Generic.Dictionary{``1,System.String}},System.String)">
+            <summary>
+            联动下拉列表
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="expression">获取数据集合</param>
+            <param name="level">显示多少级</param>
+            <param name="defaultValue">TProperty类型的默认值（如string默认值为"")</param>
+            <param name="rootItems">获取根级列表数据</param>
+            <param name="getParentID">获取列表项的ParentID方法</param>
+            <param name="getChildItems">获取子级列表数据集合方法</param>
+            <param name="getChildSelectDataUrl">获取子级列表数据的远程地址</param>
+            <returns>html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.LinkageDropDownList``1(System.Web.Mvc.HtmlHelper,System.String,``0,``0,System.Int32,System.Collections.Generic.Dictionary{``0,System.String},System.Func{``0,``0},System.Func{``0,System.Collections.Generic.Dictionary{``0,System.String}},System.String)">
+            <summary>
+            联动下拉列表
+            </summary>
+            <param name="htmlHelper">被扩展的HtmlHelper实例</param>
+            <param name="level">显示多少级</param>
+            <param name="defaultValue">TProperty类型的默认值（如string默认值为"")</param>
+            <param name="name">下拉列表表单项名</param>
+            <param name="selectedValue">当前选中值</param>
+            <param name="rootItems">获取根级列表数据</param>
+            <param name="getParentId">获取列表项的ParentID方法</param>
+            <param name="getChildItems">获取子级列表数据集合方法</param>
+            <param name="getChildSelectDataUrl">获取子级列表数据的远程地址</param>
+            <returns>html代码</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.SipmleCheckBox(System.Web.Mvc.HtmlHelper,System.String,System.Object,System.Boolean,System.Object)">
+            <summary>
+            复选框
+            </summary>
+            <param name="htmlhelper">被扩展对象</param>
+            <param name="name">名称</param>
+            <param name="value">复选框对应的值</param>
+            <param name="isChecked">是否选中</param>
+            <param name="htmlAttributes">html属性</param>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.PageName(System.Web.Mvc.HtmlHelper)">
+            <summary>
+            设置PageName
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.BreadCrumb(System.Web.Mvc.HtmlHelper)">
+            <summary>
+            设置PageName
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.GeneratePageName(System.String)">
+            <summary>
+            生成PageName
+            </summary>
+            <param name="pageName">PageName的内容</param>
+            <returns></returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.AddCssClass(System.Web.Routing.RouteValueDictionary,System.String)">
+            <summary>
+            为RouteValueDictionary扩展添加class方法
+            </summary>
+            <param name="htmlAttributes">html属性集合</param>
+            <param name="cssClass">样式名</param>
+            <returns>RouteValueDictionary</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperExtensions.GetWaterMark``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            获取水印文字并为标签添加水印标注
+            </summary>
+            <typeparam name="TModel">模型的类型</typeparam>
+            <typeparam name="TProperty">模型中对应输出的属性</typeparam>
+            <param name="expression">获取模型中的对应的属性</param>
+            <param name="htmlAttributes">html属性集合</param>
+        </member>
+        <member name="T:Tunynet.Mvc.TextIconLayout">
+            <summary>
+            文本和图标的布局方式
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.TextIconLayout.IconText">
+            <summary>
+            图标在前，文本在后
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.TextIconLayout.TextIcon">
+            <summary>
+            文本在前，图标在后
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.ButtonTypes">
+            <summary>
+            按钮类型
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonTypes.Button">
+            <summary>
+            输入按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonTypes.Reset">
+            <summary>
+            重置按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonTypes.Link">
+            <summary>
+            链接按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonTypes.Submit">
+            <summary>
+            提交按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonTypes.Cancel">
+            <summary>
+            取消按钮
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.IconTypes">
+            <summary>
+            图标类型
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.TriangleUp">
+            <summary>
+            上箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.TriangleRight">
+            <summary>
+            右箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.TriangleDown">
+            <summary>
+            下
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.TriangleLeft">
+            <summary>
+            左
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.CollapseOpen">
+            <summary>
+            展开
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.CollapseClose">
+            <summary>
+            收起
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Download">
+            <summary>
+            下载
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Upload">
+            <summary>
+            上传
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Expand">
+            <summary>
+            向下、展开
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Fold">
+            <summary>
+            向上、收起
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SlideNext">
+            <summary>
+            向后
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SlidePrev">
+            <summary>
+            向前
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.First">
+            <summary>
+            最先的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Last">
+            <summary>
+            最后的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Add">
+            <summary>
+            添加、新建
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Write">
+            <summary>
+            编辑、描述
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Update">
+            <summary>
+            更新、重建
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Set">
+            <summary>
+            设置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Config">
+            <summary>
+            配置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Cross">
+            <summary>
+            删除、关闭
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Accept">
+            <summary>
+            通过、允许、同意
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.RotateLeft">
+            <summary>
+            左旋转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.RotateRight">
+            <summary>
+            右旋转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Enlarge">
+            <summary>
+            扩大
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.School">
+            <summary>
+            学校
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Friendly">
+            <summary>
+            相互关注
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Sneak">
+            <summary>
+            悄悄关注
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Forwardc">
+            <summary>
+            转发
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Stop">
+            <summary>
+            不通过、否定、拒绝、阻止
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Elite">
+            <summary>
+            精华
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Email">
+            <summary>
+            消息，未读
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.EmailOpen">
+            <summary>
+            消息，已读
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Top">
+            <summary>
+            置顶
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Flag">
+            <summary>
+            推荐
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Lock">
+            <summary>
+            锁定、私有
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Key">
+            <summary>
+            密钥访问
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Limit">
+            <summary>
+            权限访问
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Coins">
+            <summary>
+            积分、钱币
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Fire">
+            <summary>
+            热的、急的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Move">
+            <summary>
+            移动
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Approve">
+            <summary>
+            个人认证
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.View">
+            <summary>
+            浏览、查看
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.ThumbUp">
+            <summary>
+            支持、顶
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.ThumbDown">
+            <summary>
+            反对、踩
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Share">
+            <summary>
+            分享
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Bubble">
+            <summary>
+            评论、留言
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Favorite">
+            <summary>
+            收藏、喜爱 
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Star">
+            <summary>
+            加星
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Feed">
+            <summary>
+            订阅
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.QuotesBefore">
+            <summary>
+            双引号、前
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.QuotesAfter">
+            <summary>
+            双引号、后
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Topic">
+            <summary>
+            主题、话题
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Label">
+            <summary>
+            标签
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.User">
+            <summary>
+            用户、好友、成员
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserAdd">
+            <summary>
+            添加好友
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserAllow">
+            <summary>
+            特许用户
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserStop">
+            <summary>
+            阻止用户
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserRelation">
+            <summary>
+            用户关系
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserAvatar">
+            <summary>
+            用户头像
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserInvite">
+            <summary>
+            邀请用户
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.UserCard">
+            <summary>
+            用户卡片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Group">
+            <summary>
+            群组
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Chain">
+            <summary>
+            链接
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Pen">
+            <summary>
+            个性签名、钢笔
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Creator">
+            <summary>
+            男
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Manager">
+            <summary>
+            女
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BrowseList">
+            <summary>
+            列表浏览
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BrowseDetail">
+            <summary>
+            详情浏览
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BrowseMedium">
+            <summary>
+            中图、中块浏览
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BrowseSmall">
+            <summary>
+            小图、小块浏览
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BrowseSlide">
+            <summary>
+            幻灯浏览
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Dress">
+            <summary>
+            页面装扮，布局调整
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Jump">
+            <summary>
+            跳转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Zomm">
+            <summary>
+            放大
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Camera">
+            <summary>
+            照片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Calendar">
+            <summary>
+            日期指示
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Color">
+            <summary>
+            颜色
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Admin">
+            <summary>
+            创建人、高级管理员
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Auadmin">
+            <summary>
+            管理员、副管理员
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Female">
+            <summary>
+            女
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Male">
+            <summary>
+            男
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Movie">
+            <summary>
+            //视频
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Sound">
+            <summary>
+            声音
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Music">
+            <summary>
+            音乐
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Skin">
+            <summary>
+            皮肤
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Blog">
+            <summary>
+            博客
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Archive">
+            <summary>
+            档案
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Forum">
+            <summary>
+            论坛、讨论组
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Vote">
+            <summary>
+            投票
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.News">
+            <summary>
+            新闻、资讯
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Job">
+            <summary>
+            求职、招聘、职位、经理
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.World">
+            <summary>
+            互联网
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Home">
+            <summary>
+            主页
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Question">
+            <summary>
+            疑问
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Notice">
+            <summary>
+            通知、消息
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Escalator">
+            <summary>
+            电梯、直达
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Alert">
+            <summary>
+            警告
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Exclamation">
+            <summary>
+            提示
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.CrossCircle">
+            <summary>
+            错误
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.AcceptCircle">
+            <summary>
+            正确
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Apply">
+            <summary>
+            申请
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Logout">
+            <summary>
+            注销
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Join">
+            <summary>
+            加入
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Quit">
+            <summary>
+            退出
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Emotion">
+            <summary>
+            表情
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.PaperClip">
+            <summary>
+            附件
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Folder">
+            <summary>
+            文件
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Album">
+            <summary>
+            相册
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Event">
+            <summary>
+            活动
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Find">
+            <summary>
+            搜索
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Picture">
+            <summary>
+            图片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.App">
+            <summary>
+            应用
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Market">
+            <summary>
+            招贴、交易、买卖、市场
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Answer">
+            <summary>
+            问答
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Microblog">
+            <summary>
+            微博
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.At">
+            <summary>
+            关于、提及
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Play">
+            <summary>
+            播放
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Pause">
+            <summary>
+            暂停
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Discovery">
+            <summary>
+            探索、发现
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Gift">
+            <summary>
+            礼品
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Function">
+            <summary>
+            功能(常用)
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Chart">
+            <summary>
+            地图(结构图)
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Clock">
+            <summary>
+            时钟(最近访问)
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Pending">
+            <summary>
+            排队(待处理)
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Datasheet">
+            <summary>
+            数据表
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.System">
+            <summary>
+            系统信息
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Product">
+            <summary>
+            产品信息
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.AddPicture">
+            <summary>
+            新增照片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Banned">
+            <summary>
+            封禁
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Moderated">
+            <summary>
+            管制
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Ask">
+            <summary>
+            问答
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.Bar">
+            <summary>
+            贴吧
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.PointMall">
+            <summary>
+            积分商城
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallTriangleUp">
+            <summary>
+            small上箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallTriangleRight">
+            <summary>
+            small右箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallTriangleDown">
+            <summary>
+            small下箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallTriangleLeft">
+            <summary>
+            small左箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallCollapseOpen">
+            <summary>
+            small展开
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallCollapseClose">
+            <summary>
+            small收起
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallDownload">
+            <summary>
+            small下载
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallUpload">
+            <summary>
+             small上传
+             </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallWrite">
+            <summary>
+             small编辑、描述
+             </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallUpdate">
+            <summary>
+            small更新、重建
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallSet">
+            <summary>
+            small设置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallConfig">
+            <summary>
+            small配置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallAdd">
+            <summary>
+            small添加、新建
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallCross">
+            <summary>
+            small删除、关闭
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallAccept">
+            <summary>
+            small通过、允许、同意
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallStop">
+            <summary>
+            small不通过、否定、拒绝、阻止
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallExpand">
+            <summary>
+            small向下、展开
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallFold">
+            <summary>
+            small向上、收起
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallSlideNext">
+            <summary>
+            small向后
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallSlidePrev">
+            <summary>
+            small向前
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallSlideFirst">
+            <summary>
+            small最先的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallSlideLast">
+            <summary>
+            small最后的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallTop">
+            <summary>
+            small置顶
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallMicroblog">
+            <summary>
+            small微博
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallRotateLeft">
+            <summary>
+            small左旋转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallRotateRight">
+            <summary>
+            small右旋转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallEnlarge">
+            <summary>
+            small扩大
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallLabel">
+            <summary>
+            small标签
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallFind">
+            <summary>
+            small搜索、查找
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallAlert">
+            <summary>
+            small警告
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallElite">
+            <summary>
+            small精华
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallFriendly">
+            <summary>
+            small相互关注
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallSneak">
+            <summary>
+            small悄悄关注
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallFemale">
+            <summary>
+            small女
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallMale">
+            <summary>
+            small男
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallAsk">
+            <summary>
+            smallAsk
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallBar">
+            <summary>
+            smallBar
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallPointMall">
+            <summary>
+            pointMall
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.SmallGroup">
+            <summary>
+            smallGroup
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigTriangleUp">
+            <summary>
+            big上箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigTriangleRight">
+            <summary>
+             big右箭头
+             </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigTriangleDown">
+            <summary>
+            big下箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigTriangleLeft">
+            <summary>
+            big左箭头
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigCollapseOpen">
+            <summary>
+            big展开
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigCollapseClose">
+            <summary>
+            big收起
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigDownLoad">
+            <summary>
+            big下载
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigUpLoad">
+            <summary>
+            big上传
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigExpand">
+            <summary>
+            big向下、展开
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigFold">
+            <summary>
+            big向上、收起
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigSlideNext">
+            <summary>
+            big向后
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigSlidePrev">
+            <summary>
+            big向前
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigFirst">
+            <summary>
+            big最先的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigLast">
+            <summary>
+            big最后的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigWrite">
+            <summary>
+            big编辑、描述
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigUpdate">
+            <summary>
+            big更新、重建
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigSet">
+            <summary>
+            big设置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigConfig">
+            <summary>
+            big配置
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAdd">
+            <summary>
+            big添加、新建
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigCross">
+            <summary>
+            big删除、关闭
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigRotateLeft">
+            <summary>
+            big左旋转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigRotateRight">
+            <summary>
+            big右旋转
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigEnlarge">
+            <summary>
+            big扩大
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigEmail">
+            <summary>
+            big消息、未读
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigTop">
+            <summary>
+            big置顶
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigLock">
+            <summary>
+            big锁定、私有
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigShare">
+            <summary>
+            big分享
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigBubble">
+            <summary>
+            big评论、留言
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigFavorite">
+            <summary>
+            big收藏、喜爱
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigQuotesBefore">
+            <summary>
+            big双引号、前
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigQuotesAfter">
+            <summary>
+            big双引号、后
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigTopic">
+            <summary>
+            big主题、话题
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigUser">
+            <summary>
+            big用户、好友、成员
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigGroup">
+            <summary>
+            big群组
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigChain">
+            <summary>
+            big链接
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigZoom">
+            <summary>
+            big放大
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAlert">
+            <summary>
+            big警告
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigExclamation">
+            <summary>
+            big提示
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigCrossCircle">
+            <summary>
+            big错误
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAcceptCircle">
+            <summary>
+            big正确
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigLogout">
+            <summary>
+            big注销、退出
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigHome">
+            <summary>
+            big主页
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigEmotion">
+            <summary>
+            big表情
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigFolder">
+            <summary>
+            big文件
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigMoive">
+            <summary>
+            big视频
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigPicture">
+            <summary>
+            big图片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAlbum">
+            <summary>
+            big相册
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigSound">
+            <summary>
+            big声音
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigBlog">
+            <summary>
+            big博客
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigEvent">
+            <summary>
+            big活动
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigVote">
+            <summary>
+            big投票
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigNews">
+             <summary>
+            big新闻、资讯
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigJob">
+             <summary>
+            big求职、招聘、职位、经理
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigApp">
+             <summary>
+            big应用程序
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAt">
+             <summary>
+            big关于、提及
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigPlay">
+             <summary>
+            big播放
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigPause">
+             <summary>
+            big暂停
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigDiscovery">
+             <summary>
+            big探索、发现
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigSkin">
+             <summary>
+            big皮肤
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAddPicture">
+             <summary>
+            big添加照片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigCamera">
+             <summary>
+            big照片
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigMusic">
+             <summary>
+            big音乐
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigAsk">
+            <summary>
+            bigAsk
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigBar">
+            <summary>
+            BigBar
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.BigPointMall">
+            <summary>
+            PointMall
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.LargeLock">
+            <summary>
+            large锁定
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.LargeUser">
+            <summary>
+            large用户
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.LargeAlert">
+            <summary>
+            large警告
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.LargeExclamation">
+            <summary>
+            large提示
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.LargeCrossCircle">
+            <summary>
+            large锁定
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.IconTypes.LargeAcceptCircle">
+            <summary>
+            large锁定
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.ButtonSizes">
+            <summary>
+            按钮大小
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonSizes.Default">
+            <summary>
+            默认大小
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.ButtonSizes.Large">
+            <summary>
+            大按钮
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.HighlightStyles">
+            <summary>
+            高亮显示类型
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.HighlightStyles.Default">
+            <summary>
+            默认高亮
+            淡蓝色
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.HighlightStyles.Primary">
+            <summary>
+            主流高亮
+            深蓝色，主要用于提交等需要突出显示的按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.HighlightStyles.Secondary">
+            <summary>
+            非主流高亮
+            灰色，主要用于取消等不需要突出显示的按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.HighlightStyles.Lite">
+            <summary>
+            最弱的高亮效果
+            不显示背景色，只有鼠标移上去才会显示背景色
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.HighlightStyles.Hollow">
+            <summary>
+            镂空效果(无底色）
+            默认只显示边框色，只有鼠标移上去才会显示背景色
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.InputWidthTypes">
+            <summary>
+            录入框宽度类型
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.InputWidthTypes.Short">
+            <summary>
+            短的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.InputWidthTypes.Medium">
+            <summary>
+            中等的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.InputWidthTypes.Long">
+            <summary>
+            长的
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.InputWidthTypes.Longest">
+            <summary>
+            最长的
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.DateRangeAttribute">
+            <summary>
+            验证日期确保在某一范围内
+            </summary>
+            <remarks>
+            至少指定最大值和最小值中的一个
+            </remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.DateRangeAttribute.IsValid(System.Object)">
+            <summary>
+            服务器端验证
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.DateRangeAttribute.FormatErrorMessage(System.String)">
+            <summary>
+            格式化ErrorMessage
+            </summary>
+            <param name="name">表单项名</param>
+            <returns>格式式处理过的ErrorMessage</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.DateRangeAttribute.GetClientValidationRules(System.Web.Mvc.ModelMetadata,System.Web.Mvc.ControllerContext)">
+            <summary>
+            获取客户端验证规则
+            </summary>
+            <param name="metadata">Model元数据</param>
+            <param name="context">控制器上下文</param>
+            <returns>客户端验证规则集合</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.DateRangeAttribute.ParseDate(System.String)">
+            <summary>
+            转换为日期格式
+            </summary>
+            <param name="dateString">字符串类型的日期，或日期表达式</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateRangeAttribute.GetDaysInMonth(System.Int32,System.Int32)">
+            <summary>
+            获取某个月的天数
+            </summary>
+            <param name="year">年份</param>
+            <param name="month">月份</param>
+            <returns>指定年份、月份里的天数</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.DateRangeAttribute.EnsureErrorMessage">
+            <summary>
+            确保ErrorMessage已赋值
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.DateRangeAttribute.MinDate">
+            <summary>
+            日期最小值
+            </summary>
+            <remarks>
+                <para>
+                    可为其设置以下情况的数值：
+                </para>
+                <list type="number">
+                    <item>
+                        <term>静态日期</term>
+                        <description>需要符合当前日期格式，比如："2012-12-12"</description>
+                    </item>
+                    <item>
+                        <term>整数</term>
+                        <description>是指相对于当前日期加多少天，比如：其值为"-2"，当前日期为"2012-01-05",则其对应日期为"2012-01-03"</description>
+                    </item>
+                    <item>
+                        <term>空</term>
+                        <description>表示无限制</description>
+                    </item>
+                    <item>
+                        <term>日期表达式</term>
+                        <description>
+                            <para>
+                                是指基于当前日期进行计算的表达式，使用表达式我们可以很方便的控制日期范围。其有以下特点：
+                            </para>
+                            <list type="bullet">
+                                <item>表达式可以看作是由多个子项拼接在一起的，允许子项之间有空格</item>
+                                <item>每个子项的形式为[符号位][数字位][日期单位]，其中符号位可选值为"+"或"-"，并可以省略符号位</item>
+                                <item>日期单位不区分大小写</item>
+                                <item>不填日期单位，默认为天</item>
+                            </list>
+                            <para>
+                                允许使用的日期单位说明如下：
+                            </para>
+                            <list type="bullet">
+                                <item>
+                                    <term>Y/y</term>
+                                    <description>在当前年份的基础上增加多少年，比如："+12Y"，当前日期为"2012-01-05",表示"2024-01-05"</description>
+                                </item>
+                                <item>
+                                    <term>M/m</term>
+                                    <description>在当前月份的基础上增加几个月，比如："+2M"，当前日期为"2012-01-05",表示"2012-03-05"</description>
+                                </item>
+                                <item>
+                                    <term>W/w</term>
+                                    <description>在当前日期的基础上增加多少个周，比如："+1W"，当前日期为"2012-01-05",表示"2012-01-12"</description>
+                                </item>
+                                <item>
+                                    <term>D/d</term>
+                                    <description>在当前年份的基础上增加多少天，比如："-2D"，当前日期为"2012-01-05",表示"2012-01-03"</description>
+                                </item>
+                            </list>
+                        </description>
+                    </item>
+                </list>
+            </remarks>
+        </member>
+        <member name="P:Tunynet.Mvc.DateRangeAttribute.MaxDate">
+            <summary>
+            日期最大值
+            </summary>
+            <remarks>
+                <para>
+                    可为其设置以下情况的数值：
+                </para>
+                <list type="number">
+                    <item>
+                        <term>静态日期</term>
+                        <description>需要符合当前日期格式，比如："2012-12-12"</description>
+                    </item>
+                    <item>
+                        <term>整数</term>
+                        <description>是指相对于当前日期加多少天，比如：其值为"-2"，当前日期为"2012-01-05",则其对应日期为"2012-01-03"</description>
+                    </item>
+                    <item>
+                        <term>空</term>
+                        <description>表示无限制</description>
+                    </item>
+                    <item>
+                        <term>日期表达式</term>
+                        <description>
+                            <para>
+                                是指基于当前日期进行计算的表达式，使用表达式我们可以很方便的控制日期范围。其有以下特点：
+                            </para>
+                            <list type="bullet">
+                                <item>表达式可以看作是由多个子项拼接在一起的，允许子项之间有空格</item>
+                                <item>每个子项的形式为[符号位][数字位][日期单位]，其中符号位可选值为"+"或"-"，并可以省略符号位</item>
+                                <item>日期单位不区分大小写</item>
+                                <item>不填日期单位，默认为天</item>
+                            </list>
+                            <para>
+                                允许使用的日期单位说明如下：
+                            </para>
+                            <list type="bullet">
+                                <item>
+                                    <term>Y/y</term>
+                                    <description>在当前年份的基础上增加多少年，比如："+12Y"，当前日期为"2012-01-05",表示"2024-01-05"</description>
+                                </item>
+                                <item>
+                                    <term>M/m</term>
+                                    <description>在当前月份的基础上增加几个月，比如："+2M"，当前日期为"2012-01-05",表示"2012-03-05"</description>
+                                </item>
+                                <item>
+                                    <term>W/w</term>
+                                    <description>在当前日期的基础上增加多少个周，比如："+1W"，当前日期为"2012-01-05",表示"2012-01-12"</description>
+                                </item>
+                                <item>
+                                    <term>D/d</term>
+                                    <description>在当前年份的基础上增加多少天，比如："-2D"，当前日期为"2012-01-05",表示"2012-01-03"</description>
+                                </item>
+                            </list>
+                        </description>
+                    </item>
+                </list>
+            </remarks>
+        </member>
+        <member name="T:Tunynet.Mvc.RouteExtensions">
+            <summary>
+            RouteCollection扩展
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.RouteExtensions.MapHttpHandler``1(System.Web.Routing.RouteCollection,System.String,System.String)">
+            <summary>
+            添加使用HttpHandler的Route
+            </summary>
+            <typeparam name="THandler"></typeparam>
+            <param name="routes"></param>
+            <param name="name"></param>
+            <param name="url"></param>
+        </member>
+        <member name="M:Tunynet.Mvc.RouteExtensions.MapHttpHandler``1(System.Web.Routing.RouteCollection,System.String,System.String,System.Object)">
+            <summary>
+            添加使用HttpHandler的Route
+            </summary>
+            <typeparam name="THandler"></typeparam>
+            <param name="routes"></param>
+            <param name="name"></param>
+            <param name="url"></param>
+            <param name="defaults"></param>
+        </member>
+        <member name="M:Tunynet.Mvc.RouteExtensions.MapHttpHandler``1(System.Web.Routing.RouteCollection,System.String,System.String,System.Func{System.Web.Routing.RequestContext,``0})">
+            <summary>
+            添加使用HttpHandler的Route
+            </summary>
+            <typeparam name="THandler"></typeparam>
+            <param name="routes"></param>
+            <param name="name"></param>
+            <param name="url"></param>
+            <param name="handlerFactory"></param>
+        </member>
+        <member name="M:Tunynet.Mvc.RouteExtensions.MapHttpHandler``1(System.Web.Routing.RouteCollection,System.String,System.String,System.Object,System.Object,System.Func{System.Web.Routing.RequestContext,``0})">
+            <summary>
+            添加使用HttpHandler的Route
+            </summary>
+            <typeparam name="THandler"></typeparam>
+            <param name="routes"></param>
+            <param name="name"></param>
+            <param name="url"></param>
+            <param name="defaults"></param>
+            <param name="constraints"></param>
+            <param name="handlerFactory"></param>
+        </member>
+        <member name="T:Tunynet.Mvc.HtmlHelperAjaxFormExtensions">
+            <summary>
+            扩展对js控件的HtmlHelper输出方法
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxForm(System.Web.Mvc.HtmlHelper,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxForm(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="actionName"></param>
+            <param name="controllerName"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxForm(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Object,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="actionName"></param>
+            <param name="controllerName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxForm(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Object,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions,System.Object)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="actionName"></param>
+            <param name="controllerName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <param name="htmlAttributes">表单html属性集合</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxForm(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Web.Routing.RouteValueDictionary,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="actionName"></param>
+            <param name="controllerName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxForm(System.Web.Mvc.HtmlHelper,System.String,System.String,System.Web.Routing.RouteValueDictionary,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="actionName"></param>
+            <param name="controllerName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <param name="htmlAttributes">表单html属性集合</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxRouteForm(System.Web.Mvc.HtmlHelper,System.String,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="routeName"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxRouteForm(System.Web.Mvc.HtmlHelper,System.String,System.Object,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="routeName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxRouteForm(System.Web.Mvc.HtmlHelper,System.String,System.Object,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions,System.Object)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="routeName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <param name="htmlAttributes">表单html属性集合</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxRouteForm(System.Web.Mvc.HtmlHelper,System.String,System.Web.Routing.RouteValueDictionary,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions)">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="routeName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.BeginAjaxRouteForm(System.Web.Mvc.HtmlHelper,System.String,System.Web.Routing.RouteValueDictionary,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="routeName"></param>
+            <param name="routeValues"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <param name="htmlAttributes">表单html属性集合</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.HtmlHelperAjaxFormExtensions.FormHelper(System.Web.Mvc.HtmlHelper,System.String,System.Web.Mvc.FormMethod,Tunynet.Mvc.AjaxFormOptions,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            输出AjaxForm表单
+            </summary> 
+            <param name="htmlHelper">被扩展的htmlHelper实例</param>
+            <param name="formAction"></param>
+            <param name="method">表单请求方式</param>
+            <param name="options">异步提交表单选项</param>
+            <param name="htmlAttributes">表单html属性集合</param>
+            <returns>MvcForm</returns>
+        </member>
+        <member name="T:Tunynet.Mvc.TabTargetType">
+            <summary>
+            Tab项链接打开方式
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.TabTargetType.Ajax">
+            <summary>
+            默认异步加载Tab内容
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.TabTargetType.Self">
+            <summary>
+            在本窗口打开链接
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.TabTargetType.Blank">
+            <summary>
+            在新窗口打开链接
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.WaterMarkAttribute">
+            <summary>
+            To add a watermark
+            </summary>
+            <remarks>
+            基于jquery.watermark实现
+            具体参见：http://jquery-watermark.googlecode.com/
+            </remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.WaterMarkAttribute.#ctor">
+            <summary>
+            构造器
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.WaterMarkAttribute.Content">
+            <summary>
+            水印文字内容
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.DateTimePicker">
+            <summary>
+            日期时间选择器
+            </summary>
+            <remarks> 
+            <para>基于jQuery UI Datepicker （V1.8.7）和 jquery-ui-timepicker-addon 插件构建，更多信息请参见：</para> 
+            <list type="number">
+            <item>http://jqueryui.com/demos/datepicker/</item>
+            <item>http://trentrichardson.com/examples/timepicker/</item>
+            </list>    
+            <para>如果需要更多option设置，可以通过设置AdditionalParameters属性来实现</para>
+            <para>依赖文件：</para>
+            <list type="number">
+            <item>jquery-ui.js</item>
+            <item>jquery-ui-timepicker-addon.js（V0.9.7）</item>
+            <item>jquery.ui.datepicker-zh-CN.js</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.#ctor">
+            <summary>
+            构造器
+            </summary>
+            <remarks>在构造器中为属性赋默认值</remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetShowTime(System.Boolean)">
+            <summary>
+            设置是否显示时间
+            </summary>
+            <param name="showTime">是否显示时间</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetSelectedDate(System.Nullable{System.DateTime})">
+            <summary>
+            设置默认日期
+            </summary>
+            <param name="selectedDate">默认日期</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetDateFormat(System.String)">
+            <summary>
+            设置日期格式
+            </summary>
+            <param name="dateFormat">日期格式</param>
+            <example>'yyyy-MM-dd'</example>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetTimeFormat(System.String)">
+            <summary>
+            设置时间格式
+            </summary>
+            <param name="timeFormat">时间格式</param>
+            <example>"HH:mm"</example>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetMaxDate(System.String)">
+            <summary>
+            设置最大时间
+            </summary>
+            <param name="maxDate">最大时间</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetMinDate(System.String)">
+            <summary>
+            设置最小时间
+            </summary>
+            <param name="minDate">最小时间</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetChangeMonth(System.Boolean)">
+            <summary>
+            设置是否可改变月份
+            </summary>
+            <param name="changeMonth">是否可改变月份</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetChangeYear(System.Boolean)">
+            <summary>
+            设置是否可改变月份
+            </summary>
+            <param name="changeYear">是否可改变月份</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetBeforeShowCallBack(System.String)">
+            <summary>
+            设置呈现日期选择器前的Javascript回调函数<br/>
+            原型为 function(input, inst)
+            </summary>
+            <param name="beforeShowCallBack">呈现日期选择器前的Javascript回调函数</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetOnSelectCallBack(System.String)">
+            <summary>
+            设置选中事件的Javascript回调函数<br/>
+            原型为 function(dateText,inst)
+            </summary>
+            <param name="onSelectCallBack">选中事件的Javascript回调函数</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.SetOnCloseCallBack(System.String)">
+            <summary>
+            设置关闭事件的Javascript回调函数<br/>
+            原型为 function(dateText,inst)
+            </summary>
+            <param name="onCloseCallBack">关闭事件的Javascript回调函数</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.MergeAdditionalOption(System.String,System.Object)">
+            <summary>
+            datepicker或timepicker插件中提供的其他option选项
+            </summary>
+            <param name="optionName">选项名</param>
+            <param name="optionValue">选项值</param>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.MergeHtmlAttribute(System.String,System.Object)">
+            <summary>
+            添加html属性
+            </summary>
+            <param name="attributeName">属性名</param>
+            <param name="attributeValue">属性值</param>
+            <remarks>如果存在，则覆盖</remarks>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.ToHtmlAttributes">
+            <summary>
+            转为Html属性集合
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.Render(System.Web.Mvc.HtmlHelper,System.String)">
+            <summary>
+            呈现控件
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.ConvertToClientDateFormat(System.String)">
+            <summary>
+            转换为客户端可用的日期格式
+            </summary>
+            <param name="dateFormat">服务器端的日期格式</param>
+            <returns>客户端的日期格式</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.DateTimePicker.ConvertToClientTimeFormat(System.String,System.Boolean@)">
+            <summary>
+            转换为客户端可用的时间格式
+            </summary>
+            <param name="timeFormat">服务器端的时间格式</param>
+            <param name="ampm">输出参数，是否为12小时制</param>
+            <returns>客户端的时间格式</returns>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.ShowTime">
+            <summary>
+            是否显示时间
+            </summary>
+            <value>false</value>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.SelectedDate">
+            <summary>
+            默认日期
+            </summary>        
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.DateFormat">
+            <summary>
+            日期格式
+            </summary>
+            <example>'yyyy-MM-dd' </example>
+            <value>"yyyy-MM-dd"</value>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.TimeFormat">
+            <summary>
+            时间格式
+            </summary>
+            <example>"HH:mm"</example>
+            <value>"HH:mm"</value>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.MaxDate">
+            <summary>
+            最大可选时间
+            </summary>
+            <value>"+10Y"</value>
+            <remarks>
+                <para>
+                    可为其设置以下情况的数值：
+                </para>
+                <list type="number">
+                    <item>
+                        <term>静态日期</term>
+                        <description>需要符合当前日期格式，比如："2012-12-12"</description>
+                    </item>
+                    <item>
+                        <term>整数</term>
+                        <description>是指相对于当前日期加多少天，比如：其值为"-2"，当前日期为"2012-01-05",则其对应日期为"2012-01-03"</description>
+                    </item>
+                    <item>
+                        <term>空</term>
+                        <description>表示无限制</description>
+                    </item>
+                    <item>
+                        <term>日期表达式</term>
+                        <description>
+                            <para>
+                                是指基于当前日期进行计算的表达式，使用表达式我们可以很方便的控制日期范围。其有以下特点：
+                            </para>
+                            <list type="bullet">
+                                <item>表达式可以看作是由多个子项拼接在一起的，允许子项之间有空格</item>
+                                <item>每个子项的形式为[符号位][数字位][日期单位]，其中符号位可选值为"+"或"-"，并可以省略符号位</item>
+                                <item>日期单位不区分大小写</item>
+                                <item>不填日期单位，默认为天</item>
+                            </list>
+                            <para>
+                                允许使用的日期单位说明如下：
+                            </para>
+                            <list type="bullet">
+                                <item>
+                                    <term>Y/y</term>
+                                    <description>在当前年份的基础上增加多少年，比如："+12Y"，当前日期为"2012-01-05",表示"2024-01-05"</description>
+                                </item>
+                                <item>
+                                    <term>M/m</term>
+                                    <description>在当前月份的基础上增加几个月，比如："+2M"，当前日期为"2012-01-05",表示"2012-03-05"</description>
+                                </item>
+                                <item>
+                                    <term>W/w</term>
+                                    <description>在当前日期的基础上增加多少个周，比如："+1W"，当前日期为"2012-01-05",表示"2012-01-12"</description>
+                                </item>
+                                <item>
+                                    <term>D/d</term>
+                                    <description>在当前年份的基础上增加多少天，比如："-2D"，当前日期为"2012-01-05",表示"2012-01-03"</description>
+                                </item>
+                            </list>
+                        </description>
+                    </item>
+                </list>
+            </remarks>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.MinDate">
+            <summary>
+            最小可选时间
+            </summary>
+            <value>"0"</value>
+            <remarks>
+                <para>
+                    可为其设置以下情况的数值：
+                </para>
+                <list type="number">
+                    <item>
+                        <term>静态日期</term>
+                        <description>需要符合当前日期格式，比如："2012-12-12"</description>
+                    </item>
+                    <item>
+                        <term>整数</term>
+                        <description>是指相对于当前日期加多少天，比如：其值为"-2"，当前日期为"2012-01-05",则其对应日期为"2012-01-03"</description>
+                    </item>
+                    <item>
+                        <term>空</term>
+                        <description>表示无限制</description>
+                    </item>
+                    <item>
+                        <term>日期表达式</term>
+                        <description>
+                            <para>
+                                是指基于当前日期进行计算的表达式，使用表达式我们可以很方便的控制日期范围。其有以下特点：
+                            </para>
+                            <list type="bullet">
+                                <item>表达式可以看作是由多个子项拼接在一起的，允许子项之间有空格</item>
+                                <item>每个子项的形式为[符号位][数字位][日期单位]，其中符号位可选值为"+"或"-"，并可以省略符号位</item>
+                                <item>日期单位不区分大小写</item>
+                                <item>不填日期单位，默认为天</item>
+                            </list>
+                            <para>
+                                允许使用的日期单位说明如下：
+                            </para>
+                            <list type="bullet">
+                                <item>
+                                    <term>Y/y</term>
+                                    <description>在当前年份的基础上增加多少年，比如："+12Y"，当前日期为"2012-01-05",表示"2024-01-05"</description>
+                                </item>
+                                <item>
+                                    <term>M/m</term>
+                                    <description>在当前月份的基础上增加几个月，比如："+2M"，当前日期为"2012-01-05",表示"2012-03-05"</description>
+                                </item>
+                                <item>
+                                    <term>W/w</term>
+                                    <description>在当前日期的基础上增加多少个周，比如："+1W"，当前日期为"2012-01-05",表示"2012-01-12"</description>
+                                </item>
+                                <item>
+                                    <term>D/d</term>
+                                    <description>在当前年份的基础上增加多少天，比如："-2D"，当前日期为"2012-01-05",表示"2012-01-03"</description>
+                                </item>
+                            </list>
+                        </description>
+                    </item>
+                </list>
+            </remarks>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.ChangeMonth">
+            <summary>
+            是否可改变月份
+            </summary>
+            <value>true</value>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.ChangeYear">
+            <summary>
+            是否可改变月份
+            </summary>
+            <value>true</value>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.BeforeShowCallBack">
+            <summary>
+            呈现日期选择器前的Javascript回调函数<br/>
+            原型为 function(input, inst)
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.OnSelectCallBack">
+            <summary>
+            选中事件的Javascript回调函数<br/>
+            原型为 fn(dateText,inst)
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.OnCloseCallBack">
+            <summary>
+            设置关闭事件的Javascript回调函数<br/>
+            原型为 fn(dateText,inst)
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.AdditionalOptions">
+            <summary>
+            datepicker或timepicker插件中提供的其他option选项
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.HtmlAttributes">
+            <summary>
+            文本框的html属性集合
+            </summary>
+        </member>
+        <member name="P:Tunynet.Mvc.DateTimePicker.DefaultDateString">
+            <summary>
+            默认时间值
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.AjaxDataType">
+            <summary>
+            服务器返回异步内容的数据类型
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.AjaxDataType.Html">
+            <summary>
+            默认返回纯文本 HTML 信息；包含 script 元素
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.AjaxDataType.Xml">
+            <summary>
+            返回 XML 文档
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.AjaxDataType.Json">
+            <summary>
+             返回 JSON 数据
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.AjaxDataType.Script">
+            <summary>
+            返回纯文本 JavaScript 代码
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.CachedUrlHelper">
+            <summary>
+            可缓存的UrlHelper
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.CachedUrlHelper.RouteUrl(System.String)">
+            <summary>
+            通过routeName获取url
+            </summary>
+            <param name="routeName">routeName</param>
+            <returns>url</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.CachedUrlHelper.RouteUrl(System.String,System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            通过routeName获取url
+            </summary>
+            <param name="routeName">routeName</param>
+            <param name="routeValueDictionary">路由数据</param>
+            <returns>url</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.CachedUrlHelper.Action(System.String,System.String,System.String)">
+            <summary>
+            通过Action/Controller获取url
+            </summary>
+            <param name="actionName">actionName</param>
+            <param name="controllerName">controllerName</param>
+            <param name="areaName">路由分区名称</param>
+            <returns>返回对应的url</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.CachedUrlHelper.Action(System.String,System.String,System.String,System.Web.Routing.RouteValueDictionary)">
+            <summary>
+            通过Action/Controller获取url
+            </summary>
+            <param name="actionName">actionName</param>
+            <param name="controllerName">controllerName</param>
+            <param name="areaName">路由分区名称</param>
+            <param name="routeValueDictionary">路由数据</param>
+            <returns>返回对应的url</returns>
+        </member>
+        <member name="M:Tunynet.Mvc.CachedUrlHelper.GetRequestContext">
+            <summary>
+            获取RequestContext
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Tunynet.Mvc.BreadCrumb">
+            <summary>
+            用来在Action中中设置PageName和面包屑
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.BreadCrumb.#ctor">
+            <summary>
+            受保护构造器
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.BreadCrumb.New">
+            <summary>
+            类实例化工具方法
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="F:Tunynet.Mvc.BreadCrumb.BreadCrumbKeyInHttpContext">
+            <summary>
+            BreadCrumbQueue在HttpContext.Items中的key
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.BreadCrumb.PageNameKeyInHttpContext">
+            <summary>
+            PageName在HttpContext.Items中的key
+            </summary>
+        </member>
+        <member name="M:Tunynet.Mvc.BreadCrumb.SetPageName(System.String,System.String)">
+            <summary>
+            设置页面PageName
+            </summary>
+            <param name="innerHtml">PageName显示内容</param>
+            <param name="href">面包屑节点对应的链接</param>
+        </member>
+        <member name="M:Tunynet.Mvc.BreadCrumb.AddBreadCrumbItem(System.String,System.String)">
+            <summary>
+            添加面包屑节点
+            </summary>
+            <param name="innerHtml">面包屑节点内容</param>
+            <param name="href">面包屑节点对应的链接</param>
+        </member>
+        <member name="P:Tunynet.Mvc.BreadCrumb.IsAutoAddSiteHomeNode">
+            <summary>
+            是否自动添加站点首页节点
+            </summary>
+        </member>
+        <member name="T:Tunynet.Mvc.MenuItemType">
+            <summary>
+            菜单项类型
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.MenuItemType.Link">
+            <summary>
+            链接
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.MenuItemType.Radio">
+            <summary>
+            单选按钮
+            </summary>
+        </member>
+        <member name="F:Tunynet.Mvc.MenuItemType.CheckBox">
+            <summary>
+            复选框
+            </summary>
+        </member>
+    </members>
+</doc>

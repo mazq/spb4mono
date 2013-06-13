@@ -1,0 +1,97 @@
+﻿@model CommentEditModel
+@{
+    int randomNum = new Random().Next(100000, 999999);
+
+    TenantCommentSettings settings = TenantCommentSettings.GetRegisteredSettings(ViewData.Get<string>("TenantTypeId", string.Empty));
+    bool showBefor = ViewData.Get<bool>("ShowBefor", true);
+    bool showAfter = ViewData.Get<bool>("ShowAfter", false);
+
+    bool enableComment = ViewData.Get<bool>("enableComment", true);
+}
+@Html.Action("_ChildCommentList", "Channel", new { pageindex = ViewData.Get<int>("PageIndex", 1), parentId = Model.Id, area = "Common", showBefor = showBefor, showAfter = showAfter, enableComment = enableComment })
+@if (new Authorizer().Comment_Create(Model.TenantTypeId, Model.ToUserId) && settings.EnableComment && enableComment)
+{
+    <div id="childComment-@Model.Id" class="tn-comment-form" data-focus="tn-comment-expand">
+        @using (Html.BeginAjaxForm("Comment", "Channel", null, FormMethod.Post, new AjaxFormOptions { CloseDialog = false, OnErrorCallBack = "commentOnErrorCallBack", OnSuccessCallBack = "commentOnSuccessCallBack", ClearForm = true }, new { listId = "commentList-" + Model.CommentedObjectId + "-" + Model.Id }))
+        {
+            if (UserContext.CurrentUser == null)
+            {
+            <div class="tn-comment-anonym tn-helper-clearfix">
+                <div class="tn-name">
+                    @Html.TextBox("Author", string.Empty, new { @class = "tn-textbox tn-border-gray", id = "Author-" + Model.Id })
+                </div>
+                <div class="tn-email">
+                    @Html.TextBox("Contact", string.Empty, new { @class = "tn-textbox tn-border-gray", id = "Contact-" + Model.Id })
+                </div>
+                <a name="childCommmentLogin" href="@SiteUrls.Instance().Login(false, SiteUrls.LoginModal._LoginInModal, callBack: "CommentLoginCallBack")" plugin="dialog" class="tn-action">
+                    <span class="tn-action-text">登录</span></a>
+                @Html.ValidationMessageFor(n => n.Author)
+                @Html.ValidationMessageFor(n => n.Contact)
+            </div>
+            }
+            <div class="tn-comment-text-wrap">
+                <div class="tn-comment-form-avatar">
+                    @Html.ShowUserAvatar(UserContext.CurrentUser == null ? 0 : UserContext.CurrentUser.UserId, AvatarSizeType.Small)
+                </div>
+                <div class="tn-comment-text-inner tn-border-gray">
+                    @Html.TextArea("Body", string.Empty, new { @class = "tn-comment-text-area", plugin = "ShortcutSubmit", id = "comment-body-second-" + Model.Id })
+                </div>
+            </div>
+            <div class="tn-comment-form-act tn-helper-clearfix" id="publisher-@randomNum">
+                @Html.EmotionSelector()
+                @*<span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-at"></span>
+                    <a id="atFriend" class="tn-action-text" href="javascript:;">朋友</a> </span>
+                @Html.AtUser("#comment-body-second-" + Model.Id, "#publisher-" + randomNum.ToString() + " #atFriend")*@
+                @Html.AtUser("#comment-body-second-" + Model.Id) <span class="tn-count tn-text-note" id="comment-body-count-second-@Model.Id">
+                    0/@settings.MaxCommentLength</span>
+                @if (settings.EnablePrivate && !Model.IsPrivate && UserContext.CurrentUser != null)
+                {
+                    <span class="tn-private">
+                        <label>
+                            @Html.CheckBoxFor(n => n.IsPrivate, new { @class = "tn-checkbox" })
+                            悄悄话
+                        </label>
+                    </span>
+                }
+                else if (settings.EnablePrivate && Model.IsPrivate)
+                {
+                    <span class="tn-private">
+                        <label>
+                            @Html.CheckBoxFor(n => n.IsPrivate, new { @class = "tn-checkbox", disabled = "disabled" })
+                            悄悄话
+                        </label>
+                    </span>
+                }
+                @Html.Button("评论", ButtonTypes.Submit, HighlightStyles.Primary)
+            </div>
+            @Html.Hidden("tenantTypeId", Model.TenantTypeId)
+            @Html.Hidden("OwnerId", Model.OwnerId)
+            @Html.Hidden("ParentId", Model.Id)
+            @Html.Hidden("CommentedObjectId", Model.CommentedObjectId)
+            @Html.Hidden("ToUserId", Model.ToUserId)
+            @Html.Hidden("Subject", Model.Subject)
+        }
+    </div>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            $("textarea#comment-body-second-@Model.Id").watermark('请输入回复');
+
+            $("input#Contact-@Model.Id").watermark("请输入手机号码");
+            $("input#Author-@Model.Id").watermark("请输入姓名");
+
+            //开启计数
+            $("#comment-body-second-@Model.Id").GetTextCount('comment-body-count-second-@Model.Id', @settings.MaxCommentLength, true, @settings.EntryBoxAutoHeight.ToString().ToLower());
+
+             @if (showAfter && showBefor)
+             {
+            <text>
+             //页面加载之后重新定位 
+             if(window.location.hash != ""){
+                window.location.href = window.location.hash;
+             }
+            </text>
+             }
+        });
+    </script>
+    
+}

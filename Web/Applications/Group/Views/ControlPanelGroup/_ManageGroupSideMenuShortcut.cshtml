@@ -1,0 +1,20 @@
+﻿<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            便捷操作</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        @{
+            ManagementOperationService service = new ManagementOperationService();
+            IEnumerable<ApplicationManagementOperation> items = service.GetShortcuts(PresentAreaKeysOfBuiltIn.ControlPanel, false);
+            Html.ViewContext.RouteData.Values["tenantTypeId"] = TenantTypeIds.Instance().Group();
+        }
+        <ul class="tn-side-menu tnc-operation">
+            @foreach (var item in items)
+            {
+                <li class="tn-border-dashed tn-border-gray tn-border-bottom"><a href="@item.GetUrl(Html.ViewContext.RouteData.Values)" target="@item.NavigationTarget">
+                    <span class="tn-icon tn-smallicon-slide-next" title="@item.OperationText"></span>@item.OperationText</a></li>
+            }
+        </ul>
+    </div>
+</div>

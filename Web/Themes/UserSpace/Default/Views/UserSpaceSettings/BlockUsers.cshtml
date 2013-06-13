@@ -1,0 +1,77 @@
+﻿@model IEnumerable<UserBlockedObjectViewModel>
+@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.Blocked;
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-user-blacklist">
+            <div class="tn-tabs">
+                <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                    <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected">@Html.Link("屏蔽用户", SiteUrls.Instance().BlockUsers(Url.SpaceKey()), "屏蔽用户")</li>
+                    <li class="tn-widget-content tn-border-gray tn-border-trl">@Html.Link("屏蔽群组", SiteUrls.Instance().BlockGroups(Url.SpaceKey()), "屏蔽群组")</li>
+                </ul>
+                <div class="tn-tabs-panel">
+                    @Html.StatusMessage(TempData["StatusMessageData"] as StatusMessageData)
+                    <div class="tnc-blanklist">
+                        @if (TempData["StatusMessageData"] == null)
+                        {
+                            @Html.PresetMessage("您可以将自己关注的用户加入屏蔽名单，屏蔽后将不再接收该用户的动态", true)
+                        }
+                        @using (Html.BeginForm("BlockUsers", "UserSpaceSettings", FormMethod.Post, new { id = "blockuser-form" }))
+                        { 
+                            <div class="tnc-selector-blanklist tn-helper-clearfix">
+                                @Html.UserSelector("blockUserIds", ViewData.Get<int>("specifyUserMaxCount", 10), null, SelectorWidthType.Longer, UserSelectorSearchScope.Site)
+                                <div class="tnc-addbtn-blacklist">
+                                    @Html.Button("添加", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "blockuser-button" })
+                                </div>
+                            </div>
+                        }
+                        <div class="tnc-blacklist-list">
+                            @if (Model != null && Model.Count() > 0)
+                            {
+                                <ul class="tn-list tn-helper-clearfix">
+                                    @foreach (var item in Model)
+                                    {
+                                        <li class="tn-list-item tn-helper-clearfix" id="block-user-@item.Id">
+                                            <div class="tn-list-item-area-left">
+                                                @Html.ShowUserAvatar(item.ObjectId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                                            </div>
+                                            <div class="tn-list-item-area-main">
+                                                <div class="tn-list-item-row tn-list-item-heading">
+                                                    @Html.Link(item.ObjectName, SiteUrls.Instance().SpaceHome(item.ObjectId), item.ObjectName, new { target = "_blank" })</div>
+                                                <div class="tn-list-item-row tn-list-item-summary">
+                                                    @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要解除屏蔽？").SetText("解除 × ").SetDeleteTarget("#block-user-" + item.Id).SetUrl(SiteUrls.Instance().UnBlock(Url.SpaceKey(), item.Id)).MergeHtmlAttribute("class", "tn-secondary-text"))
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="tn-no-data">
+                                    目前还没有人进入您的屏蔽列表</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("button#blockuser-button").click(function () {
+            if ($("input#as-values-blockUserIds").val() == "") {
+                alert("至少选择一个好友进行操作");
+            } else {
+                $("form#blockuser-form").submit();
+            }
+        });
+    });
+</script>

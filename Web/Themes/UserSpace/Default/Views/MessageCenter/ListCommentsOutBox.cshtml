@@ -1,0 +1,138 @@
+﻿@model PagingDataSet<Comment>
+@{
+    Layout = "_MessageCenter";
+    IEnumerable<ApplicationBase> ownerApps = ViewData.Get<IEnumerable<ApplicationBase>>("ownerApps", null);
+    Dictionary<string, string> tenantTypeDic = ViewData.Get<Dictionary<string, string>>("tenantTypeDic", null);
+    Dictionary<long, TenantType> commentId_tenantType = ViewData.Get<Dictionary<long, TenantType>>("commentId_tenantType", null);
+    Dictionary<long, CommentedObject> commentedObject = ViewData.Get<Dictionary<long, CommentedObject>>("commentedObject", null);
+    Dictionary<long, Comment> commentId_parentComment = ViewData.Get<Dictionary<long, Comment>>("commentId_parentComment", null);
+    IUser currentUser = UserContext.CurrentUser;
+    string tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", "0");
+}
+@section Aside{
+    @Html.Action("_MessageCenter_Menu", "MessageCenter", new { subMenu = MessageCenterMenu.CommentsInBox })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-my-comments">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-tabs spb-new-activities">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li class="tn-widget-content tn-border-gray tn-border-trl">
+                    @Html.Link("收到的评论", SiteUrls.Instance().ListCommentsInBox(Url.SpaceKey(), null), "收到的评论")
+                </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected">
+                    @Html.Link("发出的评论", SiteUrls.Instance().ListCommentsOutBox(Url.SpaceKey(), null), "收到的评论")
+                </li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl">
+                    @Html.Link("@我的评论", SiteUrls.Instance().AtMeComments(Url.SpaceKey(), null), "@我的评论")
+                </li>
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="tn-list-header">
+                    <div class="tn-list-header-row tn-border-gray tn-border-bottom">
+                        <div class="tn-filter" id="selectedNum">
+                            <a class="tn-action" href="@SiteUrls.Instance().ListCommentsOutBox(Url.SpaceKey(), 1)" data-num="0">
+                                <span class="tn-action-text">全部</span></a>
+                            
+                            @foreach (var tenantTypeName in tenantTypeDic)
+                            {
+                                <span class="tn-spacer tn-text-note">|</span>
+                                <a class="tn-action" href="@SiteUrls.Instance().ListCommentsOutBox(Url.SpaceKey(), 1, tenantTypeName.Key) " data-num="@(tenantTypeName.Key)">
+                                    <span class="tn-action-text">@tenantTypeName.Value</span></a>
+                            } 
+                        </div>
+                    </div>
+                </div>
+                @if (Model != null && Model.Count > 0)
+                {
+                    <ul class="tn-list tnc-dynamic ">
+                        @foreach (Comment comment in Model)
+                        {
+                            if (commentId_tenantType.ContainsKey(comment.Id) && commentedObject.ContainsKey(comment.Id))
+                            {
+                            <li  id="comment_@(comment.Id)" class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-microblog-item">
+                                <div class="tn-list-item-area-left">
+                                    @Html.ShowUserAvatar(comment.UserId, AvatarSizeType.Small)
+                                </div>
+                                <div class="tn-list-item-area-main tnc-microblog-wid">
+                                    <div class="tnc-dynamic-title">
+                                        <span class="tn-helper-right tn-report" id="delete-@(comment.Id)" style="display:none">
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除评论吗？ ").SetIcon(IconTypes.SmallCross).SetTooltip("删除评论").SetDeleteTarget("#comment_" + comment.Id).SetUrl(SiteUrls.Instance().DeleteComment(Url.SpaceKey(), comment.Id)))
+                                        </span><a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(comment.UserId)" target="_blank">
+                                            @Html.ShowUserDisplayName(comment.UserId)</a>：
+                                        @Html.Raw(comment.Body)<span>&nbsp;&nbsp;&nbsp;</span><span class=" tn-text-note">@comment.DateCreated.ToUserDateString(true)</span></div>
+                                    <div class="tn-list-item-row tn-helper-align-right  tn-helper-clearfix tn-list-reply-row">
+                                       
+                                        @if (comment.ParentId == 0)
+                                        {
+                                            <em class="tn-date tn-text-note tn-helper-left">评论 @(currentUser.UserId == commentedObject[comment.Id].UserId ? "我" : commentedObject[comment.Id].Author)的@(commentId_tenantType[comment.Id].Name)：
+                                            @if (commentedObject.ContainsKey(comment.Id))
+                                            {
+                                                if (comment.TenantTypeId == "100302")
+                                                {
+                                                    <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank" plugin="dialog">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                                }
+                                            } 
+                                            </em>
+                                        }
+                                        else
+                                        {
+                                            <em class="tn-date tn-text-note tn-helper-left">
+                                            在@(currentUser.UserId == commentedObject[comment.Id].UserId ? "我" : commentedObject[comment.Id].Author)的@(commentId_tenantType[comment.Id].Name):
+                                            @if (comment.TenantTypeId == "100302")
+                                            {
+                                                <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank" plugin="dialog">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                            }
+                                            回复评论:
+                                            @if (commentId_parentComment[comment.Id] != null)
+                                            { 
+                                            @Html.Raw(commentId_parentComment[comment.Id].Body)
+                                            }
+                                            </em>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+                            }
+                        }
+                    </ul>
+                    <div class="tn-pagination">
+                        @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 7)
+                        @Html.PagingResults(Model) 
+                   </div>
+                }
+                else
+                {
+                    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                        <div class="tn-no-data">
+                            暂无评论</div>
+                    </div> 
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //我的评论顶部应用的选中状态
+        $('#selectedNum a[data-num="'+@(tenantTypeId)+'"]').addClass('tn-selected');
+
+        //每条评论鼠标移入出现X 删除操作
+        $("li[id^='comment_']").mouseenter(function(){
+            $(this).find("span[id^='delete-']").show();
+            
+        });
+        $("li[id^='comment_']").mouseleave(function(){
+            $(this).find("span[id^='delete-']").hide();
+            
+        });
+    });
+
+</script>

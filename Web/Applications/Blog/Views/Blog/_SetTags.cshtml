@@ -1,0 +1,63 @@
+﻿@{
+    IEnumerable<TagInOwner> tags = ViewData.Get<IEnumerable<TagInOwner>>("tags", null);
+    IEnumerable<long> threadIds = ViewData.Get<IEnumerable<long>>("threadIds", null);
+}
+@using (Html.BeginAjaxForm("_SetTags", "Blog", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    foreach (long threadId in threadIds)
+    {
+<input type="hidden" name="threadIds" value="@threadId" />
+}
+<div class="tnc-set-tag">
+  <div class="tnc-dailog-pd">
+    <div class="tn-scroll-box">
+      <ul id="create-tag-ul" class="tnc-tag-list tn-helper-clearfix">
+        @foreach (var tag in tags)
+        {
+        <li class="tnc-tag-item"> @Html.SipmleCheckBox("tagNames", tag.TagName, false, new { id = "ownerTagId-" + tag.Id })
+          <label id="ownerTagName-@(tag.Id)" for="ownerTagId-@(tag.Id)">@tag.TagName</label>
+        </li>
+        }
+      </ul>
+    </div>
+    <div class="tn-form tn-form-single"> @Html.TextBox("tagName" , "" , new { @class = "tn-textbox tn-border-gray" })
+      @Html.LinkButton("创建",SiteUrls.Instance()._CreateMyTag(Url.SpaceKey(),TenantTypeIds.Instance().BlogThread()), htmlAttributes: new { id = "create-tag" }) </div>
+  </div>
+  <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top"> @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" }) </div>
+</div>
+}
+<script type="text/dialog">
+    this.title("设置标签");
+</script>
+<script language="javascript" type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#tagName").watermark("请输入标签名");
+
+        $("#create-tag").click(function (e) {
+            e.preventDefault();
+            var tagName = $("input[name='tagName']").val();
+            if (!tagName) {
+                return;
+            }
+            var url = $(this).attr("href");
+            $.post(url, { tagName: tagName }, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    if (data.MessageType == 1) {
+                        var li = $('<li><input id="ownerTagId-' + tagName + '" name="tagNames" type="checkbox" value="' + tagName + '"><label id="ownerTagName-' + tagName + '" for="ownerTagId-' + tagName + '">&nbsp;' + tagName + '</label><li>');
+                        $("#create-tag-ul").append(li);
+                        $("#tagName").val("");
+                    }
+                });                
+            })
+        })
+    });
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            window.location.reload();
+        });
+    }
+            
+</script>

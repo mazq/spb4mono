@@ -1,0 +1,94 @@
+﻿@model  IEnumerable<ApplicationBase>
+@{
+    Layout = "_UserSpaceSettings";
+    int points = ViewData.Get<int>("totalPoints", 0);
+    int noModeratedUserPoint = ViewData.Get<int>("noModeratedUserPoint", 0);
+    Dictionary<string, PermissionItemInUserRole> dicModeratedUserRoles = ViewData.Get<Dictionary<string, PermissionItemInUserRole>>("dicModeratedUserRoles", new Dictionary<string, PermissionItemInUserRole>());
+    Dictionary<string, PermissionItemInUserRole> dicRegisteredUsersRoles = ViewData.Get<Dictionary<string, PermissionItemInUserRole>>("dicRegisteredUsersRoles", new Dictionary<string, PermissionItemInUserRole>());
+    IEnumerable<PermissionItem> PermissionItems = null;
+    var userItem = ViewData.Get<User>("userItem", null);
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-moderated-explain-box">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-moderated-explain">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>
+                    关于管制</h2>
+            </div>
+            @if (userItem.IsModerated)
+            {
+                <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                    <p>
+                        需要积分达到@(noModeratedUserPoint)后才能解除管制，我现在有@(points)个积分。<a href="@SiteUrls.Instance().MyRank(Url.SpaceKey())">如何获取积分？</a></p>
+                </div>
+            }
+            <table class="tn-table-grid">
+                <tbody>
+                    <tr class="tn-table-grid-header">
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            <strong>权限项</strong>
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            <strong>管制用户</strong>
+                        </td>
+                        <td class="tn-border-gray tn-border-bottom tn-text-note">
+                            <strong>解除管制后</strong>
+                        </td>
+                    </tr>
+                    @foreach (var applicationBase in Model)
+                    {
+
+                        PermissionItems = ViewData.Get<IEnumerable<PermissionItem>>("permissionItem_" + applicationBase.ApplicationKey, null);
+                        if (PermissionItems == null || PermissionItems.Count() == 0)
+                        {
+
+                            continue;
+                        }
+
+                        <tr class="tn-table-grid-row">
+                            <td class="tn-border-gray tn-border-bottom tn-title tn-bg-gray" colspan="3">
+                                <strong>@(applicationBase.Config.ApplicationName)基础权限</strong>
+                            </td>
+                        </tr>
+                                    foreach (var permissionItem in PermissionItems)
+                                    {
+                        <tr class="tn-table-grid-row">
+                            <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                @permissionItem.ItemName：
+                            </td>
+                            @if (dicModeratedUserRoles.ContainsKey(permissionItem.ItemKey) && dicModeratedUserRoles[permissionItem.ItemKey].PermissionType == PermissionType.Refuse)
+                            {
+                                <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                    &nbsp;<span class="tn-icon-colorful tn-icon-colorful-stop tn-icon-inline" title="禁止"></span>
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                    &nbsp;<span class="tn-icon-colorful tn-icon-colorful-pass tn-icon-inline" title="允许"></span>
+                                </td>
+                            }
+                            @if (dicRegisteredUsersRoles.ContainsKey(permissionItem.ItemKey) && dicRegisteredUsersRoles[permissionItem.ItemKey].PermissionType == PermissionType.Refuse)
+                            {
+                                <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                    &nbsp;<span class="tn-icon-colorful tn-icon-colorful-stop tn-icon-inline" title="禁止"></span>
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="tn-border-gray tn-border-bottom tn-text-note">
+                                    &nbsp;<span class="tn-icon-colorful tn-icon-colorful-pass tn-icon-inline" title="允许"></span>
+                                </td>
+                            }
+                        </tr>
+                                    }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

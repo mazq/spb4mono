@@ -1,0 +1,96 @@
+﻿@model IUser
+@{
+    long userId = Convert.ToInt64(ViewData["userId"]);
+    string action = "DeleteUsers";
+    if (userId > 0)
+    {
+        action = "DeleteUser";
+    }
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+}
+
+    
+@using (Html.BeginAjaxForm(action, "ControlPanelUser",null, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "success" }, new { id = "deleteUserDialog" }))
+{
+    @Html.Hidden("UserIds")
+    @Html.Hidden("SingleUserId", userId)
+
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right">
+            @if (userId > 0)
+            {
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        用户名：</label>
+                    @if (Model != null)
+                    {
+                        @Html.Label(Model.UserName)}
+                </div>
+                <div class="tn-form-row">
+                    <label class="tn-form-label">
+                        用户Id：</label>
+                    @if (Model != null)
+                    {
+                        @Html.Label(Model.UserId.ToString())}
+                </div>
+            }
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    删除方式：</label>
+                @Html.RadioButton("isReassign", false, false, new { @id = "isReassign1" })
+                <label for="isReassign1">
+                    删除用户及其相关信息</label>
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                </label>
+                @Html.RadioButton("isReassign", true, true, new { @id = "isReassign2" })
+                <label for="isReassign2">
+                    删除用户，但将其相关信息转让给其他用户</label>
+            </div>
+            <div class="tn-form-row" id="reassign">
+                <label class="tn-form-label">
+                    接收转让的用户名：</label>
+                @Html.TextBox("reassignUserName", "", InputWidthTypes.Medium)
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+
+<script type="text/dialog">
+    this.title("删除用户");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var tt = 0;
+        $("input[name='CheckBoxGroup']:checked").each(function () {
+            tt += $(this).val() + ',';
+        });
+        $("#UserIds").val(tt);
+    });
+
+    $("#isReassign1").click(function () {
+        $('#reassign').css('display', 'none');
+    });
+
+    $("#isReassign2").click(function () {
+        $('#reassign').css('display', '');
+    });
+
+    function success(data) {
+        if (data.MessageType == 1) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+        } else {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+    }
+
+    function error(data) {
+        $("#deleteUserDialog").replaceWith(data);
+    }
+
+</script>

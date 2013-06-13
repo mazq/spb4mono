@@ -1,0 +1,191 @@
+﻿@model BarSectionEditModel
+@{
+    Layout = "_ControlPanel";
+
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+                <div class="tnc-settings">
+                    @Html.Partial("_ManageBarRightMenuShortcut")
+                </div>
+            </div>
+        </div>
+        <div class="tnc-ctn-center tnc-edit-c-w">
+            <h1>
+                @Html.Link("帖吧", SiteUrls.Instance().ManageThreads(), "帖吧")<span class="tn-pipe tn-text-note">&gt;</span><span class="tn-selected">@(Model.SectionId == 0 ? "添加" : "编辑")帖吧</span></h1>
+            @using (Html.BeginForm("EditSection", "ControlPanelBar", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            { 
+                <div class="tnc-ctnright-list">
+                    @Html.StatusMessage(ViewData.Get<StatusMessageData>("StatusMessageData", null))
+                    @Html.HiddenFor(n => n.SectionId)
+                    <div class="tnc-content-manage">
+                        <div class="tn-form-box">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            @Html.FormLabelFor(n => n.Name)
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(n => n.Name, InputWidthTypes.Long)
+                                        </td>
+                                        <td>
+                                            @Html.ValidationMessageFor(n => n.Name)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.FormLabelFor(n => n.CategoryId)
+                                        </th>
+                                        <td>
+                                            @Html.CategoryDropDownListFor(n => n.CategoryId, TenantTypeIds.Instance().BarSection(), 2)
+                                        </td>
+                                        <td>
+                                            @Html.ValidationMessageFor(n => n.CategoryId)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.FormLabelFor(n => n.UserId)
+                                        </th>
+                                        <td class="tn-z">
+                                            @{
+                                       long userId = ViewData.Get<long>("UserId", 0);
+                                            }
+                                            @Html.UserSelector("UserId", userId)
+                                        </td>
+                                        <td>
+                                            @Html.ValidationMessageFor(n => n.UserId)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.FormLabelFor(n => n.ManagerUserIds)
+                                        </th>
+                                        <td>
+                                            @Html.UserSelector("ManagerUserIds", ViewData.Get<int>("SectionManagerMaxCount", 5), ViewData.Get<IEnumerable<long>>("ManagerUserIds", null), SelectorWidthType.Long, UserSelectorSearchScope.Site)
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Logo：
+                                        </th>
+                                        <td>
+                                            <input type="file" name="LogoImage" id="LogoImage" />
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    @if (Model.HasLogoImage())
+                                    {
+                                        <tr>
+                                            <th>
+                                            </th>
+                                            <td>
+                                                <div class="tn-formrow-img">
+                                                    <span class="tn-avatar">
+                                                        <img src="@SiteUrls.Instance().LogoUrl(Model.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium())" width="100px" title="@Model.Name" alt="@Model.Name"/></span> <a id="deleteBarSectionLogo" href="@SiteUrls.Instance()._DeleteBarSectionLogo(Model.SectionId)">删除</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <th>
+                                            @Html.FormLabelFor(n => n.DisplayOrder)
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(n => n.DisplayOrder, InputWidthTypes.Short)
+                                        </td>
+                                        <td>
+                                            @Html.ValidationMessageFor(n => n.DisplayOrder)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            @Html.FormLabelFor(n => n.Description)
+                                        </th>
+                                        <td>
+                                            @Html.HtmlEditorFor(n => n.Description, new HtmlEditorOptions(HtmlEditorMode.Simple))
+                                        </td>
+                                        <td>
+                                            @Html.ValidationMessageFor(n => n.Description)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            @Html.FormLabelFor(n => n.ThreadCategoryStatus)
+                                        </th>
+                                        <td>
+                                            @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.ForceEnabled, new { id = "ForceEnabled", @class = "tn-radiobutton" })
+                                            <label for="ForceEnabled">
+                                                强制分类</label>
+                                            @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.NotForceEnabled, new { id = "NotForceEnabled", @class = "tn-radiobutton" })
+                                            <label for="NotForceEnabled">
+                                                允许分类</label>
+                                            @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.Disabled, new { id = "Disabled", @class = "tn-radiobutton" })
+                                            <label for="Disabled">
+                                                禁用</label>
+                                            @Html.ValidationMessageFor(n => n.ThreadCategoryStatus)
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            @Html.FormLabelFor(n => n.IsEnabled)
+                                        </th>
+                                        <td>
+                                            @Html.RadioButton("IsEnabled", true, new { id = "IsEnabled-true", @class = "tn-radiobutton" })
+                                            <label for="IsEnabled-true">
+                                                是</label>
+                                            @Html.RadioButton("IsEnabled", false, new { id = "IsEnabled-false", @class = "tn-radiobutton" })
+                                            <label for="IsEnabled-false">
+                                                否</label>
+                                            @Html.ValidationMessageFor(n => n.ThreadCategoryStatus)
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            &nbsp;
+                                        </th>
+                                        <td>
+                                            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                                            @Html.Button("返回", ButtonTypes.Button, HighlightStyles.Secondary, ButtonSizes.Large, url: SiteUrls.Instance().ManageThreads())
+                                        </td>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#deleteBarSectionLogo").click(function () {
+            var url = $(this).attr("href");
+            $.post(url, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+            });
+            return false;
+        });
+    });
+    
+</script>

@@ -1,0 +1,77 @@
+﻿@model  PagingDataSet<User>
+@{
+    Dictionary<long, bool> isCurrentUserFollowDic = ViewData.Get<Dictionary<long, bool>>("isCurrentUserFollowDic", null);
+    Dictionary<long, IEnumerable<string>> companyNameDic = ViewData["companyNameDic"] as Dictionary<long, IEnumerable<string>>;
+}
+                     @foreach (var user in Model)
+                              {
+                                  string gender = "";
+
+                                  if (user.Profile != null)
+                                  {
+                                      if (user.Profile.Gender == GenderType.Male)
+                                      {
+                                          gender = "tn-icon tn-smallicon-male";
+                                      }
+                                      else if (user.Profile.Gender == GenderType.FeMale)
+                                      {
+                                          gender = "tn-icon tn-smallicon-female";
+                                      }
+                                  }
+                                <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+                                  <div class="tn-list-item-area-left">
+                                    @Html.ShowUserAvatar(user, AvatarSizeType.Medium, true, HyperLinkTarget._blank)
+                                  </div>
+                                  <div class="tn-list-item-area-main">
+                                    <div class="tn-list-item-row tn-helper-clearfix">
+                                      @if (isCurrentUserFollowDic !=null && (UserContext.CurrentUser == null || (UserContext.CurrentUser != null && UserContext.CurrentUser.UserId != user.UserId)))
+                                      {
+                                        <div class="tnc-relationship" id="followedDiv">
+                                            @Html.FollowUser(user.UserId,"加关注",followButtonType:FollowButtonTypes.Link)
+                                        </div>
+                                      }
+                                      <div class="tnc-user-notename"><a href="@SiteUrls.Instance().SpaceHome(user.UserName)" class="tn-user-name" target="_blank">@user.DisplayName</a>
+                                      @Html.IdentificationType(user.UserId)
+                                       </div>
+                                    </div>
+                                    <div class="tnc-userinfo-content tn-helper-clearfix">
+                                      <div class="tnc-userinfo-item">
+                                        <div class="tn-list-item-row">
+                                          <div class="tn-location"><span title='@if(user.Profile.Gender == GenderType.Male){<text>男</text>}else{<text>女</text>}'  class="@gender"></span>
+                                          @if (user.Profile != null && !string.IsNullOrEmpty(user.Profile.NowAreaCode))
+                                          {   
+                                               @Formatter.FormatArea(user.Profile.NowAreaCode, false)
+                                          }
+                                           </div>
+                                        </div>
+                                        <div class="tn-list-item-row tnc-usernums"> 
+                                            <span>关注 <a href="@SiteUrls.Instance().ListFollowedUsers(user.UserName)" target="_blank"><strong>@user.FollowedCount</strong></a></span> 
+                                            <span class="tn-spacer tn-text-note">|</span> <span>粉丝 <a href="@SiteUrls.Instance().ListFollowers(user.UserName)" target="_blank"><strong>@user.FollowerCount</strong></a></span> 
+                                            <span class="tn-spacer tn-text-note">|</span> <span>内容数 <strong>@user.ContentCount</strong></span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="tn-list-item-row">
+                                      <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+                                        <div class="tn-bubble-arrow"> <b class="tn-arrow-b1 tn-border-gray"></b> <b class="tn-arrow-b2 tn-widget-bubble"></b> </div>
+                                        <div class="tn-bubble-content tn-border-gray tn-corner-all">                                            
+                                            @{
+                                                IEnumerable<string> companys = companyNameDic[user.UserId];
+                                            }
+                                            @if (companys.Count()>0)
+                                            {
+                                             <p>
+                                              共同就职于：
+                                                @foreach (string company in companys)
+                                                {
+                                                <a href="@SiteUrls.Instance().UserSearch(company, UserSearchRange.COMPANY)" target="_blank">@company</a>
+                                                }
+                                            </p>   
+                                            }
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              }
+                              @Html.Hidden("pageCount", @ViewData.Get<int>("pageCount",0))

@@ -1,0 +1,15 @@
+﻿@model Tunynet.ExceptionFacade
+@{
+    ViewBag.Title = "主页";
+    Layout = "~/Themes/Shared/Views/_Layout.cshtml";
+}
+<div class="spb-error-transfer">
+    <h3>@Model.Message</h3>
+    <p>
+        @Model.OperationContextMessage
+    </p>
+    <ul>
+        <li><a href="/">返回上一页</a></li>
+        <li><a href="/">回到首页</a></li>
+    </ul>
+</div>

@@ -1,0 +1,64 @@
+﻿@model IEnumerable<User>
+@{
+    string userName = ViewData.Get<string>("userName", string.Empty);
+    bool isAnonymousUser = ViewData.Get<bool>("isAnonymousUser", false);
+    GenderType gender = ViewData.Get<GenderType>("gender", GenderType.NotSet);
+    string showString = "他的粉丝也关注了";
+    if (gender == GenderType.FeMale)
+    {
+        showString = "她的粉丝也关注了";
+    }
+    else if (gender == GenderType.NotSet)
+    {
+        showString = "Ta的粉丝也关注了";
+    }
+}
+<div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <div class="tn-option">
+        <a href="@SiteUrls.Instance().SpaceHomeMore(Url.SpaceKey())">更多</a></div>
+    <h3 class="tn-helper-reset">
+        @showString</h3>
+</div>
+<div class="tn-box-content tn-widget-content tn-corner-bottom ">
+    <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+        @if (Model == null || Model.Count() == 0)
+        {
+            @Html.Raw("暂无");
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+            <li class="tn-avatar-item">
+                @Html.ShowUserAvatar(item.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(item.UserId)" title="@item.DisplayName" target="_blank">@item.DisplayName</a>
+                <div class="tn-follow-btn">
+                    @if (isAnonymousUser)
+                    {
+                        <a class="tn-button tn-corner-all tn-button-secondary tn-button-hollow tn-button-text-icon-primary" href="@SiteUrls.Instance().Login(false, SiteUrls.LoginModal._LoginInModal, SiteUrls.Instance().SpaceHome(userName))" id="addFollowedUserA" plugin="dialog"><span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">关注</span></a>
+                    }else
+                    {
+                        @Html.FollowUser(item.UserId, "关注")
+                    }
+                </div>
+            </li>
+            }
+        }
+    </ul>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#addFollowedUserA").click(function (e) {
+            e.preventDefault();
+            var url = "";
+            if ("@isAnonymousUser" == "False") {
+                url = "@SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal, SiteUrls.Instance().SpaceHome(userName))"
+            }
+            else {
+                url = $(this).attr("href");
+            }
+        });
+    })
+
+</script>

@@ -1,0 +1,49 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    Layout = "app-home-2cols";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+    
+    string tagName = ViewData.Get<string>("tagName", string.Empty);
+ }
+@section Aside{   
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">日志标签</h3>
+    </div>
+    <p class="tn-tags-hot">
+        @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().BlogThread(), Area = "Common" })
+    </p>
+</div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading">
+            <h2>
+                标签：@tagName</h2>
+        </div>
+        <div class="spb-bar-headlines">
+            <div class="tn-tabs">
+                @if (Model != null && Model.Count() > 0) { 
+                    <div class="tn-tabs-panel">
+                       <ul class="tn-list">
+                        @foreach (var blogTag in Model)
+                        {        
+                            @Html.Partial("_BlogItemChannel", blogTag)
+                        }
+                   
+                       </ul>
+                       <div class="tn-pagination">
+                           @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                       </div>
+                   </div>
+                }
+                else
+                { 
+                    <div class="tn-no-data">暂无数据</div>
+                }
+                
+            </div>
+        </div>
+    </div>
+</div>

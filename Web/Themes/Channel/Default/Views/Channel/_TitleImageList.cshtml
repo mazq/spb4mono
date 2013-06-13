@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Attachment>
+@{
+    string attachmentIds = ViewData.Get<string>("_attachmentIds", "");
+    string tenantTypeId = ViewData.Get<string>("_tenantTypeId", "");
+}
+
+<ul class="tn-photo-list tn-widget tn-helper-reset tn-helper-clearfix">
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (var image in Model)
+                {
+                    bool isChecked = attachmentIds.Contains(image.AttachmentId.ToString());
+                    
+                    <li id="image-@image.AttachmentId" data-image-id="@image.AttachmentId" class="tn-photo-item @(isChecked ? "tn-hover" : "")" data-selected="@isChecked.ToString().ToLower()">
+                        <div class="tn-edit ">
+                            <span class="tn-set ">
+                                <a href="javascript:void(0)" class="tn-icon tn-smallicon-accept tn-bg-deep" style="@(isChecked ? "tn-hover" : "display:none")" >
+                                    选中
+                                </a> 
+                            </span>
+                            <span class="tn-manage">
+                                <a href="@SiteUrls.Instance()._DeleteAttachment(tenantTypeId, image.AttachmentId)" style="display: none;" class="tn-icon tn-smallicon-cross tn-bg-deep">
+                                    删除
+                                </a>
+                            </span>
+                        </div>
+                        <p class="tn-photo-wrap tn-widget-content @(isChecked ? "tn-border-deep tn-bg-light" : "tn-border-gray") ">
+                            <a title="点击设置标题图" href="javascript:void(0)">
+                                <img src="@SiteUrls.Instance().ImageUrl(image.AttachmentId, tenantTypeId, ImageSizeTypeKeys.Instance().Small())" width="100" height="100">
+                                <span></span>
+                            </a>
+                        </p>
+                        <p class="tn-text-heading" title="@(image.FriendlyFileName)">
+                            @StringUtility.Trim(image.FriendlyFileName, 8)
+                        </p>
+                    </li>
+                }
+            }
+</ul>
+@if (Model == null || Model.Count() == 0)
+{
+    <div class="tn-no-data">暂无数据</div>
+}

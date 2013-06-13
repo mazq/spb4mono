@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<combres xmlns='urn:combres'>
+    <filters>
+        <filter type="Combres.Filters.FixUrlsInCssFilter, Combres" acceptedResourceSets="siteCss"/>
+    </filters>
+    <resourceSets url="~/combres.axd" defaultDuration="30" defaultVersion="auto" defaultDebugEnabled="auto" >
+        <resourceSet name="siteCss" type="css">
+            <resource path="~/Themes/Shared/Styles/tn.core_src.css" />
+            <resource path="~/Themes/Shared/Styles/tn.widgets_src.css" />
+            <resource path="~/Themes/Shared/Styles/tn.theme_src.css" />
+            <resource path="~/Themes/Shared/Styles/common.css" />
+            <resource path="~/Scripts/jquery/Jcrop/jquery.Jcrop.css"/>
+            <resource path="~/Scripts/jquery/artDialog/skins/default.css" />
+            <resource path="~/Scripts/syntaxHighlighter/styles/shCore.css" />
+            <resource path="~/Scripts/syntaxHighlighter/styles/shThemeDefault.css" />
+            <resource path="~/Scripts/jquery/fancybox/jquery.fancybox.css" />
+            <resource path="~/Scripts/jquery/ColorSelect/css/jquery.bigcolorpicker.css" />
+        </resourceSet>
+        <resourceSet name="siteJs" type="js">
+            <resource path="~/Scripts/jquery/jquery-1.7.1.js" />
+            <resource path="~/Scripts/jquery/ajaxForm/jquery.livequery.js"/>
+            <resource path="~/Scripts/jquery/jquery.cookie.js" />
+            <resource path="~/Scripts/jquery/jquery.hoverIntent.js" />
+            <resource path="~/Scripts/jquery/jquery.metaData.js" />
+            <resource path="~/Scripts/jquery/jquery.dcmegamenu.1.3.3.js" />
+            <resource path="~/Scripts/jquery/jqueryUI/jquery-ui-1.8.7.js" />
+            <resource path="~/Scripts/jquery/jqueryUI/jquery-ui-timepicker-addon.js" />
+            <resource path="~/Scripts/tunynet/jquery-ui-external.js" />
+            <resource path="~/Scripts/jquery/jqueryUI/jquery.ui.datepicker-zh-CN.js" />
+            <resource path="~/Scripts/jquery/star-rating/jquery.rating-3.14.js" />
+            <resource path="~/Scripts/jquery/superfish/jquery.superfish-1.4.8.js" />
+            <resource path="~/Scripts/jquery/tipsy/jquery.tipsy-1.0.0a.js" />
+            <resource path="~/Scripts/jquery/tipsy/jquery.tipsy.hovercard.js" />
+            <resource path="~/Scripts/jquery/zTree/jquery.ztree.all-3.1.js" />
+            <resource path="~/Scripts/tunynet/jquery.spb.collapsibleBox.js" />
+            <resource path="~/Scripts/tunynet/jquery.spb.sideMenu.js" />
+            <resource path="~/Scripts/tunynet/jquery.tn.menuButton.js" />
+            <resource path="~/Scripts/tunynet/jquery.spb.tabs.js" />
+            <resource path="~/Scripts/jquery/template/jquery.tmpl.js" />
+            <resource path="~/Scripts/jquery/jquery.dcmegamenu.1.3.3.js" />
+            <resource path="~/Scripts/tunynet/jquery.spb.SupportOppose.js" />
+            <resource path="~/Scripts/tunynet/jquery.autoComplete-external.js" />
+            <resource path="~/Scripts/tunynet/jquery.spb.quicksearch.js" />
+            <resource path="~/Scripts/jquery/scrollTo/jquery.scrollTo-1.4.3.1.js" />
+        </resourceSet>
+        <resourceSet name="FormJs" type="js">
+            <resource path="~/Scripts/jquery/uploadify/jquery.uploadify-3.1.js"/>
+            <resource path="~/Scripts/jquery/autoSuggest/jquery.autoSuggest-1.4.js" />
+            <resource path="~/Scripts/jquery/validate/jquery.validate.js" />
+            <resource path="~/Scripts/jquery/validate/jquery.validate.unobtrusive.js" />
+            <resource path="~/Scripts/tunynet/jquery.validate.additional-methods.js" />
+            <resource path="~/Scripts/tunynet/jquery.validate.messages-zh-CN.js" />
+            <resource path="~/Scripts/jquery/ajaxForm/jquery.blockUI.js" />
+            <resource path="~/Scripts/jquery/ajaxForm/jquery.form.js" />
+            <resource path="~/Scripts/jquery/artDialog/jquery.artDialog-4.1.4.js" />
+            <resource path="~/Scripts/jquery/artDialog/plugins/jquery.artDialog.iframeTools.js" />
+            <resource path="~/Scripts/jquery/watermark/jquery.watermark-3.1.4.js" />
+            <resource path="~/Scripts/tunynet/jquery.tn.form.unobtrusive.js" />
+            <resource path="~/Scripts/tunynet/jquery.tn.textarea.js" />
+            <resource path="~/Scripts/tunynet/jquery.iColorPicker.js" />
+            <resource path="~/Scripts/jquery/jquery.validate.password.js" />
+            <resource path="~/Scripts/jquery/ZeroClipboard/jquery.zclip.js" />
+            <resource path="~/Scripts/jquery/Jeditable/jquery.jeditable.js" />
+            <resource path="~/Scripts/jquery/AtUser/jquery.atwho.js" />
+            <resource path="~/Scripts/jquery/AtUser/jquery.atUser.js" />
+            <resource path="~/Scripts/jquery/AtUser/jquery.caret.js" />
+            <resource path="~/Scripts/jquery/ColorSelect/js/jquery.bigcolorpicker.js" />
+        </resourceSet>
+        <resourceSet name="ImageJs" type="js">
+            <resource path="~/Scripts/jquery/imgareaselect/jquery.imgareaselect-0.9.8.js" />
+            <resource path="~/Scripts/tunynet/jquery.photoViewer.js" />
+            <resource path="~/Scripts/jquery/jQueryRotate-2.1.js" />
+            <resource path="~/Scripts/jquery/sliderkit/jquery.sliderkit-1.9.1.js" />
+            <resource path="~/Scripts/jquery/sliderkit/addons/sliderkit.counter.1.0.js" />
+            <resource path="~/Scripts/jquery/sliderkit/addons/sliderkit.delaycaptions.1.1.js" />
+            <resource path="~/Scripts/jquery/sliderkit/addons/sliderkit.imagefx.1.0.js" />
+            <resource path="~/Scripts/jquery/sliderkit/addons/sliderkit.timer.1.0.js" />
+            <resource path="~/Scripts/jquery/Jcrop/jquery.Jcrop.Js" />
+            <resource path="~/Scripts/jquery/fancybox/jquery.fancybox.js" />
+            <resource path="~/Scripts/jquery/jqzoom/jquery.jqzoom-core.js" />
+            <!--<resource path="~/Scripts/jquery/DD_belatedPNG/jquery.DD_belatedPNG-0.0.8a.min.js" />-->
+        </resourceSet>
+
+        <resourceSet name="CodeHighlighterJs" type="js">
+            <resource path="~/Scripts/syntaxHighlighter/scripts/shCore-2.0.296.js" />
+            <resource path="~/Scripts/syntaxHighlighter/scripts/shLegacy-2.0.296.js" />
+            <resource path="~/Scripts/syntaxHighlighter/scripts/shBrushAllLanguage-2.0.296.js" />
+        </resourceSet>
+
+        <resourceSet name="UnobtrusiveJs" type="js">
+            <resource path="~/Scripts/tunynet/jquery.tn.form.unobtrusive.js" />
+            <resource path="~/Scripts/tunynet/jquery.tn.ui.unobtrusive.js" />
+        </resourceSet>
+    </resourceSets>
+</combres>

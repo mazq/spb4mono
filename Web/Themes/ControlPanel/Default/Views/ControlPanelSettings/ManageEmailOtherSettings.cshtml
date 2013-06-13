@@ -1,0 +1,103 @@
+﻿@model EmailSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block tnc-ctnborder" id="all">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1 style="border-bottom: 0px">
+                <span>邮件设置</span>
+            </h1>
+            <div class="tn-tabs">
+                <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                    <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().ListOutBox()">
+                        发件箱列表</a></li>
+                    <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@SiteUrls.Instance().ManageEmailOtherSettings()">
+                        其他设置</a></li>
+                </ul>
+            </div>
+            @using (Html.BeginAjaxForm("ManageEmailOtherSettings", "ControlPanelSettings", FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("ManageEmailOtherSettingsSuccessCallBack")))
+            {
+                <div class="tnc-ctnright-list">
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        管理员Email：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.AdminEmailAddress, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.AdminEmailAddress)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        不允许回复Email：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.NoReplyAddress, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.NoReplyAddress)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        群发邮件数限制：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.BatchSendLimit, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.BatchSendLimit)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        发送失败后尝试次数：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.NumberOfTries, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.NumberOfTries)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        邮件发送间隔：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.SendTimeInterval, new { @class = "tn-textbox tn-input-short tn-border-gray" })
+                                        分钟
+                                        @Html.ValidationMessageFor(n => n.SendTimeInterval)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-Submit">
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, htmlAttributes: new { id = "submit" })
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    //关于邮箱的其他设置成功的回调函数
+    function ManageEmailOtherSettingsSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+    }
+</script>

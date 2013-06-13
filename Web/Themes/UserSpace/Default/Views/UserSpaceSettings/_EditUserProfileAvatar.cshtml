@@ -1,0 +1,48 @@
+﻿@using Spacebuilder.Common.Configuration
+@{
+    IUserProfileSettingsManager userProfileSettingsManager = DIContainer.Resolve<IUserProfileSettingsManager>();
+    UserProfileSettings userProfileSettings = userProfileSettingsManager.GetUserProfileSettings();
+
+}
+<div class="tn-border-gray tn-corner-all tnc-upload-avatar">
+    <div id="queueImage">
+    </div>
+    @Html.Uploadify("uploadifyAvatar", "jpeg,jpg,png", 5120,
+                                                UploadFileOptions.New()
+                                                .SetMultiple(false)
+                                                .SetPreventCaching(true)
+                                                .SetQueueSizeLimit(1)
+                                                .SetRemoveCompleted(true)
+                                                .SetUploadLimit(100)
+                                                .MergeUploadifyFormData("userName", UserContext.CurrentUser.UserName)
+                                                .SetQueueId("queueImage")
+                                                .MergeUploadifyCallBack("onUploadSuccess", "sucessUploadify")
+                                                .SetUploaderUrl(SiteUrls.Instance()._EditAvatar(Tunynet.Utilities.WebUtility.UrlEncode(Url.SpaceKey()))),
+                                                ButtonOptions.New()
+                                                .SetText("上传"))
+    <div class="tn-text-note tnc-remarks">
+        您可以上传 JPG、PNG（文件大小上限为 5MB），图片尺寸下限为@(userProfileSettings.AvatarHeight)&times;@(userProfileSettings.AvatarWidth)
+        px。
+        @Html.Hidden("x1", 0)
+        @Html.Hidden("y1", 0)
+        @Html.Hidden("w", 0)
+        @Html.Hidden("h", 0)
+    </div>
+</div>
+<div id="_AvatarImageAsyn" class="tnc-avatar-pic tn-helper-clearfix">
+    @Html.Action("_EditAvatarAsyn", new { spaceKey = Url.SpaceKey() })
+</div>
+<script type="text/javascript">
+    $.ajaxSetup({ cache: false });
+    function sucessUploadify(file, data, response) {
+        var error = $.parseJSON(data).error;
+        if (error) {
+            $.dialog.tips(error, 1.5, 0);
+        }
+        refreshImage();
+    }
+
+    function refreshImage() {
+        $("#_AvatarImageAsyn").load('@SiteUrls.Instance()._EditAvatarAsyn(Url.SpaceKey())');
+    }
+</script>

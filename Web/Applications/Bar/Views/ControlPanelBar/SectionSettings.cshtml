@@ -1,0 +1,166 @@
+﻿@model SectionSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+    string preName = ViewData.Get<string>("prePoint", "威望");
+
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        @Html.Partial("_ManageBarRightMenuSystemInfo")
+        <div class="tnc-ctn-center">
+            <h1>
+                @Html.Link("管理", SiteUrls.Instance().ManageThreads(), "管理")<span class="tn-pipe tn-text-note">&gt;</span><span
+                    class="tn-selected">帖吧设置</span></h1>
+            <div class="tnc-ctnright-list">
+                @Html.StatusMessage()
+                <div class="tnc-section_settings">
+                    @using (Html.BeginForm("SectionSettings", "ControlPanelBar", FormMethod.Post))
+                    {
+                        <div class="tn-form tn-label-right">
+                            <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                                <strong>帖子评分</strong>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    允许帖子评分：
+                                </label>
+                                <ul class="tn-radiobutton-list">
+                                    <li>
+                                        @Html.RadioButtonFor(n => n.EnableRating, true, new { @class = "tn-radiobutton", id = "EnableRating-ture" })
+                                        @Html.Label("EnableRating-ture", "是")
+                                    </li>
+                                    <li>
+                                        @Html.RadioButtonFor(n => n.EnableRating, false, new { @class = "tn-radiobutton", id = "EnableRating-false" })
+                                        @Html.Label("EnableRating-false", "否")
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tn-form">
+                            <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                                <strong>评分项</strong>
+                            </div>
+                            <table class="tn-table-grid">
+                                <tbody>
+                                    <tr class="tn-table-grid-header">
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            积分类型
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            评分最小值
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            评分最大值
+                                        </th>
+                                        <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                            用户每日评分上限
+                                        </th>
+                                    </tr>
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom">
+                                            @preName
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom">
+                                            @Html.TextBoxFor(n => n.ReputationPointsMinValue, InputWidthTypes.Short)<br />
+                                            @Html.ValidationMessageFor(n => n.ReputationPointsMinValue)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom">
+                                            @Html.TextBoxFor(n => n.ReputationPointsMaxValue, InputWidthTypes.Short)<br />
+                                            @Html.ValidationMessageFor(n => n.ReputationPointsMaxValue)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom">
+                                            @Html.TextBoxFor(n => n.UserReputationPointsPerDay, InputWidthTypes.Short)<br />
+                                            @Html.ValidationMessageFor(n => n.UserReputationPointsPerDay)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tn-form tn-label-right">
+                            <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                                <strong>其他设置</strong>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    仅允许关注帖吧的用户发帖：</label>
+                                <ul class="tn-radiobutton-list">
+                                    <li>
+                                        @Html.RadioButtonFor(n => n.OnlyFollowerCreateThread, true, new { @class = "tn-radiobutton", id = "OnlyFollowerCreateThread-ture" })
+                                        @Html.Label("OnlyFollowerCreateThread-ture", "是")
+                                    </li>
+                                    <li>
+                                        @Html.RadioButtonFor(n => n.OnlyFollowerCreateThread, false, new { @class = "tn-radiobutton", id = "OnlyFollowerCreateThread-false" })
+                                        @Html.Label("OnlyFollowerCreateThread-false", "否")
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    允许创建帖吧：</label>
+                                <ul class="tn-radiobutton-list">
+                                    <li>
+                                        @Html.RadioButtonFor(n => n.EnableUserCreateSection, true, new { @class = "tn-radiobutton", id = "EnableUserCreateSection-ture" })
+                                        @Html.Label("EnableUserCreateSection-ture", "是")
+                                    </li>
+                                    <li>
+                                        @Html.RadioButtonFor(n => n.EnableUserCreateSection, false, new { @class = "tn-radiobutton", id = "EnableUserCreateSection-false" })
+                                        @Html.Label("EnableUserCreateSection-false", "否")
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    创建贴吧等级限制：</label>
+                                @Html.TextBoxFor(n => n.UserRankOfCreateSection, InputWidthTypes.Medium)
+                                <p>
+                                    级</p>
+                                <br />
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.ValidationMessageFor(n => n.UserRankOfCreateSection)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    帖子标题的最大长度限制：</label>
+                                @Html.TextBoxFor(n => n.ThreadSubjectMaxLength, InputWidthTypes.Medium)
+                                <p>
+                                    个字</p>
+                                <br />
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.ValidationMessageFor(n => n.ThreadSubjectMaxLength)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    帖子内容的最大长度限制：</label>
+                                @Html.TextBoxFor(n => n.ThreadBodyMaxLength, InputWidthTypes.Medium)
+                                <p>
+                                    个字</p>
+                                <br />
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.ValidationMessageFor(n => n.ThreadBodyMaxLength)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    回帖内容的最大长度限制：</label>
+                                @Html.TextBoxFor(n => n.PostBodyMaxLength, InputWidthTypes.Medium)
+                                <p>
+                                    个字</p>
+                                <br />
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.ValidationMessageFor(n => n.PostBodyMaxLength)
+                            </div>
+                            <div class="tn-form-row tn-form-row-button">
+                                <label class="tn-form-label">
+                                    &nbsp;</label>
+                                @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

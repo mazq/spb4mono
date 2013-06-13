@@ -1,0 +1,145 @@
+﻿@model SortedList<int, UserRank>
+
+@{
+    Layout = "_ControlPanel";
+    int moietyCount = Model.Count % 2 == 0 ? Model.Count / 2 : Model.Count / 2 + 1;
+}
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-rightvar tn-open">
+            <div class="tnc-settings-icon" plugin="ShortcutMenu">
+                <a href="#"></a>
+            </div>
+            <div id="ManageUserRightMenu">
+                <div class="tnc-settings">
+                    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+                        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+                            <h3 class="tn-helper-reset">
+                                便捷操作</h3>
+                        </div>
+                        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                            <ul class="tn-side-menu tnc-operation">
+                                <li>@Html.Link("积分规则", SiteUrls.Instance().ManagePointItems(), "积分规则")</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>用户等级</span></h1>
+            <div class="tnc-ctnright-list">
+			  <div class="tnc-content-manage">
+			    <div class="tn-list-header">
+					<div class="tn-toolbar-area">
+						@Html.LinkButton("添加等级", SiteUrls.Instance()._EditUserRank(), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+						@Html.LinkButton("重新计算所有用户等级", SiteUrls.Instance().ResetAllUser(), htmlAttributes: new { id = "link-ResetAllUser" })
+					</div>
+				</div>
+                <table class="tn-table-grid">
+                    <tr>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            for (int i = 0; i < 2; i++)
+                            {
+                                List<UserRank> ranksRange = Model.Values.ToList().GetRange(i * moietyCount, i == 0 ? moietyCount : Model.Count / 2);
+                                
+                            <td class="tnc-v-top">
+                                <table class="tn-table-grid">
+                                    <tbody>
+                                        <tr class="tn-table-grid-header">
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                等级
+                                            </th>
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                等级名称
+                                            </th>
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                等级图标
+                                            </th>
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                积分下限
+                                            </th>
+                                            <th class="tn-border-bottom tn-border-gray tn-text-note">
+                                                操作
+                                            </th>
+                                        </tr>
+                                        @foreach (var item in ranksRange)
+                                        {
+                                            <tr class="tn-table-grid-row">
+                                                <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                                    @item.Rank
+                                                </td>
+                                                <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                                    @item.RankName
+                                                </td>
+                                                <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                                    @Html.UserRankIcon(item.Rank)
+                                                </td>
+                                                <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                                    @item.PointLower
+                                                </td>
+                                                <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                                    @Html.Link("编辑", SiteUrls.Instance()._EditUserRank(item.Rank, true), "编辑", new { plugin = "dialog" })
+                                                    @Html.Link("删除", SiteUrls.Instance().DeleteUserRank(item.Rank), "删除", new { id = "link-edit-" + item.Rank })
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                                        if (Model.Count == 1)
+                                        {
+                                            break;
+                                        }
+                            }
+                        }
+                    </tr>
+                </table>
+		      </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+
+        $("a[id^='link-edit-']").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            art.dialog.confirm('你确认要删除？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: $this.attr("href"),
+                    success: function (msg) {
+                        location.reload(true);
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+       
+        $("a#link-ResetAllUser").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            art.dialog.confirm('你确认要重置所有用户等级？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: $this.attr("href"),
+                    success: function (msg) {
+                        art.dialog.tips(msg.MessageContent, 1.5, msg.MessageType);
+                    },
+                    error: function () {
+                        art.dialog.tips("重置失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+    });
+    function success() {
+        location.reload(true);
+    }
+</script>

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Category>
+@{
+    IUser currentUser = UserContext.CurrentUser;
+    string selfUrl = Request.Url.AbsoluteUri + "?" + Request.QueryString;
+}
+@if ((Model != null && Model.Count() > 0) || currentUser != null)
+{
+<div id="blogCategory" class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-sort">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <h3 class="tn-helper-reset">日志分类</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+    <div class="tn-sort-list">
+        @if (Model.Count()>0)
+        {
+            <ul class="tn-list">
+            @foreach (Category category in Model)
+            {
+            <li><a href="@SiteUrls.Instance().BlogList(Url.SpaceKey(), ListType.Category, null, 0, 0, category.CategoryId)">@category.CategoryName<span class="tn-text-note">（@category.ItemCount）</span></a></li>
+            }
+            </ul>
+        }
+        else
+        {
+            @:暂无分类
+        }
+        @if (currentUser != null && currentUser.UserName == Url.SpaceKey())
+        {
+        <p class="tn-actions">
+        <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._CreateMyCategory(Url.SpaceKey(), TenantTypeIds.Instance().BlogThread(), "CreateCategoryCallback")" plugin = "dialog"><span class="tn-icon tn-smallicon-add"> </span><span class="tn-action-text">添加</span></a> 
+        <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance().ManageMyCategories(Url.SpaceKey(), TenantTypeIds.Instance().BlogThread())"> 
+        <span class="tn-icon tn-smallicon-config"></span><span class="tn-action-text">管理</span></a> 
+        </p>
+        }
+    </div>
+    </div>
+</div>
+<script>
+    function CreateCategoryCallback(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            $.get("@selfUrl", function (data) {
+                $("#blogCategory").replaceWith(data);
+            })
+        });
+    }  
+</script>   
+}

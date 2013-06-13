@@ -1,0 +1,194 @@
+﻿@model PagingDataSet<Tunynet.Search.SearchedTerm> 
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+    IEnumerable<Tunynet.Search.SearchedTerm> manuals = ViewData.Get<IEnumerable<Tunynet.Search.SearchedTerm>>("manuals", null);
+    Dictionary<string, string> searchTypeDic = ViewData.Get<Dictionary<string, string>>("searchTypeDic", null);
+    Dictionary<long, int> countTypeNdayDic = ViewData.Get<Dictionary<long, int>>("countTypeNdayDic", null);
+    Dictionary<long, int> countTypeAllDic = ViewData.Get<Dictionary<long, int>>("countTypeAllDic", null);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>搜索热词</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-shortsearch-adminform">
+                        @using (Html.BeginForm("ManageSearchedTerms", "ControlPanelOperation", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    搜索词：</label>
+                                @Html.TextBox("term", Request.QueryString.GetString("term", string.Empty), InputWidthTypes.Medium)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    搜索类型：</label>
+                                @Html.DropDownList("searchTypeCode", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    最早使用时间：</label>
+                                @Html.DatePicker("startDate", Request.QueryString.Get<DateTime>("startDate"), null, null)
+                                - @Html.DatePicker("endDate", Request.QueryString.Get<DateTime>("endDate"), null, null)
+                            </div>
+                            
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>      
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加搜索词", SiteUrls.Instance()._EditSearchedTerms(0, string.Empty, string.Empty), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0 && manuals != null && manuals.Count() == 0)
+                    {
+                        <div class="tn-no-data">
+                            没有搜索到数据</div>
+                    }
+                    else
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        搜索词
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        搜索类型
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        最近使用次数
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        累计使用次数
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        最早使用时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        最新使用时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        排序
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @if (manuals != null && manuals.Count() > 0)
+                                {
+                                    foreach (var itemson in manuals)
+                                    {
+                                    <tr class="tn-table-grid-row" id="searched_@(itemson.Id)" data-id="@(itemson.Id)">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @itemson.Term
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @searchTypeDic[itemson.SearchTypeCode]
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @countTypeNdayDic[itemson.Id]
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @countTypeAllDic[itemson.Id]
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @itemson.DateCreated.ToUserDateString()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @itemson.LastModified.ToUserDateString()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("上移", SiteUrls.Instance().ChangeDisplayOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "display-order-" + "up" + itemson.Id, name = itemson.Id })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("下移", SiteUrls.Instance().ChangeDisplayOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "display-order-" + "down" + itemson.Id, name = itemson.Id })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("删除", SiteUrls.Instance().DeleteSearchedTerms(itemson.Id), "删除", new { id = "delete_button_" + itemson.Id })
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditSearchedTerms(itemson.Id, Tunynet.Utilities.WebUtility.UrlEncode(itemson.Term), itemson.SearchTypeCode), "编辑", new { plugin = "dialog" })
+                                        </td>
+                                    </tr>
+                                    }
+                                }
+                                @foreach (var item in Model)
+                                {
+
+                                    <tr class="tn-table-grid-row" id="searched_@(item.Id)">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @item.Term
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @searchTypeDic[item.SearchTypeCode]
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @countTypeNdayDic[item.Id]
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @countTypeAllDic[item.Id]
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @item.DateCreated.ToUserDateString()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @item.LastModified.ToUserDateString()
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon">
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon">
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除吗？&nbsp;&nbsp;&nbsp;").SetText("删除").SetTooltip("删除热词").SetDeleteTarget("#searched_" + item.Id).SetUrl(SiteUrls.Instance().DeleteSearchedTerms(item.Id)))
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 5)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("a[id^='delete_button_']").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            art.dialog.confirm('你确认要删除吗？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: $this.attr("href"),
+                    success: function (msg) {
+                        location.reload(true);
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+
+        $('.tn-table-grid-row').hover(function () {
+            $(this).addClass('tn-bg-gray');
+        }, function () {
+            $(this).removeClass('tn-bg-gray');
+        });
+    });
+</script>

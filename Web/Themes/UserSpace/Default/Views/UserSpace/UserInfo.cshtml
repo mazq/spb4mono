@@ -1,0 +1,338 @@
+﻿@{
+    bool isRequestFollow = ViewData.Get<bool>("isRequestFollow", false);
+    bool isFollowed = ViewData.Get<bool>("isFollowed", false);
+    bool isSameUser = ViewData.Get<bool>("isSameUser", false);
+    bool isAnonymousUser = ViewData.Get<bool>("isAnonymousUser", false);
+    bool isSuperAdmin_CurrentUser = ViewData.Get<bool>("isSuperAdmin_CurrentUser", false);
+    bool isSuperAdmin_User = ViewData.Get<bool>("isSuperAdmin_User", false);
+    bool isQuietly = ViewData.Get<bool>("isQuietly", false);
+    bool identificationTypeVisiable = ViewData.Get<bool>("identificationTypeVisiable", false);
+    string noteName = ViewData.Get<string>("noteName", string.Empty);
+    User user = ViewData.Get<User>("user", null);
+    string introduction = ViewData.Get<string>("introduction", "尚未填写简介");
+    int integrity = 0;
+    string editGroupShow = ViewData.Get<string>("editGroupShow", "编辑分组");
+    var display = isFollowed ? string.Empty : "display:none";
+
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+
+    string url;
+    if (isAnonymousUser)
+    {
+        url = SiteUrls.Instance().Login(false, SiteUrls.LoginModal._LoginInModal, SiteUrls.Instance().SpaceHome(user.UserName));
+    }
+    else
+    {
+        url = SiteUrls.Instance()._AddFollowedUser(UserContext.CurrentUser.UserName, user.UserId);
+    }
+    if (user.Profile != null)
+    {
+        integrity = user.Profile.Integrity;
+    }
+
+    var currentUser = UserContext.CurrentUser;
+}
+@Html.Hidden("isQuietly", isQuietly)
+<div class="tnc-perall-info tn-border-bottom tn-border-gray">
+    <div class="tn-info tn-helper-clearfix">
+        <h1 title="@user.DisplayName">
+            @if (string.IsNullOrEmpty(noteName.Trim()))
+            {
+                @StringUtility.Trim(user.DisplayName, 10);
+            }
+            else
+            {
+                @StringUtility.Trim(noteName, 10);
+            }
+        </h1>
+        <span class="spb-user-type">
+            @if (identificationTypeVisiable)
+            {@Html.IdentificationType(user.UserId)}
+            else
+            {
+                if (currentUser != null && currentUser.UserName == Url.SpaceKey())
+                {
+                <a href="@SiteUrls.Instance().UpdateIdentification(currentUser.UserName)">申请身份认证</a> 
+                }
+            }
+        </span>
+        @if (isSameUser)
+        {
+            if (ThemeService.Validate(PresentAreaKeysOfBuiltIn.UserSpace, UserIdToUserNameDictionary.GetUserId(Url.SpaceKey())))
+            {
+                @Html.LinkButton(string.Empty, SiteUrls.Instance()._ThemeSettings(PresentAreaKeysOfBuiltIn.UserSpace, user.UserId, true, user.IsUseCustomStyle), size: ButtonSizes.Large, iconType: IconTypes.Skin, htmlAttributes: new { plugin = "dialog" })
+            }
+            <a class="tn-button tn-corner-all tn-button-primary tn-button-large" href="@SiteUrls.Instance().EditUserProfile(Url.SpaceKey())" title="编辑资料">
+                <span class="tn-button-text">编辑资料</span></a>
+            <div class="tn-instructions">
+                <p class="tn-progress-text">
+                    资料完整度 <strong id="integrityStrong">@(integrity)%</strong></p>
+                <div class="tn-progress-bar tn-widget-content tn-corner-all" title="资料完整度为@(integrity)%">
+                    <div style="width: @(integrity)%;" class="tn-progress-bar-value tn-border-deep tn-bg-deep tn-corner-left tn-border-tbl" id="integrityDiv">
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            if (!isAnonymousUser)
+            {
+            <a menu="#moreOptions" href="javaScript:;" class="tn-button tn-corner-all tn-button-default tn-button-large tn-button-hollow tn-button-text-icon-secondary">
+                <span class="tn-icon tn-smallicon-triangle-down"></span><span class="tn-button-text">
+                    更多操作</span> </a>
+            <div class="tn-more-options tn-widget-content tn-border-gray" style="display: none;"
+                id="moreOptions">
+                <ul class="tn-more-list">
+                    <li>@Html.Link("发私信", SiteUrls.Instance()._CreateMessage(UserContext.CurrentUser.UserName, user.UserId), "发私信", new { @class = "tn-item-link", plugin = "dialog", id = "sendMegLi" })</li>
+                    @if (isRequestFollow)
+                    {
+                        <li>@Html.Link("求关注", SiteUrls.Instance()._InviteFollow(Url.SpaceKey()), "求关注", new { @class = "tn-item-link", plugin = "dialog" })</li>
+                    }
+                    @Html.Link("取消关注", SiteUrls.Instance().CancelFollow(UserContext.CurrentUser.UserName, user.UserId), "取消关注", new { style = display, name = "Follow", status = "1", @class = "tn-item-link" })
+                    @if (new Authorizer().Follow(user.UserId) && !isQuietly && !isFollowed)
+                    {
+                        <li>@Html.Link("悄悄关注", SiteUrls.Instance().QuietlyFollow(UserContext.CurrentUser.UserName, user.UserId), "悄悄关注", new { @class = "tn-item-link", name = "QuietlyFollow" })</li>
+                    }
+                    <li>@Html.Link("加入黑名单", SiteUrls.Instance().CreateStopedUser(UserContext.CurrentUser.UserName, user.UserId), "加入黑名单", new { @class = "tn-item-link", name = "StopUser" })</li>
+                    <li><a href="@SiteUrls.Instance()._ImpeachReport(user.UserId, SiteUrls.Instance().SpaceHome(user.UserId), user.DisplayName)" plugin="dialog" class="tn-item-link">
+                        举报此人</a></li>
+                    @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().User()))
+                    { 
+                        <li><a href="@SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().User(), user.UserId, user.DisplayName, userId: user.UserId)" plugin="dialog" class="tn-item-link">
+                            管理员推荐</a></li>
+                    }
+                    @if (isSuperAdmin_CurrentUser && !isSuperAdmin_User)
+                    {
+                        <li><a href="@SiteUrls.Instance().EditUserProfile(Url.SpaceKey())" class="tn-item-link">
+                            管理@(user.DisplayName)的资料</a></li>
+                    }
+                </ul>
+            </div>
+            }
+
+            if (isFollowed && !isQuietly && UserContext.CurrentUser != null)
+            {
+            <a href="@SiteUrls.Instance()._AddFollowedUser(UserContext.CurrentUser.UserName, UserIdToUserNameDictionary.GetUserId(Url.SpaceKey()), true)" class="tn-button tn-corner-all tn-button-primary tn-button-large" plugin = "dialog"  name = "aeditFollowed" title="@editGroupShow">
+                <span class="tn-button-text" id="editFollowedSpan">@StringUtility.Trim(editGroupShow, 5, "")</span></a>
+            @Html.LinkButton("加关注", url, HighlightStyles.Primary, ButtonSizes.Large, IconTypes.SmallAdd, TextIconLayout.IconText, new { plugin = "dialog", name = "addFollowed", id = "addFollowedUserA", style = "display: none;" })
+            }
+            else
+            {
+                if (UserContext.CurrentUser != null)
+                {
+            <a href="@SiteUrls.Instance()._AddFollowedUser(UserContext.CurrentUser.UserName, UserIdToUserNameDictionary.GetUserId(Url.SpaceKey()), true)" class="tn-button tn-corner-all tn-button-primary tn-button-large tn-button-text-icon-primary" plugin = "dialog"  name = "aeditFollowed" style = "display: none;" title="@editGroupShow">
+                <span class="tn-button-text" id="editFollowedSpan">@StringUtility.Trim(editGroupShow, 5, "")</span></a>
+                }
+            @Html.LinkButton("加关注", url, HighlightStyles.Primary, ButtonSizes.Large, IconTypes.SmallAdd, TextIconLayout.IconText, new { plugin = "dialog", name = "addFollowed", id = "addFollowedUserA" })                  
+            }
+            if (!isAnonymousUser)
+            {
+                IEnumerable<User> sameFollowedUsers = ViewData.Get<IEnumerable<User>>("sameFollowedUsers", null);
+                IEnumerable<string> sameTagNames = ViewData.Get<IEnumerable<string>>("sameTagNames", null);
+                IEnumerable<string> sameCompanyNames = ViewData.Get<IEnumerable<string>>("sameCompanyNames", null);
+                IEnumerable<string> sameSchoolNames = ViewData.Get<IEnumerable<string>>("sameSchoolNames", null);
+
+                string tooltip = null;
+                if (sameCompanyNames != null && sameCompanyNames.Count() > 0)
+                {
+                    tooltip = "供职于同一公司";
+                }
+                else if (sameFollowedUsers != null && sameFollowedUsers.Count() > 0)
+                {
+                    tooltip = "有" + sameFollowedUsers.Count() + "个共同关注人";
+                }
+                else if (sameSchoolNames != null && sameSchoolNames.Count() > 0)
+                {
+                    tooltip = "毕业于同一学校";
+                }
+                else if (sameTagNames != null && sameTagNames.Count() > 0)
+                {
+                    tooltip = "有" + sameTagNames.Count() + "个共同的标签";
+                }
+                if (tooltip != null)
+                {
+            <a id="same-follow-button" href="#" class="tn-button tn-corner-all tn-button-default tn-button-large tn-button-hollow">
+                <span class="tn-button-text">@tooltip</span></a>
+            <div id="same-follow-view" style="display: none;" class="tnc-same-follow">
+                <div class="tn-inner">
+                    <div class="tn-widget tn-bubble tn-bubble-arrow-right">
+                        <div class="tn-bubble-arrow">
+                            <b class="tn-arrow-b1 tn-widget-content"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                            </b>
+                        </div>
+                        <div class="tn-bubble-content tn-widget-content tn-corner-all" id="userFollowed">
+                            @if (sameFollowedUsers != null && sameFollowedUsers.Count() > 0)
+                            {                                            
+                                <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+                                    @for (int i = 0; i < Math.Min(6, sameFollowedUsers.Count()); i++)
+                                    {
+                                        User sameFollowedUser = sameFollowedUsers.ElementAt(i);
+                                        <li class="tn-avatar-item">
+                                            @Html.ShowUserAvatar(sameFollowedUser, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                                            <a href="@SiteUrls.Instance().SpaceHome(sameFollowedUser.UserId)" class="tn-user-name" target="_blank">@sameFollowedUser.DisplayName</a>
+                                        </li>
+                                    }
+                                </ul>
+                                    if (sameFollowedUsers.Count() > 6)
+                                    {
+                                <p class="tn-more">
+                                    <a href="@SiteUrls.Instance().FindUserInterested()">猜你还对哪些人感兴趣</a></p>
+                                    }
+                            }
+                            else
+                            { 
+                                <p class="tn-description">
+                                    @if (sameCompanyNames != null && sameCompanyNames.Count() > 0)
+                                    {
+                                        <text>供职于同一公司：</text>
+                                        foreach (string companyName in sameCompanyNames)
+                                        {
+                                        <a href="@SiteUrls.Instance().UserSearch(companyName, UserSearchRange.COMPANY)" target="_blank">@companyName</a>
+                                        }
+                                    }
+                                    else if (sameSchoolNames != null && sameSchoolNames.Count() > 0)
+                                    {
+                                        <text>毕业于同一学校：</text>
+                                        foreach (string schoolName in sameSchoolNames)
+                                        {
+                                        <a href="@SiteUrls.Instance().UserSearch(schoolName, UserSearchRange.SCHOOL)" target="_blank">@schoolName</a>
+                                        }
+                                    }
+                                    else if (sameTagNames != null && sameTagNames.Count() > 0)
+                                    {
+                                        <text>你们贴有相同的标签：</text>
+                                        foreach (string tagName in sameTagNames)
+                                        {
+                                        <a href="@SiteUrls.Instance().UserSearch(tagName, UserSearchRange.TAG)" target="_blank">@tagName</a>
+                                        }
+                                    }
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+                }
+            }
+        }
+    </div>
+    <div class="tn-introduction">
+        <p>
+            <span id="introductionSpan">@Html.Raw(introduction)</span>
+            @if (isSameUser)
+            {
+                <a href="@SiteUrls.Instance()._EditUserIntroduction(Url.SpaceKey())" class="tn-edit" title="编辑简介" plugin="dialog">
+                    编辑</a>
+            }
+        </p>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //黑名单
+        $("a[name='StopUser']").click(function (e) {
+            e.preventDefault();
+            $this = $(this);
+            var stopedUserId = $this.attr("stopedUserId");
+
+            art.dialog.confirm('加入黑名单会解除关系，确定要加入黑名单吗？&nbsp;&nbsp;', function () {
+                $.ajax({
+                    type: "Get",
+                    url: $this.attr("href"),
+                    success: function (msg) {
+                        $("#Follower_" + stopedUserId).fadeOut();
+                        $("a[name='addFollowed']").show();
+                        $("a[name='Follow']").hide();
+                        $("a[name='QuietlyFollow']").show();
+                        $("a[name='aeditFollowed']").hide();
+                        if ($("#isQuietly").val() == "False") {
+                            $("#userFollowerCount").text(parseInt($("#userFollowerCount").text()) - 1);
+                        }
+                        $("#isQuietly").val("False");
+                    },
+                    error: function () {
+                        art.dialog.tips("删除失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+
+        //取消关注
+        $("a[name='Follow']").click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+
+            art.dialog.confirm('确定要取消关注用户吗？&nbsp;&nbsp;', function () {
+                $.ajax({
+                    type: "Post",
+                    url: $this.attr("href"),
+                    success: function (msg) {
+                        $this.hide();
+                        $("a[name='QuietlyFollow']").show();
+                        $("a[name='addFollowed']").show();
+                        $("a[name='aeditFollowed']").hide();
+                        if ($("#isQuietly").val() == "False") {
+                            $("#userFollowerCount").text(parseInt($("#userFollowerCount").text()) - 1);
+                        }
+                        $("#isQuietly").val("False");
+                    },
+                    error: function () {
+                        art.dialog.tips("取消失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+
+        //悄悄关注
+        $("a[name='QuietlyFollow']").click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+
+            art.dialog.confirm('悄悄关注？&nbsp;&nbsp;', function () {
+                $.ajax({
+                    type: "Post",
+                    url: $this.attr("href"),
+                    success: function (data) {
+                        if (data.success == true) {
+                            art.dialog.tips("您已成功悄悄关注该用户！", 1.5, 0);
+                            $this.hide();
+                            $("a[name='Follow']").show();
+                            $("#isQuietly").val("True")
+                        }
+                        else {
+                            alert(data.message);
+                        }
+                    },
+                    error: function () {
+                        art.dialog.tips("悄悄关注失败", 1.5, -1);
+                    }
+                });
+            });
+        });
+
+        //显示共同关注内容
+        $("#same-follow-button").click(function (e) {
+            e.preventDefault();
+            //            var offset = $(this).offset();
+            //            var left = offset.left;
+            //$("#userFollowed").css();
+            var display = $("#same-follow-view");
+            if (display.css("display") != "none") {
+                display.hide();
+            } else {
+                display.show();
+                var position = $(this).offset();
+
+                display.attr("style", "display:inline; top:" + (position.top) + "px; left:" + (position.left - document.getElementById("same-follow-view").scrollWidth) + "px;");
+                $(document).bind("click", function (e) {
+                    var $sameFollowButton = $("#same-follow-button", $(this));
+                    if ($(e.target).parent().is($sameFollowButton)) {
+                        return;
+                    }
+                    $("#same-follow-view").hide();
+                    $(document).unbind("click", arguments.callee);
+                });
+            }
+        });
+    });
+</script>

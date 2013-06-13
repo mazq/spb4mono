@@ -1,0 +1,211 @@
+﻿@model PagingDataSet<Comment> 
+@{
+    Layout = "_MessageCenter";
+    Dictionary<string, string> tenantTypeDic = ViewData.Get<Dictionary<string, string>>("tenantTypeDic", null);
+    Dictionary<long, TenantType> commentId_tenantType = ViewData.Get<Dictionary<long, TenantType>>("commentId_tenantType", null);
+    Dictionary<long, CommentedObject> commentedObject = ViewData.Get<Dictionary<long, CommentedObject>>("commentedObject", null);
+    Dictionary<long, Comment> commentId_parentComment = ViewData.Get<Dictionary<long, Comment>>("commentId_parentComment", null);
+    IUser currentUser = UserContext.CurrentUser;
+
+    string tenantTypeId = Request.QueryString.Get<string>("tenantTypeId", "0");
+}
+@section Aside{
+        @Html.Action("_MessageCenter_Menu", "MessageCenter", new { subMenu = MessageCenterMenu.CommentsInBox })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-my-comments">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+<div class="tn-tabs spb-new-activities">
+        <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+            <li class="tn-widget-content tn-border-gray tn-border-trl ">
+                @Html.Link("收到的评论", SiteUrls.Instance().ListCommentsInBox(Url.SpaceKey(), null), "收到的评论")
+            </li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl">
+                @Html.Link("发出的评论", SiteUrls.Instance().ListCommentsOutBox(Url.SpaceKey(), null), "收到的评论")
+            </li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected">
+              @Html.Link("@我的评论", SiteUrls.Instance().AtMeComments(Url.SpaceKey(), null), "@我的评论")
+            </li>
+        </ul>
+        <div class="tn-tabs-panel">
+            <div class="tn-list-header">
+                <div class="tn-list-header-row tn-border-gray tn-border-bottom">
+                    <div class="tn-filter" id="selectedNum">
+                        <a class="tn-action" href="@SiteUrls.Instance().AtMeComments(Url.SpaceKey(), 1)" data-num="0">
+                            <span class="tn-action-text">全部</span></a>
+                            
+                        @foreach (var tenantTypeName in tenantTypeDic)
+                        {
+                            <span class="tn-spacer tn-text-note">|</span>
+                            <a class="tn-action" href="@SiteUrls.Instance().AtMeComments(Url.SpaceKey(), 1, tenantTypeName.Key) " data-num="@(tenantTypeName.Key)">
+                                <span class="tn-action-text">@tenantTypeName.Value</span></a>
+                        } 
+                    </div>
+                </div>
+              </div>
+            @if (Model != null && Model.Count > 0)
+                    {
+                <ul class="tn-list tnc-dynamic ">
+                    @foreach (Comment comment in Model)
+                    {
+                        if (commentId_tenantType.ContainsKey(comment.Id) && commentedObject.ContainsKey(comment.Id))
+                        {
+                        <li  id="comment_@(comment.Id)" class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-microblog-item">
+                            <div class="tn-list-item-area-left">
+                                @Html.ShowUserAvatar(comment.UserId, AvatarSizeType.Small)
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tnc-dynamic-title">
+                                    <span class="tn-helper-right tn-report">
+                                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除评论吗？ ").SetIcon(IconTypes.SmallCross).SetTooltip("删除评论").SetDeleteTarget("#comment_" + comment.Id).SetUrl(SiteUrls.Instance().DeleteComment(Url.SpaceKey(), comment.Id)))
+                                    </span><a class="tn-user-name" target="_blank"  href="@SiteUrls.Instance().SpaceHome(comment.UserId)">
+                                        @Html.ShowUserDisplayName(comment.UserId)</a>：
+                                            @Html.Raw(comment.Body)<span>&nbsp;&nbsp;&nbsp;</span>
+                                    <span class=" tn-text-note">@comment.DateCreated.ToUserDateString(true)</span></div>
+                                <div class="tn-list-item-row tn-helper-align-right  tn-helper-clearfix tn-list-reply-row">
+                                    @*<em class="tn-date tn-text-note tn-helper-left">回复 我的微博：<a href="#">欧洲杯</a></em>*@
+                                    @if (comment.ParentId != 0)
+                                    {
+                                            <em class="tn-date tn-text-note tn-helper-left">在 @(currentUser.UserId == commentedObject[comment.Id].UserId ? "我" : commentedObject[comment.Id].Author)
+                                                的@(commentId_tenantType[comment.Id].Name)：
+                                                @if (commentedObject.ContainsKey(comment.Id))
+                                                {
+                                                    if (comment.TenantTypeId == "100302")
+                                                    {
+                                                    <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank" plugin="dialog">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                                    }
+                                                    else
+                                                    {
+                                                    <a href="@commentedObject[comment.Id].DetailUrl" title="@commentedObject[comment.Id].Name)" target="_blank">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                                    }
+                                                }
+                                                回复@(currentUser.UserId == comment.ToUserId ? "我" : comment.ToUserDisplayName)的评论：@Html.Raw(commentId_parentComment[comment.Id].Body)
+                                            </em>
+                                    }
+                                    else
+                                    {
+                                            <em class="tn-date tn-text-note tn-helper-left">回复 @(currentUser.UserId == commentedObject[comment.Id].UserId ? "我" : commentedObject[comment.Id].Author)的@(commentId_tenantType[comment.Id].Name)：
+                                                @if (commentedObject.ContainsKey(comment.Id))
+                                                {
+                                                    if (comment.TenantTypeId == "100302")
+                                                    {
+                                                    <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank" plugin="dialog">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                                    }
+                                                    else
+                                                    {
+                                                    <a href="@commentedObject[comment.Id].DetailUrl" title="@(commentedObject[comment.Id].Name)" target="_blank">@(HtmlUtility.TrimHtml(commentedObject[comment.Id].Name, 30))</a>
+                                                    }
+                                                }
+                                            </em>
+                                            
+                                    }
+
+                                     <span class="tn-action tn-report"> <a  href= "@SiteUrls.Instance()._ImpeachReport(comment.UserId, comment.GetCommentDetailUrl(), HtmlUtility.TrimHtml(comment.Body, 50))" plugin="dialog">举报</a></span>
+                                     @if (comment.TenantTypeId != "100101")
+                                     {
+                                         <span class="tn-action"><a  href="javascript:;" name="reply" id="reply_@(comment.Id)" value="@(comment.Id)" >
+                                            回复</a></span>
+                                     }
+                                </div>
+                                <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-bubble-wrap"  id="ListComments_@(comment.Id)"  style="display: none">
+                                    <div class="tn-bubble-arrow tn-bubble-position">
+                                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                                        </b>
+                                    </div>
+                                    <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all" id="ReplyContainer_@(comment.Id)">
+                                        @using (Html.BeginAjaxForm("CreateComment", "MessageCenter", FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("creatCommentSucces")))
+                                        {
+                                                    @Html.Hidden("commentId", comment.Id)
+                                            <div class="tn-comment-text-inner tn-border-gray">
+                                                @Html.TextArea("commentBody", new { @id = "commentArea_" + comment.Id, @class = "tn-comment-text-area", @style = "overflow: hidden" })
+                                            </div>
+                                            <div class="tn-comment-form-act tn-helper-clearfix">
+                                                <span class="tn-icon tn-icon-emotion"></span><span class="tn-count tn-text-note" id="count_@(comment.Id)">
+                                                    0/140</span>
+                                                @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        }
+                        <script type="text/javascript" language="javascript">
+                            $("textarea[id^='commentArea_@(comment.Id)']").GetTextCount("count_@(comment.Id)", 140, true, false);
+                        </script>
+                    }
+                </ul>
+                <div class="tn-pagination">
+                        @Html.PagingButton(Model, PaginationMode.NumericNextPrevious, 7)
+                        @Html.PagingResults(Model)
+                    </div>
+                    }
+            else
+            {
+                <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                    <div class="tn-no-data">
+                        暂无评论</div>
+                </div> 
+            }
+        </div>
+      </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+
+    $(document).ready(function () {
+        $("a[id^='reply_']").live('click', function (e) {
+            e.preventDefault();
+            $this = $(this);
+            $divreplies = $('#ListComments_' + $(this).attr("value"));
+            if ($divreplies.is(":hidden")) {
+                $divreplies.show();
+            } else {
+                $divreplies.hide();
+            }
+        });
+
+//        $("textarea[id^='commentArea_']").live('focus', function () {
+//            $this = this;
+//            $note = $($this).parent().siblings('div').find("span[id^='count_']");
+//            setTimeout(function () { textareaStatisticsCount($this, $note); }, 30);
+//        });
+//    function textareaStatisticsCount($this, $note) {
+//        $jThis = $($this);
+//        $this.value = $this.value.slice(0, 140);
+//        $this.style.height = '1px';
+//        $this.style.height = ($this.scrollHeight) + 'px';
+//        $($note).text(function () {
+//            return $jThis.val().length + "/140"
+//        });
+//        if (document.activeElement == $this) {
+//            setTimeout(function () { textareaStatisticsCount($this, $note); }, 0);
+//        } else {
+//            $this.style.height = '1px';
+//            $this.style.height = ($this.scrollHeight) + 'px';
+//        };
+//    };
+
+        //每条评论鼠标移入出现X 删除操作
+        $("li[id^='comment_']").mouseenter(function(){
+            $(this).find("span[id^='delete-']").show();
+            
+        });
+        $("li[id^='comment_']").mouseleave(function(){
+            $(this).find("span[id^='delete-']").hide();
+            
+        });
+
+        //我的评论顶部应用的选中状态
+        $('#selectedNum a[data-num="'+@(tenantTypeId)+'"]').addClass('tn-selected');
+    });
+
+
+
+    function creatCommentSucces() {
+        debugger;
+        $("div[id^='ListComments_']").hide();
+        $("textarea").val("");
+        $("span[id^='count_']").text("0/140");
+        art.dialog.tips("回复成功", 1.5,1);
+    };
+</script>

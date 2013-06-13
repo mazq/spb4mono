@@ -1,0 +1,170 @@
+﻿@{    
+    List<Category> categoriesShow = ViewData.Get<List<Category>>("categoriesShow", null);
+    IEnumerable<MenuItem> menuItem = ViewData.Get<IEnumerable<MenuItem>>("menuItem", null);
+    IEnumerable<ApplicationBase> applications = ViewData.Get<IEnumerable<ApplicationBase>>("applications", null);
+    int? applicationId = Request.QueryString.Get<int?>("applicationId", null);
+    long? groupId = Request.QueryString.Get<long?>("groupId", null);
+    User user = ViewData.Get<User>("user", null);
+
+    string message = string.Empty;
+}
+<div class="spb-my-following-wrap" id="myHomeActivities">
+    <div class="tn-broadcast">@Html.Raw(message)</div>
+    @Html.Action("_Create", "Microblog", new RouteValueDictionary { { "spaceKey", user.UserName }, { "area", "Microblog" } })
+    @Html.AdvertisingPosition("11000000002")
+    <div class="tn-tabs spb-new-activities">
+        <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+            <li class="tn-widget-content tn-border-gray tn-border-trl@(groupId.HasValue ? "" : " tn-tabs-selected")" name="group" data-id="@null">
+                <a href="@SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), null)">所有分组</a>
+            </li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl" name="group"  data-id="@(FollowSpecifyGroupIds.Mutual)">
+                <a href="@SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), FollowSpecifyGroupIds.Mutual)">
+                    相互关注</a> </li>
+            @foreach (var item in categoriesShow)
+            {
+                <li class='tn-widget-content tn-border-gray tn-border-trl@(item.CategoryId == groupId ? " tn-tabs-selected" : "")' name="group" data-id="@(item.CategoryId)">
+                    <a href="@SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), item.CategoryId)">@item.CategoryName</a>
+                </li>
+            }
+            @if (menuItem != null)
+            {
+                <li class="tn-widget-content tn-border-gray tn-border-trl"><a href="#" class="tn-action tn-action-text-icon-right"
+                    menu="#moreandmore"><span class="tn-icon tn-smallicon-triangle-down"></span><span
+                        class="tn-action-text">更多</span> </a>
+                    <div class="tn-more-options tn-widget-content tn-border-gray" id="moreandmore" style="display: none;">
+                        <ul class="tn-more-list" id="moreUl">
+                            @foreach (var item in menuItem)
+                            {
+                                <li name="groupMore" data-id="@(item.Value)"><a href="@item.Url" class="tn-item-link">@item.Text</a></li>
+                            }
+                        </ul>
+                    </div>
+                </li>
+            }
+        </ul>
+        <div class="tn-tabs-panel">
+            <div class="tn-directory tn-border-gray tn-border-rbl">
+                <div class="tn-directory-level">
+                    @Html.DropDownList("microblogType", null, "所有", new { @class = "tn-dropdownlist" }) 
+                    <span class="tn-directory-item  tn-text-note @(applicationId.HasValue ? "" : " tn-selected")" app="all" name="application-all">
+                        <a href="@SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), null, null)">全部 </a>
+                    </span>
+                    @if (applications != null)
+                    {
+                        foreach (var app in applications)
+                        { 
+                        <span class="tn-spacer tn-text-note">|</span>
+                        <span class="tn-directory-item@((applicationId.HasValue && app.ApplicationId == applicationId.Value) ? " tn-selected" : "")" data-applicationId="@app.ApplicationId" name="application-@app.ApplicationId">
+                            <a href="@SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), applicationId: app.ApplicationId)">@app.Config.ApplicationName</a>
+                        </span>
+                        }
+                    }
+                </div>
+            </div>
+            <div id="activitiesForLoadDiv">
+                @Html.AjaxAction("_ActivitiesList", "UserSpace", new { spaceKey = Url.SpaceKey(), applicationId = applicationId, groupId = groupId })
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#microblogType").change(function () {
+            var groupId = $("li[class*='tn-tabs-selected']").data("id");
+            $("#activitiesForLoadDiv").load('@SiteUrls.Instance()._ActivitiesList(Url.SpaceKey(), null, 1001)', { microblogType: $(this).val(), groupId: groupId }, function () {
+            });
+        });
+        $("span[name^='application-']").bind("click", function (e) {
+            e.preventDefault();
+            $this = $(this);
+            if ($this.data("applicationid") == '1001') {
+                $("#microblogType").show();
+                $("#microblogType option:first").attr("selected", true); 
+            }
+            else {
+                $("#microblogType").hide();
+            }
+            var groupId = $("li[class*='tn-tabs-selected']").data("id");
+
+            var url = $(this).children("a").attr("href");
+
+            $("#activitiesForLoadDiv").load(url, { groupId: groupId }, function () {
+                $("span[name^='application-']").removeClass("tn-selected");
+                $this.addClass("tn-selected");
+            });
+
+        });
+
+        $("li[name^='group']").bind('click', function (e) {
+            e.preventDefault();
+            $this = $(this);
+            var url = $(this).children("a").attr("href");
+            $("#microblogType").hide();
+            $("#activitiesForLoadDiv").load(url, function () {
+
+                var matchMore = /groupMore/;
+                if (!matchMore.test($this.attr("name"))) {
+                    $("li[name='group']").removeClass("tn-tabs-selected");
+                    $this.addClass("tn-tabs-selected");
+                }
+                else {
+
+                    var $liChange = $("li[name='group']").eq(4).children();
+
+                    var changeText = $liChange.text();
+                    var changeUrl = $liChange.attr("href");
+                    var changeDataId = $liChange.parent().attr("data-id");
+
+                    $liChange.text($this.text());
+                    $liChange.attr("href", $this.children().attr("href"));
+                    $liChange.parent().attr("data-id", $this.attr("data-id"));
+
+                    $this.attr("data-id", changeDataId);
+                    $this.children().attr("href", changeUrl);
+                    $this.children().text(changeText);
+
+                    $("li[name='group']").removeClass("tn-tabs-selected");
+                    $("li[name='group']").eq(4).addClass("tn-tabs-selected");
+                }
+                $("span[name^='application-']").removeClass("tn-selected");
+                $("span[name='application-all']").addClass("tn-selected");
+            });
+
+        });
+    });
+
+    //发布微博 表单提交成功 调用函数
+    var microblogCreateSuccess = function (data) {
+        if (data.status == 'hint') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-cross-circle").addClass("tn-bigicon-exclamation");
+        } else if (data.status == 'error') {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-exclamation").addClass("tn-bigicon-cross-circle");
+        } else {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-exclamation tn-bigicon-cross-circle").addClass("tn-bigicon-accept-circle");
+        }
+
+        if (data.MessageType == -1) {
+            $('#msg-sussess').children('span').removeClass("tn-bigicon-accept-circle tn-bigicon-exclamation").addClass("tn-bigicon-cross-circle");
+            $('#msg-sussess').children('strong').html(data.MessageContent);
+            $('#msg-sussess').show();
+
+            setTimeout(function () { $('#msg-sussess').hide(); }, 1500);
+        }
+        else {
+            $('#msg-sussess').children('strong').html(data.message);
+            $('#msg-sussess').show();
+
+            setTimeout(function () { $('#msg-sussess').hide(); }, 1500);
+            $.get('@(SiteUrls.Instance()._NewActivitie(Url.SpaceKey()))', function (data) {
+                var lastActivityId = $("#lastActivityId").val(), newActivityId = $(data).last().val();
+                $(data).remove('#NewActivityId');
+                if (newActivityId > lastActivityId) {
+                    $('#activitiesForLoadDiv ul.tnc-dynamic').children(':first').after(data);
+                    $("#lastActivityId").val(newActivityId);
+                }
+            });
+        }
+        $("#microblogBody").val("");
+    }
+</script>

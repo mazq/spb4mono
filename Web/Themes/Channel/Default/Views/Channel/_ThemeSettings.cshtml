@@ -1,0 +1,95 @@
+﻿@model IEnumerable<ThemeAppearance>
+@{
+    string selectedThemeAppearance = ViewData.Get<string>("selectedThemeAppearance", string.Empty);
+    string presentAreaKey = Request.QueryString.GetString("presentAreaKey", PresentAreaKeysOfBuiltIn.UserSpace);
+    long ownerId = Request.QueryString.Get<long>("ownerId");
+    bool enableCustomStyle = Request.QueryString.Get<bool>("enableCustomStyle", false);
+    bool isUseCustomStyle = Request.QueryString.Get<bool>("isUseCustomStyle", false);
+    if (isUseCustomStyle)
+    {
+        selectedThemeAppearance = string.Empty;
+    }
+}
+<div class="tnc-custom-settings">
+    <div class="tnc-custom-ctn">
+        <div class="tn-tabs">
+            <ul class="tn-tabs-nav tn-helper-clearfix">
+                <li><a href="#themeSettings">主题</a></li>
+                @if (enableCustomStyle)
+                { 
+                    <li><a href="@SiteUrls.Instance()._CustomSettings(presentAreaKey, ownerId, isUseCustomStyle)">
+                        自定义</a></li>
+                }
+            </ul>
+            <div id="themeSettings" class="tn-tabs-panel">
+                <div class="tnc-select-skin">
+                    <ul class="tnc-skin-list tn-helper-clearfix">
+                        @foreach (var themeAppearance in Model)
+                        {
+                            string imageUrl = Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/{1}/Appearances/{2}/Preview.png", themeAppearance.PresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey));
+                            string themeUrl = Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/{1}/theme.css", themeAppearance.PresentAreaKey, themeAppearance.ThemeKey));
+                            string appearanceUrl = Tunynet.Utilities.WebUtility.ResolveUrl(string.Format("~/Themes/{0}/{1}/Appearances/{2}/appearance.css", themeAppearance.PresentAreaKey, themeAppearance.ThemeKey, themeAppearance.AppearanceKey));
+                            <li class="tnc-skin-item"><a themeAppearance="@(themeAppearance.ThemeKey + "," + themeAppearance.AppearanceKey)" themeKey="@themeAppearance.ThemeKey" themeUrl="@themeUrl" appearanceUrl="@appearanceUrl" class="tn-thumbnail" href="javascript:void(0)">
+                                <img src="@imageUrl" alt="@themeAppearance.Name" title="@themeAppearance.Name"/>
+                                <span class="tn-heading">@themeAppearance.Name</span></a> </li>
+                        }
+                    </ul>
+                </div>
+                <div class="tnc-custom-btn">
+                    @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "submitButton", dialogOperation = "close" })
+                    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { id = "cancelButton", dialogOperation = "close" })
+                </div>
+            </div>
+        </div>
+        <script type="text/dialog">
+            this.title("皮肤设置");
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("div.tn-tabs", "div.tnc-custom-settings")
+                .spbtabs({ selected: @(isUseCustomStyle ? 1 : 0),
+                select: function (event, ui) {
+                    if (ui.index == 0) {                        
+                            $('li.tnc-skin-item a.tn-selected').removeClass("tn-selected");
+                    }
+                    else
+                    {
+                        $("#cancelButton").data("FormIsChanged",true);
+                    }
+                }
+                 })
+                .find("ul").removeClass("tn-border-gray tn-border-bottom").find("li").removeClass("tn-widget-content tn-border-gray tn-border-trl");
+                $('li.tnc-skin-item a[themeAppearance="' + '@selectedThemeAppearance' + '"]').addClass("tn-selected");
+                $('li.tnc-skin-item a').click(function () {
+                if($(this).attr("themeKey")==$('li.tnc-skin-item a[themeAppearance="' + '@selectedThemeAppearance' + '"]').attr("themeKey")){
+                    $("body,#tn-content").removeAttr("style");
+                    $("style:contains('tn-page-bg')").remove();
+                    $('link[href$="theme.css"],link[href$="theme-deep.css"]').attr("href", $(this).attr("themeUrl"));
+                    $('link[href$="appearance.css"],link[href*="CustomStyle.ashx"]').attr("href", $(this).attr("appearanceUrl"));                    
+                 }
+                    $('li.tnc-skin-item a.tn-selected').removeClass("tn-selected");
+                    $(this).addClass("tn-selected");
+                    $("#cancelButton").data("FormIsChanged",true);
+                    return false;
+                });
+                
+                $("#submitButton").click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Html.Raw(SiteUrls.Instance()._ChangeThemeAppearance(presentAreaKey, ownerId))',
+                        data: { 'themeAppearance': $("li.tnc-skin-item a.tn-selected").attr("themeAppearance") },
+                        success: function (data) {                            
+                                art.dialog.tips(data.MessageContent, 1.5, data.MessageType,function(){
+                                refresh();
+                                });
+                        }
+                    });
+                });
+                $("#cancelButton").click(function () {
+                if($("#cancelButton").data("FormIsChanged")|| $("#SaveCustomSettingsForm").data("FormIsChanged"))
+                    refresh();
+                });
+            });
+        </script>
+    </div>
+</div>

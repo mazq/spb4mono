@@ -1,0 +1,28 @@
+﻿@{
+    List<Spacebuilder.Search.ISearcher> searchersQuickSearch = ViewData.Get<IEnumerable<Spacebuilder.Search.ISearcher>>("searchersQuickSearch", null).ToList<Spacebuilder.Search.ISearcher>();
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    string watermark = ViewData.Get<string>("waterMark", string.Empty);
+    bool goRelevantApp = ViewData.Get<bool>("goRelevantApp", false); //是否跳到相应的搜索页面
+    string appname = ViewData.Get<string>("appname", null); //当前应用的名字
+}
+<div id="quickSearchDisplay" data-watermark="@watermark" data-appname="@appname" data-gorelevantapp="@goRelevantApp" class="spb-search-accord spb-search-accord-top" style="display: none;">
+    <div class="tn-widget tn-bubble tn-bubble-arrow-top">
+        <div class="tn-bubble-arrow">
+            <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+            </b>
+        </div>
+        <div class="tn-bubble-content tn-widget-content tn-border-gray">
+            @for (int i = 0; i < searchersQuickSearch.Count(); i++)
+            {
+                Spacebuilder.Search.ISearcher searcher = searchersQuickSearch[i];
+                <div class="tnui-quickSearchList" data-url='@searcher.QuickSearchActionUrl("")'>
+                </div>
+            }
+            <div id="allResult" class="tn-foot tnui-option" data-search-url="@(SiteUrls.Instance().GlobalSearch(""))">
+                所有搜索结果：<a id="all-search-a" href="@(SiteUrls.Instance().GlobalSearch(""))">“<span
+                    id="all-search-span" class="tn-text-bright">@keyword</span>”</a>
+            </div>
+        </div>
+    </div>
+</div>
+@*@Html.LinkScript("~/Scripts/tunynet/jquery.spb.quicksearch.js")*@

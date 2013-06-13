@@ -1,0 +1,147 @@
+﻿@model  IEnumerable<ApplicationBase>
+@{
+    Layout = "_ControlPanel";
+    Dictionary<string, PermissionItemInUserRole> dicpermissionItemInUserRoles = ViewData.Get<Dictionary<string, PermissionItemInUserRole>>("PermissionItemsInUserRoles", null);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>权限规则</span>
+            </h1>
+            <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                <ol>
+                    <li>超级管理员可以做任何操作</li>
+                    <li>内容管理员可以做除后台用户管理和设置外的任何操作</li>
+                    <li>仅包含了完全依据规则判定的权限项</li>                    
+                    <li>“未设置”相当于“弃权”，合并时不考虑该规则</li>
+                    <li>“注册会员”角色包含所有登录用户，范围最大</li>
+                    <li>用户可能属于多个角色，因此用户的权限是由对应的所有用户角色的权限合并得到的。权限合并时遵循以下原则：
+                        <ol>
+                            <li>禁止优先</li>
+                            <li>允许的权限取合集（至少有一个是允许，合并结果才是允许）</li>
+                            <li>许可额度、许可范围取最大（只有许可类型为允许的情况下，才会合并许可额度和许可范围）</li>
+                        </ol>
+                    </li>
+                </ol>
+            </div>
+            <div class="tn-list-header">
+                <div class="tn-list-header-row tn-helper-clearfix tn-border-gray tn-border-bottom">
+                    <div class="tn-filter">
+                        图例说明：<span class="tn-explain-icon"><span class="tn-icon tnc-icon-rights tnc-icon-rights-full"></span><span
+                            class="tn-icon-text">允许</span></span><span class="tn-explain-icon"><span class="tn-icon tnc-icon-rights tnc-icon-rights-mostly"></span><span
+                                class="tn-icon-text">所属的</span></span><span class="tn-explain-icon"><span class="tn-icon tnc-icon-rights tnc-icon-rights-half"></span><span
+                                    class="tn-icon-text">所辖的</span></span><span class="tn-explain-icon"><span class="tn-icon tnc-icon-rights tnc-icon-rights-few"></span><span
+                                        class="tn-icon-text">用户的</span></span><span class="tn-explain-icon"><span class="tn-icon tnc-icon-rights tnc-icon-rights-null"></span><span
+                                            class="tn-icon-text">拒绝</span></span><span>--- 无意义</span></div>
+                </div>
+            </div>
+            <div class="tnc-ctnright-list">
+                @foreach (var applicationBase in Model)
+                {
+                    var roleNames = ApplicationAdministratorRoleNames.GetRoleNames(applicationBase.ApplicationId);
+                    var permissionItems = ViewData.Get<IEnumerable<PermissionItem>>("permissionItem_" + applicationBase.ApplicationKey, null);
+                    if (permissionItems == null || permissionItems.Count() == 0)
+                    {
+                        continue;
+                    }
+                    <div class="tnc-list">
+                        <h2>
+                            <span class="tnc-admin-icon tnc-icon-position-4">@applicationBase.Config.ApplicationName</span></h2>
+                        <div class="tnc-list-text">
+                            <table class="tn-table-grid">
+                                <tbody>
+                                    <tr class="tn-table-grid-header">
+                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                            角色
+                                        </td>
+                                        @foreach (var permissionItem in permissionItems)
+                                        {
+                                            <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                @permissionItem.ItemName
+                                            </td>
+                                        }
+                                        <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                        </td>
+                                    </tr>
+                                    @foreach (var role in ViewData.Get<IEnumerable<Role>>("role_" + applicationBase.ApplicationKey, null))
+                                    {
+                                        if (role.RoleName == RoleNames.Instance().SuperAdministrator()
+                                        || role.RoleName == RoleNames.Instance().ContentAdministrator()
+                                        || roleNames != null && roleNames.Contains(role.RoleName))
+                                        {
+                                            continue;
+                                        }
+                                        <tr class="tn-table-grid-row">
+                                            <td class="tn-border-bottom tn-border-gray">
+                                                @role.FriendlyRoleName
+                                            </td>
+                                            @foreach (var permissionItem in permissionItems)
+                                            {
+                                                var key = role.RoleName + "_" + permissionItem.ItemKey;
+                                                <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                    @if (dicpermissionItemInUserRoles.ContainsKey(key))
+                                                    {
+                                                        if (dicpermissionItemInUserRoles[key].PermissionType.Equals(PermissionType.Allow))
+                                                        {
+                                                            if (permissionItem.EnableScope)
+                                                            {
+                                                                if (dicpermissionItemInUserRoles[key].PermissionScope.Equals(PermissionScope.All))
+                                                                {
+                                                        <span title="允许" class="tn-icon tnc-icon-rights tnc-icon-rights-full"></span>
+                                                                }
+                                                                else if (dicpermissionItemInUserRoles[key].PermissionScope.Equals(PermissionScope.Management))
+                                                                {
+                                                        <span title="所辖的" class="tn-icon tnc-icon-rights tnc-icon-rights-half"></span>
+                                                                }
+                                                                else if (dicpermissionItemInUserRoles[key].PermissionScope.Equals(PermissionScope.Organization))
+                                                                {
+                                                        <span title="所属的" class="tn-icon tnc-icon-rights tnc-icon-rights-mostly"></span>
+                                                                }
+                                                                else if (dicpermissionItemInUserRoles[key].PermissionScope.Equals(PermissionScope.User))
+                                                                {
+                                                        <span title="用户的" class="tn-icon tnc-icon-rights tnc-icon-rights-few"></span>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                        <span title="允许" class="tn-icon tnc-icon-rights tnc-icon-rights-full"></span>
+                                                            }
+                                                        }
+                                                        if (dicpermissionItemInUserRoles[key].PermissionType.Equals(PermissionType.Refuse))
+                                                        {
+                                                        <span title="拒绝" class="tn-icon tnc-icon-rights tnc-icon-rights-null"></span>
+                                                        }
+                                                        if (dicpermissionItemInUserRoles[key].PermissionType.Equals(PermissionType.NotSet))
+                                                        {
+                                                            if (dicpermissionItemInUserRoles[key].PermissionType.Equals(PermissionType.NotSet) && dicpermissionItemInUserRoles[key].IsLocked.Equals(true))
+                                                            {
+                                                        <span>---</span>
+                                                            }
+                                                            else
+                                                            { 
+                                                        <span>未设置</span>
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>未设置</span>
+                                                    }
+                                                </td>
+                                            }
+                                            <td class="tn-border-bottom tn-border-gray tn-text-note">
+                                                @Html.ActionLink("编辑", "ManagePermissionItemsInUserRoles", new { roleName = @role.RoleName })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

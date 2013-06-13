@@ -1,0 +1,194 @@
+﻿@{
+    Layout = "app-home-3cols";
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+
+    IEnumerable<TagGroup> tagGroups = ViewData.Get<IEnumerable<TagGroup>>("tagGroup", null);
+    SortBy_Microblog sortBy = ViewData.Get<SortBy_Microblog>("sortBy", SortBy_Microblog.DateCreated);
+    long tagGroupId = ViewData.Get<long>("tagGroupId", 0);
+}
+@section ContentHeader{
+    @Html.Action("_Header", "ChannelMicroblog", new RouteValueDictionary { { "tab", "Square" }, { "mode", "List" } })
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-side-nav">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <ul>
+                @{
+                    string selectedNew = "";
+                    string selectedForward = "";
+                    string selectedReply = "";
+                    if (tagGroupId == 0)
+                    {
+                        if (sortBy == SortBy_Microblog.DateCreated)
+                        {
+                            selectedNew = "tn-bg-gray tn-selected";
+                        }
+                        if (sortBy == SortBy_Microblog.ForwardedCount)
+                        {
+                            selectedForward = "tn-bg-gray tn-selected";
+                        }
+                        if (sortBy == SortBy_Microblog.ReplyCount)
+                        {
+                            selectedReply = "tn-bg-gray tn-selected";
+                        }
+                    }
+                    <li class="tn-border-gray tn-border-bottom @selectedNew"><a id="lastest-microblog" href="@(SiteUrls.Instance().Microblog(SortBy_Microblog.DateCreated, 0))" class="tn-action tn-action-text-icon">
+                        <span class="tn-icon tn-icon-microblog"></span><span class="tn-action-text">最新微博</span></a>
+                    </li>
+                    <li class="tn-border-gray tn-border-bottom @selectedForward"><a id="hot-forwardedcount-microblog" href="@(SiteUrls.Instance().Microblog(SortBy_Microblog.ForwardedCount, 0))" class="tn-action tn-action-text-icon">
+                        <span class="tn-icon tn-icon-forwardc"></span><span class="tn-action-text">热门转发</span></a>
+                    </li>
+                    <li class="tn-border-gray tn-border-bottom @selectedReply"><a id="hot-replycount-microblog" href="@(SiteUrls.Instance().Microblog(SortBy_Microblog.ReplyCount, 0))" class="tn-action tn-action-text-icon">
+                        <span class="tn-icon tn-icon-bubble"></span><span class="tn-action-text">热门评论</span></a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog-interested">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">
+                可能感兴趣的</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <div class="tn-tags">
+                @foreach (TagGroup tagGroup in tagGroups)
+                {
+                    <span><a class="interest-taggroup" href="@(SiteUrls.Instance().Microblog(tagGroupId: tagGroup.GroupId))">@Tunynet.Utilities.HtmlUtility.TrimHtml(tagGroup.GroupName, 12)</a></span> 
+                }
+            </div>
+        </div>
+    </div>
+}
+@section AsideSecond{
+    @Html.AjaxAction("_RecommendTopic", "ChannelMicroblog", new { topNum = 10, recommendTypeId = "10010101" })
+    @Html.AjaxAction("_TopTopics", "ChannelMicroblog", new { topNum = 10 })
+    @Html.AjaxAction("_HotFollower", "ChannelMicroblog", new { topNum = 10 })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog-list ">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div id="tn-loading-newmicroblog" class="tn-loading" style="display: none;">
+        </div>
+        <div id="tn-load-end-newmicroblog" class="tn-load-end tn-border-gray tn-corner-all"
+            style="display: none;">
+            加载失败，请稍候再试...</div>
+        <ul id="tnc-dynamic" class="tn-list tnc-dynamic">
+            <li class="tnc-dynamic-new" style="display: none;"><a id="new-microblog" href="javascript:void(0)"
+                class="tn-instant-note tn-corner-all">有<span id="new-microblog-count">0</span>条新微博，点击查看</a></li>
+        </ul>
+        <div id="no-data" style="display: none;" class='tn-box-content tn-widget-content tn-corner-bottom'>
+            <div class='tn-no-data'>
+                暂无数据</div>
+        </div>
+        <div id="tn-load-more-oldmicroblog" class="tn-load-more tn-bg-gray tn-border-gray"
+            style="display: none;">
+            <a id="load-more" href="#" class="tn-action tn-action-text-icon-right"><span class="tn-icon tn-smallicon-collapse-open">
+            </span><span class="tn-action-text">更多</span> </a>
+        </div>
+        <div id="tn-loading-oldmicroblog" class="tn-loading tn-border-gray tn-corner-all"
+            style="display: none;">
+        </div>
+        <div id="tn-load-end-oldmicroblog" class="tn-load-end tn-border-gray tn-corner-all"
+            style="display: none;">
+            加载失败，请稍候再试...</div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+
+        if (@(tagGroupId)>0) {
+          var url='@(SiteUrls.Instance()._GetMicroblogByTagGroup())?tagGroupId=@(tagGroupId)';
+        }else{
+          var url='@(SiteUrls.Instance()._OlderMicroblog())?sortBy=@(sortBy)';
+        }
+
+        var pageIndex = 1;
+        //加载页面列表
+        function loadList() {
+            $('#tn-load-more-oldmicroblog').hide();
+            $('#tn-load-end-oldmicroblog').hide();
+            $('#tn-loading-oldmicroblog').show();
+            $.get(url, { pageIndex: pageIndex }, function (data, status, xhr) {
+                $('#tn-loading-oldmicroblog').hide();
+                if (status === "success") {
+                    $('#tnc-dynamic').append(data);
+                    var pageCount = $('.pageCount:last').val();
+                    if (pageCount == 0) {
+                        $("#no-data").show();
+                    } else if (pageCount <= pageIndex) {
+                        $('#tn-load-more-oldmicroblog').hide();
+                    } else {
+                        $('#tn-load-more-oldmicroblog').show();
+                        pageIndex++;
+                    }
+                } else {
+                    $('#tn-load-end-oldmicroblog').show();
+                }
+            });
+        }
+
+        //点击最新微博(有几条最新微博)
+        $("#new-microblog").click(function (e) {
+            e.preventDefault();
+            //得到当前最新一条微博ID
+            var lastMicroblogId = $(".lastMicroblogId:first").val();
+            $(".tnc-dynamic-new").hide();
+            $("#tn-loading-newmicroblog").show();
+            //取到最新微博数
+            var newmicroblogcount = $("#new-microblog-count").text();
+            if (newmicroblogcount > 30) {
+                window.location.reload();
+            }else {
+                $.get('@(SiteUrls.Instance()._NewerMicroblogList())?lastMicroblogId=' + lastMicroblogId, function (data) {
+                    $(".tnc-dynamic-new").after(data);
+                    $("#tn-loading-newmicroblog").hide();
+                    $("#tn-load-end-newmicroblog").hide();
+                });
+            }
+        });
+
+        //页面加载时加载初始化微博数据
+        loadList();
+
+        //点击更多
+        $('#load-more').click(function (e) {
+            e.preventDefault();
+            loadList();
+        });
+
+        //点图片模式
+        $("#image-mode").click(function (e) {
+            e.preventDefault();
+            var url = '@SiteUrls.Instance().MicroblogWaterfall()';
+            var sortby = '@(sortBy)'
+            var tagGroupId = '@(tagGroupId)'
+            if (tagGroupId != "0") {
+                url += "?tagGroupId=" + tagGroupId;
+            } else {
+                url += "?sortBy=" + sortby;
+            }
+            window.location.href = url;
+        })
+
+    });
+
+    //隔一段时间获取最新微博数
+    function getNewerCount() {
+        //得到当前最新一条微博ID
+        var lastMicroblogId = $(".lastMicroblogId:first").val();
+        //判断是不是按时间排序的
+        var sortby = '@(sortBy)';
+        if (sortby=='DateCreated') {
+          $.getJSON('@(SiteUrls.Instance()._GetNewerMicroblogCount())?lastMicroblogId=' + lastMicroblogId, function (data) {
+            if (data != 0) {
+                $(".tnc-dynamic-new").show();
+                $("#new-microblog-count").text(data);
+            }
+          });
+        }
+    }
+
+    setInterval("getNewerCount()", 60000);
+</script>

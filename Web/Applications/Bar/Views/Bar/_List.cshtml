@@ -1,0 +1,20 @@
+﻿@model PagingDataSet<BarThread>
+@if (Model != null && Model.Count() > 0)
+{        
+    <div id="barThreadsContainer" class="spb-bar-category-list">
+        <ul class="tn-list">
+            @foreach (var thread in Model)
+            {        
+                @Html.Partial("~/Applications/Bar/Views/Bar/_Thread.cshtml", thread, ViewData)
+            }
+        </ul>
+        <div class="tn-pagination">
+            @Html.AjaxPagingButton(Model, "barThreadsContainer")
+        </div>
+    </div>
+}
+else
+{ 
+    <div class="tn-no-data">
+        暂无帖子</div>
+}

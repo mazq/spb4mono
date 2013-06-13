@@ -1,0 +1,52 @@
+﻿@{
+    bool isApplied = ViewData.Get<bool>("isApplied", false);
+ }
+ @if (!isApplied)
+ {
+     using (Html.BeginAjaxForm("_EditApply", "ChannelGroup", new { groupId = Request.QueryString.Get<long>("groupId") }, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+     {
+        <div class="tnc-dailog-pd">
+            <div class="tn-form-box">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                理由：
+                            </th>
+                            <td>
+                                @Html.TextArea("applyReason", new RouteValueDictionary { { "maxlength", 128 }, { "class", "tn-textbox tn-input-long tn-border-gray" } })
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" })
+        </div>
+     }
+    <script type="text/dialog">
+        this.title("申请加入");
+    </script>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#myReason").validate({
+            rules: {
+                introduction: {
+                    maxBlength: 128
+                }
+            },
+            messages: {
+                introduction: {
+                    maxBlength: "最多输入128个汉字"
+                }
+            }
+        });
+    })
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>
+ }
+

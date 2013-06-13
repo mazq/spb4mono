@@ -1,0 +1,10 @@
+﻿@{
+    IEnumerable<IdentificationType> identificationTypes = ViewData.Get<IEnumerable<IdentificationType>>("identificationTypes", null);    
+}
+@if (identificationTypes!=null)
+{
+    foreach (var identificationType in identificationTypes)
+    {
+        <img alt="@identificationType.Name"  src="@SiteUrls.Instance().LogoUrl(identificationType.IdentificationTypeLogo, TenantTypeIds.Instance().IdentificationType(), ImageSizeTypeKeys.Instance().Small())"  title="@identificationType.Name" />
+    }   
+}

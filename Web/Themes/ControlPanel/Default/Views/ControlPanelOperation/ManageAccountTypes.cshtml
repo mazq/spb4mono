@@ -1,0 +1,59 @@
+﻿@model IEnumerable<AccountType>
+@{
+    Layout = "_ControlPanel";
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>帐号绑定</span></h1>
+            <div class="tnc-ctnright-list">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    <div class="tnc-content-manage spb-account-bound">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                @foreach (var accountType in Model)
+                                {
+                                    <tr class="tn-table-grid-row">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-avatar">
+                                            @*<span class="tnc-sina-icon"></span>*@
+                                            <img src="@SiteUrls.Instance().ThirdLogoUrl(accountType.AccountTypeKey)" alt="@accountType.AccountTypeName()" />
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <p>
+                                                <strong>@accountType.AccountTypeName()</strong><a href="http://www.spacebuilder.cn/users/accountbinding#@accountType.AccountTypeKey" target="_blank">如何申请</a></p>
+                                            <p class="tn-text-note">
+                                                AppKey：@(string.IsNullOrEmpty(accountType.AppKey) ? "尚未申请" : accountType.AppKey)
+                                            </p>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <p>&nbsp;
+                                                </p>
+                                            <p class="tn-text-note">
+                                                AppSecret：@(string.IsNullOrEmpty(accountType.AppSecret) ? "尚未申请" : accountType.AppSecret)
+                                            </p>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action1 tn-nowrap">
+                                            <a href="@SiteUrls.Instance()._EditAccountType(accountType.AccountTypeKey)" class="tn-action tn-action-text-icon" plugin="dialog" title="编辑帐号">
+                                            @if (accountType.IsEnabled)
+                                            {
+                                                <span class="tn-icon tn-icon-accept"></span>
+                                            }
+                                            else
+                                            {
+                                            <span class="tn-icon tn-icon-cross"></span>
+                                            }
+                                            <span class="tn-action-text">编辑</span></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+﻿@{
+    long id = ViewData.Get<long>("id", 0);
+}
+@using (Html.BeginAjaxForm("EditSearchedTerms", "ControlPanelOperation", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "error", OnSuccessCallBack = "success" }))
+{
+    <div class="tnc-dailog-pd">
+        <div class="tn-form tn-label-right tnc-label-short tnc-tips-location">
+            @Html.Hidden("id", id)
+            <div class="tn-form-row" id="termDiv">
+                <label class="tn-form-label">
+                    搜索词：</label>@Html.TextBox("term", Tunynet.Utilities.WebUtility.UrlDecode(Request.QueryString.GetString("term", string.Empty)), new { MaxLength = 64 })
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label">
+                    搜索类型：</label>@Html.DropDownList("searchList")
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "edit-term-submit" })
+        @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+       
+}
+<script type="text/dialog">
+    @if (id > 0)
+    {
+       @: this.title("编辑搜索词");
+    }
+    else
+    {
+       @: this.title("添加搜索词");
+    }
+</script>
+<script type="text/javascript">
+    function success() {
+        window.location.reload(true);
+    }
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($("#term").val().trim() == "") {
+            $("#edit-term-submit").attr("disabled", "disabled");
+        }
+
+
+        $("#term").focusout(function () {
+            var term = $(this).val().trim();
+
+            if (term == "") {
+                $("#termDiv").append('<div class="tn-explain"><label class="tn-form-label"></label><span class="tn-text-bright" generated="true" id="termspan">搜索词不能为空</span></div>');
+                $("#edit-term-submit").attr("disabled", "disabled");
+            }
+            else {
+                $(".tn-explain").remove();
+                $("#edit-term-submit").removeAttr("disabled");
+            }
+        });
+        $("#term").focusin(function () {
+            $(".tn-explain").remove();
+
+        })
+
+    })
+</script>

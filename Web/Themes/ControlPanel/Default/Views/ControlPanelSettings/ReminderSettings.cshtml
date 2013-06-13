@@ -1,0 +1,150 @@
+﻿@model ReminderSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+    IEnumerable<Role> roles = ViewData.Get<IEnumerable<Role>>("roles", null);
+    var isRepeated = string.Empty;
+    var notRepeated = string.Empty;
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>提醒设置</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                @using (Html.BeginAjaxForm("SaveReminderSettings", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "saveReminderSettings" }))
+                {
+                    <div class="tn-form tn-label-right tnc-reminder-settings">
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                提醒记录保留天数：</label>
+                            @Html.TextBox("ReminderRecordStorageDay", Model.ReminderRecordStorageDay, new { @class = "tn-textbox tn-border-gray  tn-input-short digits" })
+                            天
+                            @Html.ValidationMessageFor(n => n.ReminderRecordStorageDay)
+                        </div>
+                        @for (int i = 0; i < Model.ReminderModeSettings.Count; i++)
+                        {
+                            if (ReminderMode.Get(Model.ReminderModeSettings[i].ModeId) == null)
+                            {
+                                continue;
+                            }
+                            <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                                <strong>
+                                    @ReminderMode.Get(Model.ReminderModeSettings[i].ModeId).ModeName：
+                                    <input type="checkbox" class="tn-checkbox" id="select-all-@i" data-id="@i" name="select-all" />
+                                    <label for="select-all-@i">
+                                        全部启用</label>
+                                </strong>
+                            </div>
+                            <input type="hidden" name="ReminderModeSettings[@i].ModeId" value="@Model.ReminderModeSettings[i].ModeId" />
+                                                                                          var reminderInfoTypeSettings = Model.ReminderModeSettings[i].ReminderInfoTypeSettingses;
+                                                                                          for (int j = 0; j < reminderInfoTypeSettings.Count; j++)
+                                                                                          {
+                                                                                              var type = ReminderInfoType.Get(reminderInfoTypeSettings[j].ReminderInfoTypeId);
+                            <input type="hidden" name="ReminderModeSettings[@i].ReminderInfoTypeSettingses[@j].ReminderInfoTypeId" value="@reminderInfoTypeSettings[j].ReminderInfoTypeId" />
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    <strong>@type.TypeName：</strong></label>
+                                @Html.SipmleCheckBox("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].IsEnabled", true, reminderInfoTypeSettings[j].IsEnabled, new { id = "reminderInfoType-" + reminderInfoTypeSettings[j].ReminderInfoTypeId + "-" + i })
+                                <label for="reminderInfoType-@reminderInfoTypeSettings[j].ReminderInfoTypeId-@i">
+                                    是否启用</label>
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    触发条件：</label>
+                                @Html.TextBox("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].ReminderThreshold", reminderInfoTypeSettings[j].ReminderThreshold, new { @class = "tn-textbox tn-border-gray  tn-input-short digits required {min:1}" })
+                                分钟内，未进行处理
+                                @Html.ValidationMessage("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].ReminderThreshold")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否重复：</label>
+                                <ul class="tn-radiobutton-list">
+                                    @{
+                           isRepeated = "isRepeated-" + Model.ReminderModeSettings[i].ModeId + "-" + reminderInfoTypeSettings[j].ReminderInfoTypeId + "-" + i;
+                           notRepeated = "notRepeated-" + Model.ReminderModeSettings[i].ModeId + "-" + reminderInfoTypeSettings[j].ReminderInfoTypeId + "-" + i;
+                                    }
+                                    <li>
+                                        @Html.RadioButton("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].IsRepeated", true, reminderInfoTypeSettings[j].IsRepeated, new { id = isRepeated })
+                                        <label for="isRepeated-@Model.ReminderModeSettings[i].ModeId-@reminderInfoTypeSettings[j].ReminderInfoTypeId-@i">
+                                            是</label>
+                                    </li>
+                                    <li>
+                                        @Html.RadioButton("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].IsRepeated", false, !reminderInfoTypeSettings[j].IsRepeated, new { id = notRepeated, dataId = isRepeated })
+                                        <label for="notRepeated-@Model.ReminderModeSettings[i].ModeId-@reminderInfoTypeSettings[j].ReminderInfoTypeId-@i">
+                                            否</label>
+                                    </li>
+                                </ul>
+                            </div>                                
+                            <div class="tn-form-row" id="@isRepeated-1" @if (!reminderInfoTypeSettings[j].IsRepeated)
+                                                                        {<text>style="display:none"</text>}>
+                                <label class="tn-form-label">
+                                    重复提醒间隔：</label>
+                                @Html.TextBox("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].RepeatInterval", reminderInfoTypeSettings[j].RepeatInterval / 60, new { @class = "tn-textbox tn-border-gray  tn-input-short digits required {min:1}" })
+                                小时
+                                @Html.ValidationMessage("ReminderModeSettings[" + i + "].ReminderInfoTypeSettingses[" + j + "].RepeatInterval")
+                            </div>
+                                                                                          }
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    <strong>接受提醒的用户角色：</strong></label>
+                                <ul class="tnc-role-select">
+                                    <li>
+                                        <input type="checkbox" id="all-users-@i" data-id="@i" value="@RoleNames.Instance().RegisteredUsers()" name="ReminderModeSettings[@i].AllowedUserRoleNames" @if (Model.ReminderModeSettings[i].AllowedUserRoleNames.Contains(RoleNames.Instance().RegisteredUsers()))
+                                                                                                                           {<text>checked="checked"</text>} /><label for="all-users-@i">所有用户</label></li>
+                                    @foreach (var role in roles)
+                                    {   <li>
+                                        @Html.SipmleCheckBox("ReminderModeSettings[" + i + "].AllowedUserRoleNames", role.RoleName, Model.ReminderModeSettings[i].AllowedUserRoleNames.Contains(role.RoleName), new { id = "role-" + role.RoleName + i, dataId = i })
+                                        <label for="role-@role.RoleName@i">@role.FriendlyRoleName</label>
+                                    </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        <div class="tn-form-row tn-form-row-button">
+                            <label class="tn-form-label">&nbsp;</label>
+                            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType)
+    }
+    $(function () {
+        $("input[type='checkbox'][id^='select-all-']").click(function () {
+            var dataId = $(this).data("id");
+            var $this = this;
+            var items = $("input[type='checkbox'][id^='reminderInfoType-'][id$='" + dataId + "']");
+            for (var i = 0; i < items.length; i++) {
+                items[i].checked = $this.checked;
+            }
+        });
+
+        $("input[type='checkbox'][id^='all-users-']").click(function () {
+            var dataId = $(this).data("id");
+            var items = $("input[type='checkbox'][id^='role-'][id$='" + dataId + "']");
+            for (var i = 0; i < items.length; i++) {
+                $(items[i]).attr("checked", false);
+            }
+        });
+
+        $("input[type='checkbox'][id^='role-']").click(function () {
+            var dataId = $(this).attr("dataid");
+            $("input[type='checkbox'][id^='all-users-'][id$='" + dataId + "']").attr("checked", false);
+        });
+
+        $("input[type='radio'][id^='isRepeated-']").click(function () {
+            var id = $(this).attr("id");
+            $("div#" + id + "-1").show();
+        });
+        $("input[type='radio'][id^='notRepeated-']").click(function () {
+            var id = $(this).attr("dataid");
+            $("div#" + id + "-1").hide();
+        });
+    });
+</script>

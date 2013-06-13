@@ -1,0 +1,446 @@
+﻿@model PagingDataSet<BarPost>
+@{
+    BarThread barThread = ViewData.Get<BarThread>("barThread", BarThread.New());
+
+    bool showBody = new Authorizer().BarThread_BodyShow(barThread.ThreadId);
+
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(barThread.TenantTypeId);
+
+    ViewData["TenantTypeId"] = barThread.TenantTypeId;
+
+    string content = string.Format("@{0} 的帖子 \"{1}\" {2} 很不错 推荐给大家看看", barThread.User.NickName, barThread.Subject,
+                                   SiteUrls.FullUrl(urlGetter.ThreadDetail(barThread.ThreadId)));
+    string url = null;
+    if (barThread.Attachments != null && barThread.Attachments.Count() > 0)
+    {
+        url = SiteUrls.Instance()._ShareToMicroblog(content, SiteUrls.Instance().ImageUrl(barThread.Attachments.FirstOrDefault(), TenantTypeIds.Instance().BarThread(), ImageSizeTypeKeys.Instance().Small()));
+    }
+    else
+    {
+        url = SiteUrls.Instance()._ShareToMicroblog(content);
+    }
+    IBarSettingsManager barSettingsManager = DIContainer.Resolve<IBarSettingsManager>();
+    BarSettings barSettings = barSettingsManager.Get();
+    Authorizer authorizer = new Authorizer();
+}
+@if (authorizer.IsAdministrator(BarConfig.Instance().ApplicationId) && (int)barThread.AuditStatus < (int)(new AuditService().GetPubliclyAuditStatus(BarConfig.Instance().ApplicationId)))
+{ 
+    <div class="tn-cue-highlight tn-corner-all tn-message-box" id="prompt">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right" id="hidespan"></a>
+        <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>当前帖子尚未通过审核，你可以<a href="@SiteUrls.Instance().BatchUpdateThreadAuditStatus(barThread.ThreadId, true)" id = "audit-success">通过审核</a>
+            @if (barThread.AuditStatus == AuditStatus.Pending)
+            {
+                @:或者
+                <a href="@SiteUrls.Instance().BatchUpdateThreadAuditStatus(barThread.ThreadId, false)" id = "audit-fail">不通过审核</a>  
+            }
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#hidespan").click(function (e) {
+                e.preventDefault();
+                $("#prompt").hide();
+            });
+
+            //通过审核
+            $("a[id^='audit-']").click(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    type: "Post",
+                    url: $(this).attr("href"),
+                    success: function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            $("#prompt").hide();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-topic-detail">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-detail">
+            <div class="spb-topic-header tn-helper-clearfix">
+                <div class="spb-smallbar-figure">
+                    @Html.ShowUserAvatar(barThread.User, urlGetter.UserSpaceHome(barThread.UserId), AvatarSizeType.Small, HyperLinkTarget._blank)
+                </div>
+                <div class="tn-info">
+                    @Html.LinkButton(barThread.PostCount + " 回复", "#reply", HighlightStyles.Default, htmlAttributes: new { @class = "tn-helper-right" })
+                    <div class="tn-text-heading">
+                        <span>@barThread.Subject</span>
+                        @if (barThread.IsSticky)
+                        {<span title="置顶" class="tn-icon-colorful tn-icon-colorful-top tn-icon-inline"></span>}
+                        @if (barThread.IsEssential)
+                        {<span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>}
+                    </div>
+                    <p class="tn-user-data">
+                        <span class="tn-context">
+                            @if (barThread.PrevThread != null)
+                            {
+                                @Html.Link("上一篇", urlGetter.ThreadDetail(barThread.PrevThreadId), barThread.PrevThread.Subject, new { @class = "tn-context-text" })
+                            }
+                            @if (barThread.NextThread != null)
+                            {
+                                @Html.Link("下一篇", urlGetter.ThreadDetail(barThread.NextThreadId), barThread.NextThread.Subject, new { @class = "tn-context-text" })    
+                            }
+                        </span>
+                        @Html.Link(barThread.Author, urlGetter.UserSpaceHome(barThread.UserId), barThread.Author, new { @class = "tn-user-name tn-secondary-text" })
+                        发表于：<em class="tn-date tn-text-note">@barThread.DateCreated.ToFriendlyDate()</em>
+                        <span class="tn-comment-count">浏览（@barThread.HitTimes）</span>
+                        @if (new Authorizer().BarThread_Edit(barThread.ThreadId))
+                        {
+                            <span class="tn-action tn-edit">
+                                @Html.Link("编辑", urlGetter.Edit(barThread.SectionId, barThread.ThreadId), "编辑", new { @class = "tn-action-text" })
+                            </span>
+                        }
+                        @if (new Authorizer().BarThread_Edit(barThread.ThreadId))
+                        {
+                            <span class="tn-action tn-action-text-icon-right"><a menu="#admin-set" class="tn-action-text"
+                                id="manage-bar" href="javascript:;"><span class="tn-icon tn-smallicon-triangle-down">
+                                </span>管理</a> </span>
+                        }
+                        <span class="tn-action tn-edit"><a class="tn-action-text" plugin="dialog" href="@url" >
+                            分享到微博 </a></span>
+                    </p>
+                    @if (new Authorizer().BarThread_Edit(barThread.ThreadId))
+                    {
+                        <div id="admin-set" style="display: none;" class="tn-more-options tn-widget-content tn-border-gray">
+                            <ul class="tn-more-list">
+                                @if (new Authorizer().BarSection_Manage(barThread.SectionId))
+                                {
+                                    <li>
+                                        @if (barThread.IsSticky)
+                                        {
+                                            @Html.Link("取消置顶", string.Empty, "取消置顶", new { @class = "tn-item-link", link = SiteUrls.Instance().BatchSetStickyForSection(false, DateTime.UtcNow, barThread.ThreadId), id = "Set_Item_StickyDate" })   
+                                        }
+                                        else
+                                        {
+                                            @Html.Link("置顶", string.Empty, "置顶", new { @class = "tn-item-link", link = SiteUrls.Instance()._SetStickyDate(barThread.ThreadId, false), id = "art_dialog_SetStickyDate" })   
+                                        }
+                                    </li>
+                                    <li>
+                                        @if (barThread.IsEssential)
+                                        {
+                                            @Html.Link("取消加精", string.Empty, "取消加精", new { @class = "tn-item-link", link = SiteUrls.Instance().BatchSetEssentialForSection(barThread.SectionId, false, barThread.ThreadId), id = "Set_Item_Essential" })
+                                        }
+                                        else
+                                        {
+                                            @Html.Link("加精", string.Empty, "加精", new { @class = "tn-item-link", link = SiteUrls.Instance().BatchSetEssentialForSection(barThread.SectionId, true, barThread.ThreadId), id = "Set_Item_Essential" })
+                                        }
+                                    </li>
+                                }
+                                @if (ViewData.Get<bool>("ShowMove", true) && new Authorizer().IsAdministrator(BarConfig.Instance().ApplicationId))
+                                {
+                                    <li>
+                                        @Html.Link("移动", string.Empty, "移动", new { @class = "tn-item-link", link = SiteUrls.Instance()._MoveThread(barThread.ThreadId), id = "art_dialog_MoveThread" })
+                                    </li>
+                                }
+                                <li>
+                                    @Html.Link("删除", string.Empty, "删除", new { @class = "tn-item-link", link = SiteUrls.Instance().DeleteThread(barThread.ThreadId), id = "deleteThread" })
+                                </li>
+                                @if (ViewData.Get<bool>("ShowRecommend", true) && new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BarThread()))
+                                { 
+                                    <li>
+                                        @Html.Link("推荐", SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().BarThread(), barThread.ThreadId, barThread.Subject, userId: barThread.UserId), "推荐该帖子", new { plugin = "dialog", @class = "tn-item-link" })
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (showBody)
+            {
+                <div class="tn-detail-text">
+                    @Html.DisplayHtmlEditorContent(TenantTypeIds.Instance().BarThread(), barThread.GetResolvedBody(), 695)
+                </div>
+            }
+            else
+            {
+                <div class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+                    <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+                    <div class="tn-helper-flowfix">
+                        <strong>提示：</strong>当前帖子需要回复才能浏览@(Html.Raw(UserContext.CurrentUser == null ? "，您还没有登录请 " + Html.Link("登录", SiteUrls.Instance().Login(true), "登录") + " 后进行回复" : "，您最近没有" + Html.Link("回复", "#quitpost", "回复", new { id = "btn-quit-comment" }) + "过该帖子哦"))</div>
+                </div>
+            }
+            @if (showBody)
+            {
+                @Html.Action("_ListAttachement", "Channel", new { area = "common", teantTypeId = TenantTypeIds.Instance().BarThread(), threadId = barThread.ThreadId })
+            }
+            @Html.AjaxAction("_ListBarRatings", "Bar", new { threadId = barThread.ThreadId })
+            @if (showBody)
+            {
+                <div id="_BarRating_Action" class="tn-border-gray tn-border-top tn-helper-clearfix tn-feedback">
+                    @Html.ShareToThird()
+                    <div class="tn-actions">
+                        @if (new Authorizer().BarRating(barThread.ThreadId) && ViewData.Get<bool>("EnableRating", true))
+                        {
+                            @Html.LinkButton("评分", SiteUrls.Instance()._CreatBarRating(barThread.ThreadId), HighlightStyles.Default, ButtonSizes.Default, htmlAttributes: new { plugin = "dialog", id = "dialog-barRating" })
+                        }
+                        <a class="tn-button tn-corner-all tn-button-text-only tn-button-default tn-button-hollow" href="@SiteUrls.Instance()._ImpeachReport(barThread.UserId, SiteUrls.Instance().ThreadDetail(barThread.ThreadId), StringUtility.Trim(barThread.Subject, 55))" plugin="dialog">
+                            <span class="tn-button-text">举报</span></a>
+                    </div>
+                </div>
+            }
+            <div class="tn-border-gray tn-border-top tn-content-nav">
+                @if (barThread.Category != null)
+                {
+                    <div class="tn-info-part tn-sort-vest">
+                        <dl>
+                            <dt>分类：</dt>
+                            <dd>@Html.Link(barThread.Category.CategoryName, urlGetter.SectionDetail(barThread.SectionId, categoryId: barThread.CategoryId), barThread.Category.CategoryName, new { @class = "" })</dd>
+                        </dl>
+                    </div>
+                }
+                @if (barThread.TagNames != null && barThread.TagNames.Count() > 0)
+                {
+                    <div class="tn-info-part tn-tags-vest">
+                        <dl>
+                            <dt>标签：</dt>
+                            <dd>
+                                @foreach (var item in barThread.TagNames)
+                                {
+                                    @Html.Link(item, urlGetter.ListByTag(item, barThread.SectionId), item, new { @class = "" })
+                                }</dd>
+                        </dl>
+                    </div>
+                }
+            </div>
+            <a name="reply"></a>
+            @if (barThread.TenantTypeId == TenantTypeIds.Instance().Group())
+            { 
+                @Html.AdvertisingPosition("13101100004")
+            }
+            else
+            { 
+                @Html.AdvertisingPosition("10101200006")
+            }
+            <div class="spb-bar-comment">
+                <div class="tn-bg-gray spb-barcomment-title tn-helper-clearfix">
+                    <div class="tn-title">
+                        <span class="tn-selected"><a id="barpost-Filter-all" href="@urlGetter.ThreadDetail(barThread.ThreadId)">
+                            全部</a></span><span class="tn-spacer tn-text-note">|</span><span><a id="barpost-Filter-onlyLandlord" href="@urlGetter.ThreadDetail(barThread.ThreadId, true)">仅看楼主</a></span><span
+                                class="tn-spacer tn-text-note">|</span><span><a id="barpost-Filter-Desc" href="@urlGetter.ThreadDetail(barThread.ThreadId, sortBy: SortBy_BarPost.DateCreated_Desc)">倒序看帖</a></span>
+                    </div>
+                    @if (new Authorizer().BarPost_Create(barThread.SectionId))
+                    {
+                        <div class="tn-reply">
+                            @Html.LinkButton("回复", "#quitpost", HighlightStyles.Primary, ButtonSizes.Default, IconTypes.SmallWrite, htmlAttributes: new { id = "btn-quit-comment" })
+                        </div>
+                    }
+                </div>
+                @{
+                    ViewData["ReAnchor"] = true;
+                }
+                @Html.Partial("~/Applications/Bar/Views/Bar/_ListPost.cshtml", Model)
+                @if (new Authorizer().BarPost_Create(barThread.SectionId))
+                {
+                    <a name="quitpost"></a>
+                    using (Html.BeginAjaxForm("EditPost", "Bar", new { area = "Bar", threadId = 0 }, FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "postOnErrorCallBack", OnSuccessCallBack = "postOnSuccessCallBack", ClearForm = true }, new { ulfor = "comments-parent-0" }))
+                    {            
+                    <div class="tn-comment-form tn-comment-expand spb-topic-reply">
+                        <div class="tn-comment-form-head">
+                            <strong>发表回帖</strong>
+                        </div>
+                        <div class="tn-comment-text-wrap">
+                            <div class="tn-comment-form-avatar">
+                                @Html.ShowUserAvatar(UserContext.CurrentUser, AvatarSizeType.Small, false)
+                            </div>
+                            <div class="tn-comment-text-inner tn-border-gray tn-commet-textarea">
+                                @Html.TextArea("MultilineBody", new { maxlength = barSettings.PostBodyMaxLength, @class = "tn-comment-text-area required", plugin = "ShortcutSubmit", id = "quit-comment" })
+                            </div>
+                        </div>
+                        <div class="tn-comment-form-act tn-helper-clearfix">
+                            @Html.EmotionSelector()
+                            @* <span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-at"></span>
+                               <a id="atFriendquit-comment" class="tn-action-text" style="line-height: 0;" href="javascript:void(0)">
+                                    朋友</a> </span>
+                            @Html.AtUser("#quit-comment", "#atFriendquit-comment")*@
+                            @Html.AtUser("#quit-comment") <span class="tn-count tn-text-note" id="subjectCount-comment-textCount">
+                                0/@barSettings.PostBodyMaxLength</span>
+                            @Html.Link("高级模式", urlGetter.EditPost(barThread.ThreadId), "高级模式", new { id = "EditPostLink" })
+                            @Html.Button("回复", ButtonTypes.Submit, HighlightStyles.Primary)
+                        </div>
+                    </div>
+                    @Html.Hidden("ThreadId", barThread.ThreadId)
+                    @Html.Hidden("ParentId", 0)
+    
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@if (showBody)
+{
+    <script type="text/javascript" language="javascript">
+        //评论提交成功的回调函数
+        function postOnSuccessCallBack(data, status, webStatus, form) {
+            if (data.auditStatus) { art.dialog.tips(data.auditStatus.MessageContent, 2, data.auditStatus.MessageType); }
+
+            $.get("@SiteUrls.Instance()._BarPost()" + "?postId=" + data.PostId, function (data) {
+                $("ul[id='" + form.attr("ulfor") + "']:last").append(data);
+                form.find("[id^='subjectCount']").html("0/");
+                form.find("textarea:first").focusEnd();
+                if ($("#" + form.attr("ulfor")).next().is(".tn-no-data")) {
+                    $("#" + form.attr("ulfor")).next().remove();
+                }
+            });
+        }
+    </script>
+}
+else
+{
+    <script type="text/javascript" language="javascript">
+        //评论提交成功的回调函数
+        function postOnSuccessCallBack(data, status, webStatus, form) {
+            location.replace("@Request.Url.PathAndQuery");
+        }
+    </script>
+}
+@{
+    int tradePoints = UserContext.CurrentUser == null ? 0 : UserContext.CurrentUser.TradePoints;
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+
+        $("#EditPostLink").click(function(e){
+            e.preventDefault();
+            $("<form Method='GET' action='"
+                +$(this).attr("href")
+                +"'><input name='threadId' value='"
+                +@barThread.ThreadId
+                +"'><textarea name='MultilineBody'>"
+                +$("#quit-comment").val()
+                +"</textarea></form>").hide().appendTo("body").submit();
+        });
+
+        //快捷回复按钮
+        $("a#btn-quit-comment").click(function (e) {
+            window.location.href = $(this).attr("href");
+            $("#quit-comment").css("background-color","#FFFBDE");
+            setTimeout(function(){ $("#quit-comment").removeAttr("style") },1000);
+            $("#quit-comment").click().focusEnd();
+            return false;
+        });
+
+        //一级快速回复的截字
+        $("#quit-comment").GetTextCount('subjectCount-comment-textCount', @barSettings.PostBodyMaxLength, true, true);
+
+        //一级回复的水印
+        $("#quit-comment").watermark('请输入回复');
+
+        //移动标签的点击
+        $("a[id^='MoveThread_Category_']").live("click", function (e) {
+            e.preventDefault();
+            $link = $(this);
+            $.get($link.attr("href"), function (data) {
+                $("div#div_MoveThread").replaceWith(data);
+            });
+        });
+
+        //评分的内容
+        //        $.get("@SiteUrls.Instance()._ListBarRatings(barThread.ThreadId)",function(data){
+        //            $("div#_BarRating_Action").before(data);
+        //        });
+
+        //三级回复的脚本
+        $("a[id^='three-level-post-']").live('click', function (e) {
+            $link = $(this);
+            $textarea = $(this).parents(".tn-replies").find("textarea");
+            $textarea.val("@@" + $link.attr("foruser") + " " + $textarea.val().replace(/@@[^' ']*? /g, ""));
+            $textarea.click().focusEnd();
+            e.stopImmediatePropagation();
+        });
+
+        //模式框显示
+        $("a[id^='art_dialog_']").click(function () {
+            $("#admin-set").hide();
+            $link = $(this);
+            var dialog = art.dialog({ id: "tunynet-dialog", title: false });
+            $.get($link.attr("link"), function (data) {
+                dialog.content(data);
+            });
+        });
+
+        //加精/取消加精/取消置顶的操作
+        $("a[id^='Set_Item_']").click(function () {
+            $("#admin-set").hide();
+            $link = $(this);
+            $.ajax({
+                type: "POST",
+                url: $link.attr("link"),
+                success: function (data) {
+                    window.location.href = "#";
+                    window.location.reload();
+                }
+            });
+        });
+
+        //删除的操作
+        $("a#deleteThread").click(function () {
+            $("#admin-set").hide();
+            $link = $(this);
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.ajax({
+                    type: "POST",
+                    url: $link.attr("link"),
+                    success: function (data) {
+                        if (data.MessageType == -1) {
+                            alert(data.MessageContent, function () { window.location.href = "@urlGetter.SectionDetail(barThread.SectionId)"; });
+                        } else {
+                            window.location.href = "@(@urlGetter.SectionDetail(barThread.SectionId))";
+                        }
+                    },
+                    error: function (data) {
+                        data = $.parseJSON(data.responseText);
+                        alert(data.MessageContent);
+                    }
+                });
+            });
+        });
+
+        //点击倒序看帖，仅看楼主，全部的时候
+        $("a[id^='barpost-Filter-']").click(function (e) {
+            e.preventDefault();
+            $(this).parents(".tn-title").children().removeClass("tn-selected");
+            $(this).parent().addClass("tn-selected");
+            $("#posts-paging-postParentId-0").replaceWith("<div id=\"posts-paging-postParentId-0\"><div class=\"tn-loading\"></div><div>");
+            $.get($(this).attr("href"), function (data) {
+                $("#posts-paging-postParentId-0").replaceWith(data);
+            });
+        });
+
+        //点击回帖的回复的时候
+        $("a[id^='barpost-id']").live("click", function (e) {
+            e.preventDefault();
+            var $linkA = $(this);
+            var $tnicon = $(this).find(".tn-icon");
+            $tnicon.toggleClass("tn-smallicon-triangle-down");
+            $tnicon.toggleClass("tn-smallicon-triangle-up");
+            $parent = $(this).parents("li");
+            $replies = $parent.find(".tn-replies")
+            if (!$replies.children().length) {
+                $.get($linkA.attr("href"), function (data) {
+                    $replies.html(data);
+                });
+            } else {
+                $replies.slideToggle("fast");
+            }
+        });
+    });
+
+
+
+    //评论提交失败的回调函数
+    function postOnErrorCallBack(data) {
+        if (!data.MessageContent) {
+            data = $.parseJSON(data);
+        }
+        alert(data.MessageContent);
+    }
+</script>

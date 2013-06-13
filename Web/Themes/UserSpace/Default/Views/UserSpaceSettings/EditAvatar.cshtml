@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "_UserSpaceSettings";
+    ViewData["UserSettingsMenu"] = UserSettingsMenu.UserAvatar;
+}
+@section Aside
+{
+    @Html.Partial("_UserSettingsMenus", ViewData)
+}
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-form-info">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-eidtavatar">
+		    <div class="tn-main-heading tn-border-gray tn-border-bottom">
+				<h2>修改头像</h2>
+            </div>
+            @Html.Action("_EditUserProfileAvatar", new { spaceKey = Url.SpaceKey() })
+        </div>
+    </div>
+</div>

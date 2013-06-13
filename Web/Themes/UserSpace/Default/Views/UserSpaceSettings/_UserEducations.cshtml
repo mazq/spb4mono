@@ -1,0 +1,45 @@
+﻿@model IEnumerable<EducationExperience> 
+@{ 
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+}
+@Html.StatusMessage(statusMessageData)
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="tnc-experience-list tn-border-gray" id="UserEducations">
+        @foreach (var education in Model)
+        {
+            <div id="education_@(education.Id)" >
+                <div class="tn-item tn-bg-gray tn-border-gray">
+                    <div class="tn-actions">
+                        @Html.Link("修改", "javascript:;", "修改", htmlAttributes: new { @class = "tn-action", id = "UpdateEdu", onclick = "UserEducationInfoCallback(" + education.Id + ")" })
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确认要删除教育经历吗? &nbsp; &nbsp;").SetText("删除").SetTooltip("删除教育经历").SetDeleteTarget("#education_" + education.Id).SetUrl(SiteUrls.Instance().DeleteUserEducation(Url.SpaceKey(), education.Id)))
+                    </div>
+                    <div class="tn-row">
+                        <strong class="tn-school">@(education.School)</strong> <span class="tn-degree tn-text-note">
+                            @switch (education.Degree)
+                            {
+                                case DegreeType.PrimarySchool:
+                                @Html.Raw("小学"); break;
+                                case DegreeType.MiddleSchool:
+                                @Html.Raw("初中"); break;
+                                case DegreeType.HighSchool:
+                                @Html.Raw("高中"); break;
+                                case DegreeType.VocationalSchool:
+                                @Html.Raw("中专/技校"); break;
+                                case DegreeType.CommunityCollege:
+                                @Html.Raw("大专"); break;
+                                case DegreeType.Undergraduate:
+                                @Html.Raw("本科"); break;
+                                case DegreeType.Master:
+                                @Html.Raw("硕士"); break;
+                                case DegreeType.Doctor:
+                                @Html.Raw("博士"); break;
+                                default:@Html.Raw("本科"); break;
+                            }
+                        </span><em class="tn-date tn-text-note">@(education.StartYear)</em> <span class="tn-fieldofstudy tn-text-note">@(education.Department)</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

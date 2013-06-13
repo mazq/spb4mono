@@ -1,0 +1,17 @@
+﻿@model IEnumerable<ApplicationStatisticData>
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            数据统计</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-side-menu tnc-operation">
+            @foreach (var data in Model)
+            {
+
+                <li>@data.Name : @data.Value</li>
+            }
+        </ul>
+    </div>
+</div>

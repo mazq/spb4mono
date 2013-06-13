@@ -1,0 +1,28 @@
+﻿@{
+    Layout = "Common";
+}
+<div class="spb-step-1">
+    <div class="spb-step-slide spb-bg">
+        <ul>
+            <li class="spb-step-slide-1 spb-selected">环境检测</li>
+            <li class="spb-step-slide-2">数据安装</li>
+            <li class="spb-step-slide-3">完成安装</li>
+        </ul>
+    </div>
+    <div class="spb-detections-wrap spb-loading" id="loading">
+    </div>
+</div>
+@section Footer{
+    <div class="spb-ft">
+        <a href="@Url.Action("Start", "Install")" class="spb-btn">上一步</a> <a id="reTested" href="@Url.Action("Step1_EnvironmentCheck", "Install")" class="spb-btn" style="display:none;">
+            重新检测</a><a id="next" href="javascript:;" class="spb-btn">下一步</a>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajaxSetup({ cache: false });
+        $('#loading').load('@(Url.Action("_Step1_EnvironmentCheck", "Install"))', function () {
+            $('#loading').removeClass("spb-loading");
+        });
+    });
+</script>

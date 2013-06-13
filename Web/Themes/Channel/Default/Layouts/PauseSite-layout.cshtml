@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<body id="@Html.GenerateBodyId()" class="tn-page-bg @Html.GenerateBodyAppCssClass()">
+    <div id="tn-doc" class="tn-doc-bg">
+        <div id="tn-header" class="tn-header-bg">
+            <div class="tn-wrapper">
+                @Html.Action("PausePageHeader", "Channel", new { area = "Common" })
+            </div>
+        </div>
+        <div id="tn-content" class="tn-content-bg">
+            <div class="tn-wrapper">
+                
+                <div class="tn-grid">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+        <div id="tn-footer" class="tn-footer-bg">
+            <div class="tn-wrapper">
+                @Html.Action("_Footer", "Channel", new { area = "Common" })
+            </div>
+        </div>
+    </div>
+</body>
+</html>

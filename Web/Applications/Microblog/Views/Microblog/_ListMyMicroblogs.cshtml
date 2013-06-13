@@ -1,0 +1,5 @@
+﻿@model PagingDataSet<long>
+@foreach (var id in Model)
+{
+    @Html.Action("_Microblog", "MicroblogActivity", new RouteValueDictionary { { "microblogId", id } })
+}

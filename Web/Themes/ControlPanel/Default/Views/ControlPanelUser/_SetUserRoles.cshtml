@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Role>
+@{
+    string returnUrl = ViewData["returnUrl"] as string;
+    long userId = ViewData.Get<long>("userId", 0);
+    string userName = ViewData.Get("userName",string.Empty);
+    IEnumerable<Role> userRoles = ViewData["UserRoles"] as IEnumerable<Role>;
+    StatusMessageData statusMessageData = ViewData["statusMessageData"] as StatusMessageData;
+}
+<div id="bannedDialog">
+    @Html.StatusMessage(statusMessageData)
+    @using (Html.BeginAjaxForm("UpdateUserRoles", "ControlPanelUser", new RouteValueDictionary { { "userId", userId }, { "returnUrl", returnUrl } }, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "success" }))
+    {
+
+        <div class="tnc-dailog-pd">
+            <div class="tnc-select-checkbox tn-helper-clearfix">
+                <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                    请在以下角色中为@(userName)选择角色</div>
+                <div class="tn-role">
+                    @if (Model != null)
+                    {
+                        foreach (Role role in Model)
+                        {
+                            if (!role.ConnectToUser || !role.IsEnabled)
+                            {
+                                continue;
+                            }
+                            bool isCheck = false;
+                            if (userRoles.Contains(role))
+                            {
+                                isCheck = true;
+                            }
+                        <div class="tn-form-row">                         
+                            @Html.SipmleCheckBox("RoleName",role.RoleName, isCheck, new { @class = "tn-radiobutton", id = "Role_" + role.RoleName })
+                            <label class="tn-form-label" for="Role_@(role.RoleName)" title="@role.FriendlyRoleName">
+                                @StringUtility.Trim(role.FriendlyRoleName, 7)</label>
+                        </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+            @Html.Button("保存", ButtonTypes.Submit, HighlightStyles.Primary)
+            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+        </div>
+    }
+</div>
+<script type="text/dialog">
+    this.title("设置用户角色");
+</script>

@@ -1,0 +1,272 @@
+﻿@model PagingDataSet<Advertising>
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        @Html.AjaxAction("_AdvertisingRightMenu", "ControlPanelOperation")
+        
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>广告管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-search-adminform">
+                        @using (Html.BeginForm("ManageAdvertisings", "ControlPanelOperation", FormMethod.Get, new { id = "manageAdvertisngs" }))
+                        {
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    投放区域：</label>
+                                @Html.DropDownList("presentAreaKey", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    广告位：</label>
+                                @Html.DropDownList("positionId", null, "不限", new { @class = "tn-dropdownlist tn-input-medium" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    有效期：</label>
+                                @Html.DatePicker("startDate", Request.QueryString.Get<DateTime>("startDate"), "-5Y", "+5Y")
+                                到
+                                @Html.DatePicker("endDate", Request.QueryString.Get<DateTime>("endDate"), "-5Y", "+5Y")
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否过期：</label>
+                                @Html.DropDownList("isExpired", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    是否启用：</label>
+                                @Html.DropDownList("isEnable", null, "不限", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row tn-form-row-button">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { @class = "tn-button-text" })
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加", SiteUrls.Instance().EditAdvertising(), iconType: IconTypes.SmallAdd, htmlAttributes: new { id = "create-advertising" })
+                            @Html.LinkButton("删除", SiteUrls.Instance()._DeleteAdvertisings(), iconType: IconTypes.SmallCross, htmlAttributes: new { id = "delete-advertisings" })
+                            @Html.LinkButton("启用", SiteUrls.Instance()._SetAdvertisingStatus(isEnable:true), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "change-advertisings-enabled" })
+                            @Html.LinkButton("禁用", SiteUrls.Instance()._SetAdvertisingStatus(isEnable:false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "change-advertisings-disabled" })
+                        </div>
+                    </div>
+                    @if (Model == null || Model.Count() == 0)
+                    { 
+                        <div class="tn-no-data">
+                            没有查询到数据！</div>
+                    }
+                    else
+                    { 
+                        <form action="#" method="post" id="Form-BatchSet">
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-width-check">
+                                        <input id="select-all" type="checkbox" />
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        广告名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        广告位
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        开始时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        截止时间
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        投放数量
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        是否启用
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        是否过期
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                </tr>
+                                @foreach (Advertising advertising in Model)
+                                {
+                                    <tr class="tn-table-grid-row" data-id="@(advertising.AdvertisingId)">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-check">
+                                            @Html.SipmleCheckBox("advertisingIds", advertising.AdvertisingId)
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            <span title="@advertising.Name">@StringUtility.Trim(advertising.Name, 20)</span>
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @if (advertising.AdvertisingsPositions.Count() == 0)
+                                            { 
+                                                <span>暂无</span>
+                                            }
+                                            else { 
+                                                <a href="@SiteUrls.Instance()._ShowAdvertisingDescriptions(advertising.AdvertisingId)" class="tnui-show-description" plugin="dialog">查看</a>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @advertising.StartDate
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                            @advertising.EndDate
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-number tn-nowrap">
+                                            @advertising.UseredPositionCount
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1 tn-nowrap">
+                                            @if (advertising.IsEnable)
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-pass" title="启用"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="tn-icon-colorful tn-icon-colorful-stop" title="不启用"></span>
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                            @if (advertising.EndDate < DateTime.Now)
+                                            {
+                                                @:是
+                                            }
+                                            else
+                                            { 
+                                                @:否
+                                            }
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("上移", SiteUrls.Instance().ChangeAdvertisingOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("下移", SiteUrls.Instance().ChangeAdvertisingOrder(), "下移", new { @class = "tn-icon tn-smallicon-download" })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap   ">
+                                            @Html.Link("编辑", SiteUrls.Instance().EditAdvertising(advertising.AdvertisingId), "编辑该广告")
+                                            @if (advertising.IsEnable)
+                                            {
+                                                @Html.Link("禁用", SiteUrls.Instance()._SetAdvertisingStatus(advertising.AdvertisingId, false), "禁用该广告", new { id = "set-audit-disable" })
+                                            }
+                                            else
+                                            { 
+                                                @Html.Link("启用", SiteUrls.Instance()._SetAdvertisingStatus(advertising.AdvertisingId, true), "启用该广告", new { id = "set-audit-enable" })
+                                            }
+                                            @Html.Link("删除", SiteUrls.Instance()._DeleteAdvertisings(advertising.AdvertisingId), "删除该广告", new { @class = "tnui-delete-advertising" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        </form>                    
+                        <div class="tn-pagination">
+                            @Html.PageSizeDropdownList("pageSize")
+                            @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+                            @Html.PagingResults(Model)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+
+        //处理火狐下刷新后单选框和单选钮仍然选中问题
+        if ($.browser.mozilla) {
+            $("input[type='radio']").attr("autocomplete", "off");
+            $("input[type='checkbox']").attr("autocomplete", "off");
+        }
+        
+        $("a[id^='set-audit-']").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            $.post(url, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    window.location.reload(true);
+                });
+            });
+        });
+
+        //单个删除
+        $(".tnui-delete-advertising").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm('你确认要删除吗？', function () {
+                $.post(url, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        window.location.reload(true);
+                    });
+                });
+            });
+        });
+
+        //批量删除
+        $("#delete-advertisings").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='advertisingIds']:checked").length) {
+                art.dialog.alert("请至少选择一个广告操作！");
+                return false;
+            }
+            var url = $(this).attr("href");
+            art.dialog.confirm('你确认要删除吗？', function () {
+                $.post(url, $("form#Form-BatchSet").serialize(), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        window.location.reload(true);
+                    });
+                });
+            });
+        });
+
+        //批量启用/禁用
+        $("a[id^=change-advertisings-]").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='advertisingIds']:checked").length) {
+                art.dialog.alert("请至少选择一个广告操作！");
+                return false;
+            }
+            var url = $(this).attr("href");
+            var data = $("form#Form-BatchSet").serialize();
+            $.post(url, data, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    window.location.reload(true);
+                });
+            });
+        });
+
+
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //全选按钮
+        $("input#select-all").click(function () {
+            checkAll(this, "advertisingIds");
+        });
+
+        $("#presentAreaKey").change(function () {
+            $("form#manageAdvertisngs").submit();
+        });
+    });
+</script>

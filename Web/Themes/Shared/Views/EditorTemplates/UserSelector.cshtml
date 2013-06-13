@@ -1,0 +1,61 @@
+﻿@{
+    string controlName = ViewData.Get<string>("controlName", "userSelector");
+    int selectionLimit = ViewData.Get<int>("selectionLimit", 10);
+    string getMyFollowedUsersUrl = SiteUrls.Instance().GetMyFollowedUsers();
+    UserSelectorSearchScope searchScope = ViewData.Get<UserSelectorSearchScope>("searchScope", UserSelectorSearchScope.FollowedUser);
+    string searchUsersUrl = SiteUrls.Instance().SearchUsers(searchScope);
+    string followGroups = ViewData.Get<string>("followGroups", "[]");
+    string selectedUsers = ViewData.Get<string>("selectedUsers", "[]");
+    string selectionAddedCallBack = ViewData.Get<string>("selectionAddedCallBack", string.Empty);
+    bool showDropDownMenu = ViewData.Get<bool>("showDropDownMenu", true);
+    string widthClass = ViewData.Get<string>("widthClass", string.Empty);
+    string containerClass = string.Empty;
+    if (showDropDownMenu)
+    {
+        containerClass = " tn-expand-has-icon";
+    }
+}
+<div class="tn-expand-control tn-user-selector @containerClass">
+    <input id="@controlName" value="" />
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#@controlName").autoSuggest("@searchUsersUrl",
+        {   asHtmlID: "@controlName",
+        @if (searchScope == UserSelectorSearchScope.FollowedUser)
+        {
+            @: startText: "输入用户名称",
+        }
+            
+            defaultCategory:"所有分组",
+            buttonText: "确定",
+            limitTextPattern: "最多只能添加{0}个用户",
+            remainTextPattern: "还可以选择{0}个用户",
+            selectionLimit: @(selectionLimit),
+            preFill: @Html.Raw(selectedUsers),
+             @if (showDropDownMenu)
+             {
+                @:allSelectData: "@getMyFollowedUsersUrl",
+             }
+            categoryData: @Html.Raw(followGroups),
+            selectedItemProp: "displayName",
+            selectedValuesProp: "userId",
+            searchObjProps: "displayName,trueName,nickName,noteName,userName",
+            widthClass:"@Html.Raw(widthClass)",
+            formatList: function(data, elem) {
+            var noteNameHtml="";
+            if(data.noteName&&data.noteName.length>0)
+            noteNameHtml="（<span class=\"tn-text-note\">"+data.noteName+"</span>）";
+            var new_elem = elem.html("<div class=\"tn-avatar-mini\"><img src=\"" + data.userAvatarUrl + "\" /></div><div class=\"tn-user-name-info\">"
+            + data.displayName + noteNameHtml+"</div>");
+            elem.removeClass("as-result-item").addClass("ui-corner-project ui-menu-item tn-widget tn-widget-content tn-border-gray tn-border-rbl tn-helper-clearfix");
+                return new_elem;
+            }
+            @if (!string.IsNullOrEmpty(selectionAddedCallBack))
+            {
+            @:,selectionAdded: @selectionAddedCallBack
+            }
+        });
+    });
+   
+</script>

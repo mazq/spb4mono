@@ -1,0 +1,83 @@
+﻿@model LoginEditModel
+@{
+    string callBack = ViewData.Get<string>("CallBackName", "SuccessCallBack");
+    bool canRegister = ViewData.Get<bool>("CanRegister", true);
+    IEnumerable<AccountType> accountTypes = new AccountBindingService().GetAccountTypes(true);
+}
+<div class="tnc-dailog-pd">
+    <div class="tnc-login-pop">
+        @Html.StatusMessage()
+        @using (Html.BeginAjaxForm("LoginInModel", "Account", null, FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("LoginCallBack").SetDataType(AjaxDataType.Json), new { @class = "tn-helper-flowfix" }))
+        {
+            <div class="tn-form ">
+                <div class="tn-form-row tnc-user-name">
+                    @Html.TextBoxFor(n => n.UserName, InputWidthTypes.Long, new RouteValueDictionary { { "class", "tnc-watermark-color" } })
+                    <span class="tn-icon tn-icon-user tnc-login-icon"></span>
+                    @if (canRegister)
+                    {
+                        <span class="tn-join">@Html.Link("免费注册", SiteUrls.Instance().Register(Model.ReturnUrl), "免费注册", new { tabindex = "-1" })</span>
+                    }
+                    <div style="display: none">
+                        @Html.ValidationMessageFor(n => n.UserName)
+                    </div>
+                </div>
+                <div class="tn-form-row tnc-user-name">
+                    @Html.TextBoxFor(n => n.Password, InputWidthTypes.Long, new RouteValueDictionary { { "class", "tnc-watermark-color" }, { "type", "password" } })
+                    <span class="tn-icon tn-icon-key tnc-login-icon"></span><span class="tn-find-password">@Html.Link("找回密码", SiteUrls.Instance().FindPassword(), "找回密码", new { tabindex = "-1" })</span>
+                    <div style="display: none">
+                        @Html.ValidationMessageFor(n => n.Password)</div>
+                </div>
+                <div class="tn-form-row tn-form-row-button">
+                    <button class="tn-button tn-corner-all tn-button-text-only tn-button-large tn-button-primary"
+                        type="submit">
+                        <span class="tn-button-text">登录</span></button>
+                    <span class="tn-remember">
+                        @Html.CheckBoxFor(n => n.RememberPassword)
+                        @Html.LabelFor(n => n.RememberPassword)</span>
+                </div>
+                @Html.TextBoxFor(n => n.ReturnUrl, new { type = "hidden" })
+            </div>
+           if (accountTypes != null && accountTypes.Count() > 0)
+           {
+            <div class="tn-form tn-border-top tn-border-gray tnc-third-id">
+                <p class="tnc-third-title">
+                    使用第三方帐号登录</p>
+                @foreach (var accountType in accountTypes)
+                {     
+                    <a href="javascript:;" onclick="window.open('@SiteUrls.Instance().LoginToThird(accountType.AccountTypeKey)',
+                    'ThirdLogin', 'width=600,height=500,menubar=0,scrollbars=0, status=1,titlebar=0,toolbar=0,location=1');
+                    return false;">
+                        <img src="@SiteUrls.Instance().ThirdLoginButtonUrl(accountType.AccountTypeKey)"
+                alt="使用第三方帐号登录" /></a>
+                }
+            </div>   
+           }
+        }
+    </div>
+</div>
+<script type="text/dialog">
+    this.title("登录");
+</script>
+<script language="javascript" type="text/javascript">
+    //登录回调函数
+    function LoginCallBack(data) {
+        if (data.MessageType == 1) {
+            if (@callBack) {
+                @(callBack)();
+            }
+        } else {
+            art.dialog.tips(data.MessageContent, 2, data.MessageType, function () {
+                var returnUrl = encodeURIComponent(window.location.href);
+                if (window.location.href.indexOf("?returnUrl=")>0) {
+                    returnUrl = window.location.href.substring(window.location.href.indexOf("?returnUrl=")+11);
+                }
+                window.location.href = "@SiteUrls.Instance().Login()"+"?returnUrl="+returnUrl;
+            });
+        }
+    }
+
+    //默认的回调函数
+    function SuccessCallBack() {
+        window.location.reload();
+    }
+</script>

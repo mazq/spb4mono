@@ -1,0 +1,13 @@
+﻿@model AccountType
+<div class="tnc-dailog-pd">
+    还没有绑定@(Model.AccountTypeName())，点这里
+    @Html.Button("开始绑定", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { dialogOperation = "close", onclick = "startBind()" })
+</div>
+<script type="text/javascript">
+    function startBind() {
+        $("#sync_@(Model.AccountTypeKey)").data("isbind", true);
+        window.open('@SiteUrls.Instance().LoginToThird(Model.AccountTypeKey)', 'ThirdLogin',
+        'width=600,height=500,menubar=0,scrollbars=0, status=1,titlebar=0,toolbar=0,location=1');
+        return false;
+    }
+</script>

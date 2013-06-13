@@ -1,0 +1,7 @@
+﻿<div class="tn-form-row tnc-captcha">
+    <label for="CaptchaInputName" class="tn-form-label">
+        验证码：
+    </label>
+    @ViewData["CaptchaText"]
+    @Html.ValidationMessage("Captcha")
+</div>

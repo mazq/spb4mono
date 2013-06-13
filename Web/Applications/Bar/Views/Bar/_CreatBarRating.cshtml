@@ -1,0 +1,63 @@
+﻿@model BarRatingEditModel
+@if (!ViewData.Get<bool>("CanCreatBarRating", true))
+{
+    <script type="text/dialog">
+    this.close();
+    </script>
+    <script language="javascript" type="text/javascript">
+        alert("@(ViewData.Get<string>("ErrorMessage", "您可能没有权限发表评分"))");
+    </script>
+}
+else
+{
+    using (Html.BeginAjaxForm("_CreatBarRating", "Bar", FormMethod.Post, new AjaxFormOptions { OnErrorCallBack = "OnErrorCallBack", OnSuccessCallBack = "OnSuccessCallBack" }))
+    {
+    @Html.HiddenFor(n => n.ThreadId)
+    <div class="tnc-dailog-pd">
+        <div class="tn-form">
+            <div class="tn-form-row">
+                @Html.FormLabelFor(n => n.ReputationPoints)
+                @Html.DropDownListFor(n => n.ReputationPoints, null, new { @class = "tn-dropdownlist" })
+                
+            </div>
+			<div class="tn-form-row">
+			    @Html.FormLabelFor(n => n.RemainReputationPoints)
+                @Model.RemainReputationPoints
+			</div>
+            <div class="tn-form-row">
+                @Html.FormLabelFor(n => n.Reason)
+                @Html.TextBoxFor(n => n.Reason, InputWidthTypes.Medium)
+                <br />
+                @Html.ValidationMessageFor(n => n.Reason)
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-border-gray tn-border-top tn-bg-gray">
+        @Html.Button("确认", ButtonTypes.Submit, HighlightStyles.Primary)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogoperation = "close" })
+    </div>
+    }
+    <script type="text/dialog">
+    this.title("帖子评分");
+    </script>
+    <script language="javascript" type="text/javascript">
+        //提交成功的回调函数
+        function OnSuccessCallBack(data) {
+            $.get("@SiteUrls.Instance()._OneBarRating()",
+                { ratingId: data.BarRatingId },
+                function (barRating) {
+                    $("#bar-rating").append(barRating);
+                    $("#content-ranting-nodata").remove();
+                    $("#dialog-barRating").remove();
+                    $("#ajax-pagingbutton-bar-rating").show();
+                });
+        }
+
+        //提交失败的回调函数
+        function OnErrorCallBack(data) {
+            data = $.parseJSON(data);
+            alert(data.MessageContent);
+        }
+    </script>
+
+}

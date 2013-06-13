@@ -1,0 +1,109 @@
+﻿@model Dictionary<string,IEnumerable<UserReminderSettings>>
+@{
+    Layout = "_MessageCenter";
+    var isRepeated = string.Empty;
+    var notRepeated = string.Empty;
+    int count = ViewData.Get<int>("count", 0);
+    int k = 0;
+}
+@section Aside{
+    @Html.Action("_MessageCenter_Menu", "MessageCenter", new { subMenu = MessageCenterMenu.UserReminder })
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-request">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-letter-wrap">
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                提醒设置
+            </h2>
+            </div>
+            @if (Model == null || count==0)
+            { 
+                <div class="tn-no-data">尚未开放设置！</div>
+            }
+            else
+            {
+                using (Html.BeginAjaxForm("SaveUserReminderSettings", "MessageCenter", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "saveUserReminderSettings" }))
+                {
+                    <div class="tn-form tn-label-right tnc-reminder-settings">
+                        @for (int i = 0; i < Model.Keys.Count(); i++)
+                        {
+                            var userReminderSettings = Model[Model.Keys.ElementAt(i)].ToList();
+                            if (userReminderSettings.Count > 0)
+                            {
+                                <div class="tn-text-heading tn-border-gray tn-border-bottom">
+                                    <strong>
+                                        @ReminderMode.Get(int.Parse(Model.Keys.ElementAt(i))).ModeName
+                                    </strong>
+                                </div>
+                            
+                                for (int j = 0; j < userReminderSettings.Count; j++)
+                                {
+                                    int n = j + k;
+                                    var type = ReminderInfoType.Get(userReminderSettings[j].ReminderInfoTypeId);
+                                    <input type="hidden" name="userReminderSettings[@n].ReminderInfoTypeId" value="@userReminderSettings[j].ReminderInfoTypeId" />
+                                    <input type="hidden" name="userReminderSettings[@n].ReminderModeId" value="@userReminderSettings[j].ReminderModeId" />
+                                    <div class="tn-form-row">
+                                        <label class="tn-form-label"><strong>@type.TypeName：</strong></label>
+                                        @Html.SipmleCheckBox("userReminderSettings[" + n + "].IsEnabled", true, userReminderSettings[j].IsEnabled, new { id = "userReminderSettings-" + n })
+                                        <label for="userReminderSettings-@n">是否启用</label>
+                                    </div>
+                                    <div class="tn-form-row">
+                                        <label class="tn-form-label">
+                                            触发条件：</label>
+                                        @Html.TextBox("userReminderSettings[" + n + "].ReminderThreshold", userReminderSettings[j].ReminderThreshold, new { @class = "tn-textbox tn-border-gray  tn-input-short digits required {min:1}" }) 分钟内，未进行处理
+                                        @Html.ValidationMessage("userReminderSettings[" + n + "].ReminderThreshold")
+                                    </div>
+                                    <div class="tn-form-row">
+                                    <label class="tn-form-label">是否重复：</label>
+                                        @{
+                                        isRepeated = "isRepeated-" + Model.Keys.ElementAt(i) + "-" + userReminderSettings[j].ReminderInfoTypeId;
+                                        notRepeated = "notRepeated-" + Model.Keys.ElementAt(i) + "-" + userReminderSettings[j].ReminderInfoTypeId;
+                                        }                                                              
+                                        @Html.RadioButton("userReminderSettings[" + n + "].IsRepeated", true, userReminderSettings[j].IsRepeated, new { id = isRepeated })
+                                        <label for="isRepeated-@Model.Keys.ElementAt(i)-@userReminderSettings[j].ReminderInfoTypeId">是</label>
+                                        @Html.RadioButton("userReminderSettings[" + n + "].IsRepeated", false, !userReminderSettings[j].IsRepeated, new { id = notRepeated, dataId = isRepeated })
+                                        <label for="notRepeated-@Model.Keys.ElementAt(i)-@userReminderSettings[j].ReminderInfoTypeId">否</label>
+                                    </div>                                
+                                    <div class="tn-form-row" id="@isRepeated-1" @if (!userReminderSettings[j].IsRepeated)
+                                                                                {<text>style="display:none"</text>}>
+                                        <label class="tn-form-label">重复提醒间隔：</label>
+                                        @Html.TextBox("userReminderSettings[" + n + "].RepeatInterval", userReminderSettings[j].RepeatInterval/60, new { @class = "tn-textbox tn-border-gray  tn-input-short digits required {min:1}" }) 小时
+                                        @Html.ValidationMessage("userReminderSettings[" + n + "].RepeatInterval")
+                                    </div>
+                                    <input type="hidden" name="userReminderSettings[@n].UserId" value="@UserIdToUserNameDictionary.GetUserId(Url.SpaceKey())" />
+                                }
+                            }
+                            k = k + userReminderSettings.Count;
+                        }
+                        <div class="tn-form-row tn-form-row-button">
+                            <label class="tn-form-label">&nbsp;</label>
+                            @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "btnSave" })
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType)
+    }
+    $(function () {
+        //关闭火狐浏览器下radioButton和checkBox的自动完成。
+        if ($.browser.mozilla) {
+            $("input[type='radio']").attr("autocomplete", "off");
+            $("input[type='checkbox']").attr("autocomplete", "off");
+        }
+
+        $("input[type='radio'][id^='isRepeated-']").click(function () {
+            var id = $(this).attr("id");
+            $("div#" + id + "-1").show();
+        });
+        $("input[type='radio'][id^='notRepeated-']").click(function () {
+            var id = $(this).attr("dataid");
+            $("div#" + id + "-1").hide();
+        });
+    });
+</script>

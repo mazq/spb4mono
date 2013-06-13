@@ -1,0 +1,46 @@
+/* 
+Offical Style for Spacebuilder
+(c) 2007-2012 Tunynet Inc.
+*/ 
+
+/* Page Layout
+----------------------------------*/
+html { overflow-x:hidden;}
+#tn-content .tn-wrapper { width: 950px; margin: 0 auto; padding-top: 20px; }
+#tn-footer .tn-wrapper { width: 950px; margin: 0 auto; }
+
+/* Global navigation */
+.spb-top-menubar .tn-inner { width: 950px; margin: 0 auto 10px; }
+.spb-top-menubar .spb-user-menu { float: none; padding: 0 30px 0 0; height: 34px; width: auto; }
+.spb-top-menubar .spb-user-act,
+.spb-top-menubar .spb-sign-menu  { float: right; padding: 8px 0 0 20px; z-index: 20; *width: 180px; }
+.spb-top-menubar .tn-icon-menu { float: right; height: 20px; }
+.spb-top-menubar li.tn-icon-menu a.tn-icon { float: right; margin-bottom: 0; }
+.spb-top-menubar .spb-current-user { float: right; width: auto; position: relative; }
+.spb-top-menubar .spb-current-user .tn-user-name { line-height: 16px; margin: 0; padding: 4px 0 0; }
+.spb-top-menubar .spb-logo a { width: 170px; height:68px; }
+.spb-top-menubar .spb-menu { padding: 0 20px 19px; margin: 19px 0 0; z-index: 10; }
+.spb-top-menubar .spb-menu a { font-size: 16px; padding: 0 10px; line-height: 30px; }
+.spb-top-menubar .spb-sign-menu { float: right; padding: 8px 0 0 10px }
+.spb-top-menubar .tn-search-box { float: right; padding: 22px 20px 0 0; }
+
+/* Content Header */
+.tnc-content-header { margin-bottom: 20px; height: 81px; }
+.tnc-content-header .tn-section { height: 41px; }
+.tnc-content-header .tn-submenu-area { padding-left: 160px; }
+.tnc-content-header .tn-submenu-inner { padding: 0 0 0 20px; height: 40px; }
+.tnc-content-header .tn-submenu { height: 40px; border-width: 0; float: left; padding-right: 20px; }
+.tnc-content-header .tn-submenu li { float: left; border-width: 0; padding: 0; margin: 6px 0 0; }
+.tnc-content-header .tn-submenu .tn-submenu-link { font-size: 14px; float: left; display: block; padding: 0 8px 0 9px; }
+
+/* Box */
+.tn-box { border-width: 0; }
+.tn-box .tn-box-header { margin: 0; padding-bottom: 10px; border-width: 0; }
+
+/* Adjust the Layout UI elements
+----------------------------------*/
+.spb-layout-1 .spb-photo-waterfall .spb-photo-unit { width: 225px; }
+
+/* Footer */
+#tn-footer { padding: 10px 0 60px; }
+#tn-footer .tn-footer-legal { text-align: center; line-height: 25px; }

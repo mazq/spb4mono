@@ -1,0 +1,43 @@
+﻿@model BuyInviteCountEditModel
+@{
+    Layout = null;
+    int invitationCodeUnitPrice = (ViewData["InvitationCodeUnitPrice"] as int?) ?? 5;
+    //todo:bianchx by libsh,页面里不能用Service
+    IAuthenticationService authenticationService = DIContainer.ResolvePerHttpRequest<IAuthenticationService>();
+    IUser user = authenticationService.GetAuthenticatedUser();
+    int canBuyCount = invitationCodeUnitPrice <= 0 ? 0 : user.TradePoints / invitationCodeUnitPrice;
+}
+@using (Html.BeginAjaxForm("_BuyInviteCount", "Follow", new { }, FormMethod.Post, new AjaxFormOptions() { OnErrorCallBack = "_BuyInviteCountError", OnSuccessCallBack = "_BuyInviteCountSuccess" }, new { @class = "tn-helper-flowfix" }))
+{
+
+    <div class="tnc-dailog-pd">
+        <div class="tn-form">
+            <div class="tn-form-row">
+                @Html.LabelFor(n => n.invitationCodeCount)
+                @Html.TextBox("invitationCodeCount", Model.invitationCodeCount, new { @class = "tn-textbox tn-border-gray  tn-input-short" })
+                @Html.Button("购买", ButtonTypes.Submit)
+                @Html.ValidationMessageFor(n => n.invitationCodeCount)
+            </div>
+            <div class="tn-form-row">
+                <label class="tn-form-label" />
+                每个邀请配额需要花费<span class="tn-text-bright"> @invitationCodeUnitPrice </span>个金币
+                @if (invitationCodeUnitPrice != 0)
+                {
+                    <text> ，还可以购买 <span class="tn-text-bright">@canBuyCount </span>个邀请配额</text>
+                }
+            </div>
+        </div>
+    </div>
+}
+<script type="text/dialog">
+    this.title("购买邀请配额");
+</script>
+<script type="text/javascript" language="javascript">
+    function _BuyInviteCountError(data) {
+        art.dialog.tips("购买失败", 1.5, -1);
+    }
+    function _BuyInviteCountSuccess(data) {
+        window.location.reload();
+        //        art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+    }
+</script>

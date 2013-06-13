@@ -1,0 +1,56 @@
+﻿@{
+    int attachmentLength = ViewData.Get<int>("attachmentLength", 0);
+    long associateId = ViewData.Get<long>("associateId", 0);
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", string.Empty);
+    string allowedFileExtensions = ViewData.Get<string>("allowedFileExtensions", string.Empty).Replace("gif,", "").Replace("jpg,", "").Replace("jpeg,", "").Replace("png,", "").Replace("bmp,", "");   
+}
+<div class="tnc-dailog-pd" style="width: 560px; height: 358px;">
+    <div class="tnc-upload-btn">
+        <div class="tn-helper-clearfix">
+            @Html.Uploadify("uploadAttachmentManage", tenantTypeId, allowedFileExtensions: allowedFileExtensions, buttonOptions: new ButtonOptions().SetText("上传文件"), uploadFileOptions: new UploadFileOptions()
+                 .MergeUploadifyCallBack("onQueueComplete", "OnQueueComplete")
+                 .SetAutoUpload(true)
+                 .SetMultiple(true)
+                 .SetPreventCaching(true)
+                 .SetQueueId("queueManage")
+                 .SetQueueSizeLimit(6)
+                 .SetRemoveCompleted(true)
+                 .SetUploadLimit(100)
+                 .SetAssociateId(associateId)
+                 .MergeUploadifyFormData("CurrentUserIdToken", Utility.EncryptTokenForUploadfile(0.1, UserContext.CurrentUser.UserId))
+                 .MergeUploadifyFormData("resize", true)
+            )
+            <span class="tn-text-note">限制文件大小：@(attachmentLength)M;
+                <br />
+                @{ if (allowedFileExtensions.Length > 38)
+                   {
+                       allowedFileExtensions = string.Format("<p>{0}</p>", allowedFileExtensions);
+                   }
+                }
+                允许文件类型：@Html.Raw(allowedFileExtensions)
+            </span>
+        </div>
+        <div id="queueManage">
+        </div>
+    </div>
+    <div id="_ListAttachments" class="tnc-upload-attach">
+        @{
+            Html.RenderAction("_ListAttachments", new { tenantTypeId = tenantTypeId, associateId = associateId });
+        }
+    </div>
+</div>
+<div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+    @Html.Button("全部插入", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "insertEditAttachment", dialogOperation = "close" })
+    @Html.Button("关闭", ButtonTypes.Cancel, HighlightStyles.Secondary, htmlAttributes: new { id = "cancelEditAttachment", dialogOperation = "close" })
+</div>
+<script type="text/javascript">
+
+    function OnQueueComplete(queueData) {
+        $("#_ListAttachments").load('@Html.Raw(SiteUrls.Instance()._ListAttachments(tenantTypeId, associateId))', { date: new Date() });
+    }
+    $(document).ready(function () {
+        $("#insertEditAttachment").click(function () {
+            selectAttachments();
+        });
+    });
+</script>

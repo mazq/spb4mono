@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Navigation>
+@{
+    User user = ViewData.Get<User>("user", new User());
+    int currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+    bool isOwner = UserContext.CurrentUser != null && user.UserId == UserContext.CurrentUser.UserId;
+}
+<div class="tnc-user-nav-area">
+    <div class="tnc-user-nav-wrap">
+        <ul id="PoUserNav" class="tnc-user-nav tn-drop-menu">
+            @if (isOwner)
+            { 
+                <li class="@if (currentNavigationId.Equals(11000101))
+                           {@("tn-selected")} tnc-user-nav-item"><a class="tnc-user-nav-link" href="@SiteUrls.Instance().MyHome(Url.SpaceKey())">
+                               我的首页 </a></li>
+            }
+            @if (currentNavigationId == 11000102 || !isOwner)
+            {
+                <li class="@if (currentNavigationId.Equals(11000102))
+                           {@("tn-selected")} tnc-user-nav-item"><a class="tnc-user-nav-link" href="@SiteUrls.Instance().SpaceHome(Url.SpaceKey())">
+                               @if (isOwner)
+                               {
+                                   @("个人主页")
+                               }
+                               else
+                               {
+                                   @(user.Profile.ThirdPerson() + "的主页")
+                               }
+                           </a></li>
+            }
+            @if (currentNavigationId != 11000101)
+            {
+                <li class="@if (currentNavigationId == 11000103)
+                           { @("tn-selected ") }tnc-user-nav-item"><a class="tnc-user-nav-link" href="@SiteUrls.Instance().PersonalInformation(Url.SpaceKey())">
+                               @(user.Profile.ThirdPerson() + "的资料")
+                           </a></li>
+            }
+            @if (Model != null)
+            {
+                int count = 5;
+
+                for (int i = 0; i < Math.Min(count, Model.Count()); i++)
+                {
+                    var navigation = Model.ElementAt(i);
+                    if (!navigation.IsVisible(UserContext.CurrentUser))
+                    {
+                        continue;
+                    }
+                <li class="@if (navigation.IsCurrent(currentNavigationId))
+                           {@("tn-selected ")}tnc-user-nav-item"><a class="tnc-user-nav-link" href="@navigation.GetUrl(Url.SpaceKey())" target="@navigation.NavigationTarget">@(user.Profile.ThirdPerson() + "的" + navigation.Text)</a>
+                </li>
+                }
+                if (Model.Count() > count)
+                {
+                <li class="tnc-user-nav-item"><a href="javascript:;" class="tnc-user-nav-link">更多</a>
+                    @{var model = Model.Skip(count);}
+                    <ul class="tn-widget-content tn-corner-all">
+                        @foreach (var nav in model)
+                        {
+                            if (!nav.IsVisible(UserContext.CurrentUser))
+                            {
+                                continue;
+                            }          
+                            <li><a target="@nav.NavigationTarget" href="@nav.GetUrl(Url.SpaceKey())">@(user.Profile.ThirdPerson() + "的" + nav.Text)</a></li>                            
+                        }
+                    </ul>
+                </li>             
+                }
+
+            }
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function ($) {
+        $('#PoUserNav').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+    });
+</script>

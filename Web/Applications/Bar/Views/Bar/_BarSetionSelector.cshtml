@@ -1,0 +1,68 @@
+﻿@model BarSection
+@{
+    string name = ViewData.Get<string>("Name", "name");
+    long? categoryId = ViewData.Get<long?>("CategoryId", null);
+
+}
+<input type="hidden" name="@name" id="@name" value="@(Model == null ? null : Model.SectionId.ToString())" />
+<div class="tn-expand-control">
+    <input class="tn-textbox tn-border-gray  tn-input-medium" readonly="readonly" id="barSelector-@name" type="text" value="@(Model == null ? "" : Model.Name)" />
+    <a class="spb-plug-closebutton"  href="#" id="@name-del-button" style="@(Model == null ? "display:none" : ""); left: 115px; top: 5px;"  >
+        <span class="tn-icon tn-smallicon-cross"></span></a>
+    @Html.Action("_BarSetionSelectItem", "Bar", new { categoryId = categoryId, selectedSectionId = Model == null ? 0 : Model.SectionId, isHidden = true })</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+
+
+        //显示菜单
+        $("input#barSelector-@name").click(function () {
+            //            $("a#@name-del-button").css({ "left": "2px", "top": $(this).offset().top + "px" });
+            //$("div#barSectionSelector-Item-@name").css({ "left": $(this).offset().left + "px", "top": $(this).offset().top + $(this).height + "px" });
+            $("div#barSectionSelector-Item-@name").show();
+            if ($("input#@name").val() != "") {
+                $("a#@name-del-button").show();
+            }
+            $(document).bind("click", function (e) {
+                if ($(e.target).closest($("li[id^='li-BarSection-']")).length > 0) {
+                    if ($(e.target).is("li")) {
+                        $li = $(e.target);
+                    } else {
+                        $li = $(e.target).parents("li[id^='li-BarSection-']");
+                    }
+                    $("input#@name").val($li.find("input[valueType='sectionId']").first().val());
+                    $("input#barSelector-@name").val($li.find("input[valueType='sectionName']").first().val());
+                    $(e.target).parents("ul").first().find("li").removeClass("tn-selected");
+                    $(e.target).parents("ul").first().find("li").removeClass("tn-bg-deep");
+                    $(e.target).parents("ul").first().find("li").removeClass("tn-border-deep");
+                    $li.addClass("tn-bg-deep tn-border-deep tn-selected");
+                    $("#@name-del-button").show();
+                } else if ($(e.target).closest($("div#barSectionSelector-Item-@name")).length > 0 || $(e.target).is("#barSelector-SectionId")) {
+                    return;
+                } else if ($(e.target).closest($("input#barSelector-@name")).length > 0)
+                    return;
+                $(document).unbind("click", arguments.callee);
+                $("div#barSectionSelector-Item-@name").hide();
+                //                $("a#@name-del-button").hide();
+            });
+        });
+
+        //点击删除按钮的时候
+        $("#@name-del-button").click(function (e) {
+            e.preventDefault();
+            $(this).hide();
+            $("ul#section-selector-@name").find("li").removeClass("tn-selected tn-bg-deep tn-border-deep");
+            $("input#@name").val("");
+            $("input#barSelector-@name").val("");
+        });
+
+        //选择一个类别的时候
+        $("a[id^='SectionSelectItem-Category-']").live("click", function (e) {
+            e.preventDefault();
+            $link = $(this);
+            $.get($link.attr("href"), function (data) {
+                $("div#barSectionSelector-Item-@name").replaceWith(data);
+                //                $("div#barSectionSelector-Item-@name").css({ "left": $("input#barSelector-@name").offset().left + "px", "top": $("input#barSelector-@name").offset().top + $("input#barSelector-@name").height + "px" });
+            });
+        });
+    });
+</script>

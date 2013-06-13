@@ -1,0 +1,27 @@
+﻿@{
+    string menu = ViewData.Get<string>("menu", null);
+    IUser user = UserContext.CurrentUser;
+    int integrity = ViewData.Get<int>("integrity", 0);
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-set-menu">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-section">
+            <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>
+                    身份认证</h4>
+            </div>
+            <ul class="tn-side-menu">
+               <li @if (menu == "applyfor")
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }>
+                 <a class="tn-menu-text" href="@SiteUrls.Instance().UpdateIdentification(Url.SpaceKey())">申请认证</a>
+                </li>
+                <li @if (menu == "lookfor")
+                    { @Html.Raw("class=\"tn-selected tn-border-gray tn-bg-gray tn-corner-all\"");
+                    }>
+                 <a class="tn-menu-text" href="@SiteUrls.Instance().IdentificationResult(Url.SpaceKey())">我的认证</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

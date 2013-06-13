@@ -1,0 +1,13 @@
+﻿<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-settings-list">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+        <h3 class="tn-helper-reset">
+            便捷操作</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <ul class="tn-side-menu tnc-operation">
+            <li>@Html.Link("微博话题管理", SiteUrls.Instance().ManageMicroblogTopics(), "微博话题管理")</li>
+            <li>@Html.Link("话题分组管理", SiteUrls.Instance().ManageTopicGroups(), "话题分组管理")</li>
+            <li>@Html.Link("微博评论管理", SiteUrls.Instance().ManageComments(TenantTypeIds.Instance().Microblog()), "微博评论管理")</li>
+        </ul>
+    </div>
+</div>

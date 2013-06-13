@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<notices>
+    <notice templateName="NewAnswer">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a> 回答了问题 <a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>
+    </notice>
+    <notice templateName="NewAskComment">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a> 评论了问题 <a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a>
+    </notice>
+    <notice templateName="SetBestAnswer">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a> 为问题 <a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a> 采纳了满意回答
+    </notice>
+    <notice templateName="AskUser">
+        <a href="@Model.LeadingActorUrl" target="_blank">@Model.LeadingActor</a> 邀请您对问题 <a href="@Model.RelativeObjectUrl" target="_blank">@Model.RelativeObjectName</a> 进行解答
+    </notice>
+</notices>

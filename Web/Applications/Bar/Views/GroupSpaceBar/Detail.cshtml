@@ -1,0 +1,46 @@
+﻿@model PagingDataSet<BarPost>
+@{
+    Layout = "app-detail-2cols";
+
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 13101201;
+
+    ViewData["ShowMove"] = false;
+    ViewData["ShowRecommend"] = false;
+    var barThread = ViewData.Get<BarThread>("barThread", null);
+    var group = ViewData.Get<GroupEntity>("group", null);
+
+    bool showGroupLogo = TempData.Get<bool>("ShowGroupLogo", true);
+}
+@section Aside{
+    @Html.AjaxAction("_BarThreadSearch", "GroupSpaceBar", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_TagCloud", "GroupSpaceBar", new { spaceKey = Url.SpaceKey() })
+    @Html.AdvertisingPosition("13101100005")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-crumbs">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-breadcrumb tn-helper-clearfix">
+            @if (showGroupLogo)
+            { 
+            <div class="tn-avatar-mini">
+                <a href="@SiteUrls.Instance().GroupHome(group.GroupKey)" title="@group.GroupName">
+                    <img width="25" src="@SiteUrls.Instance().LogoUrl(group.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Small())"/></a>
+            </div>
+            <span class="tn-breadcrumb-item">
+            <a title="@group.GroupName" href="@SiteUrls.Instance().GroupHome(Url.SpaceKey())">@StringUtility.Trim(group.GroupName, 10)</a>
+            </span>
+            <span class="tn-seperator">&gt;</span>
+            }
+            <span class="tn-breadcrumb-item">
+            <a title="讨论" href="@SiteUrls.Instance().GroupSectionDetail(Url.SpaceKey())">讨论</a>
+            </span>
+            <span class="tn-seperator">&gt;</span>
+            <span class="tn-selected" title="@barThread.Subject">@StringUtility.Trim(barThread.Subject, 20)</span>
+        </div>
+    </div>
+</div>
+@Html.Partial("~/Applications/Bar/Views/Bar/_ThreadDetail.cshtml", Model)

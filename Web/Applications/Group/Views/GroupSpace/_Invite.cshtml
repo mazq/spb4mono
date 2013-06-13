@@ -1,0 +1,42 @@
+﻿@using (Html.BeginAjaxForm("_Invite", "GroupSpace", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+<div class="tnc-dailog-pd spb-group-invite">
+        <div class="tn-form tn-label-right">
+            <div class="tn-form-box">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>
+                            查找好友
+                        </th>
+                        <td>
+                            @Html.UserSelector("userIds",100,searchScope:UserSelectorSearchScope.FollowedUser,widthType:SelectorWidthType.Long)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            
+                        </th>
+                        <td>
+                            @Html.TextArea("remark", new { watermark = "想对好友说点什么？", @class = "tn-textbox tn-input-long tn-border-gray", maxlength="50",style="height:50px" })
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top">
+        @Html.Button("提交", ButtonTypes.Submit)
+        @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "close" })
+    </div>
+}
+<script type="text/dialog">
+    this.title("邀请好友");
+</script>
+<script type="text/javascript">
+    function OnSuccessCallBack(data)
+    {
+        art.dialog.tips(data.MessageContent, 3, data.MessageType);
+    };
+</script>

@@ -1,0 +1,32 @@
+﻿@model GroupEntity
+@{
+    string announcement = StringUtility.Trim(Model.Announcement, 100);
+}
+@if (!string.IsNullOrEmpty(Model.Announcement))
+{
+    <div class="tn-cue-highlight tn-corner-all tn-message-box tn-helper-clearfix">
+        @if (new Authorizer().Group_Manage(Model))
+        { 
+            <a class="tn-icon tn-smallicon-write tn-helper-right" href="@SiteUrls.Instance()._EditAnnouncement(Url.SpaceKey())" plugin="dialog" title="编辑公告"></a>
+        }
+        <div class="tn-helper-flowfix">
+            <span class="tn-icon tn-icon-notice" title="群公告"></span>
+            <label id="shortAnnouncement">@announcement</label>
+            <label id="longAnnouncement" style="display: none">@Model.Announcement</label>
+        </div>
+        <span id="announcementSwitchButton" class="tn-helper-right" style="@(Model.Announcement.Length <= 100 ? "display:none" : "")"><a class="tn-action tn-action-text-icon-right" href="#" id="editAnnouncement"><span class="tn-icon tn-smallicon-collapse-open"></span><span class="tn-action-text">展开</span></a></span>
+    </div>
+}
+else if (new Authorizer().Group_Manage(Model))
+{
+    <div class="tn-cue-highlight tn-corner-all tn-message-box tn-helper-clearfix">
+        <a class="tn-icon tn-smallicon-write tn-helper-right" href="@SiteUrls.Instance()._EditAnnouncement(Url.SpaceKey())" plugin="dialog" title="添加公告" id="addAnnouncement"></a>
+        <div class="tn-helper-flowfix">
+            <label id="shortAnnouncement">
+                可添加公告</label>
+            <label id="longAnnouncement" style="display: none">
+            </label>
+        </div>
+        <span id="announcementSwitchButton" class="tn-helper-right" style="display: none"><a class="tn-action tn-action-text-icon-right" href="#" id="editAnnouncement"><span class="tn-icon tn-smallicon-collapse-open"></span><span class="tn-action-text">展开</span></a></span>
+    </div>
+}

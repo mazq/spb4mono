@@ -1,0 +1,66 @@
+﻿@{
+    IEnumerable<Category> categories = ViewData.Get<IEnumerable<Category>>("categories", null);
+    IEnumerable<long> threadIds = ViewData.Get<IEnumerable<long>>("threadIds", null);
+    string tenantTypeId = TenantTypeIds.Instance().BlogThread();
+}
+@using (Html.BeginAjaxForm("_SetCategories", "Blog", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }))
+{
+    foreach (long threadId in threadIds)
+    {
+<input type="hidden" name="threadIds" value="@threadId" />
+}
+<div class="tnc-set-category">
+  <div class="tnc-dailog-pd">
+    <div class="tn-scroll-box">
+      <ul class="tnc-category-list tn-helper-clearfix">
+        @foreach (var category in categories)
+        {
+        <li class="tnc-category-item">
+          @Html.SipmleCheckBox("categoryIds", category.CategoryId, false, new { id = "ownerCategoryId-" + category.CategoryId })
+          <label id="ownerCategoryName-@(category.CategoryId)" for="ownerCategoryId-@(category.CategoryId)">@category.CategoryName</label>
+        </li>
+        }
+      </ul>
+    </div>
+    <div id="create-category-tr" class="tn-form tn-form-single"> @Html.TextBox("categoryName" , "" , new { @class = "tn-textbox tn-border-gray" })
+      @Html.LinkButton("创建", SiteUrls.Instance()._CreateMyCategory(Url.SpaceKey(), tenantTypeId), htmlAttributes: new { id = "create-category" }) </div>
+  </div>
+  <div class="tnc-artdilog-btn tn-bg-gray tn-border-gray tn-border-top"> @Html.Button("确定", ButtonTypes.Submit, HighlightStyles.Primary)
+    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, htmlAttributes: new { dialogOperation = "closeAll" }) </div>
+</div>
+}
+<script type="text/dialog">
+    this.title("设置分类");
+</script>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+
+        $("#categoryName").watermark("请输入分类名");
+
+        $("#create-category").click(function (e) {
+            e.preventDefault();
+            var categoryName = $("#categoryName").val();
+            if (!categoryName) {
+                return;
+            }
+            var url = $(this).attr("href");
+            $.post(url, { categoryName: categoryName }, function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    if (data.MessageType == 1) {
+                        var tr = $('<tr><td><input id="ownerCategoryId-' + data.CategoryId + '" name="categoryIds" type="checkbox" value="' + data.CategoryId + '"><label id="ownerCategoryName-' + data.CategoryId + '" for="ownerCategoryId-' + data.CategoryId + '">&nbsp;' + categoryName + '</label></td></tr>');
+                        $("#create-category-tr").before(tr);
+                        $("#categoryName").val("");
+                    }
+                });
+            })
+        })
+
+    }); 
+
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { 
+            window.location.reload();
+        });
+    }
+            
+</script>

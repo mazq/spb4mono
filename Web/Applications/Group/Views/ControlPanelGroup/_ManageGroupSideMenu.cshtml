@@ -1,0 +1,13 @@
+﻿<div class="tnc-rightvar tn-open">
+    <div class="tnc-settings-icon" plugin="ShortcutMenu">
+        <a href="#"></a>
+    </div>
+        <div class="tnc-settings">
+            @Html.AjaxAction("_ManageableDataDetail", "ControlPanel", new { area = "Common", applicationKey = GroupConfig.Instance().ApplicationKey })
+            @Html.Partial("_ManageGroupSideMenuShortcut")
+            @Html.AjaxAction("_StatisticDataDetail", "ControlPanel", new { area = "Common", applicationKey = GroupConfig.Instance().ApplicationKey })
+    </div>
+</div>
+
+
+

@@ -1,0 +1,114 @@
+﻿@{
+    Layout = "~/Applications/Setup/Layouts/Upgrade.cshtml";
+    Dictionary<string, string> applicationDictionary = ViewData.Get<Dictionary<string, string>>("applicationDictionary", new Dictionary<string, string>());
+    string applicationKeys = Request.QueryString.Get<string>("applicationKeys");
+    var applicationKeysList = Request.QueryString.Gets<string>("applicationKeys", new List<string>()).ToList();
+    if (applicationKeysList.Contains("Group"))
+    {
+        applicationKeysList.Remove("Group");
+        applicationKeysList.Insert(0, "Group");
+    }    
+}
+<form action="@Url.Action("Complete", "Upgrade")" method="get" id="CompleteForm">
+<input type="hidden" name="applicationKeys" value="@applicationKeys" />
+@foreach (var applicationKey in applicationKeysList)
+{     
+    <input type="hidden" name="@applicationKey" value="false" />
+}
+</form>
+<div class="spb-form spb-annex">
+    <div class="spb-title">
+        <strong>正在升级平台：</strong>
+    </div>
+    <div class="spb-provisions">
+        <p id="Upgrading_Database_Ready" data-url="@Url.Action("Upgrading_Database_Ready", "Upgrade")">
+            升级数据库准备中...</p>
+        <p id="Upgrading_Database_InstallNewVersion" data-url="@Url.Action("Upgrading_Database_InstallNewVersion", "Upgrade", new { applicationKeys = applicationKeys })" style="display:none">
+            4.0版本数据库安装中...</p>
+        @if (applicationKeys.Contains("Common"))
+        { 
+            <p data-url="@Url.Action("Upgrading_Database_Common", "Upgrade")" style="display:none">
+                3.2=>4.0 平台升级脚本执行中...</p>
+        }       
+        @foreach (var applicationKey in applicationKeysList)
+        {
+            string applicationName = string.Empty;
+            if (applicationDictionary.ContainsKey(applicationKey))
+            {
+                applicationName = applicationDictionary[applicationKey];
+            <p data-key="@applicationKey" data-url="@Url.Action("Upgrading_Database_Applcation", "Upgrade", new { applicationKey = applicationKey })" style="display:none">
+                3.2=>4.0@(applicationName)升级脚本执行中...</p>
+            }
+        }
+        <p id="Upgrading_Attachment_MoveToOld" data-url="@Url.Action("Upgrading_Attachment_MoveToOld", "Upgrade")" style="display:none">
+            开始升级附件，将旧附件移动到Old目录中...</p>
+        @if (applicationKeys.Contains("Common"))
+        {
+            <p id="Upgrading_Attachment_UserAvatar" data-url="@Url.Action("Upgrading_Attachment_UserAvatar", "Upgrade")" style="display:none">
+                升级用户头像附件中...</p>
+            <p id="Upgrading_Attachment_Link" data-url="@Url.Action("Upgrading_Attachment_Link", "Upgrade")" style="display:none">
+                升级友情链接附件中...</p>
+        }
+        @if (applicationKeys.Contains("Microblog"))
+        { 
+            <p id="Upgrading_Attachment_Microblog" data-key="Microblog" data-url="@Url.Action("Upgrading_Attachment_Microblog", "Upgrade")" style="display:none">
+                升级微博附件中...</p>
+        }
+        @if (applicationKeys.Contains("Bar"))
+        { 
+            <p id="Upgrading_Attachment_Bar" data-key="Bar" data-url="@Url.Action("Upgrading_Attachment_Bar", "Upgrade")" style="display:none">
+                升级贴吧附件(包括帖子、回帖、贴吧Logo）中...</p>
+        }
+        @if (applicationKeys.Contains("Blog"))
+        { 
+            <p id="Upgrading_Attachment_Blog" data-key="Blog" data-url="@Url.Action("Upgrading_Attachment_Blog", "Upgrade")" style="display:none">
+                升级日志附件中...</p>
+        }
+        @if (applicationKeys.Contains("Group"))
+        { 
+            <p id="Upgrading_Attachment_Group" data-key="Group" data-url="@Url.Action("Upgrading_Attachment_Group", "Upgrade")" style="display:none">
+                升级群组Logo中...</p>
+        }
+        @if (applicationKeys.Contains("Photo"))
+        { 
+            <p id="Upgrading_Attachment_Photo" data-key="Photo" data-url="@Url.Action("Upgrading_Attachment_Photo", "Upgrade")" style="display:none">
+                升级相册附件中...</p>
+        }
+        @if (applicationKeys.Contains("Ask"))
+        { 
+            <p id="Upgrading_Attachment_Ask" data-key="Ask" data-url="@Url.Action("Upgrading_Attachment_Ask", "Upgrade")" style="display:none">
+                升级问答附件中...</p>
+        }
+        @if (applicationKeys.Contains("PointMall"))
+        { 
+            <p id="Upgrading_Attachment_PointMall" data-key="PointMall" data-url="@Url.Action("Upgrading_Attachment_PointMall", "Upgrade")" style="display:none">
+                升级积分商城附件中...</p>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        excUpgrade($("#Upgrading_Database_Ready"));
+    });
+
+    function excUpgrade($p) {
+        $p.show();
+        $.post($p.data("url"), function (data) {
+            $p.html(data.MessageContent);
+            if (data.MessageType < 1) {
+                $p.css({ "color": "red" });
+            }
+            else {
+                $("input[name='" + $p.data("key") + "']").attr("value", true);
+            }
+            if ($p.next("p").length > 0) {
+                excUpgrade($p.next("p"));
+            }
+            else {
+                setTimeout(function () {
+                    $("#CompleteForm").submit();
+                }, 2000);
+            }
+        });
+    }
+</script>

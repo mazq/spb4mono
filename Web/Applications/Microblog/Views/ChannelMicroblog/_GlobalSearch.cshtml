@@ -1,0 +1,81 @@
+﻿@model PagingDataSet<MicroblogEntity>
+@{
+    MicroblogSearcher microblogSearcher = (MicroblogSearcher)Spacebuilder.Search.SearcherFactory.GetSearcher(MicroblogSearcher.CODE);
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+    long currentUserId = UserContext.CurrentUser == null ? 0 : UserContext.CurrentUser.UserId;
+    string spaceKey = UserIdToUserNameDictionary.GetUserName(currentUserId);
+}
+@if (Model.TotalRecords > 0)
+{
+    <input type="hidden" class="totalRecords" value="@Model.TotalRecords" />
+    <input type="hidden" class="queryDuration" value="@Model.QueryDuration" />
+    <div class="tn-content-heading tn-border-light tn-border-bottom">
+        <div class="tn-option">
+            <a href="@microblogSearcher.PageSearchActionUrl(keyword)">更多</a>
+        </div>
+        <h4>
+            微博</h4>
+    </div>
+    foreach (MicroblogEntity microBlog in Model)
+    {
+      <div class="tnc-search-person">
+        <ul class="tn-list">
+        <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+        <div class="tn-list-item-area-left">
+          @Html.ShowUserAvatar(microBlog.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+        </div>
+        <div class="tn-list-item-area-main">
+         <div class="tn-list-item-row tn-list-item-summary">
+         <p>
+            <a href="@SiteUrls.Instance().SpaceHome(microBlog.UserId)" class="tn-user-name">@microBlog.Author</a>
+            @Html.IdentificationType(microBlog.UserId)：
+            @Html.Raw(Tunynet.Search.SearchEngine.Highlight(Request.QueryString.GetString("keyword", string.Empty), microBlog.Body, 100))
+         </p>
+         </div>
+         <div class="tn-list-item-row tn-list-info">
+          <p>
+           <span class="tn-actions">
+           <a class="tn-action" href="@SiteUrls.Instance()._ForwardMicroblog(spaceKey, microBlog.MicroblogId)" plugin="dialog">
+                <span class="tn-action-text">转发(@microBlog.ForwardedCount)</span>
+            </a>
+             <a class="tn-action microblog-CommentA" href="@Html.Raw(SiteUrls.Instance()._Comment_Microblog(microBlog.MicroblogId, microBlog.OwnerId, TenantTypeIds.Instance().Microblog()))" data-microblogId="@microBlog.MicroblogId">
+                <span class="tn-action-text">评论(@microBlog.ReplyCount)</span> 
+            </a>
+           </span>
+           <a href="@SiteUrls.Instance().ShowMicroblog(microBlog.User.UserName,microBlog.MicroblogId)">
+            <em class="tn-date tn-text-note">@microBlog.DateCreated.ToFriendlyDate()</em></a>
+          </p>
+          <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-bubble-wrap" id="microblog-CommentDiv-@(microBlog.MicroblogId)" style="display:none" >
+            <div class="tn-bubble-arrow tn-bubble-position">
+                <b class="tn-arrow-b1 tn-border-gray"></b>
+                <b class="tn-arrow-b2 tn-widget-bubble"></b>
+            </div>
+            <div class="tn-bubble-content tn-border-gray tn-corner-all" id="microblog-CommentDivContentContainer-@(microBlog.MicroblogId)">
+                loading...
+            </div>
+        </div>
+         </div>
+        </div>
+        </li>
+        </ul>
+      </div>
+    }
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".microblog-CommentA").toggle(
+                function () {
+                    var microblogId = $(this).attr("data-microblogId");
+                    $("#microblog-CommentDiv-" + microblogId).removeAttr("style");
+                    $("#microblog-CommentDivContentContainer-" + microblogId).load($(this).attr("href"));
+                },
+                function () {
+                    var microblogId = $(this).attr("data-microblogId");
+                    $("#microblog-CommentDiv-" + microblogId).attr("style", "display:none");
+                }
+            );
+        });
+
+    </script>
+}

@@ -1,0 +1,54 @@
+﻿@model PagingDataSet<BlogThread>
+@{
+    Layout = "app-home-2cols";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+
+    string rank = ViewData.Get<string>("rank", "new");
+}
+@section Aside{
+    @Html.AjaxAction("_RecommendUser", "ChannelBlog", new { topNum = 5 })
+    @Html.AjaxAction("_UserRank", "ChannelBlog", new { topNum = 5 })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <h3 class="tn-helper-reset">日志标签</h3>
+        </div>
+        <p class="tn-tags-hot">
+            @Html.AjaxAction("_TagCloud", "Channel", new { tenantTypeId = TenantTypeIds.Instance().BlogThread(), Area = "Common" })
+        </p>
+    </div>
+}
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-list">
+    <div class="tn-tabs">
+        <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+            <li class="tn-widget-content tn-border-gray tn-border-trl  @if (rank=="new")
+                {<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().BlogListByRank("new")">最新日志</a></li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl  @if (rank=="hot")
+                {<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().BlogListByRank("hot")">热门日志</a></li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl  @if (rank=="comment")
+                {<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().BlogListByRank("comment")">热评日志</a></li>
+            <li class="tn-widget-content tn-border-gray tn-border-trl  @if (rank=="isessential")
+                {<text>tn-tabs-selected</text>}"><a href="@SiteUrls.Instance().BlogListByRank("isessential")">精华日志</a></li>
+        </ul>
+   </div>   
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if (Model != null && Model.Count() > 0) { 
+        <div class=" spb-blog-list-wrap">
+            <ul class="tn-list">
+                @foreach (var blogThread in Model)
+                {        
+                    @Html.Partial("_BlogItemChannel", blogThread)
+                }                   
+            </ul>
+            <div class="tn-pagination">
+                @Html.PagingButton(Model, PaginationMode.NumericNextPrevious)
+            </div>
+        </div>
+        } else { 
+        <div class="tn-no-data">暂无数据</div>
+        }
+        
+    </div>     
+</div>
+          

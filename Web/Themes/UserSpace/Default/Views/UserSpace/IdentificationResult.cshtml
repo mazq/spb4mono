@@ -1,0 +1,100 @@
+﻿@model Dictionary<IdentificationType, Identification>
+@{
+    Layout = "_UserSpaceSettings";
+    string spaceKey = Url.SpaceKey();
+}
+@section Aside
+{
+    @{ViewData["menu"] = "lookfor";}
+    @Html.Partial("_IdentificationMenu", ViewData)
+}
+
+@if (Model.Count == 0||Model==null)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-identity">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            @*<div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <div class="tn-option">
+                </div>
+                <h2>
+                </h2>
+            </div>*@
+            <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                <span class="tn-helper-left"><span class="tn-icon-large tn-largeicon-exclamation"></span>
+                </span>
+                <div class="tn-helper-flowfix">
+                    <strong>您还没有申请任何身份验证。</strong>
+                </div>
+            </div>
+           </div>
+</div>  
+}
+else
+{
+    foreach (var item in Model)
+    {
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-identity">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+              <div class="tn-content-heading tn-border-gray tn-border-bottom">
+                <h4>@item.Key.Name</h4>
+              </div>
+              
+               @if (item.Value.Status == IdentificationStatus.success)
+            {
+                <div class="tn-cue-success tn-corner-all tn-message-box">
+                    <span class="tn-helper-left"><span class="tn-icon-large tn-largeicon-accept-circle">
+                    </span></span>
+                    <div class="tn-helper-flowfix">
+                        <p><strong>您的信息已验证通过。</strong></p>
+                        <p><a href="@SiteUrls.Instance().UpdateIdentification(Url.SpaceKey(), item.Value.IdentificationId)">
+                            修改认证信息</a> <a class="cancel-Identification" href="@SiteUrls.Instance()._DeleteIdentification(Url.SpaceKey(), item.Value.IdentificationId)">
+                                取消身份认证</a><p>
+                    </div>
+                </div>
+            }
+            else if (item.Value.Status == IdentificationStatus.fail)
+            {
+                <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                    <span class="tn-helper-left"><span class="tn-icon-large tn-largeicon-exclamation"></span>
+                    </span>
+                    <div class="tn-helper-flowfix">
+                        <p><strong>您的信息未通过认证。</strong></p>
+                        <p><a href="@SiteUrls.Instance().UpdateIdentification(Url.SpaceKey(), item.Value.IdentificationId)">
+                            重新完善申请信息</a></p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="tn-cue-success tn-corner-all tn-message-box">
+                    <span class="tn-helper-left"><span class="tn-icon-large tn-largeicon-accept-circle">
+                    </span></span>
+                    <div class="tn-helper-flowfix">
+                        <p><strong>您的认证信息已成功提交，我们将尽快对您提交的信息进行验证，请耐心等待。</strong></p>
+                        <p><a href="@SiteUrls.Instance().UpdateIdentification(Url.SpaceKey(), item.Value.IdentificationId)">
+                            修改认证信息</a> <a class="cancel-Identification" href="@SiteUrls.Instance()._DeleteIdentification(Url.SpaceKey(), item.Value.IdentificationId)">
+                                取消身份认证</a></p>
+                    </div>
+                </div>
+            }
+             
+            </div>
+			</div>     
+    }
+}
+
+<script>
+    $(function () {
+
+        $(".cancel-Identification").livequery("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要取消吗？', function () {
+                $.post(url, function () {
+                    art.dialog.tips("取消成功！", 1.5, 1, function () { window.location.reload();});
+                })
+            });
+        })
+
+    })
+</script>

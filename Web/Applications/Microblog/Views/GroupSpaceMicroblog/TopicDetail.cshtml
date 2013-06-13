@@ -1,0 +1,51 @@
+﻿@model  Tag
+@{
+    Layout = "list-2cols";
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Group/Scripts/jquery.spb.group.js", ResourceRenderPriority.Last);
+}
+@section Aside{
+    @Html.AjaxAction("_TopGroupTopics", "GroupSpaceMicroblog", new { spaceKey = Url.SpaceKey(), topNumber = 9, sortBy = SortBy_Tag.PreWeekItemCountDesc })
+    @Html.AjaxAction("_TopGroupTopics", "GroupSpaceMicroblog", new { spaceKey = Url.SpaceKey(), topNumber = 9 })
+}
+@{
+    bool isFavorited = ViewData.Get<bool>("isFavorited", false);
+    IUser currentUser = UserContext.CurrentUser;    
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-microblog-hotdetail">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @if (Model.IsFeatured)
+        {
+            <div class="tn-bg-light tn-border-light tn-corner-all spb-microtopic-intro">
+                <div class="tn-inner tn-helper-clearfix">
+                    <div class="tn-figure">
+                        @if (!string.IsNullOrEmpty(Model.FeaturedImage))
+                        {
+                            <img alt="@Model.TagName" title="@Model.TagName" src="@SiteUrls.Instance().LogoUrl(Model.FeaturedImage, TenantTypeIds.Instance().Tag(), ImageSizeTypeKeys.Instance().Medium())" />
+                        }
+                    </div>
+                    <div class="tn-info">
+                        <div class="tn-title">
+                            <h2>@Model.TagName</h2>
+                        </div>
+                        <div class="tn-brief">@Html.Raw(Model.Description)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tn-content-heading">
+                <h4>
+                    参与讨论</h4>
+            </div>
+        }
+        else
+        { 
+            <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                <h2>@Model.TagName</h2>
+            </div>
+        }
+        @Html.Action("_Create", "Microblog", new RouteValueDictionary { { "spaceKey", UserContext.CurrentUser == null ? string.Empty : UserContext.CurrentUser.UserName }, { "tenantTypeId", TenantTypeIds.Instance().Group() }, { "ownerId", Spacebuilder.Group.GroupIdToGroupKeyDictionary.GetGroupId(Url.SpaceKey()) }, { "area", "Microblog" } })
+        @Html.Partial("~/Applications/Microblog/Views/ChannelMicroblog/_Topic.cshtml", Model)
+    </div>
+</div>

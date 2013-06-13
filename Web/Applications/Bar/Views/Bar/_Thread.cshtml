@@ -1,0 +1,64 @@
+﻿@model BarThread
+@{
+    bool ShowThreadCategory = false;
+    long categoryId = Request.QueryString.Get<long>("categoryId",0);
+    if (categoryId == 0) {
+        ShowThreadCategory = true;
+    }
+    
+    string tenantTypeId = ViewData.Get<string>("TenantTypeId", TenantTypeIds.Instance().Bar());
+
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+    <div class="tn-list-item-area-left">
+        @Html.ShowUserAvatar(Model.User, urlGetter.UserSpaceHome(Model.UserId, Model.SectionId), AvatarSizeType.Small, HyperLinkTarget._blank)
+    </div>
+    <div class="tn-list-item-area-main">
+        <div class="tn-list-item-row tn-list-item-heading">
+            <div class="tn-reply">
+                @Html.LinkButton(Model.PostCount.ToString(), urlGetter.ThreadDetail(Model.ThreadId) + "#reply", HighlightStyles.Secondary, htmlAttributes: new { @class = "tn-button-hollow" })
+            </div>
+            <h5>
+                @if (ShowThreadCategory && Model.Category != null)
+                {
+                    <a href="@urlGetter.SectionDetail(Model.SectionId, categoryId: Model.CategoryId)" title="浏览该分类下的帖子">
+                        [@Model.Category.CategoryName]</a>
+                }
+                <a href="@urlGetter.ThreadDetail(Model.ThreadId)" title="@Model.Subject">@Model.Subject</a>
+                @if (Model.IsSticky)
+                { 
+                    <span title="置顶" class="tn-icon-colorful tn-icon-colorful-top tn-icon-inline"></span>
+                }
+                @if (Model.IsEssential)
+                { 
+                    <span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>
+                }
+            </h5>
+        </div>
+        @if (Model.TagNames != null && Model.TagNames.Count() > 0)
+        {
+            <div class="tn-list-item-row tn-tags">
+                @foreach (string tagName in Model.TagNames)
+                {
+                    <span><a href="@urlGetter.ListByTag(tagName, Model.SectionId)" title="点击浏览该标签下的其他帖子">@tagName</a></span>
+                }
+            </div>
+        }
+        @{
+            BarPost barPost = Model.GetNewestPost();
+        }
+        <div class="tn-list-item-row tn-list-info tn-helper-clearfix">
+            <em class="tn-date tn-text-note">@Model.DateCreated.ToUserDateString()</em><em class="tn-count">浏览 (@Model.HitTimes)</em>
+            @if (Model.User != null)
+            {
+                <span class="tn-owner"><text> 楼主：</text><a href="@urlGetter.UserSpaceHome(Model.UserId, Model.SectionId)" title="@Model.User.DisplayName" class="tn-user-name">@Model.User.DisplayName</a></span> 
+            }
+            @if (barPost != null)
+            { 
+                <span class="tn-last">最后回复： <a href="@urlGetter.UserSpaceHome(barPost.UserId, Model.SectionId)" title="@barPost.Author" class="tn-user-name">@barPost.Author</a>
+                    <a href="@SiteUrls.Instance().ThreadDetailGotoPost(barPost.PostId)" title="查看回帖" class="tn-secondary-text ">@barPost.DateCreated.ToFriendlyDate()</a></span>
+            }
+        </div>
+    </div>
+</li>

@@ -1,0 +1,113 @@
+﻿@model IEnumerable<IdentificationType>
+@{
+    Layout = "_ControlPanel";
+    Html.ViewContext.RouteData.Values["CurrentNavigatioNId"] = 20000025;
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <a href="@SiteUrls.Instance().ManageIdentifications()" class="tn-action">认证申请管理</a><span>认证标识管理</span></h1>
+            <div class="tnc-content-manage">
+                <div class="tn-list-header">
+                    <div class="tn-toolbar-area">
+                        @Html.LinkButton("添加标识", SiteUrls.Instance()._EditIdentificationType(), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog", @title = "添加标识" })
+                    </div>
+                </div>
+                @if (Model == null || Model.Count() == 0)
+                { 
+                    <div class="tn-no-data">
+                        没有查询到数据！</div>
+                }
+                else
+                {
+                    <table class="tn-table-grid">
+                        <tbody>
+                            <tr class="tn-table-grid-header">
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    名称
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    标识图标
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    描述
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    是否启用
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    处理人
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    处理时间
+                                </th>
+                                <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    操作
+                                </th>
+                            </tr>
+                            @foreach (var identificationType in Model)
+                            {
+                                <tr class="tn-table-grid-row">
+                                    <td class="tn-border-gray tn-border-bottom tn-width-user-name">
+                                        @identificationType.Name
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-avatar">
+                                        <img src="@SiteUrls.Instance().LogoUrl(identificationType.IdentificationTypeLogo, TenantTypeIds.Instance().IdentificationType(), ImageSizeTypeKeys.Instance().Small())" />
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                        @identificationType.Description
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-status tn-nowrap">
+                                        @(identificationType.Enabled ? Html.Raw("<span class='tn-icon-colorful tn-icon-colorful-pass tn-icon-inline' title='启用'>") : Html.Raw("<span class='tn-icon-colorful tn-icon-colorful-stop tn-icon-inline' title='禁用'>"))
+                                        @Html.Raw("</span>")
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-user-name">
+                                        @if (identificationType.GetUser != null)
+                                        { 
+                                            @Html.Link(identificationType.GetUser.DisplayName, SiteUrls.Instance().SpaceHome(identificationType.CreaterId), identificationType.GetUser.DisplayName + "的主页", new { target = "_blank" })
+                                        }
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-datetime tn-nowrap">
+                                        @identificationType.DateCreated
+                                    </td>
+                                    <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                        @Html.Link("编辑", SiteUrls.Instance()._EditIdentificationType(identificationType.IdentificationTypeId), "编辑", new { plugin = "dialog", @class = "tn-button tn-corner-all tn-button-text-only tn-button-lite tnui-edit-identificationType" })
+                                        @Html.Link("删除", SiteUrls.Instance()._DeleteIdentificationType(identificationType.IdentificationTypeId), "删除", new { @class = "tn-button tn-corner-all tn-button-text-only tn-button-lite tnui-delete-identificationType" })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //给当前行添加样式
+        $(".tn-table-grid-row").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            }
+        );
+
+        //单个删除
+        $(".tnui-delete-identificationType").click(function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+            art.dialog.confirm('该标识下的所有申请也将被删除\r\n确定要删除该标识吗？', function () {
+                $.post(url, function (data) {
+                    if (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true); });
+                    }
+                });
+            });
+        });
+    });
+</script>

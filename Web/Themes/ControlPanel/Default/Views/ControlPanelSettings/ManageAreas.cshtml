@@ -1,0 +1,104 @@
+﻿@model  IEnumerable<Area>
+@{
+    Layout = "_ControlPanel";
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js", ResourceRenderPriority.Last);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+		    <h1><span>地区管理</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-cue-highlight tn-corner-all tn-message-box">
+                    <ul>
+					    <li><strong>行政区号编码规范</strong></li>
+                        <li>1.总共有八位，每两位为一组 XX XX XX XX</li>
+                        <li>2.前两位表示省，直辖市</li>
+                        <li>3.第二组两位数据码，其中01-20、51-70表示省直辖市，21-50表示地区（州、盟）</li>
+                        <li>4.第三组两位数字码，其中01-18、表示市辖区或地辖区，21-80表示县（旗），81-99表示省直辖县级市</li>
+                        <li>5.第四组是预留两位数字码，可以填写乡镇级地区编码</li>
+                    </ul>
+                </div>
+                <div class="tn-manager-search tn-helper-clearfix">
+                    <div class="tnc-shortsearch-adminform">
+                        @using (Html.BeginForm("ManageAreas", "ControlPanelSettings", FormMethod.Get))
+                        {
+                            <div class="tn-form-row">
+                                @Html.AreaDropDownList("areaCode", Request.QueryString.GetString("areaCode", string.Empty), null, string.Empty)
+                            </div>
+                
+                            <div class="tn-form-row">
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>      
+                        }
+                    </div>
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area">
+                            @Html.LinkButton("添加地区", SiteUrls.Instance()._CreateArea(Request.QueryString.GetString("AreaCode", string.Empty)), iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog" })
+                        </div>
+                    </div>
+                    @if (Model.Count() == 0)
+                    {
+                        <div class="tn-no-data">
+                            暂无地区</div>
+                    }
+                    else
+                    {
+                        <table class="tn-table-grid">
+                            <tbody>
+                                <tr class="tn-table-grid-header">
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        地区名称
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        行政区号
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        邮政编码
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        排序
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                    </th>
+                                    <th class="tn-border-gray tn-border-bottom tn-text-note">
+                                        操作
+                                    </th>
+                                </tr>
+                                @if (Model.Count() > 0)
+                                {
+                                    foreach (var area in Model)
+                                    {
+                                    <tr class="tn-table-grid-row" id="searched_@(area.AreaCode)" data-id="@(area.AreaCode)">
+                                        <td class="tn-border-gray tn-border-bottom tn-width-auto">
+                                            @area.Name
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @area.AreaCode
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-category  tn-nowrap">
+                                            @area.PostCode
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("上移", SiteUrls.Instance().ChangeAreaOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "area-order-" + "up" + area.AreaCode, name = area.AreaCode })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-icon1">
+                                            @Html.Link("下移", SiteUrls.Instance().ChangeAreaOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "area-order-" + "down" + area.AreaCode, name = area.AreaCode })
+                                        </td>
+                                        <td class="tn-border-gray tn-border-bottom tn-width-action2 tn-nowrap">
+                                            @Html.Link("编辑", SiteUrls.Instance()._EditArea(area.AreaCode), "编辑", new { plugin = "dialog" })
+                                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetText("删除").SetTooltip("删除地区").SetDeleteTarget("#searched_" + area.AreaCode).SetUrl(SiteUrls.Instance()._DeleteArea(area.AreaCode)))
+                                        </td>
+                                    </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>                        
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

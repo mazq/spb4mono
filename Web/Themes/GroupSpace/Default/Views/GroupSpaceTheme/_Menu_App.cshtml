@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Navigation>
+@{
+    int currentNavigationId = 0;
+    if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+    {
+        currentNavigationId = Html.ViewContext.RouteData.Values.Get<int>("CurrentNavigationId", 0);
+    }
+    Spacebuilder.Group.Controllers.GroupMenu? groupMenu = TempData["GroupMenu"] as Spacebuilder.Group.Controllers.GroupMenu?;
+    string spaceKey = Url.SpaceKey();
+
+    long groupId = GroupIdToGroupKeyDictionary.GetGroupId(spaceKey);
+
+    IEnumerable<ApplicationManagementOperation> managementOperations = ViewData.Get<IEnumerable<ApplicationManagementOperation>>("ApplicationManagementOperations", new List<ApplicationManagementOperation>());
+}
+<ul class="tn-side-menu">
+    @foreach (var navigation in Model)
+    {
+        if (!navigation.IsVisible(UserContext.CurrentUser)
+            || (navigation.NavigationId == 13900190 && !new Authorizer().Group_Manage(groupId)))
+        {
+            continue;
+        }
+
+        string selectedStatus = "";
+        if (navigation.IsCurrent(currentNavigationId))
+        {
+            selectedStatus = "tn-selected tn-bg-gray tn-border-gray tn-corner-all";
+        }
+        <li class="@(selectedStatus)">
+            @if (!string.IsNullOrEmpty(navigation.IconName))
+            {
+                @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), navigation.IconName, false))
+            }
+            <a class="tn-menu-text" href="@navigation.GetUrl(spaceKey)" title="@navigation.Text" target="@navigation.NavigationTarget">@navigation.Text</a></li>
+    }
+</ul>

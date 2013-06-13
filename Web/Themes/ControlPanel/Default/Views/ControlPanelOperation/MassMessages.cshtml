@@ -1,0 +1,176 @@
+﻿@{
+    Layout = "_ControlPanel";
+    IEnumerable<MenuItem> roles = ViewData.Get<IEnumerable<MenuItem>>("Roles", null);
+    var maxUserRank = ViewData.Get<long>("maxUserRank", 1);
+}
+<div class="tn-block tnc-ctnborder">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>群发消息</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-form tn-label-right tnc-reminder-settings">
+                    @using (Html.BeginAjaxForm("MassMessages", "ControlPanelOperation", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new RouteValueDictionary { { "Id", "MassMessage" } }))
+                    {
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                收件人：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li class="tn-inline-list">
+                                    @Html.RadioButton("isByRole", true, true, new { @id = "isByRole-true", @class = "tn-radiobutton" })
+                                    <label for="isByRole-true">
+                                        按角色</label>
+                                </li>
+                                <li class="tn-inline-list">
+                                    @Html.RadioButton("isByRole", false, false, new { @id = "isByRole-false", @class = "tn-radiobutton" })
+                                    <label for="isByRole-false">
+                                        按等级</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tn-form-row" id="byRoleName">
+                            <label class="tn-form-label">
+                                &nbsp;</label>
+                            @Html.MenuButton("roleName", "请选择用户角色", MenuItemType.CheckBox, roles)<span class="tn-text-note" style="color:Red">注意：此项不选择会给所有用户发送消息！</span>
+                        </div>
+                        <div class="tn-form-row" style="display: none" id="byRank">
+                            <label class="tn-form-label">
+                                &nbsp;</label>
+                            @Html.TextBox("minRank", 1, new { @class = "tn-textbox tn-input-short tn-border-gray {required:true,digits:true,min:1,max:" + maxUserRank + ", messages:{required:'请填写等级下限',min:'等级下限最小为1级',max:'等级下限最大为" + maxUserRank + "级',digits:'等级下限必须为整数'}}", watermark = "等级下限" })
+                            -
+                            @Html.TextBox("maxRank", maxUserRank, new { @class = "tn-textbox tn-input-short tn-border-gray {required:true,digits:true,min:1,max:" + maxUserRank + ",messages:{required:'请填写等级上限',min:'等级上限最小为1级',max:'等级上限最大为" + maxUserRank + "级',digits:'等级上限必须为整数'}}", watermark = "等级上限" })
+                            @Html.ValidationMessage("minRank")
+                            @Html.ValidationMessage("maxRank")
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                发送方式：</label>
+                            <ul class="tn-radiobutton-list">
+                                <li class="tn-inline-list">
+                                    @Html.RadioButton("isMessage", true, true, new { @id = "isMessage-true", @class = "tn-radiobutton" })
+                                    <label for="isMessage-true">
+                                        站内信</label>
+                                </li>
+                                <li class="tn-inline-list">
+                                    @Html.RadioButton("isMessage", false, false, new { @id = "isMessage-false", @class = "tn-radiobutton" })
+                                    <label for="isMessage-false">
+                                        邮件</label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tn-form-row" id="subject" style="display: none">
+                            <label class="tn-form-label">
+                                标题：</label>
+                            <input class="tn-textbox tn-input-longest tn-border-gray {required:true}" type="text"
+                                name="messageSubject" id="messageSubject" />
+                            @Html.ValidationMessage("messageSubject")
+                        </div>
+                        
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                内容：</label>
+                            <textarea class="tn-textarea tn-input-longest tn-border-gray {required:true}" rows=""
+                                cols="" name="messageBody" id="messageBody"></textarea><text id="abc"></text>
+                            @Html.ValidationMessage("messageBody")
+                        </div>
+                        <div class="tn-form-row">
+                            <label class="tn-form-label">
+                                &nbsp;</label>
+                            <span id="Note" class="tn-text-note tn-action">0/300</span>
+                        </div>
+                        <div class="tn-form-row tn-form-row-button">
+                            <label class="tn-form-label">
+                                &nbsp;</label>
+                            @Html.Button("提交", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "massMessageSubmit" })
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+
+        //        $('input[name="roleName"]').click(function () {
+        //            var $span = $("button[name='roleName_Button']").find("span.tn-button-text");
+        //            var str = "";
+        //            var arrary = $.makeArray($('input[name="roleName"]:checked').next().ToArray().text());
+        //            str = arrary.join('、');
+        //            if (str.length == 0)
+        //                str = "请选择用户角色";
+        //            $span.text(str);
+        //        });
+        $('input[name="roleName"]').click(function () {
+            var $span = $("button[name='roleName_Button']").find("span.tn-button-text");
+            var str = "";
+            $('input[name="roleName"]:checked').each(function () {
+                str += $(this).next().text() + ",";
+            });
+            if (str.length == 0)
+                str = "请选择用户角色";
+            else
+                str = str.substring(0,str.length-1);
+            $span.text(str);
+        });
+
+        $("#isByRole-true").click(function () {
+            $("#byRoleName").show();
+            $("#byRank").hide();
+        });
+        $("#isByRole-false").click(function () {
+            $("#byRoleName").hide();
+            $("#byRank").show();
+        });
+
+        $("#isMessage-true").click(function () {
+            $("#subject").hide();
+        });
+        $("#isMessage-false").click(function () {
+            $("#subject").show();
+        });
+
+        //字数控制
+        var countInterval;
+        function blength(value) {
+            return parseInt((value.replace(/[^\x00-\xff]/g, "**").length + 1) / 2);
+        }
+        var length = blength($("#messageBody").val());
+        function count() {
+            length = blength($("#messageBody").val());
+            var $ps = $('#Note');
+
+            $("#Note").html(length + "/300");
+        }
+        $("#Note").html(blength($("#messageBody").val()) + "/300");
+        $("#messageBody").focus(function () {
+            countInterval = setInterval(function () { count(); }, 360);
+        }).blur(function () {
+            clearInterval(countInterval);
+            count();
+        });
+        count();
+        $("#massMessageSubmit").click(function () {
+            if (length > 300) {
+                art.dialog.tips("字数超出限制!", 2, 0);
+                return false;
+            }
+            if (!$("#MassMessage").valid())
+                return false;
+            $("#roleName_Menu").appendTo($("#massMessageSubmit").parents("form:first"));
+            $($("#massMessageSubmit").parents("form:first")).submit();
+
+        });
+
+        //        $("#roleName_Menu:checked").each(function () {
+        //            var str = $(this).first("label").text();
+        //            alert(str);
+        //        });
+
+
+    });
+    function OnSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType)
+    }
+</script>

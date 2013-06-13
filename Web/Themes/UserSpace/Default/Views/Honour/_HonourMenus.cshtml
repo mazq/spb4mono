@@ -1,0 +1,20 @@
+﻿    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-side-menu">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <ul class="tn-side-menu">
+                <li class="tn-border-gray tn-border-bottom @DisplaySelectedClass(HonourMenu.MyRank)">
+                    @Html.Link("我的等级", SiteUrls.Instance().MyRank(Url.SpaceKey()), "我的等级", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+                <li class="tn-border-gray tn-border-bottom @DisplaySelectedClass(HonourMenu.PointRecord)">
+                    @Html.Link("积分记录", SiteUrls.Instance().ListPointRecords(Url.SpaceKey()), "积分纪录", htmlAttributes: new { @class = "tn-menu-text" })
+                </li>
+            </ul>
+            @Html.Action("_PointMenus")
+        </div>
+    </div>
+@helper DisplaySelectedClass(HonourMenu honourMenu)
+    {
+        if (honourMenu == ViewData.Get<HonourMenu>("HonourMenu", HonourMenu.MyRank))
+        {
+    @Html.Raw("tn-selected tn-bg-gray");
+        }
+}

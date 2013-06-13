@@ -1,0 +1,56 @@
+﻿@model BarSection
+@{
+    bool isSubscribed = ViewData.Get<bool>("isSubscribed", false);
+    bool onlyFollowerCreateThread = ViewData.Get<bool>("OnlyFollowerCreateThread", false);
+}
+<div class="tn-section tn-helper-clearfix">
+    <h2 class="tn-pagename">
+        <span class="tn-icon-special tn-special-icon-bar"></span><a href="@SiteUrls.Instance().BarHome()" title="帖吧首页">
+            帖吧</a>
+        @if (Model != null)
+        { 
+            <span class="tn-pipe tn-text-note">/</span>
+            <a href="@SiteUrls.Instance().SectionDetail(Model.SectionId)" title="@Model.Name">@Model.Name</a>      
+        }
+    </h2>
+    @if (Model != null)
+    { 
+        <div class="tn-added">
+            @Html.Action("_SubscribeSectionButton", new { sectionId = Model.SectionId })
+        </div>
+    }
+    <div class="tn-shortcut">
+        @if (Model != null)
+        {
+            @Html.LinkButton("发帖", SiteUrls.Instance().BarThreadEdit(Model.SectionId), HighlightStyles.Lite, ButtonSizes.Default, IconTypes.SmallWrite, htmlAttributes: new { id = "EditThreadbutton" })
+        }
+        else if (new Authorizer().BarSection_Create())
+        { 
+            @Html.Button("创建帖吧", ButtonTypes.Link, HighlightStyles.Lite, ButtonSizes.Default, IconTypes.SmallAdd, url: SiteUrls.Instance().CreateSection())
+        }
+        @if (UserContext.CurrentUser != null)
+        { 
+            @Html.Button("我的帖吧", ButtonTypes.Link, HighlightStyles.Lite, ButtonSizes.Default, url: SiteUrls.Instance().UserThreads(UserContext.CurrentUser.UserId))
+        }
+    </div>
+</div>
+@if (Model != null && onlyFollowerCreateThread && !isSubscribed)
+{
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            $("#EditThreadbutton").click(function (e) {
+                var _this = $(this);
+                art.dialog.confirm('需要关注才能发帖，是否马上关注发帖？', function () {
+                    $.post('@SiteUrls.Instance().SubscribeSection(Model.SectionId)', function (data) {
+                        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                            if (data.MessageType == 1) {
+                                window.location.href = _this.attr("href");
+                            }
+                        });
+                    });
+                });
+                return false;
+            });
+        });
+    </script>
+}

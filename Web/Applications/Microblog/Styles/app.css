@@ -1,0 +1,44 @@
+/* 
+Offical Style for Spacebuilder
+(c) Tunynet Inc.
+*/
+
+/* UserSpace page
+----------------------------------*/
+.tn-comment-wrap .tn-comment-form-act .tn-checkbox{ float:left; margin:5px 10px 0 0; }
+.tnc-micro-blog  .tnc-blog-comment .tnc-dynamic .tn-list-item-row{ margin:5px 0px 0 0;}
+.tnc-micro-blog .tnc-dynamic .tn-list-reply-row .tn-text-note { font-size:14px;}
+
+/* Microblog Detail */
+.spb-microdetail .tnc-dynamic-title { margin-bottom: 10px; }
+.spb-microdetail .tn-feedback { padding: 10px 0; }
+
+.spb-follow-microbloger .tn-user-name { margin-bottom: 5px; }
+.spb-follow-microbloger .tn-button { margin: 0; }
+.spb-follow-microbloger .tn-icon-text { padding-right: 0; line-height: 24px; }
+
+/* Channel page
+----------------------------------*/
+.spb-userfans-top .tn-person-rank li { padding: 5px 0; }
+.spb-microblog-hotdetail .tn-content-heading { padding: 0 0 10px; margin-bottom: 0; }
+
+.spb-microtopic-intro{ padding:10px; margin-bottom: 10px;}
+.spb-microtopic-intro .tn-figure { float: left; margin-right: 20px; }
+.spb-microtopic-intro .tn-info { overflow: hidden; zoom:1; }
+.spb-microtopic-intro .tn-title { margin-bottom: 10px; }
+.spb-microtopic-intro .tn-brief { line-height: 20px; }
+.spb-microtopic-intro .tn-actions { float: right; }
+.spb-microtopic-intro h2{ font-size:18px; font-weight: normal; margin: 0;}
+
+.spb-microblog-rank h3 { margin-bottom:5px; padding-left:6px; line-height:20px; height:15px;}
+.spb-microblog-rank-box{ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); padding:10px;border-radius: 3px 3px 3px 3px; }
+.spb-microblog-rank-box h3{ margin:0; padding:5px 0 10px;}
+.spb-microtop-day { float: left; width: 32.28%; margin-right: 1.58%; }
+.spb-microtop-week { float: left; width: 32.28%; }
+.spb-microtop-topic { float: left; width: 49.21%; }
+.spb-microtop-fans { float: right; width: 32.28%; }
+.spb-microtop-prestige { float: right; width: 49.21%; }
+
+/* Group Microblog */
+.spb-microblog-crumbs .tn-breadcrumb { padding: 0; line-height: 25px; font-size: 16px; font-weight: normal; }
+.spb-microblog-crumbs .tn-avatar-mini { float: left; margin-right: 10px; }

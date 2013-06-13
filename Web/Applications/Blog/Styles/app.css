@@ -1,0 +1,47 @@
+/* 
+Offical Style for Spacebuilder
+(c) Tunynet Inc.
+*/
+
+/* List */
+.spb-blog-list .tn-list-item-area-left { width: 100px; overflow: hidden; word-wrap: break-word; }
+.spb-blog-list .tn-list-item-row h5 { font-size: 14px; }
+.spb-blog-list .tn-follow { float: right; }
+
+/* Publication */
+.spb-blog-edit .tn-dropdownlist { margin-right: 10px; }
+.spb-blog-edit .tn-collapsible-content { padding: 10px 0; }
+.spb-blog-edit .tn-checkbox-list li { float: left; margin-right: 10px; padding: 0; }
+
+/* Channel page
+----------------------------------*/
+
+/* Blog Slider */
+.spb-blog-slider-rec { width: 320px; height: 240px; float: left; }
+.spb-blog-slider-rec .spb-slider-nav { right: 5px; bottom: 4px; }
+.spb-blog-slider-rec .spb-slider-nav-clip { margin: 0; }
+.spb-blog-slider-rec .spb-slider-panel { width: 320px; height: 240px; }
+.spb-blog-slider-rec .spb-slider-panel .spb-slider-panel-textbox { width: 320px; height: 24px; top: 0; left: 0; right: 0; }
+.spb-blog-slider-rec .spb-slider-panel .spb-slider-panel-text { width: 320px; height: 24px; }
+.spb-blog-slider-rec .spb-slider-panel .spb-slider-panel-text p { padding: 0 10px; line-height: 24px; text-align: left; }
+.spb-blog-slider-rec .spb-slider-panel .spb-slider-panel-overlay { width: 320px; height: 24px; }
+
+.spb-blog-rec-list { overflow: hidden; zoom:1; padding-left:10px;}
+.spb-blog-rec-list .tn-list-item-summary{ padding:5px 0;}
+.spb-blog-rec-list li { padding:2px 0; line-height: 26px; height: 26px; overflow: hidden;}
+.spb-blog-rec-list li .tn-user-name { margin: 0 0 0 10px; }
+.spb-blog-rec-list li.tn-list-first { margin: 0 0 5px; height: auto;}
+.spb-blog-rec-list li.tn-list-first .spb-rec-btn { float: right; }
+.spb-blog-rec-list li.tn-list-first .tn-list-item-row h5 { font-size: 14px; line-height: 25px; height: 25px; overflow: hidden; margin: 0; }
+.spb-blog-rec-list li.tn-list-first .tn-list-item-row p { line-height: 20px; }
+.spb-blog-rec-list li.tn-list-first .tn-user-name { margin: 0 10px 0 0; }
+
+.spb-textbox-list li{padding:4px 0;}
+.spb-blog-list-wrap .tn-list-item-area-main .tn-list-item-summary{margin: 3px 0 10px;}
+.spb-blog-manage-wrap .tn-table-grid-row td{ padding:8px 5px;}
+.spb-blog-edit-wrap .tn-publish .tn-form-box th{ width: auto;}
+.spb-blog-edit-wrap .tn-collapsible{ padding:10px 0;}
+.spb-blog-edit-wrap .tn-publish .tn-editor{ padding-top:5px;}
+.spb-blog-detail .tn-detail-text{ margin-top:10px;}
+.spb-blog-sort .tn-actions,
+.spb-hot-tags .tn-actions { text-align:right;}

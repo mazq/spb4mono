@@ -1,0 +1,181 @@
+﻿@model IEnumerable<Spacebuilder.Search.ISearcher>
+@{
+    Layout = "_Search";
+    string searcherCode = Spacebuilder.Search.SearcherFactory.GlobalSearchCode;
+    ViewData["searcherCode"] = searcherCode;
+
+    string keyword = Request.QueryString.GetString("keyword", string.Empty);
+}
+@section SearchForm{
+    @using (Html.BeginForm("GlobalSearch", "Channel", FormMethod.Get, new { id = "searchForm" }))
+    {
+        @Html.TextBox("keyword", keyword, new { autocomplete = "off", @class = "tn-textbox" })
+        <a id="button-search" href="#" class="tn-button tn-button-text-only tn-button-large tn-button-primary"><span class="tn-button-text">搜索</span></a>
+    }
+}
+@section Aside{
+    @Html.AjaxAction("_SearchHistories", "Channel", new { searcherCode = searcherCode, Area = "Common" })
+}
+
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-search-results">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+    <div class="tnc-global-search">
+        <div class="tn-list-header tn-bg-gray tn-border-gray tn-border-bottom">
+            <div class="tn-list-header-row tn-helper-clearfix tn-bg-gray">
+                <span class="tn-count">共有 <strong id="globalTotalRecords">0</strong>个搜索结果（用时 <span
+                    id="globalQueryDuration">0</span> 秒）</span>
+            </div>
+        </div>
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            var searcher = Model.ElementAt(i);
+            <div class="search-view" data-url='@searcher.GlobalSearchActionUrl(Tunynet.Utilities.WebUtility.UrlEncode(keyword))&&topNumber=7'>
+            </div>
+        }
+        <div style="display: none;" class="tn-cue-tips tn-corner-all tn-message-box tn-border-gray tn-bg-gray">
+            <a class="tn-icon tn-smallicon-cross tn-helper-right" href="#"></a><span class="tn-helper-left">
+                <span class="tn-icon tn-icon-exclamation"></span></span>
+            <div class="tn-helper-flowfix">
+                <strong>提示：</strong>请输入搜索条件</div>
+        </div>
+        <div class="tnc-search-noresults">
+            <p class="tn-title">
+                很抱歉，没有找到符合您搜索条件的结果！</p>
+            <dl class="tn-support">
+                <dt><strong>建议：</strong></dt>
+                <dd>
+                    请确保搜索文字拼写正确</dd>
+                <dd>
+                    请尝试使用其他关键词或使用近义词</dd>
+                <dd>
+                    请尝试使用含义更为宽泛的关键词</dd>
+            </dl>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script id="template-auto-complete" type="text/x-jquery-tmpl">
+    <li class='tn-list-item tn-auto-complete-item tn-helper-clearfix tnc-auto-complete-public'>
+        <a class="tn-user-info">
+            <div class="tn-list-item-area-main">
+                <div class="tn-list-item-row">{{html tagNameWithHighlight}}</div>
+            </div>
+        </a>
+    </li>
+</script>
+
+<script>
+    $(function () {
+        var GlobalSearcher = function () {
+            this.init();
+        };
+
+        GlobalSearcher.fn = GlobalSearcher.prototype = {
+            init: function () {
+                var self = this;
+
+                //加载各应用搜索结果
+                $(".search-view").each(function () {
+                    $(this).load($(this).data("url"));
+                })
+
+                //计算总共的搜索总数及搜索时间
+                var totalRecords = 0;
+                var queryDuration = 0;
+                $(".totalRecords").livequery(function () {
+                    $(this).each(function () {
+                        totalRecords += parseInt($(this).val());
+                    });
+                    $("#globalTotalRecords").text(totalRecords);
+                    //有totalRecords，说明有查询结果
+                    $(".tnc-search-noresults").hide();
+                });
+
+                $(".queryDuration").livequery(function () {
+                    $(this).each(function () {
+                        queryDuration += parseFloat($(this).val());
+                    });
+                    $("#globalQueryDuration").text(queryDuration);
+                });
+
+                var key = $("#keyword").val();
+                if (key == null) {
+                    $(".tn-cue-tips").show();
+                    $(".tnc-search-noresults").hide();
+                }
+
+                this.searchForm = $('#searchForm');
+                this.keyword = $('#keyword', this.searchForm);
+
+                //注册自动完成响应事件
+                this.keyword.bind("input.autocomplete", function () {
+                    $(this).trigger('keydown.autocomplete');
+                });
+                this.keyword.autocomplete({
+                    minLength: 1,
+                    source: function (request, response) {
+                        //缓存搜索结果
+                        var term = request.term.toLowerCase(),
+                            element = this.element,
+                            cache = this.element.data('autocompleteCache') || {},
+                            foundInCache = false;
+
+                        $.each(cache, function (key, data) {
+                            if (term === key && data.length > 0) {
+                                response(data);
+                                foundInCache = true;
+                                return;
+                            }
+                        });
+
+                        if (foundInCache) return;
+                        var keyword = encodeURIComponent(self.keyword.val());
+                        $.getJSON('@SiteUrls.Instance().GlobalAutoComplete()?keyword=' + keyword + '&topNumber=10', function (data) {
+                            cache[term] = data;
+                            element.data('autocompleteCache', cache);
+
+                            response(data);
+                        });
+                    },
+                    search: function (event, ui) {
+                    },
+                    open: function (event, ui) {
+                    },
+                    focus: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        self.keyword.val(ui.item.tagName);
+                        self.searchForm.submit();
+                    }
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $('#template-auto-complete').tmpl(item).data("item.autocomplete", item).appendTo(ul);
+                };
+
+                //关键字输入框水印
+                this.keyword.watermark("请输入关键字");
+
+                //注册表单提交事件
+                this.searchForm.submit(function (e) {
+                    if ($.trim(self.keyword.val()) == "") {
+                        e.preventDefault();
+                    }
+
+                    if (self.resetForm) {
+                        self.clearForm();
+                    }
+                });
+
+                //注册搜索按钮点击事件
+                $('#button-search').click(function (e) {
+                    e.preventDefault();
+                    self.searchForm.submit();
+                });
+            }            
+        }
+
+        GlobalSearcher = new GlobalSearcher();
+    })
+</script>

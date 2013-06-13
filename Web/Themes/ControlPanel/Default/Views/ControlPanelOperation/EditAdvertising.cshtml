@@ -1,0 +1,418 @@
+﻿@model AdvertisingEditModel
+@{
+    Layout = "_ControlPanel";
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 20000035;
+    string title = Model.AdvertisingId > 0 ? "编辑广告" : "添加广告";
+    var advertisingType = Model.AdvertisingType;
+    var isUploadImage = Model.isUploadImage;
+    var name = Enum.GetName(typeof(AdvertisingType), Model.AdvertisingType);
+    int fontSize = ViewData.Get<int>("fontSize", 0);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center tnc-ctnborder">
+            <h1>
+                <span>@title</span></h1>
+            <div class="tnc-ctnright-list">
+                <div class="tnc-content-manage spb-add-ad">
+                    @using (Html.BeginAjaxForm("EditAdvertising", "ControlPanelOpreation", null, FormMethod.Post, new AjaxFormOptions {DataType=AjaxDataType.Json, OnSuccessCallBack = "OnEditAdvertisingSuccessCallBack" }, new { id = "form-create-advertising",enctype = "MULTIPART/FORM-DATA" }))
+                    {
+                            <table class="tn-table-grid tn-form-box tn-table-grid-td">
+                                <tbody class="tnui-options">
+                                    <tr>
+                                        <th>
+                                            @Html.FormLabelFor(model => model.Name)
+                                        </th>
+                                        <td class="tn-table-grid-td">
+                                            @Html.TextBoxFor(model => model.Name, InputWidthTypes.Long)
+                                            @Html.ValidationMessageFor(model => model.Name)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            有效期：
+                                        </th>
+                                        <td>
+                                            @Html.DateTimePicker("startDate", Model.StartDate)
+                                            到
+                                            @Html.DateTimePicker("endDate", Model.EndDate)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            呈现方式：
+                                        </th>
+                                        <td>
+                                            <input name="AdvertisingType" id="Script" value="@AdvertisingType.Script" type="radio" @if (Model.AdvertisingType == AdvertisingType.Script) { <text>checked="checked"</text>} class="tnui-radio-advertising-type" /><label for="Script">代码</label>
+                                            <input name="AdvertisingType" id="Text" value="@AdvertisingType.Text" type="radio" @if (Model.AdvertisingType == AdvertisingType.Text) { <text>checked="checked"</text>} class="tnui-radio-advertising-type" /><label for="Text">文字</label>
+                                            <input name="AdvertisingType" id="Image" value="@AdvertisingType.Image" type="radio" @if (Model.AdvertisingType == AdvertisingType.Image) { <text>checked="checked"</text>} class="tnui-radio-advertising-type" /><label for="Image">图片</label>
+                                            <input name="AdvertisingType" id="Flash" value="@AdvertisingType.Flash" type="radio" @if (Model.AdvertisingType == AdvertisingType.Flash) { <text>checked="checked"</text>} class="tnui-radio-advertising-type" /><label for="Flash">flash</label>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody class="tnui-type tnui-script" @if (Model.AdvertisingType != AdvertisingType.Script)
+                                                                     {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                        </th>
+                                        <td>
+                                            @Html.TextAreaFor(model => model.ScriptContent, InputWidthTypes.Long,5,0,htmlAttributes:new RouteValueDictionary{{"class","canIgnore"}})<br />
+                                            <label class="tn-text-note">
+                                                可以录入Html和JavaScript代码</label><br />
+                                            @Html.ValidationMessageFor(model => model.ScriptContent)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody class="tnui-type tnui-text" @if (Model.AdvertisingType != AdvertisingType.Text)
+                                                                   {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                            文字内容：
+                                        </th>
+                                        <td>
+                                            <div class="tnc-formbtn-box">
+                                                <a href="javascript:void(0)" id="AdvertisingTextColor" class="tnc-formbtn-a"></a>
+                                                <a href="javascript:void(0)" id="AdvertisingTextWeight" class="tnc-formbtn-b"></a>
+                                                <a href="javascript:void(0)" id="AdvertisingTextItalic" class="tnc-formbtn-i"></a>
+                                                <a href="@SiteUrls.Instance()._SetFontSize(fontSize,12)" id="AdvertisingTextSize" class="tnc-formbtn-s" plugin="dialog" ><span>@fontSize</span></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                        </th>
+                                        <td>
+                                            @Html.TextAreaFor(model => model.TextContent, InputWidthTypes.Long,5,0, htmlAttributes: new RouteValueDictionary { { "id", "AdvertisingTextContent" }, { "style", Model.TextStyle } ,{"class","canIgnore"} })<br />
+                                            @Html.ValidationMessageFor(model => model.TextContent)
+                                            @Html.HiddenFor(model => model.TextStyle)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            文字链接：
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(model => model.TextLinkedUrl, InputWidthTypes.Long, new RouteValueDictionary { { "class", "canIgnore" } })
+                                            @Html.ValidationMessageFor(model=>model.TextLinkedUrl)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            在新窗口打开：
+                                        </th>
+                                        <td class="tn-table-grid-td">
+                                            @Html.RadioButtonFor(model=>model.IsTextBlank,true,new{id="isTextBlank"})
+                                            <label for="isTextBlank">是</label>
+                                            @Html.RadioButtonFor(model => model.IsTextBlank, false, new { id = "notTextBlank" })
+                                            <label for="notTextBlank">否</label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody class="tnui-type tnui-image tuni-upload-select" @if (Model.AdvertisingType != AdvertisingType.Image)
+                                                                                       {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                            图片文件：
+                                        </th>
+                                        <td class="tn-table-grid-td">
+                                            @Html.RadioButtonFor(model => model.isUploadImage, true, new { @class = "radio-image-type" ,id="isUpload"})
+                                            <label for="isUpload">上传</label>
+                                            @Html.RadioButtonFor(mdoel => mdoel.isUploadImage, false, new { @class = "radio-image-type",id="isLink" })
+                                            <label for="isLink">链接</label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody class="tnui-type tnui-image tnui-type-image-upload" @if (Model.AdvertisingType != AdvertisingType.Image)
+                                                                                           {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                        </th>
+                                        <td>
+                                            <input id="UploadImageFileName" name="UploadImageFileName" type="file" class="canIgnore  tn-input-long" />
+                                        </td>
+                                    </tr>
+                                    @if (!string.IsNullOrEmpty(Model.UploadImageFileName))
+                                    { 
+                                        <tr id="advertising-image-show">
+                                            <th>
+                                            </th>
+                                            <td>
+                                                <img src="@SiteUrls.Instance().LogoUrl(Model.UploadImageFileName, TenantTypeIds.Instance().Advertising(), ImageSizeTypeKeys.Instance().Original())" width="200" height="200"/>
+                                                @Html.Link("删除", SiteUrls.Instance()._DeleteAdvertisingImage(Model.AdvertisingId), "删除示意图", new { id = "deleteAdvertisingImage" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tbody class="tnui-type tnui-image tnui-type-image-link" @if (Model.AdvertisingType != AdvertisingType.Image)
+                                                                                         {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(model => model.NetImageUrl, InputWidthTypes.Long, new RouteValueDictionary { { "class", "canIgnore" } })
+                                            @Html.ValidationMessageFor(model=>model.NetImageUrl)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody class="tnui-type tnui-image" @if (Model.AdvertisingType != AdvertisingType.Image)
+                                                                    {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                            在新窗口打开：
+                                        </th>
+                                        <td class="tn-table-grid-td">
+                                            @Html.RadioButtonFor(model => model.IsImageBlank, true, new{id="isImageBlank"})
+                                            <label for="isImageBlank">是</label>
+                                            @Html.RadioButtonFor(model => model.IsImageBlank, false, new {id="notImageBlank"})
+                                            <label for="notImageBlank">否</label> 
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            图片宽度：
+                                        </th>
+                                        <td >
+                                            @Html.TextBoxFor(model => model.ImageWidth, InputWidthTypes.Short, new RouteValueDictionary { { "class", "canIgnore" } }) px
+                                            @Html.ValidationMessageFor(model => model.ImageWidth)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            图片高度：
+                                        </th>
+                                        <td >
+                                            @Html.TextBoxFor(model => model.ImageHeight, InputWidthTypes.Short, new RouteValueDictionary { { "class", "canIgnore" } }) px
+                                            @Html.ValidationMessageFor(model => model.ImageHeight)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            图片链接：
+                                        </th>
+                                        <td >
+                                            @Html.TextBoxFor(model => model.ImageLinkedUrl, InputWidthTypes.Long, new RouteValueDictionary { { "class", "canIgnore" } })<br />
+                                            @Html.ValidationMessageFor(model=>model.ImageLinkedUrl)
+                                        </td>
+                                    </tr>                                    
+                                </tbody>
+                                <tbody class="tnui-type tnui-flash" @if (Model.AdvertisingType != AdvertisingType.Flash)
+                                                                    {<text>style="display:none"</text>}>
+                                    <tr>
+                                        <th>
+                                            Flash宽度：
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(model => model.FlashWidth, InputWidthTypes.Short ,new RouteValueDictionary { { "class", "canIgnore" } }) px
+                                            @Html.ValidationMessageFor(model => model.FlashWidth)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Flash高度：
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(model => model.FlashHeight, InputWidthTypes.Short ,new RouteValueDictionary { { "class", "canIgnore" } }) px
+                                            @Html.ValidationMessageFor(model => model.FlashHeight)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Flash地址：
+                                        </th>
+                                        <td>
+                                            @Html.TextBoxFor(model => model.FlashUrl, InputWidthTypes.Long ,new RouteValueDictionary { { "class", "canIgnore" } })
+                                            @Html.ValidationMessageFor(model => model.FlashUrl)
+                                        </td>
+                                    </tr>                                    
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            启用：
+                                        </th>
+                                        <td class="tn-table-grid-td">
+                                            @Html.RadioButtonFor(model => model.IsEnable, true, new { @class = "radio-isEnabled",id="isEbalbedTrue"})
+                                            <label for="isEnabledTrue">是</label>
+                                            @Html.RadioButtonFor(model => model.IsEnable, false, new { @class = "radio-isEnabled",id="isEnabledFalse" })
+                                            <label for="isEnabledFalse">否</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            广告位：
+                                        </th>
+                                        <td id="td-advertising-position-list">
+                                            @Html.Action("_AdvertisingPositionList", "ControlPanelOperation", new { advertisingId =Model.AdvertisingId})
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                        </th>
+                                        <td>
+                                            @Html.Button("提交", ButtonTypes.Button, HighlightStyles.Primary, htmlAttributes: new { id = "edit-advertising-submit" })
+                                            @Html.Button("取消", ButtonTypes.Cancel, HighlightStyles.Secondary,url:SiteUrls.Instance().ManageAdvertisings())
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    //成功后的回调函数
+    function OnEditAdvertisingSuccessCallBack(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            window.location.href = "@SiteUrls.Instance().ManageAdvertisings()";
+        });
+    }
+
+    //设置单选钮选中时的显示样式
+    function setAdvertisingType(type) {
+        $(".tnui-" + type).show();
+        $(".canIgnore",".tnui-" + type).removeClass("ignore");
+        $(".tnui-" + type).siblings().each(function(){
+            $(".canIgnore", this).addClass("ignore");
+        });
+        
+        $(".tnui-" + type).siblings(".tnui-type").hide();
+        if (type == "image") {
+            $(".tuni-upload-select").show();
+            $(".tnui-image").show();
+            if ($(".radio-image-type:checked").val().toLocaleLowerCase() == "true") {
+                $("tbody.tnui-type-image-upload").show();
+                $("tbody.tnui-type-image-link").hide();
+
+            } else {
+                $("tbody.tnui-type-image-upload").hide();
+                $("tbody.tnui-type-image-link").show();
+            }
+
+        }
+    }
+
+
+
+    $(document).ready(function () {
+
+        //关闭火狐浏览器下radioButton和checkBox的自动完成。
+        if ($.browser.mozilla) {
+            $("input[type='radio']").attr("autocomplete", "off");
+            $("input[type='checkbox']").attr("autocomplete", "off");
+        }
+
+        //设置页面初始化时的验证忽略
+        var InitType = $(".tnui-radio-advertising-type:checked");
+        setAdvertisingType(InitType.val().toLocaleLowerCase());
+
+        //文字样式自动选中
+        if ($("#AdvertisingTextContent").css("font-weight") == 'bold' || $("#AdvertisingTextContent").css("font-weight") == '700') {
+            $("#AdvertisingTextWeight").addClass("tn-selected");
+        }
+        if ($("#AdvertisingTextContent").css("font-style") == 'italic') {
+            $("#AdvertisingTextItalic").addClass("tn-selected");
+        }
+        if ($("#AdvertisingTextContent").css("text-decoration") == 'underline') {
+            $("#AdvertisingTextUnderline").addClass("tn-selected");
+        }
+        $("#AdvertisingTextSize").children().remove();
+        var _size = $("#AdvertisingTextSize").css("font-size");
+        _size = _size.substring(0, (_size.length - 2));
+        $("#AdvertisingTextSize").append("<span>" + _size + "</span>");
+
+        //文字颜色
+        $("#AdvertisingTextColor").bigColorpicker(function (el, color) {
+            $("#AdvertisingTextContent").css("color", color);
+            $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+        });
+
+        //文字加粗
+        $('#AdvertisingTextWeight').click(function () {
+            if ($(this).hasClass("tn-selected")) {
+                $(this).removeClass("tn-selected")
+                $('#AdvertisingTextContent').css('font-weight', 'normal');
+                $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            }
+            else {
+                $(this).addClass("tn-selected")
+                $('#AdvertisingTextContent').css('font-weight', 'bold');
+                $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            }
+        });
+
+        //文字倾斜
+        $('#AdvertisingTextItalic').click(function () {
+            if ($(this).is(".tn-selected")) {
+                $(this).removeClass("tn-selected")
+                $('#AdvertisingTextContent').css('font-style', 'normal');
+                $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            }
+            else {
+                $(this).addClass("tn-selected")
+                $('#AdvertisingTextContent').css('font-style', 'italic');
+                $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            }
+        });
+
+        //文字下划线
+        $('#AdvertisingTextUnderline').click(function () {
+            if ($(this).is(".tn-selected")) {
+                $(this).removeClass("tn-selected")
+                $('#AdvertisingTextContent').css('text-decoration', '');
+                $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            }
+            else {
+                $(this).addClass("tn-selected")
+                $('#AdvertisingTextContent').css('text-decoration', 'underline');
+                $('#TextStyle').val($('#AdvertisingTextContent').attr('style'));
+            }
+        });
+
+        //处理单选按钮的切换
+        $(".tnui-radio-advertising-type").click(function () {
+            setAdvertisingType($(this).val().toLocaleLowerCase());
+        });
+
+        //处理上传图片和网络图片
+        $(".radio-image-type").click(function () {
+            var value = $(this).val().toLocaleLowerCase();
+            if (value == 'true') {
+                $(".tnui-type-image-upload").show();
+                $(".tnui-type-image-link").hide();
+            } else {
+                $(".tnui-type-image-upload").hide();
+                $(".tnui-type-image-link").show();
+            }
+        });
+
+        //删除图片
+        $("#deleteAdvertisingImage").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm("您确认要删除该示意图吗？", function () {
+                $.post(url, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        $("#advertising-image-show").remove();
+                    });
+                });
+            })
+        });
+
+        //验证用户是否上传了图片
+        $("#edit-advertising-submit").click(function (e) {
+            e.preventDefault();
+            if (!$("#advertising-image-show").length && $("#UploadImageFileName").val() == "" && $(".tnui-radio-advertising-type:checked").val() == "Image" && $("input[name='isUploadImage']:checked").val()=="True") {
+                art.dialog.alert("必须上传图片！");
+                return false;
+            } else {
+                $(this).submit();
+            }
+        });
+    });
+
+</script>

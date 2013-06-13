@@ -1,0 +1,126 @@
+﻿@model BarSectionEditModel
+@{
+    Layout = "app-1col";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@Html.StatusMessage()
+@using (Html.BeginForm("CreateSection", "Bar", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-create-posts">
+        <div class="tn-box-content tn-widget-content tn-corner-all">
+            <div class="tn-main-heading">
+                <h2>
+                    创建帖吧</h2>
+            </div>
+            <div class="tn-form-box">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>@Html.FormLabelFor(n => n.Name)
+                            </th>
+                            <td>@Html.TextBoxFor(n => n.Name, InputWidthTypes.Long)
+                                @Html.ValidationMessageFor(n => n.Name)
+                                <div class="tn-explain">
+                                    <span class="tn-text-note">@Html.DescriptionFor(n => n.Name)</span></div>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.FormLabelFor(n => n.CategoryId)
+                            </th>
+                            <td>
+                                @Html.CategoryDropDownListFor(n => n.CategoryId, TenantTypeIds.Instance().BarSection(), 2)
+                                @Html.ValidationMessageFor(n => n.CategoryId)
+                                <div class="tn-explain">
+                                    <span class="tn-text-note">@Html.DescriptionFor(n => n.Name)</span></div>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.FormLabelFor(n => n.ManagerUserIds)
+                            </th>
+                            <td>
+                                @Html.UserSelector("ManagerUserIds", ViewData.Get<int>("SectionManagerMaxCount", 5), null, SelectorWidthType.Long, UserSelectorSearchScope.Site)
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(n => n.ManagerUserIds)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Logo：
+                            </th>
+                            <td>
+                                <input type="file" name="LogoImage" id="LogoImage" />
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.FormLabelFor(n => n.Description)
+                            </th>
+                            <td>
+                                @Html.HtmlEditorFor(n => n.Description, new HtmlEditorOptions(HtmlEditorMode.Simple))
+                                @Html.ValidationMessageFor(n => n.Description)
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.FormLabelFor(n => n.ThreadCategoryStatus)
+                            </th>
+                            <td>
+                                <ul class="tn-radiobutton-list">
+                                    <li>
+                                        @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.ForceEnabled, false, new { id = "ForceEnabled", @class = "tn-radiobutton" })
+                                        <label for="ForceEnabled">
+                                            强制分类</label>
+                                    </li>
+                                    <li>
+                                        @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.NotForceEnabled, true, new { id = "NotForceEnabled", @class = "tn-radiobutton" })
+                                        <label for="NotForceEnabled">
+                                            允许分类</label>
+                                    </li>
+                                    <li>
+                                        @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.Disabled, false, new { id = "Disabled", @class = "tn-radiobutton" })
+                                        <label for="Disabled">
+                                            禁用</label>
+                                    </li>
+                                    @Html.ValidationMessageFor(n => n.ThreadCategoryStatus)
+                                </ul>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                &nbsp;
+                            </th>
+                            <td>
+                                @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                                @if (HttpContext.Current.Request.UrlReferrer != null)
+                                {
+                                    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, ButtonSizes.Large, url: HttpContext.Current.Request.UrlReferrer.AbsoluteUri)
+                                }
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

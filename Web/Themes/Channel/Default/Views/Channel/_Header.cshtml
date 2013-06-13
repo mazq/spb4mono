@@ -1,0 +1,182 @@
+﻿@{  
+    IEnumerable<Navigation> navigations = ViewData.Get<IEnumerable<Navigation>>("Navigations", null);
+    var currentUser = UserContext.CurrentUser;
+    string search = ViewData.Get<string>("search", null);
+    var registrationMode = DIContainer.Resolve<IUserSettingsManager>().Get().RegistrationMode;
+    bool groupIsEnable = ViewData.Get<bool>("groupIsEnable", false);
+    Navigation navigation = null;
+    foreach (var nav in navigations)
+    {
+        if (nav.ApplicationId == 1011)
+        {
+            navigation = nav;
+        }
+    }
+}
+<!--[if IE 6]>
+<script type="text/javascript" src="@(Tunynet.Utilities.WebUtility.ResolveUrl("~/Scripts/jquery/DD_belatedPNG/jquery.DD_belatedPNG-0.0.8a.js"))"></script>
+<![endif]-->
+<div class="spb-top-menubar">
+    <div class="tn-inner tn-helper-clearfix">
+        <div class="spb-logo">
+            <h1>
+                <a href="@SiteUrls.Instance().SiteHome()">spacebuilder</a></h1>
+        </div>
+        <ul id="spb-global-nav" class="spb-menu tn-drop-menu">
+            @{
+                var homeUrl = currentUser != null ? SiteUrls.Instance().MyHome(currentUser.UserId) : SiteUrls.Instance().SimpleHome();
+                string currentNavigationId = string.Empty;
+                if (Html.ViewContext.RouteData.Values.ContainsKey("CurrentNavigationId"))
+                {
+                    currentNavigationId = Html.ViewContext.RouteData.Values["CurrentNavigationId"].ToString();
+                }
+            }
+            <li @if (currentNavigationId.Equals("11000101"))
+                {  @("class=tn-selected") }><a  class="spb-menu-link"  href="@homeUrl" >首页</a></li>
+            <li><a class="spb-menu-link" href="@SiteUrls.Instance().SiteHome()">广场</a> </li>
+            <li><a class="spb-menu-link" href="@SiteUrls.Instance().FindUserHome()">找人</a></li>
+            @if (groupIsEnable&&navigation!=null)
+            {
+            <li>@Html.Action("_GroupGlobalNavigations", "ChannelGroup", new { area = "Group" })
+            </li>
+            }
+            <li><a class="spb-menu-link" href="javascript:;">应用</a>
+                <ul class="tn-widget-content tn-border-gray spb-app-menu">
+                    @if (navigations != null)
+                    {
+                        foreach (var nav in navigations)
+                        {
+                            if (!nav.IsVisible(UserContext.CurrentUser))
+                            {
+                                continue;
+                            }
+
+                        <li><a class="tn-item-link" href="@nav.GetUrl()" target="@nav.NavigationTarget">
+                            @if (!string.IsNullOrEmpty(nav.IconName))
+                            {
+                                @Html.Icon((IconTypes)Enum.Parse(typeof(IconTypes), nav.IconName, false))
+                            }
+                            @nav.NavigationText</a></li>
+                        }
+                    }
+                </ul>
+            </li>
+        </ul>
+        <div class="tn-search-box">
+            @using (Html.BeginForm("GlobalSearch", "Channel", FormMethod.Get, new { id = "quickSearchForm" }))
+            {
+                <input type="text" class="tn-search-input tn-input-medium tn-border-gray tn-border-tbl"
+                    id="keyword" name="keyword" autocomplete="off" />                
+                <span id="button-search-header" class="tn-search-button tn-search-ico-button tn-border-gray tn-bg-gray required">
+                    <button>
+                        <span class="tn-icon tn-smallicon-find">搜索</span></button>
+                </span>
+            }
+        </div>
+        <div class="spb-user-menu">
+            @if (currentUser != null)
+            {
+                <ul id="spb-user-menu" class="spb-user-act tn-drop-menu">
+                    <li class="spb-current-user">
+                        @Html.ShowUserAvatar(currentUser.UserId, AvatarSizeType.Micro, enableCachingInClient: false, isShowUserCard: false)
+                        <a  class="tn-user-name" href="@SiteUrls.Instance().MyHome(currentUser.UserName)" title="@currentUser.DisplayName">@Html.ShowUserDisplayName(currentUser.DisplayName, 6)</a></li>
+                    <li class="tn-icon-menu">@Html.Link("注销", SiteUrls.Instance().Logout(), "退出", new { @class = "tn-icon tn-icon-quit" })</li>
+                    <li class="tn-icon-menu"><a class="tn-icon tn-icon-email tn-msg-bubble-fix" title="消息"  name="messagePrompt" menu="#messagePrompt" url='@SiteUrls.Instance()._ListPrompt()'  href="@SiteUrls.Instance().ListMessageSessions(currentUser.UserName, null)">
+                        消息
+                        @{int count = ViewData.Get<int>("PromptCount", 0);
+                          if (count > 0)
+                          {
+                            <span class="tn-msg-bubble">@(count)</span>
+                          }
+                        }
+                    </a>
+                        @if (count > 0)
+                        { 
+                            <div id="messagePrompt" style="display: none" class="tn-widget tn-bubble tn-bubble-arrow-top tnc-prompt">
+                                <div class="tn-bubble-arrow">
+                                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                                    </b>
+                                </div>
+                                <div class="tn-bubble-content tn-widget-content tn-border-gray">
+                                    <div class="tn-loading">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        { 
+                            <ul class="tn-widget-content tn-border-gray spb-set-menu">
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().ListMessageSessions(currentUser.UserName, null)">
+                                    私信</a></li>
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().ListInvitations(currentUser.UserName)">
+                                    请求</a></li>
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().ListNotices(currentUser.UserName, null, null)">
+                                    通知</a></li>
+                                @*                                <li><a class="tn-item-link" href="@SiteUrls.Instance().Notice(currentUser.UserId)">通知</a></li>
+*@ @*                     <li><a class="tn-item-link" href="#">@@我的内容</a></li>
+                                <li><a class="tn-item-link" href="@SiteUrls.Instance().AtMeComments(currentUser.UserName, null)">
+                                    @@我的评论</a></li>*@
+                            </ul>
+                        }
+                    </li>
+                    <li class="tn-icon-menu"><a class="tn-icon tn-icon-set" title="设置" href="@SiteUrls.Instance().EditUserProfile(currentUser.UserName)">
+                        设置</a>
+                        <ul class="tn-widget-content tn-border-gray spb-set-menu">
+                            <li><a class="tn-item-link" href="@SiteUrls.Instance().EditUserProfile(currentUser.UserName)">
+                                编辑资料</a></li>
+                            <li><a class="tn-item-link" href="@SiteUrls.Instance().UserPrivacyItemsSettings(currentUser.UserName)">
+                                隐私设置</a></li>
+                            <li><a class="tn-item-link" href="@SiteUrls.Instance().UpdateIdentification(currentUser.UserName)">
+                                身份认证</a></li>
+                            @if (currentUser.IsAllowEntryControlPannel())
+                            { 
+                                <li><a class="tn-item-link" target="_blank" href="@SiteUrls.Instance().ManageHome()">
+                                    后台管理</a></li>
+                            }
+                            @if (currentUser.IsInRoles(RoleNames.Instance().SuperAdministrator(), RoleNames.Instance().ContentAdministrator()))
+                            {  <li><a class="tn-item-link" href="@SiteUrls.Instance()._ThemeSettings(PresentAreaKeysOfBuiltIn.Channel)" plugin="dialog">
+                                  站点装扮</a></li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            }
+            else
+            {
+                <ul class="spb-sign-menu">
+                    <li>@Html.Link("登录", SiteUrls.Instance().Login(true, SiteUrls.LoginModal._LoginInModal), "登录", new { id = "login", plugin = "dialog" })</li>
+                    @if (registrationMode == RegistrationMode.All)
+                    { 
+                        <li>@Html.Link("注册", SiteUrls.Instance().Register(), "注册")</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+@Html.Action("_QuickSearch", "Channel", new { area = "Common" })
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#spb-global-nav').dcMegaMenu({
+            rowItems: '1',
+            speed: 'fast',
+            effect: 'fade'
+        });
+
+        $('#spb-user-menu').dcMegaMenu({
+            rowItems: '2',
+            speed: 'fast',
+            effect: 'fade',
+            fullWidth: true
+        });
+
+        $(".tn-drop-menu ul a.tn-item-link").hover(
+            function () {
+                $(this).addClass("tn-bg-gray");
+            },
+            function () {
+                $(this).removeClass("tn-bg-gray");
+            });
+    });
+</script>

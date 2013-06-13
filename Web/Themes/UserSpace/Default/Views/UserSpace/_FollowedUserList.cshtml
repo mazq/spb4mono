@@ -1,0 +1,44 @@
+﻿@model IEnumerable<User>
+@{ 
+    Dictionary<long, bool> isFollowesUser = ViewData.Get<Dictionary<long, bool>>("isFollowesUser", null);
+    bool isSameUser = ViewData.Get<bool>("isSameUser", false);
+    GenderType gender = ViewData.Get<GenderType>("gender", GenderType.NotSet);
+    int followedUsersCount = ViewData.Get<int>("followedUsersCount", 0);
+    string showName = "他关注的人";
+    if (isSameUser)
+    {
+        showName = "我关注的人";
+    }
+    else if (gender == GenderType.FeMale)
+    {
+        showName = "她关注的人";
+    }
+    else if (gender == GenderType.NotSet)
+    {
+        showName = "Ta关注的人";
+    }
+}
+<div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <div class="tn-option">
+        <a href="@SiteUrls.Instance().ListFollowedUsers(Url.SpaceKey())">更多</a></div>
+    <h3 class="tn-helper-reset">
+        @showName</h3>
+    <em class="tn-count">（@followedUsersCount）</em>
+</div>
+<div class="tn-box-content tn-widget-content tn-corner-bottom">
+    <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+        @if (Model == null || Model.Count() == 0)
+        {
+            @Html.Raw("暂无关注用户")
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+            <li class="tn-avatar-item">
+                @Html.ShowUserAvatar(item.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                <a href="@SiteUrls.Instance().SpaceHome(item.UserId)" class="tn-user-name" title="@item.DisplayName" target="_blank">@item.DisplayName</a></li>
+            }
+        }
+    </ul>
+</div>

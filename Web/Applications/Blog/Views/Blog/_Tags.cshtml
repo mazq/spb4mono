@@ -1,0 +1,46 @@
+﻿@model  Dictionary<TagInOwner, int>
+@{
+    IUser currentUser = UserContext.CurrentUser;
+    string selfUrl = Request.Url.AbsoluteUri;
+}
+@if ((Model != null && Model.Count() > 0) || currentUser != null)
+{
+<div id="manageTagsDiv" class="tn-box tn-widget tn-widget-content tn-corner-all spb-hot-tags">
+    <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <h3 class="tn-helper-reset">标签</h3>
+    </div>
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+    <div class="tn-tags-wrap">
+        <p class="tn-tags-cloud"> 
+        @if (Model.Count>0)
+        {
+            foreach (var tag in Model)
+            {
+    <span class="tn-font-size-@tag.Value"><a href="@SiteUrls.Instance().BlogList(Url.SpaceKey(), ListType.Tag, tag.Key.TagName)">@Tunynet.Utilities.StringUtility.Trim(tag.Key.TagName,10)</a></span> 
+            }
+        }
+        else { 
+        @:暂无标签
+        }
+        </p>
+        @if (currentUser != null && currentUser.UserName == Url.SpaceKey())
+        {
+            <p class="tn-actions">
+             <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance()._CreateMyTag(Url.SpaceKey(),TenantTypeIds.Instance().BlogThread())&callBack=CreateTagCallback" plugin = "dialog"><span class="tn-icon tn-smallicon-add"> </span><span class="tn-action-text">添加</span></a>
+             <a class="tn-action tn-action-text-icon" href="@SiteUrls.Instance().ManageMyTags(Url.SpaceKey(), TenantTypeIds.Instance().BlogThread())"> <span class="tn-icon tn-smallicon-config"></span><span class="tn-action-text">管理</span></a>
+            </p>
+        }
+    </div>
+    </div>
+</div>
+<script>
+    function CreateTagCallback(data) {
+        art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+            url = '@(selfUrl)'
+            $.get(url, function (data) {
+                $("#manageTagsDiv").replaceWith(data);
+            })
+        });
+    }
+</script>
+}

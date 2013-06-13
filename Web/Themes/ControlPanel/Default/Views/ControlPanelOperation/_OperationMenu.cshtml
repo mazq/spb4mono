@@ -1,0 +1,79 @@
+﻿@{
+    OperationMenu menu = OperationMenu.ManagePointRecords;
+    menu = ViewData["OperationMenu"] == null ? OperationMenu.ManagePointRecords : (OperationMenu)ViewData["OperationMenu"];
+}
+<div class="tn-block">
+    <div class="tnc-aside">
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-sidebar">
+            <div class="tn-box-content tn-widget-content tn-corner-all">
+                <div class="tnc-menu-item">
+                    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                        <h4>
+                            <span class="tn-icon-file"></span>运营</h4>
+                    </div>
+                    <ul class="tn-side-menu">
+                        <li @if (menu == OperationMenu.ManagePointRecords)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManagePointRecords())">
+                                积分记录</a></li>
+                        <li @if (menu == OperationMenu.ManageSearchedTerms)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageSearchedTerms())">
+                                搜索热词</a></li>
+                        <li @if (menu == OperationMenu.ManageRecommendItems)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageRecommendItems())">
+                                内容推荐</a></li>
+                        <li @if (menu == OperationMenu.ManageRecommendUsers)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageRecommendUsers())">
+                                用户推荐</a></li>
+                        <li @if (menu == OperationMenu.ManageAccountTypes)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageAccountTypes())">
+                                第三方帐号绑定</a></li>
+                        <li @if (menu == OperationMenu.ManageEmotionCategories)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageEmotionCategories())">
+                                表情包管理</a></li>
+                        <li @if (menu == OperationMenu.ManageSensitiveWords)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageSensitiveWords())">
+                                敏感词管理</a></li>
+                        <li @if (menu == OperationMenu.ManageAnnouncements)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageAnnouncements())">
+                                公告管理</a></li>
+                        <li @if (menu == OperationMenu.ManageOperationLogs)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageOperationLogs())">
+                                操作日志管理</a></li>
+                        <li @if (menu == OperationMenu.ManageImpeachReports)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageImpeachReports())">
+                                用户举报管理</a></li>
+                        <li @if (menu == OperationMenu.ManageLinks)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageLinksForAdmin())">
+                                友情链接管理</a></li>
+                        <li @if (menu == OperationMenu.ManageCustomMessage)
+                            {@Html.Raw("class=\"tnc-sublist-over\"");
+                            } ><em></em><a class="tn-menu-text" href="@(SiteUrls.Instance().ManageCustomMessage())">
+                                友情链接管理</a></li>
+                    </ul>
+                </div>
+                <div class="tnc-menu-item">
+                    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                        <h4>
+                            <span class="tn-icon-file"></span>最近访问</h4>
+                    </div>
+                    <ul class="tn-side-menu">
+                        <li><em></em><a class="tn-menu-text" href="#">问答管理</a></li>
+                        <li><em></em><a class="tn-menu-text" href="#">日志管理</a></li>
+                        <li><em></em><a class="tn-menu-text" href="#">投票管理</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

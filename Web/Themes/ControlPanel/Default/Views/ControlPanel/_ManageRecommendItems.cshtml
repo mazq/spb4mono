@@ -1,0 +1,86 @@
+﻿@model IEnumerable<RecommendItem>
+@Html.LinkScript("~/Scripts/tunynet/jquery.tn.changeDisplayOrder.js")
+@{
+    bool showLinkButton = ViewData.Get<bool>("showLinkButton", true);
+    var recommendType = ViewData.Get<RecommendItemType>("RecommendType", null);
+}
+@if (Model != null)
+{ 
+    <div class="tnc-dailog-pd">
+        @if (showLinkButton)
+        { 
+            <div class="tn-helper-right">
+                @Html.LinkButton("添加外链推荐", SiteUrls.Instance()._RecommendItem(recommendType.TenantTypeId, recommendItemTypeId: recommendType.TypeId, showLink: true, showInList: false), HighlightStyles.Primary, iconType: IconTypes.SmallAdd, htmlAttributes: new { plugin = "dialog", id = "addRecommendLink" })
+            </div>
+        }
+        @if (Model.Count() == 0)
+        { 
+            <div class="tn-no-data">
+                没有查询到数据！</div>
+        }
+        else
+        {
+            bool hasFeaturedImage = Model.First().RecommendItemType.HasFeaturedImage;
+            <table class="tn-table-grid">
+                <tr class="tn-table-grid-header">
+                    @if (hasFeaturedImage || Model.First().TenantTypeId == TenantTypeIds.Instance().User())
+                    { 
+                        <th class="tn-border-bottom tn-border-gray tn-text-note">
+                        </th>
+                    }
+                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                        主题
+                    </th>
+                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                        操作
+                    </th>
+                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                    </th>
+                    <th class="tn-border-bottom tn-border-gray tn-text-note">
+                    </th>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    <tr class="tn-table-grid-row" id ="RecommendItem_@(item.Id)" data-id="@item.Id">
+                        @if (hasFeaturedImage || Model.First().TenantTypeId == TenantTypeIds.Instance().User())
+                        { 
+                            <td class="tn-border-bottom tn-border-gray tn-nowrap">
+                                @if (item.TenantTypeId == TenantTypeIds.Instance().User())
+                                { 
+                                    @Html.ShowUserAvatar(item.ItemId, AvatarSizeType.Micro, false)
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(item.FeaturedImage))
+                                    { 
+                                    <div class="tn-avatar-mini">
+                                        <img width="25" title="@item.ItemName" src="@SiteUrls.Instance().LogoUrl(item.FeaturedImage, TenantTypeIds.Instance().Recommend(), ImageSizeTypeKeys.Instance().Small())"/>
+                                    </div>
+                                    }
+                                }
+                            </td>
+                        }
+                        <td class="tn-border-bottom tn-border-gray tn-width-auto">
+                            <label id="recommendTitle-@(item.Id)" title="@item.ItemName">@StringUtility.Trim(item.ItemName, 18)</label>
+                        </td>
+                        <td class="tn-border-bottom tn-border-gray tn-width-icon1">
+                            @Html.Link("上移", SiteUrls.Instance()._ChangeRecommendOrder(), "上移", new { @class = "tn-icon tn-smallicon-upload", id = "display-order-" + "up" + item.Id, name = item.Id })
+                        </td>
+                        <td class="tn-border-bottom tn-border-gray tn-width-icon1">
+                            @Html.Link("下移", SiteUrls.Instance()._ChangeRecommendOrder(), "下移", new { @class = "tn-icon tn-smallicon-download", id = "display-order-" + "down" + item.Id, name = item.Id })
+                        </td>
+                        <td class="tn-border-bottom tn-border-gray tn-width-action2 tn-nowrap">
+                            @Html.Link("编辑", SiteUrls.Instance()._RecommendItem(recommendId: item.Id, needRefresh: false, showInList: false), "编辑", new { plugin = "dialog", id = "addRecommendLink" })
+                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定删除吗？").SetText("删除").SetTooltip("删除该推荐")
+                        .SetDeleteTarget("#RecommendItem_" + item.Id)
+                        .SetUrl(SiteUrls.Instance()._DeleteRecommend(item.Id)))
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+}
+<script type="text/dialog">
+    this.title("管理@(recommendType.Name)");
+</script>

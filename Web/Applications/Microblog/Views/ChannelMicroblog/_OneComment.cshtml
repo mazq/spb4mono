@@ -1,0 +1,41 @@
+﻿@model Comment
+@if (new Authorizer().Comment_Show(Model))
+{
+    <li class="tn-comment-item tn-border-gray tn-border-top" id="li-comment-@Model.Id">
+        <div class="tn-comment tn-helper-clearfix">
+            <div class="tn-comment-avatar">
+                @Html.ShowUserAvatar(Model.IsAnonymous ? 0 : Model.UserId, AvatarSizeType.Small)
+            </div>
+            <div class="tn-comment-info tn-hover">
+                <div class="tn-comment-act tn-state-hidden">
+                    @if (new Authorizer().Comment_Delete(Model))
+                    {
+                        @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetDeleteTarget("#li-comment-" + Model.Id).SetText("删除").SetUrl(SiteUrls.Instance()._DeleteComment(Model.Id)))
+                    }
+                    <a href="@SiteUrls.Instance()._ImpeachReport(Model.UserId, Model.GetCommentDetailUrl(), HtmlUtility.TrimHtml(Model.Body, 50))"  plugin="dialog" class="tn-report">举报</a></div>
+                <div class="tn-commentator">
+                    <h5>
+                        @if (Model.IsAnonymous)
+                        {
+                            @:匿名
+                        }
+                        else
+                        {
+                            @Html.Link(Model.Author, SiteUrls.Instance().SpaceHome(Model.UserId), Model.Author, new { @class = "tn-author" })
+                        }
+                    </h5>
+                    <em class="tn-text-note tn-date">@Model.DateCreated.ToFriendlyDate()</em>
+                    @if (Model.IsPrivate)
+                    {
+                        <span class="tn-explain-icon"><span class="tn-icon tn-icon-colorful tn-icon-colorful-private"></span><span class="tn-icon-text">悄悄话</span></span>
+                    }
+                </div>
+                <p>
+                    @Html.Raw(Model.Body)</p>
+                <div class="tn-comment-feed tn-helper-clearfix">
+                    <span class="tn-reply"><a foruser="@Model.User().NickName" textfor="Body-comment-@Model.CommentedObjectId" class="tn-action tn-action-text-icon-right" href="#"><span class="tn-action-text">回复</span></a> </span>
+                </div>
+            </div>
+        </div>
+    </li>
+}

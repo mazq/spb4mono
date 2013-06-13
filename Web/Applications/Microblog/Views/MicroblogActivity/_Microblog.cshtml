@@ -1,0 +1,153 @@
+﻿@model MicroblogEntity
+@{
+    IMicroblogUrlGetter urlGetter = MicroblogUrlGetterFactory.Get(Model.TenantTypeId);
+}
+@if (Model != null)
+{
+    long currentUserId = UserContext.CurrentUser == null ? 0 : UserContext.CurrentUser.UserId;
+    string spaceKey = UserIdToUserNameDictionary.GetUserName(currentUserId);
+    bool isMyTimeline = Request.QueryString.Get<bool>("isMyTimeline");
+
+    FavoriteService faroriteService = new FavoriteService(TenantTypeIds.Instance().Microblog());
+
+    <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom spb-microblog-item" id="microblog-@Model.MicroblogId" data-microblog-id="@Model.MicroblogId">
+        <div class="tn-list-item-area-left">
+            @{HyperLinkTarget hyperLinkTarget;
+              if (Model.UserId == currentUserId)
+              {
+                  hyperLinkTarget = HyperLinkTarget._self;
+              }
+              else
+              {
+                  hyperLinkTarget = HyperLinkTarget._blank;
+              }
+            }
+            @Html.ShowUserAvatar(Model.UserId, AvatarSizeType.Small, true, hyperLinkTarget)
+        </div>
+        <div class="tn-list-item-area-main ">
+            @Html.ActivityOperation(ViewData.Get<long>("ActivityId", 0))
+            <div class="tnc-dynamic-title">
+                <a href="@SiteUrls.Instance().SpaceHome(Model.UserId)" class="tn-user-name" @(Model.User == UserContext.CurrentUser ? "target=_self" : "target=_blank")>@Model.Author</a>
+                @Html.IdentificationType(Model.UserId)
+                @Html.Raw(Model.GetResolvedBody())
+            </div>
+            @*是否是转发的微博*@
+            @if (Model.IsForward)
+            {               
+                <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-bubble-wrap">
+                    <div class="tn-bubble-arrow">
+                        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                        </b>
+                    </div>
+                    <div class="tn-bubble-content tn-border-gray tn-corner-all">
+                        @if (Model.OriginalMicroblog != null)
+                        {
+                            string showOriginalMicroblogUrl = urlGetter.MicroblogDetail(Model.OriginalMicroblog.MicroblogId);
+                         
+                            <p>
+                                <a href="@SiteUrls.Instance().SpaceHome(Model.OriginalMicroblog.UserId)" class="tn-user-name" target="_blank">@Model.OriginalMicroblog.Author
+                                    @Html.IdentificationType(Model.OriginalMicroblog.UserId)：</a>
+                                @Html.Raw(Model.OriginalMicroblog.GetResolvedBody())
+                            </p>
+                            @Html.Action("_Microblog_Attachments", "MicroblogActivity", new RouteValueDictionary { { "microblogId", Model.OriginalMicroblog.MicroblogId }, { "forwardMicroblogId", Model.MicroblogId } })
+                            <div class="tn-list-item-row tn-helper-clear tn-helper-clearfix ">
+                                <em class="tn-date tn-text-note tn-helper-left"><a class="tn-secondary-text" href="@showOriginalMicroblogUrl" target="_blank">@Model.OriginalMicroblog.DateCreated.ToFriendlyDate()</a>
+                                </em><span class="tn-spacer tn-text-note">| </span><span class="tn-action"><a href="@showOriginalMicroblogUrl" target="_blank" class="tn-action-text">
+                                    原文转发
+                                    @if (Model.OriginalMicroblog.ForwardedCount > 0)
+                                    {
+                                        @("(" + Model.OriginalMicroblog.ForwardedCount + ")") 
+                                    }</a></span><span class="tn-spacer tn-text-note"> |</span> <span class="tn-action"><a href="@showOriginalMicroblogUrl" target="_blank">
+                                        原文评论
+                                        @if (Model.OriginalMicroblog.ReplyCount > 0)
+                                        {
+                                            @("(" + Model.OriginalMicroblog.ReplyCount + ")")
+                                        }</a> </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="tn-no-data">
+                                当前微博已被删除。
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                @Html.Action("_Microblog_Attachments", "MicroblogActivity", new RouteValueDictionary { { "microblogId", Model.MicroblogId } })
+            }
+            <div class="tn-list-item-row tn-helper-align-right tn-helper-clearfix ">
+                <span class="tn-helper-left"><em class="tn-date tn-text-note"><a class="tn-secondary-text" href="@urlGetter.MicroblogDetail(Model.MicroblogId)" target="_blank">@Model.DateCreated.ToFriendlyDate()</a>
+                </em><em class="tn-report">
+                    @if (Model.User != null)
+                    {
+                        <span class="tn-spacer tn-text-note">|</span> <a class="tn-action"
+                    href="@SiteUrls.Instance()._ImpeachReport(Model.UserId, SiteUrls.Instance().ShowMicroblog(Model.User.UserName, Model.MicroblogId), StringUtility.Trim(Model.Body, 64))" plugin="dialog">
+                            <span class="tn-action-text">举报</span> </a>
+                    }</em></span>
+                @if (!isMyTimeline && new Authorizer().Microblog_Delete(Model))
+                {
+                    <em class="tn-delete"><a name="deleteCurrentMblog-@Model.MicroblogId" data-id="@Model.MicroblogId" class="tn-action" href="@SiteUrls.Instance().Delete(spaceKey, Model.MicroblogId)">
+                        <span class="tn-action-text">删除</span></a><span class="tn-spacer tn-text-note">|</span></em>
+                }
+                @if (UserContext.CurrentUser != null)
+                {
+                    <a class="tn-action" href="@SiteUrls.Instance()._ForwardMicroblog(spaceKey, Model.MicroblogId)" plugin="dialog">
+                        <span class="tn-action-text">转发
+                            @if (Model.ForwardedCount > 0)
+                            {
+                                @("(" + Model.ForwardedCount + ")")
+                            }
+                        </span></a><span class="tn-spacer tn-text-note">|</span>
+                            string text = "收藏", stauts = "0";
+                            if (UserContext.CurrentUser != null && faroriteService.IsFavorited(Model.MicroblogId, UserContext.CurrentUser.UserId))
+                            {
+                                text = "取消收藏";
+                                stauts = "1";
+                            }
+                
+                    @Html.Link(text, SiteUrls.Instance().Favorite(spaceKey, Model.MicroblogId, currentUserId), text, new { id = "favoriteMicroblog-" + Model.MicroblogId, status = stauts })
+                    <span class="tn-spacer tn-text-note">|</span> <a class="tn-action" href="@Html.Raw(SiteUrls.Instance()._Comment_Microblog(Model.MicroblogId, Model.UserId, TenantTypeIds.Instance().Microblog(), subject: Url.Encode(HtmlUtility.TrimHtml(Model.Body, 10)), originalAuthor: Model.OriginalMicroblog != null ? Model.OriginalMicroblog.Author : string.Empty))" id="microblog-CommentA-@Model.MicroblogId" data-microblogId="@Model.MicroblogId">
+                        <span class="tn-action-text">评论
+                            @if (Model.ReplyCount > 0)
+                            {
+                                @("(" + Model.ReplyCount + ")")
+                            }
+                        </span></a>   
+                }
+            </div>
+            <div class="tn-widget tn-bubble tn-bubble-arrow-top tnc-bubble-wrap" id="microblog-CommentDiv-@(Model.MicroblogId)" style="display:none" >
+                <div class="tn-bubble-arrow tn-bubble-position">
+                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+                    </b>
+                </div>
+                <div class="tn-bubble-content tn-widget-content tn-border-gray tn-corner-all" id="microblog-CommentDivContentContainer-@(Model.MicroblogId)">
+                    loading...
+                </div>
+            </div>
+        </div>
+    </li>
+                                                                                                                                   
+    <script type="text/javascript">
+        //todo:libsh,by zhengw:以下代码应当提取到js文件中
+        //        $(document).ready(function () {
+        $("#microblog-CommentA-@Model.MicroblogId").toggle(
+                function () {
+
+                    var microblogId = $(this).attr("data-microblogId");
+                    $("#microblog-CommentDiv-" + microblogId).removeAttr("style");
+                    $("#microblog-CommentDivContentContainer-" + microblogId).load($(this).attr("href"), function (data) {
+                        $("#microblog-CommentDivContentContainer-" + microblogId).html(data)
+                    });
+                },
+                function () {
+                    var microblogId = $(this).attr("data-microblogId");
+                    $("#microblog-CommentDiv-" + microblogId).attr("style", "display:none");
+                }
+            );
+        //        });
+
+    </script>
+}

@@ -1,0 +1,78 @@
+﻿@model MicroblogEntity
+<div class="tnc-dailog-pd">
+    <div class="spb-repeat-box">
+        @using (Html.BeginAjaxForm("ForwardMicroblog", "Microblog", new { }, FormMethod.Post, new AjaxFormOptions() { OnErrorCallBack = "error", OnSuccessCallBack = "success" }, new { id = "ForwardMicroblogForm" }))
+        {
+            string initforwardBody = string.Empty;
+            if (Model.IsForward)
+            {
+                initforwardBody = "//@" + UserIdToNickNameDictionary.GetNickName(Model.UserId) + " " + Model.Body;
+            @Html.Hidden("toOriginalUserId", Model.OriginalMicroblog.UserId)
+            }
+            @Html.Hidden("toUserId", Model.UserId)
+            @Html.Hidden("forwardedMicroblogId", Model.MicroblogId)
+            @Html.Hidden("originalMicroblogId", Model.OriginalMicroblogId > 0 ? Model.OriginalMicroblogId : Model.MicroblogId)
+            <div class="tn-txt">
+                @if (Model.IsForward)
+                {
+                    if (Model.OriginalMicroblog != null && Model.OriginalMicroblog.User != null)
+                    { 
+                    <a href="@SiteUrls.Instance().SpaceHome(Model.OriginalMicroblog.UserId)">@Model.OriginalMicroblog.User.DisplayName</a><text>:</text>
+                    }
+                    @Html.Raw(Model.OriginalMicroblog.Body)
+                }
+                else
+                {
+                    if (Model.User != null)
+                    { 
+                    <a href="@SiteUrls.Instance().SpaceHome(Model.UserId)">@Model.User.DisplayName</a><text>:</text>
+                    }
+                    @Html.Raw(Model.Body)
+                }
+            </div>
+            <div class="tn-act tn-helper-clearfix">
+                <span class="tn-count" id="forwardCountSpan">还可以输入<strong>140</strong>字</span>
+                @Html.EmotionSelector()
+            </div>
+            @Html.TextArea("forwardBody", Tunynet.Utilities.WebUtility.HtmlDecode(initforwardBody), new { plugin = "ShortcutSubmit", id = "forwardBody", @class = "tn-textarea tn-input-long tn-border-gray", watermark = "请输入转发理由" })
+            <div class="tn-submit tn-helper-clearfix">
+                @Html.Button("转发", ButtonTypes.Submit, HighlightStyles.Primary, htmlAttributes: new { id = "forwardSubmitButton" })
+                <p>
+                    <label>
+                        @Html.SipmleCheckBox("isCommnet", true)
+                        同时给@(Model.User.DisplayName)评论</label></p>
+                @if (Model.IsForward)
+                {
+                    <p>
+                        <label>
+                            @Html.SipmleCheckBox("isCommentOriginal", true)
+                            同时给原作者评论</label></p>
+                }
+            </div>
+        }
+    </div>
+</div>
+<script type="text/dialog">
+ this.title("转发");
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#forwardBody").focus(function () {
+            countInterval = setInterval(function () { checkTextLength("forwardBody", "forwardCountSpan", "forwardSubmitButton"); }, 360);
+        });
+        $("#forwardBody").focus();
+        $(".aui_close").click(function () {
+            $("div[class='tnc-mode-icon']").children("a[class='tn-icon tn-smallicon-cross']").click();
+        });
+    });
+
+    function success(data) {
+        $("#listUl").prepend(data);
+        art.dialog.tips(data.MessageContent, 2, data.MessageType);
+    }
+
+    function error() {
+        art.dialog.tips("转发失败", 2, -1);
+    }
+
+</script>

@@ -1,0 +1,90 @@
+﻿@model IDictionary<Tunynet.Common.TagGroup, List<string>>
+@{
+    int tagGroupsCount = ViewData.Get<int>("tagGroupsCount", 0);
+    int count = ViewData.Get<int>("count", 0);
+}
+@if (Model != null)
+{
+    @Html.Hidden("groupCount", tagGroupsCount)
+    <div class="tnc-tags-show tn-helper-clearfix">
+        <div class="tnc-tagsbtn-prev" id="btn_l">
+            <a href="#" class="tn-icon-big tn-bigicon-slide-prev">上一页</a></div>
+        <div class="tnc-select-tags">
+            <div  id="UserSiteTagsDiv" style="width: @(tagGroupsCount * 290)px;" class="tnc-personalized-labels">
+                @if (Model.Keys != null && Model.Keys.Count > 0)
+                {
+                    foreach (KeyValuePair<TagGroup, List<string>> pair in Model)
+                    {
+                    <div class="tnc-personalized-item" id="TagGroup_@(pair.Key.GroupId)">
+                        <div class="tn-text-heading">
+                            @(pair.Key.GroupName)</div>
+                        <ul class="tnc-tags-list">
+                            @if (pair.Value != null && pair.Value.Count > 0)
+                            {
+                                foreach (var tag in pair.Value)
+                                {
+                                <li class="tnc-tag"><a href="javascript:;" class="tn-invert-text" title="添加标签">@(tag)</a></li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="tnc-tagsbtn-next" id="btn_r">
+            <a href="#" class="tn-icon-big tn-bigicon-slide-next">下一页</a></div>
+    </div>
+
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('li a', $('#UserSiteTagsDiv')).click(function () {
+          if($(this).hasClass("tn-bg-gray tn-state-disabled"))
+          {
+          return false;
+          }
+            if ($('#MyTagsDiv').find('a').length >= '@count') {
+              art.dialog.tips("最多只能添加"+'@count'+"个标签！", 1.5, -1);
+            }
+            else {
+            var url='@SiteUrls.Instance().AddTagToItem(Url.SpaceKey())?tagName=' + encodeURIComponent($(this).text().replace('\n', ""));
+                $.get(url,function(data){
+                    $(data).replaceAll($("#MyTagsDiv").children('ul'));
+                });
+
+                $(this).parent().find("a").first().addClass("tn-bg-gray tn-state-disabled").removeClass("tn-invert-text");
+            }
+        });
+         var countWidth= $("div.tnc-select-tags").width();
+        var leftsize = -@(tagGroupsCount) * countWidth;
+
+        $("#btn_r").click(function () {
+          if(leftsize==-@(tagGroupsCount)* countWidth)
+            {
+            leftsize=0;
+            }
+            if (leftsize > -@((tagGroupsCount - 1))*countWidth) {
+                leftsize = leftsize - countWidth;
+                $(".tnc-personalized-labels").animate({ "left": leftsize });
+            }
+
+            else if(leftsize==-@((tagGroupsCount - 1))*countWidth){
+                 leftsize =0;
+             $(".tnc-personalized-labels").animate({"left":leftsize });
+              }
+        });
+        $("#btn_l").click(function () {
+            if (leftsize <= -countWidth) {
+                leftsize = leftsize + countWidth;
+                $(".tnc-personalized-labels").animate({ "left": leftsize });
+            }
+            else if(leftsize == 0||(leftsize == (@(tagGroupsCount)*countWidth))){
+              leftsize = -@((tagGroupsCount - 1))* countWidth;
+
+               $(".tnc-personalized-labels").animate({"left":leftsize});
+
+               }
+        });
+    });
+</script>

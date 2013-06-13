@@ -1,0 +1,289 @@
+﻿@model BlogThread
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Blog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Blog/Scripts/jquery.spb.blog.js", ResourceRenderPriority.Last);
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 11100203;
+
+    Authorizer authorizer = new Authorizer();
+    IUser currentUser = UserContext.CurrentUser;
+
+    IEnumerable<Attachment> attachments = ViewData.Get<IEnumerable<Attachment>>("attachments", null);
+
+}
+@section Aside{
+    @Html.Action("_Panel", "Blog", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() } })
+    @Html.AjaxAction("_Categories", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Tags", "Blog", new { spaceKey = Url.SpaceKey() })
+    @Html.AjaxAction("_Newest", "Blog", new { spaceKey = Url.SpaceKey(), topNum = 10 })
+}
+@if (authorizer.IsAdministrator(BlogConfig.Instance().ApplicationId) && (int)Model.AuditStatus < (int)(new AuditService().GetPubliclyAuditStatus(BlogConfig.Instance().ApplicationId)))
+{
+    <div class="tn-cue-highlight tn-corner-all tn-message-box" id="prompt">
+        <a href="#" class="tn-icon tn-smallicon-cross tn-helper-right" id="hidespan"></a>
+        <span class="tn-helper-left"><span class="tn-icon tn-icon-exclamation"></span></span>
+        <div class="tn-helper-flowfix">
+            <strong>提示：</strong>当前日志尚未通过审核，你可以<a href="@SiteUrls.Instance()._BlogControlPanelUpdateAuditStatu(Model.ThreadId, true)" id = "audit-success">通过审核</a>
+            @if (Model.AuditStatus == AuditStatus.Pending)
+            {
+                @:或者
+                <a href="@SiteUrls.Instance()._BlogControlPanelUpdateAuditStatu(Model.ThreadId, false)" id = "audit-fail">不通过审核</a>
+            }
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#hidespan").click(function (e) {
+                e.preventDefault();
+                $("#prompt").hide();
+            });
+
+            //通过审核
+            $("a[id^='audit-']").click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "Post",
+                    url: $(this).attr("href"),
+                    success: function (data) {
+                        art.dialog.tips(data.MessageContent, 2, data.MessageType, function () {
+                            if (data.MessageType > 0)
+                                $("#prompt").hide();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-blog-detail">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-detail">
+            <div class="tn-text-heading">
+                <h1 class="tn-title">@Model.ResolvedSubject
+                    @if (Model.IsSticky)
+                    { 
+                        <span title="置顶" class="tn-icon-colorful tn-icon-colorful-top tn-icon-inline"></span>
+                    }
+                    @if (Model.IsEssential)
+                    {
+                        <span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>
+                    }
+                    @if (Model.PrivacyStatus == PrivacyStatus.Private)
+                    {
+                        <span title="不公开" class="tn-icon-colorful tn-icon-colorful-secret tn-icon-inline">
+                        </span>
+                    }
+                    else if (Model.PrivacyStatus == PrivacyStatus.Part)
+                    { 
+                        <span title="特定用户可见" class="tn-icon tn-icon-limit tn-icon-inline"></span>
+                    }
+                </h1>
+            </div>
+            <div class="tn-text-note tn-border-gray tn-border-top tn-detail-info">
+                @if (authorizer.BlogThread_Edit(Model)
+                || authorizer.BlogThread_Delete(Model)
+                || authorizer.BlogThread_Manage())
+                {
+                    <div class="tn-actions">
+                        <span class="tn-action tn-action-text-icon-right tn-action-has-drop-menu tn-border-trl"
+                            menu="#manage-blog"><span class="tn-icon tn-smallicon-triangle-down"></span><a href="javascript:;"
+                                class="tn-action-text">管理操作</a> </span>
+                        <div id="manage-blog" class="tn-more-options tn-widget-content tn-border-gray" style="display: none">
+                            <ul class="tn-more-list">
+                                @if (authorizer.BlogThread_Edit(Model))
+                                {
+                                    <li>@Html.Link("编辑", SiteUrls.Instance().BlogEdit(Url.SpaceKey(), Model.ThreadId, null), "编辑", new { @class = "tn-item-link" })</li>
+                                }
+                                @if (authorizer.BlogThread_Delete(Model))
+                                {
+                                    <li>@Html.Link("删除", SiteUrls.Instance()._BlogDelete(Url.SpaceKey(), Model.ThreadId), "删除", new { @class = "tn-item-link", id = "blog-delete" })</li>
+                                }
+                                @if (authorizer.BlogThread_Edit(Model))
+                                {
+                                    if (Model.IsSticky)
+                                    {
+                                    <li>@Html.Link("取消置顶", SiteUrls.Instance()._BlogSetSticky(Url.SpaceKey(), Model.ThreadId, false), "取消置顶", new { @class = "tn-item-link", id = "blog-set-sticky" })</li>
+                                    }
+                                    else
+                                    { 
+                                    <li>@Html.Link("置顶", SiteUrls.Instance()._BlogSetSticky(Url.SpaceKey(), Model.ThreadId, true), "置顶", new { @class = "tn-item-link", id = "blog-set-sticky" })</li>
+                                    }
+                                }
+                                @if (authorizer.BlogThread_Manage())
+                                {
+                                    if (Model.IsEssential)
+                                    {
+                                    <li>@Html.Link("取消精华", SiteUrls.Instance()._BlogControlPanelSetEssential(Model.ThreadId, false), "取消精华", new { @class = "tn-item-link", id = "blog-set-essential" })</li>
+                                    }
+                                    else
+                                    {
+                                    <li>@Html.Link("加精", SiteUrls.Instance()._BlogControlPanelSetEssential(Model.ThreadId, true), "加精", new { @class = "tn-item-link", id = "blog-set-essential" })</li>
+                                    }
+                                    <li>@Html.Link("管理员推荐", SiteUrls.Instance()._RecommendItem(TenantTypeIds.Instance().BlogThread(), Model.ThreadId, Model.ResolvedSubject, userId: Model.UserId), "管理员推荐", new { @class = "tn-item-link", id = "blog-set-recommend", plugin = "dialog" })</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>            
+                }
+                <em class="tn-date">@Model.DateCreated.ToUserDateString(true)</em><a class="tn-count"
+                    href="#comment">评论(@Model.CommentCount)</a> <em class="tn-view">浏览(@Model.HitTimes)</em>
+                @if (Model.IsReproduced)
+                {
+                    <span class="tn-source">转自：<a href="@SiteUrls.Instance().Blog(UserIdToUserNameDictionary.GetUserName(Model.OriginalAuthorId))" target="_blank">@Model.OriginalAuthorName</a></span>
+                }
+            </div>
+            <div class="tn-detail-text">
+                @Html.DisplayHtmlEditorContent(TenantTypeIds.Instance().BlogThread(), Model.GetResolvedBody(), 720)
+            </div>
+            @Html.Action("_ListAttachement", "Channel", new { area = "common", teantTypeId = TenantTypeIds.Instance().BlogThread(), threadId = Model.ThreadId })
+            <div class="tn-border-gray tn-border-top tn-content-nav">
+                <div class="tn-info-part tn-context tn-helper-clearfix">
+                    @{
+                        BlogThread prevThread = Model.PrevThread;
+                        BlogThread nextThread = Model.NextThread;
+                        IEnumerable<Category> ownerCategories = Model.OwnerCategories;
+                        IEnumerable<string> tagNames = Model.TagNames;
+                    }
+                    @if (prevThread != null)
+                    {
+                        <dl class="tn-before">
+                            <dt>前一篇：</dt>
+                            <dd>
+                                <a href="@SiteUrls.Instance().BlogDetail(Url.SpaceKey(), prevThread.ThreadId)">@prevThread.Subject</a></dd>
+                        </dl>
+                    }
+                    @if (nextThread != null)
+                    {
+                        <dl class="tn-after">
+                            <dt>后一篇：</dt>
+                            <dd>
+                                <a href="@SiteUrls.Instance().BlogDetail(Url.SpaceKey(), nextThread.ThreadId)">@nextThread.Subject</a></dd>
+                        </dl>
+                    }
+                </div>
+                @if (ownerCategories != null && ownerCategories.Count() > 0)
+                {        
+                    <div class="tn-info-part tn-sort-vest">
+                        <dl>
+                            <dt>分类：</dt>
+                            <dd>
+                                @foreach (Category category in ownerCategories)
+                                {
+                                    <a href="@SiteUrls.Instance().BlogList(Url.SpaceKey(), ListType.Category, null, 0, 0, category.CategoryId)">@category.CategoryName</a>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                }
+                @if (tagNames != null && tagNames.Count() > 0)
+                {  
+                    <div class="tn-info-part tn-tags-vest">
+                        <dl>
+                            <dt>标签：</dt>
+                            <dd>
+                                @foreach (string tagName in tagNames)
+                                {
+                                    <a href="@SiteUrls.Instance().BlogList(Url.SpaceKey(), ListType.Tag, tagName)"><span>@tagName</span></a>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                }
+            </div>
+            <div class="tn-border-gray tn-border-top tn-helper-clearfix tn-feedback">
+                @Html.ShareToThird()
+                @if (currentUser == null || currentUser.UserId != Model.UserId)
+                {
+                    <div class="tn-follow">
+                        @Html.Action("_SubscribeButton", "Blog", new { spaceKey = Url.SpaceKey(), threadId = Model.ThreadId })
+                    </div>
+                }
+                <div class="tn-actions">
+                    @{
+                        string content = string.Format("@{0} 的日志 \"{1}\" {2} 很不错 推荐给大家看看", Model.User.NickName, Model.Subject, SiteUrls.FullUrl(SiteUrls.Instance().BlogDetail(Model.User.UserName, Model.ThreadId)));
+                        string imageUrl = null;
+                        if (Model.FeaturedImageAttachmentId != 0)
+                        { 
+                            imageUrl = SiteUrls.Instance().ImageUrl(Model.FeaturedImageAttachmentId, TenantTypeIds.Instance().BlogThread(), ImageSizeTypeKeys.Instance().Big());
+                        }
+                    }
+                    <a href="@SiteUrls.Instance()._ShareToMicroblog(content, imageUrl)" plugin="dialog" >
+                        分享</a>
+                    @if (currentUser != null && currentUser.UserId != Model.UserId)
+                    {
+                        <a class="tn-action tn-repost" href="@SiteUrls.Instance()._BlogReproduce(Url.SpaceKey(), Model.ThreadId)" plugin = "dialog" >
+                            <span class="tn-action-text">转载(@Model.ReproduceCount)</span></a>
+                    }
+                    else
+                    { 
+                        <text>转载(@Model.ReproduceCount)</text>
+                    }
+                    @Html.SupportOppose(TenantTypeIds.Instance().BlogThread(), Model.ThreadId, Model.UserId, AttitudeMode.Unidirection, AttitudeStyle.Support)
+                </div>
+            </div>
+            @Html.AjaxAction("_Related", "Blog", new RouteValueDictionary { { "spaceKey", Url.SpaceKey() }, { "threadId", Model.ThreadId } })
+            @Html.AdvertisingPosition("10100200003")
+            <a name="comment"></a>
+            @Html.Action("_Comment", "Channel", new { area = "Common", commentedObjectId = Model.ThreadId, toUserId = Model.UserId, ownerId = Model.OwnerId, tenantTypeId = TenantTypeIds.Instance().BlogThread(), enableComment = !Model.IsLocked, subject = Model.Subject })
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+
+        //删除日志
+        $("a[id='blog-delete']").click(function (e) {
+            var self = $(this);
+
+            art.dialog.confirm('您确认要删除吗？', function () {
+                $.post(self.attr("href"), function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                        if (data.MessageType == '1') {
+                            window.location = "@SiteUrls.Instance().Blog(Url.SpaceKey())";
+                        } else {
+                            art.dialog.tips(data.MessageContent, 2, data.MessageType);
+                        }
+                    });
+                });
+            });
+
+            return false;
+        });
+
+        //置顶/取消置顶
+        $("a[id='blog-set-sticky']").click(function (e) {
+            var self = $(this);
+
+            $.post(self.attr("href"), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    if (data.MessageType == '1') {
+                        window.location.reload();
+                    } else {
+                        art.dialog.tips(data.MessageContent, 2, data.MessageType);
+                    }
+                });
+            });
+
+            return false;
+        });
+
+        //加精/取消精华
+        $("a[id='blog-set-essential']").click(function (e) {
+            var self = $(this);
+
+            $.post(self.attr("href"), function (data) {
+                art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () {
+                    if (data.MessageType == '1') {
+                        window.location.reload();
+                    } else {
+                        art.dialog.tips(data.MessageContent, 2, data.MessageType);
+                    }
+                });
+            });
+
+            return false;
+        });
+
+    });
+</script>

@@ -1,0 +1,17 @@
+﻿@model PagingDataSet<BarPost>
+@{
+    Layout = "app-detail-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    BarThread barThread = ViewData.Get<BarThread>("barThread", BarThread.New());
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar", new { SectionId = barThread.SectionId })
+}
+@section Aside{
+    @Html.AjaxAction("_HisOtherThreads", "bar", new { userId = barThread.UserId, exceptThreadId = barThread.ThreadId })
+    @Html.AdvertisingPosition("10101200004")
+    @Html.AjaxAction("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.ThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Headline })
+    @Html.AdvertisingPosition("10101200005")
+}
+@Html.Partial("~/Applications/Bar/Views/Bar/_ThreadDetail.cshtml", Model)

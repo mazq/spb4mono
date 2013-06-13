@@ -1,0 +1,98 @@
+﻿@model ManageGroupEditModel
+@{
+    Layout = "_ControlPanel";
+    PagingDataSet<GroupEntity> groups = ViewData.Get<PagingDataSet<GroupEntity>>("Groups", null);
+}
+
+<div class="tn-block">
+    <div class="tnc-main">
+        @Html.Partial("_ManageGroupSideMenu")
+        <div class="tnc-ctn-center">
+            <h1>
+                <span class="tn-selected">群组管理</span>
+            </h1>
+            <div class="tnc-ctnright-list">
+                <div class="tn-manager-search tn-helper-clearfix">
+                    @using (Html.BeginForm("ManageGroups", "ControlPanelGroup", FormMethod.Get))
+                    { 
+                        <div class="tnc-search-adminform">
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.UserId)
+                                @{
+                           long userId = 0;
+                           long.TryParse(string.IsNullOrEmpty(Model.UserId) ? "" : Model.UserId.Replace(",", ""), out userId);
+                                }
+                                @Html.UserSelector("UserId", userId)
+                            </div>
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.GroupNameKeyword)
+                                @Html.TextBoxFor(n => n.GroupNameKeyword, InputWidthTypes.Medium)
+                            </div>
+                            <div class="tn-form-row">
+                                @Html.FormLabelFor(n => n.AuditStatus)
+                                @Html.EnumDropDownListFor(n => n.AuditStatus, "全部", new { @class = "tn-dropdownlist" })
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    发布时间：
+                                </label>
+                                @Html.DateTimePicker("StartDate", new DateTimePicker().SetDateFormat("yyyy-MM-dd").SetMaxDate("0").SetMinDate("-10Y")) 到
+                                @Html.DateTimePicker("EndDate", new DateTimePicker().SetDateFormat("yyyy-MM-dd").SetMaxDate("0").SetMinDate("-10Y"))
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                    规模：
+                                </label>
+                                @Html.TextBoxFor(n => n.minMemberCount, InputWidthTypes.Short) 到
+                                @Html.TextBoxFor(n => n.maxMemberCount, InputWidthTypes.Short) 人
+                            </div>
+                            <div class="tn-form-row tn-form-row-clear">
+                                @Html.FormLabelFor(n => n.CategoryId)
+                                @*@Html.CategoryDropDownListFor(n => n.CategoryId ?? 0, TenantTypeIds.Instance().Group(), 9)*@
+                                @Html.CategoryDropDownListFor("CategoryId",Model.CategoryId ?? 0, TenantTypeIds.Instance().Group(), 9)
+                            </div>
+                            <div class="tn-form-row">
+                                <label class="tn-form-label">
+                                </label>
+                                @Html.Button("搜索", ButtonTypes.Submit, HighlightStyles.Primary)
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tnc-content-manage">
+                    <div class="tn-list-header">
+                        <div class="tn-toolbar-area tn-helper-clearfix">
+                            @Html.LinkButton("通过审核", SiteUrls.Instance().BatchUpdateGroupAuditStatus(), iconType: IconTypes.SmallAccept, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus" })
+                            @Html.LinkButton("不通过审核", SiteUrls.Instance().BatchUpdateGroupAuditStatus(false), iconType: IconTypes.SmallStop, htmlAttributes: new { id = "BatchSet-UpdateAuditStatus-false" })
+                            @Html.LinkButton("添加群组", SiteUrls.Instance().CreateGroup(), iconType: IconTypes.SmallAdd, htmlAttributes: new { target = "_blank" })
+                        </div>
+                    </div>
+                    @Html.Partial("_PagingGroups", groups)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //批量操作 
+        $("a[id^='BatchSet-']").click(function (e) {
+            e.preventDefault();
+            if (!$("input[name='groupIds']:checked").length) {
+                alert("至少选择一条群组信息操作");
+                return false;
+            }
+
+            //提交
+            $("form#Form-BatchSet").ajaxSubmit({
+                url: $(this).attr("href"),
+                success: function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType,
+                    function () {
+                        window.location.reload(true);
+                    });
+                }
+            });
+        });
+    });
+</script>

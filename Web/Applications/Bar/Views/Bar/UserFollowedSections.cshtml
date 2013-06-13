@@ -1,0 +1,107 @@
+﻿@model IEnumerable<BarSection>
+@{
+    Layout = "app-list-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    long userId = Request.QueryString.Get<long>("userId");
+    bool isOwner = ViewData.Get<bool>("isOwner", false);
+
+    SelectList followedBarSections = ViewData.Get<SelectList>("followedBarSections", null);
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @Html.AjaxAction("_TopSections", "Bar", new { topNumber = 6, sortBy = SortBy_BarSection.ThreadAndPostCount, displayTemplate = DisplayTemplate_TopSections.Headline })
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom tn-border-gray">
+            <span class="tn-helper-right"><a href="@SiteUrls.Instance().TagMap()">更多</a> </span>
+            <h3 class="tn-helper-reset">
+                热门标签
+            </h3>
+        </div>
+        @Html.Action("_TagCloud", "Channel", new { area = "Common", tenantTypeId = TenantTypeIds.Instance().BarThread() })
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-mypost">
+@using (Html.BeginForm("UserFollowedSections", "Bar", new RouteValueDictionary { {"userId",userId} }, FormMethod.Get, new { id = "joinedorcreatedSection" }))
+{ 
+
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @Html.Action("_UserData", new { userId = userId, displayTemplate = DisplayTemplate_UserData.Main })
+        <div class="tn-tabs">
+            <ul id="userThreadTabNavs" class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                <li id="myThreads" class="tn-widget-content tn-border-gray tn-border-trl"><a href="@SiteUrls.Instance().UserThreads(userId)">@(isOwner ? "我的帖子" : "TA的帖子")</a> </li>
+                <li id="myPosts" class="tn-widget-content tn-border-gray tn-border-trl"><a href="@Html.Raw(SiteUrls.Instance().UserThreads(userId, true))">@(isOwner ? "我的回复" : "TA的回复")</a></li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl tn-tabs-selected"><a href="@Html.Raw(SiteUrls.Instance().UserFollowedSections(userId))">关注的帖吧</a> </li>
+                @Html.Hidden("userId",userId)
+                @Html.DropDownList("userCreated", followedBarSections, new { @class = "tn-dropdownlist tn-helper-right", id = "followedBarSections" })
+            </ul>
+            <div class="tn-tabs-panel">
+                <div class="spb-bar-myinterest">
+                    @if (Model != null && Model.Count() > 0)
+                    { 
+                        <ul class="tn-list tn-helper-clearfix">
+                            @foreach (var bar in Model)
+                            {
+                                <li id="barSection_@(bar.SectionId)" class="tn-list-item tn-border-gray tn-corner-all tn-helper-clearfix">
+                                    <div class="tn-list-item-area-left">
+                                        <div class="spb-smallbar-figure">
+                                            <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)">
+                                                <img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" width="50px" height="50px" title="@bar.Name" alt="@bar.Name"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="tn-list-item-area-main">
+                                        <div class="tn-list-item-row tn-list-item-heading">
+                                            @if (isOwner)
+                                            { 
+                                                <a title="取消关注" sectionId="@bar.SectionId" href="@SiteUrls.Instance().CancelSubscribeSection(bar.SectionId)" name="cancelSubscribeSectionButton" class="tn-icon tn-smallicon-cross tn-helper-right">取消关注</a>
+                                            }
+                                            <h5 class="tn-helper-reset">
+                                                <a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)" title="@bar.Name">@bar.Name</a></h5>
+                                        </div>
+                                        <div class="tn-list-item-row">
+                                            <span class="tn-stat">帖子：<a href="@SiteUrls.Instance().SectionDetail(bar.SectionId)">@bar.ThreadAndPostCount</a></span> <span class="tn-stat">关注：<a href="@SiteUrls.Instance().SectionMembers(bar.SectionId)">@bar.FollowedCount</a></span>
+                                        </div>
+                                    </div>
+                                </li>                     
+                            }
+                        </ul>
+                    }
+                    else
+                    { 
+                        <div class="tn-no-data">
+                            暂无关注的帖吧</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("a[name='cancelSubscribeSectionButton']").click(function () {
+            var $this = $(this);
+            var sectionId = $(this).attr("sectionId");
+            art.dialog.confirm("确定要取消关注此帖吧吗？<br/>取消后，你将不会再接收到此帖吧的动态", function () {
+                $.ajax({
+                    type: "POST",
+                    url: $this.attr("href"),
+                    success: function (data) {
+                        if (data.MessageType == '1') //成功
+                            $("#barSection_" + sectionId).slideUp().remove();
+                        else
+                            art.dialog.tips(data.MessageContent, 2, data.MessageType);
+                    }
+                });
+            });
+            return false;
+        });
+
+        $("#followedBarSections").change(function (e) {
+            $("form#joinedorcreatedSection").submit();
+        });
+    });
+</script>

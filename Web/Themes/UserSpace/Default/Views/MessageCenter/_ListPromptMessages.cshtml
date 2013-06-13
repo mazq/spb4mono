@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Tunynet.Common.MessageSession>
+<div id="promp_message" class="tnc-prompt-wrap tn-border-gray tn-border-bottom">
+    @if (Model != null && Model.Count() > 0)
+    {
+        Dictionary<long, Tunynet.Common.Message> messages = ViewData["messages"] as Dictionary<long, Tunynet.Common.Message>;
+        <h3 class="tn-helper-reset tnc-prompt-header">私信</h3>
+        <ul class="tn-list">
+            @{foreach (var session in Model)
+              {
+                  if (!messages.ContainsKey(session.SessionId))
+                  {
+                      continue;
+                  }
+                  string sender = messages[session.SessionId].Sender;
+                <li id="msg_message_@(messages[session.SessionId].MessageId)" class="tn-list-item tn-helper-clearfix"><span class="tnc-handle-mark"><span class="tn-action"><a href="@(SiteUrls.Instance().ListMessages(Url.SpaceKey(), session.SessionId))">查看</a></span> </span><a href="@SiteUrls.Instance().SpaceHome(session.OtherUserId)" title="@sender">@(StringUtility.Trim(sender, 5, ""))</a>：
+                    @(Tunynet.Utilities.HtmlUtility.TrimHtml(messages[session.SessionId].Body, 40))
+                </li>
+              }
+            }
+        </ul>
+        <div class="tn-actions">
+            <div class="tn-view">
+                @Html.LinkButton("查看所有", SiteUrls.Instance().ListMessageSessions(Url.SpaceKey(), null), HighlightStyles.Secondary)
+            </div>
+        </div>
+        <script type="text/javascript">
+            $("li[id^='msg_message']", $("ul.tn-list")).hover(function () {
+                $("a[name='operate_" + $(this).attr("id").replace(/[^0-9]/ig, "") + "']").show();
+            }, function () {
+                $("a[name='operate_" + $(this).attr("id").replace(/[^0-9]/ig, "") + "']").hide();
+            });
+        </script>
+    }
+</div>
+ 

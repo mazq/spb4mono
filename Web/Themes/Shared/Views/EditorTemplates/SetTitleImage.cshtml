@@ -1,0 +1,88 @@
+﻿@{
+    IEnumerable<Attachment> attachments = ViewData.Get<IEnumerable<Attachment>>("attachments", null);
+    string tenantTypeId = ViewData.Get<string>("tenantTypeId", string.Empty);
+    long associateId = ViewData.Get<long>("associateId", 0);
+    string htmlFieldName = ViewData.Get<string>("htmlFieldName", string.Empty);
+    bool isMultiSelect = ViewData.Get<bool>("isMultiSelect", false);
+    string attachmentIds = string.Empty;
+    int maxSelect = ViewData.Get<int>("maxSelect",0);
+
+}
+<div id="title-image-list" class="tnc-titleimg-pic">
+    @if (attachments == null || attachments.Count() == 0)
+    { 
+        <img id="title-image-0" data-image-id="0" src="@SiteUrls.Instance().ImageUrl(0, tenantTypeId, ImageSizeTypeKeys.Instance().Small())" width="50" height="50" />
+    }
+    else
+    {
+        foreach (var attachment in attachments) {
+            if (attachment != null) { 
+                attachmentIds+=(attachment.AttachmentId+",");
+            }
+        }
+        attachmentIds = attachmentIds.Trim(',');
+        for (int i = 0; i < attachments.Count(); i++)
+        {
+            Attachment attachment = attachments.ElementAt(i);
+            if (attachment == null) { 
+                continue;
+            }
+            <div class="tnc-titleimg-add tn-hover">
+                <img id="title-image-@attachment.AttachmentId" data-image-id="@attachment.AttachmentId" src="@SiteUrls.Instance().ImageUrl(attachment.AttachmentId, tenantTypeId, ImageSizeTypeKeys.Instance().Small())" width="50" height="50" />
+                @if (isMultiSelect)
+                { 
+                <div class="tn-edit">
+                    <span class="tn-set  tn-state-hidden">
+                        <a class="tn-button tn-corner-all  tn-button-secondary tn-button-icon-only" href="javascript:void(0)" title="设为展示图">
+                            <span class="tn-icon tn-smallicon-album"></span>
+                            <span class="tn-button-text">设为展示图</span>
+                        </a>
+                    </span>
+                </div>
+                }
+                
+            </div>
+        }
+    }
+    <a id="select-title-image" class="tn-action tn-action-text-icon" plugin="dialog" href="@SiteUrls.Instance()._SetTitleImage(tenantTypeId, associateId, htmlFieldName, isMultiSelect,maxSelect, attachmentIds)">修改</a>
+    <input type="hidden" name="@htmlFieldName" id="@htmlFieldName" value="@attachmentIds" />
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //默认第一张选中
+        if (!$("span.tn-set.big-image").length && ($("span.tn-set:first").parent().siblings("img").data("imageId") != '0')) {
+
+            $("span.tn-set:first").addClass("big-image");
+            $("span.tn-set").addClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-primary").addClass("tn-button-secondary");
+            $("span.tn-set.big-image:first").removeClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-secondary").addClass("tn-button-primary");
+        }
+
+        $("span.tn-set.big-image:first").removeClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-secondary").addClass("tn-button-primary");
+        //点击图片交换图片排序顺序
+        $("a.tn-button", "#title-image-list").livequery("click", function () {
+            var imageIds = "";
+            var imageId = $(this).parent().parent().siblings("img").data("imageId");
+            if (imageId > 0) {
+                imageIds += imageId + ",";
+            }
+            $(this).parent().addClass("big-image");
+            $(this).parent().parent().parent().siblings().find("img").each(function (i) {
+                $(this).siblings(".tn-edit").find(".tn-set").removeClass("big-image");
+                imageId = $(this).data("imageId");
+                if (imageId > 0) {
+                    imageIds += imageId + ",";
+                }
+
+            });
+            //为有类big-image的第一个图片设置显示样式并将其他图片的样式恢复
+            $("span.tn-set").addClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-primary").addClass("tn-button-secondary");
+            $("span.tn-set.big-image:first").removeClass("tn-state-hidden").children(".tn-button").removeClass("tn-button-secondary").addClass("tn-button-primary");
+            if (imageIds.lastIndexOf(',') > 0) {
+                imageIds = imageIds.substring(0, imageIds.length - 1);
+            }
+            $("input#@(htmlFieldName)", "#title-image-list").val(imageIds);
+        });
+
+    });
+</script>

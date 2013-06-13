@@ -1,0 +1,62 @@
+﻿@model IEnumerable<RecommendItem>
+@*@{
+    Dictionary<long, string> recommendNames = ViewData.Get<Dictionary<long, string>>("recommendNames", null);
+ }*@
+@if (Model !=null && Model.Count() > 0)
+{ 
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-thumb-carousel">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option">
+                @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BarSection()))
+                {
+                    <a href="@SiteUrls.Instance()._ManageRecommendItems("10120101",false)" plugin="dialog">管理</a>
+                }
+            </div>
+            <h3 class="tn-helper-reset">推荐帖吧</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <div class="spb-slider spb-carousel-slider" id="Carousel" style="display: block;">
+                <div class="spb-slider-nav">
+                    <div class="spb-slider-nav-clip">
+                        <ul class="tn-photo-list tn-helper-clearfix">
+                            @foreach (var item in Model)
+                            {
+                                var bar = item.GetBarSection();
+                                <li class="tn-photo-item">
+                                    <p class="tn-photo-wrap tn-widget-content tn-border-gray"><a href="@item.DetailUrl" title="@item.ItemName">@if (bar != null)
+                                            {<img src="@SiteUrls.Instance().LogoUrl(bar.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium(), bar.HasLogoImage)" title="@item.ItemName" alt="@item.ItemName" /><span></span>}
+                                            else
+                                            {<img src="@SiteUrls.Instance().LogoUrl(null, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium())" title="@item.ItemName" alt="@item.ItemName" /><span></span>}</a></p>
+                                    <p class="tn-text-heading"><a href="@item.DetailUrl" title="@item.ItemName">@item.ItemName</a></p>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="spb-slider-btn spb-slider-nav-btn spb-slider-nav-prev"><a title="向左滑动" href="javascript:void(0)"><span class="tn-icon tn-icon-slide-prev"></span></a></div>
+                    <div class="spb-slider-btn spb-slider-nav-btn spb-slider-nav-next"><a title="向右滑动" href="javascript:void(0)"><span class="tn-icon tn-icon-slide-next"></span></a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#Carousel").sliderkit({
+			cssprefix: "spb-slider",
+			auto: false,
+			autospeed: 4000,
+			shownavitems: 6,
+			circular: true,
+			fastchange: false,
+			scrolleasing: "easeOutExpo",
+			scrollspeed: 500
+		});
+		$(".spb-slider-nav-btn").hover(
+		function () {
+		  $(this).addClass("tn-bg-gray");
+		},
+		function () {
+		  $(this).removeClass("tn-bg-gray");
+		});
+	}); 
+</script>
+}

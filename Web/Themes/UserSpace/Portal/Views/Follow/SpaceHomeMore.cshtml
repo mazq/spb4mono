@@ -1,0 +1,100 @@
+﻿@model IEnumerable<User>
+@{
+    Layout = "_Follow";
+    SpaceHomeMoreType type = ViewData.Get<SpaceHomeMoreType>("type", SpaceHomeMoreType.TogetherFollowedUsers);
+    string showString = ViewData.Get<string>("showString", string.Empty);
+}
+@section ContentHeader{
+    <div class="spb-po-user-profile">
+        <div class="spb-po-profile-wrap tn-helper-clearfix">
+            <div class="spb-po-face-info">
+                @Html.Action("_UserInfo", "UserSpace")
+            </div>
+            <div class="spb-po-user-info">
+                @Html.Action("UserInfo", "UserSpace", new { spaceKey = Url.SpaceKey() })
+                @Html.Action("_SelectMenu", "UserSpace")
+            </div>
+        </div>
+    </div>
+}
+@section Aside{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-profile">
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <div class="tn-info-part">
+                @Html.Action("_UserStatus", "UserSpace")
+            </div>
+        </div>
+    </div>
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-tags">
+        @Html.Action("_TopUserTags", "UserSpace")
+    </div>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-more-follow">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>@showString</h2>
+        </div>
+        <div class="tnc-user-list">
+            @if (Model != null && Model.Count() > 0)
+            {
+                <ul class="tn-list">
+                    @foreach (var user in Model)
+                    { 
+                        <li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+                            <div class="tn-list-item-area-left">
+                                @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                            </div>
+                            <div class="tn-list-item-area-main">
+                                <div class="tn-list-item-row tn-helper-clearfix">
+                                    <div class="tnc-relationship">
+                                        @if (type == SpaceHomeMoreType.FollowedUsersOfFollowers)
+                                        {
+                                            @Html.FollowUser(user.UserId, "加关注", followButtonType: FollowButtonTypes.Link)
+                                        }
+                                    </div>
+                                    <div class="tnc-user-notename">
+                                        <a href="@SiteUrls.Instance().SpaceHome(user.UserName)"   class="tn-user-name" title="@user.DisplayName" target="_blank">@StringUtility.Trim(user.DisplayName, 20)</a>
+                                    </div>
+                                </div>
+                                <div class="tnc-userinfo-content tn-helper-clearfix">
+                                    <div class="tnc-userinfo-item">
+                                        @if (user.Profile != null)
+                                        { 
+                                            <div class="tn-list-item-row">
+                                                <div class="tn-location">
+                                                    @if (user.Profile.Gender == GenderType.FeMale)
+                                                    {@Html.Icon(IconTypes.SmallFemale, "女")}
+                                                    @if (user.Profile.Gender == GenderType.Male)
+                                                    {@Html.Icon(IconTypes.SmallMale, "男")}
+                                                    @Formatter.FormatArea(user.Profile.NowAreaCode, true)
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="tn-list-item-row tnc-usernums">
+                                            <span>关注 <a href="@SiteUrls.Instance().ListFollowedUsers(user.UserName)"><strong>@user.FollowedCount</strong></a></span>
+                                            <span class="tn-spacer tn-text-note">|</span> <span>粉丝 <a href="@SiteUrls.Instance().ListFollowers(user.UserName)"  >
+                                                <strong>@user.FollowerCount</strong></a></span> <span class="tn-spacer tn-text-note">
+                                                    |</span> <span>内容 <strong>@user.ContentCount</strong></span>
+                                        </div>
+                                        @if (user.Profile != null && !string.IsNullOrEmpty(user.Profile.Introduction.Trim()))
+                                        {
+                                            <div class="tn-list-item-row">
+                                                简介：
+                                                @HtmlUtility.TrimHtml(user.Profile.Introduction,100)
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            { 
+                <div class="tn-no-data">
+                    暂无数据</div>
+            }
+        </div>
+    </div>
+</div>

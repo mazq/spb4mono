@@ -1,0 +1,33 @@
+﻿@model IEnumerable<RecommendItem>
+@{
+    User currentUser = (User)UserContext.CurrentUser;
+    BlogSettings blogSettings = new BlogSettings();
+}
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="tn-box tn-widget tn-widget-content tn-corner-all spb-textbox-list">
+        <div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+            <div class="tn-option">
+                @if (new Authorizer().RecommendItem_Manage(TenantTypeIds.Instance().BlogThread()))
+                {
+                    <a href="@SiteUrls.Instance()._ManageRecommendItems(blogSettings.RecommendWordTypeId)" plugin="dialog">
+                        管理</a>
+                }
+            </div>
+            <h3 class="tn-helper-reset">
+                推荐日志</h3>
+        </div>
+        <div class="tn-box-content tn-widget-content tn-corner-bottom">
+            <ul class="tn-list">
+                @foreach (RecommendItem recommendItem in Model)
+                {                    
+                    <li class="tn-border-dashed tn-border-gray tn-border-bottom">
+                        <div class="tnc-list-topic">
+                            @Html.Link(recommendItem.ItemName, recommendItem.DetailUrl, recommendItem.ItemName, new { @class = "tn-user-name" }, navigateTarget: HyperLinkTarget._blank)
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

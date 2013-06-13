@@ -1,0 +1,153 @@
+﻿@{
+    string currentSpaceKey = Url.SpaceKey();
+    int randomNum = new Random().Next(100000, 999999);
+
+    string title = "发微博";
+    string displayStates = "inline";
+    string content = ViewData.Get<string>("content", string.Empty);
+    string imageUrl = ViewData.Get<string>("imageUrl", string.Empty);
+    bool isShare = ViewData.Get<bool>("isShare", false);
+
+    if (isShare)
+    {
+        displayStates = "none";
+        title = "分享到微博";
+    }
+    var currentUserId = UserContext.CurrentUser != null ? UserContext.CurrentUser.UserId : 0;
+    var accountTypes = new AccountBindingService().GetAccountTypes(true, true);
+    var accountBindingService = new AccountBindingService(); 
+}
+@using (Html.BeginAjaxForm("Create", "Microblog", FormMethod.Post, new AjaxFormOptions().SetOnSuccessCallBack("microblogCreateSuccess").SetOnErrorCallBack("microblogCreateError")))
+{
+    @Html.Hidden("tenantTypeId", Request.QueryString.Get<string>("tenantTypeId", null))
+    @Html.Hidden("ownerId", Request.QueryString.Get<long>("ownerId", 0))
+    @Html.Hidden("imageUrl", imageUrl)
+    <div class="tnc-publisher" id="publisher-@randomNum">
+        <div class="spb-status-wrap tn-border-gray tn-corner-all">
+            <div class="spb-status-textarea">
+                <textarea id="microblogBody" plugin='ShortcutSubmit' rows="" onkeyup="getMousePosition('microblogBody');"
+                    onmouseup="getMousePosition('microblogBody');" name="microblogBody" class="tn-textarea ">@content</textarea>
+                <div class="spb-status-tip tn-success" id="msg-sussess">
+                    &nbsp;<span class="tn-icon-big tn-bigicon-accept-circle"></span><strong>发布成功</strong>
+                </div>
+            </div>
+        </div>
+        <div class="spb-foot tn-helper-clearfix">
+            <div class="tn-actions">
+                <span class="tn-action tn-action-text-icon">
+                    @Html.EmotionSelector()
+                    <a id="addExpressionA" class="tn-action-text" href="javascript:;">表情</a> </span>
+                <span class="tn-action tn-action-text-icon" style="display:@displayStates"><span
+                    ntype="icon" class="tn-icon tn-icon-topic"></span><a id="addTopicsA" class="tn-action-text" href="@SiteUrls.Instance()._ListTopics(currentSpaceKey)" ntype="topic">
+                        话题</a> </span><span class="tn-action tn-action-text-icon"><span class="tn-icon-picture tn-icon"
+                            ntype="icon"></span><a id="uploadPicsA" class="tn-action-text" href="@SiteUrls.Instance()._UploadImages(currentSpaceKey)" ntype="image">
+                                传图</a> </span><span class="tn-action tn-action-text-icon" style="display:@displayStates">
+                                    <span id="addVideoA" class="tn-icon tn-icon-movie" ntype="icon"></span><a class="tn-action-text" ntype="video" href="@SiteUrls.Instance()._AddVideo("microblogBody")">
+                                        视频</a> </span><span class="tn-action tn-action-text-icon" style="display:@displayStates">
+                                            <span id="addMusicA" class="tn-icon tn-icon-music" ntype="icon"></span><a class="tn-action-text" href="@SiteUrls.Instance()._AddMusic("microblogBody")" ntype="music">
+                                                音乐</a> </span><span class="tn-action tn-action-text-icon"><span class="tn-icon tn-icon-at"
+                                                    ntype="icon"></span><a id="atFriend" class="tn-action-text" href="javascript:;">朋友</a>
+                                                </span>
+                @Html.AtUser("#microblogBody", "#publisher-" + randomNum.ToString() + " #atFriend")
+                @Html.AtUser("#microblogBody")
+            </div>
+            @{
+            }
+            @if (accountTypes.Count() > 0)
+            {
+                <div class="spb-sync-to" style="display:@displayStates">
+                    <em>同步到：</em>
+                    @foreach (var accountType in accountTypes)
+                    {
+                        var isbind = accountBindingService.GetAccountBinding(currentUserId, accountType.AccountTypeKey) != null;
+                        <label  menu="#ShareToThrid-@(accountType.AccountTypeKey)">
+                            <input type="checkbox" id="sync_@(accountType.AccountTypeKey)" name="sync_@(accountType.AccountTypeKey)" data-isbind="@isbind.ToString().ToLower()" data-typekey="@accountType.AccountTypeKey" data-messageurl="@SiteUrls.Instance()._BindThirdAccount(accountType.AccountTypeKey)" value="true" class="tn-checkbox" />
+                            <img src="@SiteUrls.Instance().ThirdLogoUrl(accountType.AccountTypeKey, ThirdLogoSizeType.Small)" alt="使用第三方帐号登录" />
+                        </label>
+                        <div id="ShareToThrid-@(accountType.AccountTypeKey)" class="tn-widget tn-bubble tn-bubble-arrow-top" style="display: none;">
+                            <div class="tn-bubble-arrow">
+                                <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-bubble-gray">
+                                </b>
+                            </div>
+                            <div class="tn-bubble-content tn-border-gray tn-bg-gray tn-corner-all">
+                                @*<p>
+                                    将内容同步到 @accountType.AccountTypeKey</p>*@
+                                    <p>
+                                    将内容同步到 @ThirdAccountGetterFactory.GetThirdAccountGetter(accountType.AccountTypeKey).AccountTypeName</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="spb-microblog-send">
+                <span class="tn-count" id="countSpan">还可以输入<strong>140</strong>字</span>
+                <button type="submit" id="publishButton" class="tn-button tn-corner-all  tn-button-large tn-button-secondary"
+                    disabled="disabled">
+                    <span class="tn-button-text">发表</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+<input type="text" value="0" id="mousePositionInMicroblogBody" style="display: none" />
+<script src="@Tunynet.Utilities.WebUtility.ResolveUrl("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#microblogBody").focus(function () {
+            countInterval = setInterval(function () { checkTextLength("microblogBody"); }, 360);
+        });
+
+        $('#addExpressionA').click(function (event) {
+            $("#tipContainerDiv").find("a.tn-smallicon-cross").click();
+            $(this).siblings("span[ntype='emotion']").click();
+            return false;
+        });
+
+        $('#atFriend').click(function (event) {
+            $("#tipContainerDiv").find("a.tn-smallicon-cross").click();
+        });
+
+        $("#publishButton").click(function (e) {
+            $.get('@SiteUrls.Instance()._UploadImages(currentSpaceKey)', function (data) {
+                $("#imageContainer").replaceWith(data);
+            });
+        });
+
+        $('span[ntype="icon"]').click(function (event) {
+            $(this).siblings('a').click();
+            return false;
+        });
+
+        $("#microblogBody").focusEnd();
+
+        $('input[id^="sync_"][type="checkbox"]').each(function () {
+            var typekey = $(this).data("typekey");
+            var isbind = $(this).data("isbind");
+            var cookieName = "bindThirdAccount-" + typekey + "-@(currentUserId)";
+            if (isbind) {
+                var checked = $.cookie(cookieName) == "true";
+                $(this).attr("checked", checked);
+            }
+        });
+        $('input[id^="sync_"]').live("click", function () {
+            var $this = $(this);
+            var isbind = $(this).data("isbind");
+            var typekey = $(this).data("typekey");
+            var messageurl = $(this).data("messageurl");
+            var cookieName = "bindThirdAccount-" + typekey + "-@(currentUserId)";
+            $.cookie(cookieName, $(this).is(":checked"));
+            if (!isbind && $(this).is(":checked")) {
+                var dialog = art.dialog({ id: 'spb-binddialog', lock: true, title: '绑定账户', close: function () {
+                    if (!$this.data("isbind"))
+                        $this.attr("checked", false);
+                }
+                });
+                $.get(messageurl, function (html) { dialog.content(html); });
+            }
+        });
+    });
+
+</script>
+<script type="text/dialog">
+    this.title("@title");
+</script>

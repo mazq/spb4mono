@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Category>          
+@{
+    Dictionary<long, IEnumerable<LinkEntity>> dic = ViewData.Get<Dictionary<long, IEnumerable<LinkEntity>>>("linksOfCategoryDic", null);
+    }
+
+<div class="spb-friend-link-box">
+  @foreach (Category category in Model)
+  {
+      <div class="spb-friend-link">
+          <div class="tn-content-heading tn-border-gray tn-border-bottom">
+              <h4>@category.CategoryName</h4>
+          </div>
+          <ul class="spb-links-list">
+            @{
+                IEnumerable<LinkEntity> links = dic[category.CategoryId];
+                foreach (LinkEntity link in links.Where(n => n.LinkType == LinkType.TextLink))
+                {
+                  <li class="tn-border-right tn-border-dashed tn-border-gray"><a href="@link.LinkUrl" target="_blank">@HtmlUtility.TrimHtml(link.LinkName, 12)</a></li>
+              }
+              }
+          </ul>
+
+          <ul class="spb-links-logo-list tn-photo-list">
+              @foreach (LinkEntity link in links.Where(n => n.LinkType == LinkType.ImageLink))
+                {
+                    bool isLocal = !link.ImageUrl.Trim().ToLower().StartsWith("http");
+                  <li class="tn-photo-item"><a href="@link.LinkUrl" target="_blank"><img alt="@link.LinkName" title="@link.LinkName" src="@(isLocal ? SiteUrls.Instance().LogoUrl(link.ImageUrl, TenantTypeIds.Instance().Link(), ImageSizeTypeKeys.Instance().Medium(), true) : link.ImageUrl)" /></a></li>
+              }
+          </ul>
+      </div>
+  }
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".spb-friend-link").each(function () {
+            //删除每一类文字链接最后的竖虚线
+            $("ul:first li:last", $(this)).removeClass("tn-border-right tn-border-dashed tn-border-gray");
+
+            //该类别没有任何友情链接时不显示该分类
+            if (!$(this).children("ul").children().length) {
+                $(this).remove();
+            }
+
+            //该类别没有任何图片链接时去除ul标签
+            if (!$(this).children("ul:first").children().length) {
+                $(this).children("ul:first").remove();
+            }
+
+            //该类别没有任何图片链接时去除ul标签
+            if (!$(this).children("ul:last").children().length) {
+                $(this).children("ul:last").remove();
+            }
+        });
+    });
+</script>

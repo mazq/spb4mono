@@ -1,0 +1,15 @@
+﻿@{
+    bool currentUserIsFollowedUser = ViewData.Get<bool>("currentUserIsFollowedUser",false);
+    bool isFollowed = ViewData.Get<bool>("isFollowed",false);
+    User currentUser = ViewData.Get<User>("currentUser",null);
+    User followedUser = ViewData.Get<User>("followedUser",null);
+}
+@if (!currentUserIsFollowedUser)
+{
+<span class="tn-explain-icon" @if (!isFollowed)
+                              {@Html.Raw("style=\"display: none;\"")}><span class="tn-icon tn-smallicon-accept">
+    </span><span class="tn-icon-text">已关注</span></span>
+<a @if (isFollowed)
+   {@Html.Raw("style=\"display: none;\"")} href="@SiteUrls.Instance()._AddFollowedUser(currentUser.UserName, followedUser.UserId)" plugin="dialog" class="tn-button tn-corner-all tn-button-primary tn-button-text-icon-primary" id="add" name="followed-follower-@followedUser.UserId">
+    <span class="tn-icon tn-smallicon-add"></span><span class="tn-button-text">关注</span></a>
+}

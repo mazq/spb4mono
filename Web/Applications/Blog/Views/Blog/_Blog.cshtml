@@ -1,0 +1,66 @@
+﻿@model BlogThread
+@{
+    string spaceKey = UserIdToUserNameDictionary.GetUserName(Model.UserId);
+    IUser currentUser = UserContext.CurrentUser;
+    bool isSubscribePage = ViewData.Get<bool>("isSubscribePage", false);
+}
+@if (Model != null)
+{ 
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom">
+    @if(!string.IsNullOrEmpty(Model.FeaturedImage)){
+        <div class="tn-list-item-area-left"><img alt="@Model.ResolvedSubject" src="@SiteUrls.Instance().ImageUrl(Model.FeaturedImage,TenantTypeIds.Instance().BlogThread(),ImageSizeTypeKeys.Instance().Small())" /></div>
+    }
+    <div class="tn-list-item-row tn-list-item-heading">
+        <h5 class="tn-helper-reset"> 
+            <a target="_blank" href="@SiteUrls.Instance().BlogDetail(spaceKey, Model.ThreadId)">@Model.ResolvedSubject</a> 
+            @if (Model.IsSticky)
+            { 
+                <span title="置顶" class="tn-icon-colorful tn-icon-colorful-top tn-icon-inline"></span>
+            }
+            @if (Model.IsEssential)
+            {
+                <span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>
+            }
+            @if (Model.PrivacyStatus == PrivacyStatus.Private)
+            {
+            <span title="不公开" class="tn-icon-colorful tn-icon-colorful-secret tn-icon-inline"></span>
+            }
+            else if (Model.PrivacyStatus == PrivacyStatus.Part)
+            { 
+            <span title="特定用户可见" class="tn-icon tn-icon-limit tn-icon-inline"></span>
+            }
+        </h5>
+    </div>
+    <div class="tn-list-item-row tn-list-item-summary">
+        <p>@Html.Raw(Model.Summary) </p>
+    </div>
+    <div class="tn-list-item-row tn-helper-clearfix tn-list-info">
+        @if (currentUser == null || currentUser.UserId != Model.UserId)
+            {
+                <div class="tn-follow">
+                    @Html.Action("_SubscribeButton", "Blog", new { spaceKey = Url.SpaceKey(), threadId = Model.ThreadId, isSubscribePage = isSubscribePage })
+                </div>
+            }
+        <em class="tn-date tn-text-note">@Model.DateCreated.ToFriendlyDate()</em>
+        @Html.SupportOppose(TenantTypeIds.Instance().BlogThread(), Model.ThreadId, Model.UserId, AttitudeMode.Unidirection,AttitudeStyle.Support)
+        <span class="tn-action tn-comment-count"><a href="@SiteUrls.Instance().BlogDetail(spaceKey, Model.ThreadId)#comment" class="tn-action-text" target="_blank">评论(@Model.CommentCount)</a></span>
+        <span class="tn-action tn-view-count"><a href="@SiteUrls.Instance().BlogDetail(spaceKey, Model.ThreadId)" class="tn-action-text" target="_blank">浏览(@Model.HitTimes)</a></span>
+        @if (new Authorizer().BlogThread_Edit(Model))
+        {
+        <span class="tn-action tn-edit" style="display:none;"><a href="@SiteUrls.Instance().BlogEdit(spaceKey, Model.ThreadId, null)" class="tn-action-text">编辑</a></span>
+        }
+        @if (new Authorizer().BlogThread_Delete(Model))
+        {
+        <span class="tn-action tn-delete" style="display:none;"><a id="blog-delete-from-list-@(Model.ThreadId)" href="@SiteUrls.Instance()._BlogDelete(spaceKey, Model.ThreadId)" class="tn-action-text">删除</a></span>
+        }
+    </div> 
+</li>
+}
+<script type="text/javascript">
+    //鼠标移动上去显示编辑、删除按钮
+    $("li.tn-list-item").mouseenter(function () {
+            $("span.tn-edit,span.tn-delete", $(this)).show();
+        }).mouseleave(function () {
+            $("span.tn-edit,span.tn-delete", $(this)).hide();
+        });
+</script>

@@ -1,0 +1,16 @@
+﻿@if (UserContext.CurrentUser != null)
+{
+    bool isSubscribed = ViewData.Get<bool>("isSubscribed", false);
+    long threadId = ViewData.Get<long>("threadId", 0);
+    bool isSubscribePage = ViewData.Get<bool>("isSubscribePage",false);
+    if (isSubscribed)
+    {
+        @Html.Button("取消关注", ButtonTypes.Link, HighlightStyles.Secondary, ButtonSizes.Default, IconTypes.SmallCross, url: SiteUrls.Instance()._BlogSubscribeCancel(Url.SpaceKey(), threadId), htmlAttributes: new { id = "blog-subscribe-cancel-" + threadId, threadId = threadId, isSubscribePage = isSubscribePage })
+        @Html.Button("关注", ButtonTypes.Link, HighlightStyles.Hollow, ButtonSizes.Default, IconTypes.SmallAdd, url: SiteUrls.Instance()._BlogSubscribe(Url.SpaceKey(), threadId), htmlAttributes: new { id = "blog-subscribe-" + threadId, threadId = threadId, isSubscribePage = isSubscribePage, @class = "tn-button-default", style = "display:none;" })
+    }
+    else
+    {
+        @Html.Button("取消关注", ButtonTypes.Link, HighlightStyles.Secondary, ButtonSizes.Default, IconTypes.SmallCross, url: SiteUrls.Instance()._BlogSubscribeCancel(Url.SpaceKey(), threadId), htmlAttributes: new { id = "blog-subscribe-cancel-" + threadId, threadId = threadId, isSubscribePage = isSubscribePage, style = "display:none;" })
+        @Html.Button("关注", ButtonTypes.Link, HighlightStyles.Hollow, ButtonSizes.Default, IconTypes.SmallAdd, url: SiteUrls.Instance()._BlogSubscribe(Url.SpaceKey(), threadId), htmlAttributes: new { id = "blog-subscribe-" + threadId, threadId = threadId, isSubscribePage = isSubscribePage, @class = "tn-button-default" })
+    }
+}

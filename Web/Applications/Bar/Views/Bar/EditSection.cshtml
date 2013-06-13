@@ -1,0 +1,121 @@
+﻿@model BarSectionEditModel
+@{
+    Layout = "app-manage-2cols";
+    Html.IncludeCss("~/Applications/Bar/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Bar/Scripts/jquery.spb.bar.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/tinymce/jquery.tinymce.js");
+    Html.IncludeScript("~/Scripts/tunynet/jquery.tn.htmlEditor.unobtrusive.js");
+    ViewData["SectionId"] = Model.SectionId;
+}
+@section ContentHeader{
+    @Html.Action("_BarSubmenu", "Bar")
+}
+@section Aside{
+    @Html.Partial("_ManageSectionLeftMenu")
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-bar-manage">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        @using (Html.BeginForm("EditSection", "Bar", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.HiddenFor(n => n.SectionId)
+            <div class="tn-form-box">
+                <div class="tn-main-heading tn-border-gray tn-border-bottom">
+                    <h2>
+                        编辑描述</h2>
+                </div>
+                @Html.StatusMessage(ViewData.Get<StatusMessageData>("StatusMessageData", null))
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                Logo：
+                            </th>
+                            <td>
+                                <input type="file" name="LogoImage" id="LogoImage" />
+                            </td>
+                        </tr>
+                      
+                        @if (Model.HasLogoImage())
+                        {
+                            <tr id="deleteBarSectionLogo">
+                                <th>
+                                </th>
+                                <td>
+                                    <div class="tn-formrow-img">
+                                        <span class="tn-avatar">
+                                            <img src="@SiteUrls.Instance().LogoUrl(Model.LogoImage, TenantTypeIds.Instance().BarSection(), ImageSizeTypeKeys.Instance().Medium())" width="100px" title="@Model.Name" alt="@Model.Name"/></span>                                 
+                                             @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定删除吗？").SetText("删除").SetTooltip("删除按钮")
+                                                  .SetDeleteTarget("#deleteBarSectionLogo")
+                                                  .SetUrl(SiteUrls.Instance()._DeleteBarSectionLogo(Model.SectionId)))
+                                    </div>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                        }
+                        @if (new Authorizer().BarSection_SetManager(Model.SectionId))
+                        {
+                            <tr>
+                                <th>
+                                    @Html.FormLabelFor(n => n.ManagerUserIds)
+                                </th>
+                                <td>
+                                    @Html.UserSelector("ManagerUserIds", ViewData.Get<int>("AdminCount", 5), ViewData.Get<IEnumerable<long>>("ManagerUserIds", null), SelectorWidthType.Longest, UserSelectorSearchScope.Site)
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+
+                        }
+                        <tr>
+                            <th>
+                                @Html.FormLabelFor(n => n.Description)
+                            </th>
+                            <td>
+                                @Html.HtmlEditorFor(n => n.Description, new HtmlEditorOptions(HtmlEditorMode.Simple))
+                                @Html.ValidationMessageFor(n => n.Description)
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.FormLabelFor(n => n.ThreadCategoryStatus)
+                            </th>
+                            <td>
+                                @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.ForceEnabled, new { id = "ForceEnabled", @class = "tn-radiobutton" })
+                                <label for="ForceEnabled">
+                                    强制分类</label>
+                                @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.NotForceEnabled, new { id = "NotForceEnabled", @class = "tn-radiobutton" })
+                                <label for="NotForceEnabled">
+                                    允许分类</label>
+                                @Html.RadioButton("ThreadCategoryStatus", ThreadCategoryStatus.Disabled, new { id = "Disabled", @class = "tn-radiobutton" })
+                                <label for="Disabled">
+                                    禁用</label>
+                                @Html.ValidationMessageFor(n => n.ThreadCategoryStatus)
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                &nbsp;
+                            </th>
+                            <td>
+                                @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Large)
+                                @if (HttpContext.Current.Request.UrlReferrer != null)
+                                {
+                                    @Html.Button("取消", ButtonTypes.Button, HighlightStyles.Secondary, ButtonSizes.Large, url: HttpContext.Current.Request.UrlReferrer.AbsoluteUri)
+                                }
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

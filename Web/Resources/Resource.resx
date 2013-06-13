@@ -1,0 +1,543 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_AdminPunish" xml:space="preserve">
+    <value>被管理员惩罚</value>
+  </data>
+  <data name="Common_AdminReward" xml:space="preserve">
+    <value>被管理员奖励</value>
+  </data>
+  <data name="Common_BeforeYesterday" xml:space="preserve">
+    <value>前天</value>
+  </data>
+  <data name="Common_BrowserTitleSeparator" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="Common_Colon" xml:space="preserve">
+    <value>：</value>
+  </data>
+  <data name="Common_DateTimeWhenZero" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="Common_DefaultDateFormat" xml:space="preserve">
+    <value>yyyy-MM-dd</value>
+  </data>
+  <data name="Common_DefaultTimeFormat" xml:space="preserve">
+    <value>HH:mm</value>
+  </data>
+  <data name="Common_ExceptionUrl" xml:space="preserve">
+    <value>异常URL：{0}</value>
+  </data>
+  <data name="Common_He" xml:space="preserve">
+    <value>他</value>
+  </data>
+  <data name="Common_HttpMethod" xml:space="preserve">
+    <value>Http传输方式：{0}</value>
+  </data>
+  <data name="Common_Now" xml:space="preserve">
+    <value>现在</value>
+  </data>
+  <data name="Common_NumberWhenZero" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="Common_PagerFirstButton" xml:space="preserve">
+    <value>&amp;lt;&amp;lt;</value>
+  </data>
+  <data name="Common_PagerLastButton" xml:space="preserve">
+    <value>&amp;gt;&amp;gt;</value>
+  </data>
+  <data name="Common_PagerNextButton" xml:space="preserve">
+    <value>下一页</value>
+  </data>
+  <data name="Common_PagerPreviousButton" xml:space="preserve">
+    <value>上一页</value>
+  </data>
+  <data name="Common_Pattern_CNMonthDay" xml:space="preserve">
+    <value>{0}月{1}日{2}</value>
+  </data>
+  <data name="Common_Pattern_DayAgo" xml:space="preserve">
+    <value>{0}天之前</value>
+  </data>
+  <data name="Common_Pattern_HoursAgo" xml:space="preserve">
+    <value>{0}小时之前</value>
+  </data>
+  <data name="Common_Pattern_MinutelAgo" xml:space="preserve">
+    <value>{0}分钟之前</value>
+  </data>
+  <data name="Common_Pattern_SecondsAgo" xml:space="preserve">
+    <value>{0}秒之前</value>
+  </data>
+  <data name="Common_PointTrade" xml:space="preserve">
+    <value>积分交易</value>
+  </data>
+  <data name="Common_PunishUser" xml:space="preserve">
+    <value>惩罚用户</value>
+  </data>
+  <data name="Common_RewardUser" xml:space="preserve">
+    <value>奖励用户</value>
+  </data>
+  <data name="Common_She" xml:space="preserve">
+    <value>她</value>
+  </data>
+  <data name="Common_Ta" xml:space="preserve">
+    <value>Ta</value>
+  </data>
+  <data name="Common_TodayAt" xml:space="preserve">
+    <value>今天</value>
+  </data>
+  <data name="Common_TransactionTax" xml:space="preserve">
+    <value>交易税</value>
+  </data>
+  <data name="Common_UserAgent" xml:space="preserve">
+    <value>用户代理信息：{0}</value>
+  </data>
+  <data name="Common_UserIP" xml:space="preserve">
+    <value>用户IP：{0}</value>
+  </data>
+  <data name="Common_YesterdayAt" xml:space="preserve">
+    <value>昨天</value>
+  </data>
+  <data name="Exception_AccessDenied" xml:space="preserve">
+    <value>没有足够的访问权限</value>
+  </data>
+  <data name="Exception_BasicManagementAccessDenied" xml:space="preserve">
+    <value>没有管理{0}的权限</value>
+  </data>
+  <data name="Exception_ContentNotFound" xml:space="preserve">
+    <value>“{0}”不存在或已被删除，Id:{1}</value>
+  </data>
+  <data name="Exception_EmailUnableToSend" xml:space="preserve">
+    <value>发送邮件时产生异常{0}</value>
+  </data>
+  <data name="Exception_FloodDenied" xml:space="preserve">
+    <value>不允许频繁发帖</value>
+  </data>
+  <data name="Exception_PostAccessDenied" xml:space="preserve">
+    <value>没有发布{0}的权限</value>
+  </data>
+  <data name="Exception_PostReplyAccessDenied" xml:space="preserve">
+    <value>没有进行回复的权限</value>
+  </data>
+  <data name="Exception_RegisterDenied" xml:space="preserve">
+    <value>禁止注册</value>
+  </data>
+  <data name="Exception_UnauthorizedAccessException" xml:space="preserve">
+    <value>I/O或无访问权限引发的异常</value>
+  </data>
+  <data name="Exception_UnknownError" xml:space="preserve">
+    <value>未知错误</value>
+  </data>
+  <data name="Exception_UserNotFound" xml:space="preserve">
+    <value>用户“{0}”不存在或已被删除</value>
+  </data>
+  <data name="EXIFLabel_0x10F" xml:space="preserve">
+    <value>设备制造厂商</value>
+  </data>
+  <data name="EXIFLabel_0x110" xml:space="preserve">
+    <value>相机型号</value>
+  </data>
+  <data name="EXIFLabel_0x829A" xml:space="preserve">
+    <value>曝光时间</value>
+  </data>
+  <data name="EXIFLabel_0x8824" xml:space="preserve">
+    <value>感光度</value>
+  </data>
+  <data name="EXIFLabel_0x9003" xml:space="preserve">
+    <value>拍摄日期</value>
+  </data>
+  <data name="EXIFLabel_0x9205" xml:space="preserve">
+    <value>最大光圈</value>
+  </data>
+  <data name="EXIFLabel_0x9209" xml:space="preserve">
+    <value>闪光灯</value>
+  </data>
+  <data name="EXIFLabel_0x920a" xml:space="preserve">
+    <value>焦距</value>
+  </data>
+  <data name="EXIFLabel_0xa002" xml:space="preserve">
+    <value>宽度</value>
+  </data>
+  <data name="EXIFLabel_0xa003" xml:space="preserve">
+    <value>高度</value>
+  </data>
+  <data name="Message_Pattern_RegisterFailedForDuplicateEmailAddress" xml:space="preserve">
+    <value>邮箱已被占用&amp;lt;a href=&amp;quot;{0}&amp;quot;&amp;gt;[忘记密码？]&amp;lt;/a&amp;gt;</value>
+  </data>
+  <data name="OperationLog_Pattern_ActivateUser" xml:space="preserve">
+    <value>批量激活了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_Approved" xml:space="preserve">
+    <value>把 {0}：{1} 设置为通过审核</value>
+  </data>
+  <data name="OperationLog_Pattern_AutoNoModeratedUser" xml:space="preserve">
+    <value>依据规则自动取消管制了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_BanUser" xml:space="preserve">
+    <value>封禁了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_CancelActivateUser" xml:space="preserve">
+    <value>批量取消激活了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_CancelEssential" xml:space="preserve">
+    <value>把 {0}：{1} 取消精华</value>
+  </data>
+  <data name="OperationLog_Pattern_CancelModerateUser" xml:space="preserve">
+    <value>批量取消管制了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_CancelSticky" xml:space="preserve">
+    <value>把 {0}：{1} 取消置顶</value>
+  </data>
+  <data name="OperationLog_Pattern_ControlledView" xml:space="preserve">
+    <value>查看了 {0}：{1}</value>
+  </data>
+  <data name="OperationLog_Pattern_Create" xml:space="preserve">
+    <value>创建了 {0}：{1}</value>
+  </data>
+  <data name="OperationLog_Pattern_Delete" xml:space="preserve">
+    <value>删除了 {0}：{1}</value>
+  </data>
+  <data name="OperationLog_Pattern_Disapproved" xml:space="preserve">
+    <value>把 {0}：{1} 设置为未通过审核</value>
+  </data>
+  <data name="OperationLog_Pattern_ModerateUser" xml:space="preserve">
+    <value>批量管制了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_ResetPassword" xml:space="preserve">
+    <value>对用户： {0}重设了密码</value>
+  </data>
+  <data name="OperationLog_Pattern_SetCategory" xml:space="preserve">
+    <value>把 {0}：{1} 由 {2} 设置为 {3}</value>
+  </data>
+  <data name="OperationLog_Pattern_SetEssential" xml:space="preserve">
+    <value>把 {0}：{1} 设置为精华</value>
+  </data>
+  <data name="OperationLog_Pattern_SetSticky" xml:space="preserve">
+    <value>把 {0}：{1} 设置为置顶</value>
+  </data>
+  <data name="OperationLog_Pattern_UnbanUser" xml:space="preserve">
+    <value>解禁了用户： {0}</value>
+  </data>
+  <data name="OperationLog_Pattern_Update" xml:space="preserve">
+    <value>更新了 {0}：{1}</value>
+  </data>
+  <data name="PointRecord_Pattern_Approved" xml:space="preserve">
+    <value>{0}：{1} 通过审核</value>
+  </data>
+  <data name="PointRecord_Pattern_Create" xml:space="preserve">
+    <value>创建了 {0}：{1}</value>
+  </data>
+  <data name="PointRecord_Pattern_CreateInviteFriendRecord" xml:space="preserve">
+    <value>{0}成功邀请了用户{1}注册</value>
+  </data>
+  <data name="PointRecord_Pattern_Delete" xml:space="preserve">
+    <value>删除了 {0}：{1}</value>
+  </data>
+  <data name="PointRecord_Pattern_Disapproved" xml:space="preserve">
+    <value>{0}：{1} 未通过审核</value>
+  </data>
+  <data name="PointRecord_Pattern_Oppose" xml:space="preserve">
+    <value>反对了{0}</value>
+  </data>
+  <data name="PointRecord_Pattern_RecommendContent" xml:space="preserve">
+    <value>{0}：{1} 被管理员推荐</value>
+  </data>
+  <data name="PointRecord_Pattern_RecommendUser" xml:space="preserve">
+    <value>您被管理员推荐</value>
+  </data>
+  <data name="PointRecord_Pattern_Register" xml:space="preserve">
+    <value>{0}注册了帐号</value>
+  </data>
+  <data name="PointRecord_Pattern_SetEssential" xml:space="preserve">
+    <value>{0}：{1} 被管理员设置为精华</value>
+  </data>
+  <data name="PointRecord_Pattern_SetSticky" xml:space="preserve">
+    <value>{0}：{1} 被管理员设置为置顶</value>
+  </data>
+  <data name="PointRecord_Pattern_Support" xml:space="preserve">
+    <value>赞同了{0}</value>
+  </data>
+  <data name="Validate_DateType" xml:space="preserve">
+    <value>{0}无效</value>
+  </data>
+  <data name="Validate_EmailRequired" xml:space="preserve">
+    <value>请输入电子邮箱</value>
+  </data>
+  <data name="Validate_EmailStyle" xml:space="preserve">
+    <value>邮箱格式不正确，请输入正确格式的邮箱地址</value>
+  </data>
+  <data name="Validate_NumericInvalid" xml:space="preserve">
+    <value>{0}必须是数字</value>
+  </data>
+  <data name="Validate_PasswordRegex" xml:space="preserve">
+    <value>您输入的密码格式不正确</value>
+  </data>
+  <data name="Validate_Pattern_MinRequiredNonAlphanumericCharacters" xml:space="preserve">
+    <value>您的密码中特殊字符太少，请至少输入 {0} 个特殊字符（如：*、$等）</value>
+  </data>
+  <data name="Validate_Pattern_MinRequiredPasswordLength" xml:space="preserve">
+    <value>密码长度不能少于 {0} 个字符</value>
+  </data>
+  <data name="Validate_Range" xml:space="preserve">
+    <value>{0}必须介于{1}和之{2}间</value>
+  </data>
+  <data name="Validate_RegularExpression" xml:space="preserve">
+    <value>{0} 表达式：{1}</value>
+  </data>
+  <data name="Validate_Required" xml:space="preserve">
+    <value>{0}不能为空</value>
+  </data>
+  <data name="Validate_RequiredPassword" xml:space="preserve">
+    <value>密码不能为空</value>
+  </data>
+  <data name="Validate_StringLength" xml:space="preserve">
+    <value>{0}长度要求填写{2} 至 {1} 位</value>
+  </data>
+  <data name="Validate_UserNameIsDisallowed" xml:space="preserve">
+    <value>该用户名不允许使用，请选择其他名字后注册</value>
+  </data>
+  <data name="Validate_UserNameIsExisting" xml:space="preserve">
+    <value>该用户名已被占用，请更换用户名重试</value>
+  </data>
+  <data name="Validate_UserNameRegex" xml:space="preserve">
+    <value>只能输入字母、数字、汉字和下划线</value>
+  </data>
+  <data name="Validate_UserNameRequired" xml:space="preserve">
+    <value>请输入用户名</value>
+  </data>
+  <data name="Validate_UserNameTooLong" xml:space="preserve">
+    <value>用户名长度最多{0}位</value>
+  </data>
+  <data name="Validate_UserNameTooShort" xml:space="preserve">
+    <value>用户名长度不能少于{0}位</value>
+  </data>
+  <data name="OperationLog_Pattern_NoActivateUser" xml:space="preserve">
+    <value>取消激活用户： {0}</value>
+  </data>
+  <data name="AccountBinding_ShareToFirend" xml:space="preserve">
+    <value>使用{0}登录了网站“{1}”{2}</value>
+  </data>
+  <data name="PointRecord_Pattern_CreateComment" xml:space="preserve">
+    <value>{0}评论了:{1}</value>
+  </data>
+  <data name="PointRecord_Pattern_DeleteComment" xml:space="preserve">
+    <value>{0}删除了评论：{1}</value>
+  </data>
+  <data name="NoActivateUser" xml:space="preserve">
+    <value>取消激活用户</value>
+  </data>
+  <data name="OperationType_UnbanUser" xml:space="preserve">
+    <value>解禁用户</value>
+  </data>
+  <data name="OperationType_Create" xml:space="preserve">
+    <value>创建</value>
+  </data>
+  <data name="OperationType_ActivateUser" xml:space="preserve">
+    <value>激活用户</value>
+  </data>
+  <data name="OperationType_BanUser" xml:space="preserve">
+    <value>封禁用户</value>
+  </data>
+  <data name="OperationType_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="OperationType_NoActivateUser" xml:space="preserve">
+    <value>取消激活用户</value>
+  </data>
+  <data name="OperationType_Update" xml:space="preserve">
+    <value>重建索引</value>
+  </data>
+  <data name="Channel" xml:space="preserve">
+    <value>频道</value>
+  </data>
+  <data name="ControlPanel" xml:space="preserve">
+    <value>后台</value>
+  </data>
+  <data name="GroupSpace" xml:space="preserve">
+    <value>群组空间</value>
+  </data>
+  <data name="UserSpace" xml:space="preserve">
+    <value>用户空间</value>
+  </data>
+  <data name="Exception_LicenseAuthorizeDenied" xml:space="preserve">
+    <value>找不到合法的Spacebuilder授权文件，请确保Web目录下存在后缀为lic的合法授权文件；如果您是商业客户，请到 http://www.spacebuilder.cn/Products/Contact 联系我们</value>
+  </data>
+  <data name="PointRecord_Pattern_FirstUploadAvatar" xml:space="preserve">
+    <value>首次上传头像</value>
+  </data>
+  <data name="Common_AnonymousDisplayName" xml:space="preserve">
+    <value>匿名用户</value>
+  </data>
+  <data name="OperationType_SetEssential" xml:space="preserve">
+    <value>设置精华</value>
+  </data>
+  <data name="OperationType_SetSticky" xml:space="preserve">
+    <value>置顶</value>
+  </data>
+  <data name="OperationLog_Pattern_DeleteUser" xml:space="preserve">
+    <value>删除了用户</value>
+  </data>
+  <data name="OperationType_Approved" xml:space="preserve">
+    <value>通过审核</value>
+  </data>
+  <data name="OperationType_CancelEssential" xml:space="preserve">
+    <value>取消设置精华</value>
+  </data>
+  <data name="OperationType_CancelSticky" xml:space="preserve">
+    <value>取消设置精华</value>
+  </data>
+  <data name="OperationType_DeleteUser" xml:space="preserve">
+    <value>删除用户</value>
+  </data>
+  <data name="OperationType_Disapproved" xml:space="preserve">
+    <value>不通过审核</value>
+  </data>
+  <data name="GoldCoin" xml:space="preserve">
+    <value>金币</value>
+  </data>
+  <data name="PointRecord_Pattern_FreeModeratedUser" xml:space="preserve">
+    <value>{0}邀请的用户{1}成功解除了管制</value>
+  </data>
+  <data name="PointRecord_Pattern_DeleteInvitedUser" xml:space="preserve">
+    <value>{0}邀请的用户{1}被删除了</value>
+  </data>
+  <data name="PointRecord_Pattern_FollowUser" xml:space="preserve">
+    <value>关注了用户"{0}"</value>
+  </data>
+  <data name="Validate_NickNameIsDisallowed" xml:space="preserve">
+    <value>昵称不允许使用，请选择其他昵称后注册</value>
+  </data>
+  <data name="Validate_NickNameIsExisting" xml:space="preserve">
+    <value>该昵称已被占用，请更换其他昵称重试</value>
+  </data>
+  <data name="Validate_NickNameRegex" xml:space="preserve">
+    <value>只能输入字母、数字、汉字和下划线</value>
+  </data>
+  <data name="Validate_NickNameRequired" xml:space="preserve">
+    <value>请输入昵称</value>
+  </data>
+  <data name="Validate_NickNameTooLong" xml:space="preserve">
+    <value>昵称长度最多{0}位</value>
+  </data>
+  <data name="Validate_NickNameTooShort" xml:space="preserve">
+    <value>昵称长度不能少于{0}位</value>
+  </data>
+  <data name="OperationType_UpdateUser" xml:space="preserve">
+    <value>更新用户</value>
+  </data>
+</root>

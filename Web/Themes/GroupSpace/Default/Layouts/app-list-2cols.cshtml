@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+@using (Html.BeginHead())
+{
+    Html.IncludeCombresScript(PageResourceType.CSS, "siteCss");
+    Html.IncludeCombresScript(PageResourceType.JS, "siteJs", ResourceRenderPriority.First);
+    Html.IncludeCombresScript(PageResourceType.JS, "FormJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "ImageJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "CodeHighlighterJs");
+    Html.IncludeCombresScript(PageResourceType.JS, "UnobtrusiveJs", ResourceRenderPriority.Last);
+}
+<body id="@Html.GenerateBodyId()" class="tn-page-bg spb-layout-19-5 spb-group-page">
+    <div id="tn-doc" class="tn-doc-bg">
+        <div id="tn-header" class="tn-header-bg">
+            <div class="tn-wrapper">
+                @Html.Action("_Header", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), area = "Group" })
+            </div>
+        </div>
+        <div id="tn-content" class="tn-content-bg">
+            <div class="tn-wrapper">
+                <div class="tn-grid-19-5">
+                    <div class="tn-unit tn-first">
+                        <div class="tnc-main">
+                            @RenderSection("ContentHeader", false)
+                            @RenderBody()
+                        </div>
+                    </div>
+                    <div class="tn-unit">
+                        <div class="tnc-aside">
+                            @Html.Action("_GroupInfo", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), area = "Group", showGroupLogo = false })
+                            @Html.Action("_Menu_Main", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), area = "Group" })
+                            @RenderSection("Aside", false)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tn-footer" class="tn-footer-bg">
+            <div class="tn-wrapper">
+                @Html.Action("_Footer", "GroupSpaceTheme", new { spaceKey = Url.SpaceKey(), area = "Group" })
+            </div>
+        </div>
+    </div>
+</body>
+</html>

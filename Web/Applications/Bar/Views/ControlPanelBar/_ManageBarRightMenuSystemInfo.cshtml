@@ -1,0 +1,16 @@
+﻿@{    
+    string tenantTypeId = Request.RequestContext.GetParameterFromRouteDataOrQueryString<string>("tenantTypeId") ?? TenantTypeIds.Instance().Bar();
+    IBarUrlGetter urlGetter = BarUrlGetterFactory.Get(tenantTypeId);
+}
+<div class="tnc-rightvar tn-open">
+    <div class="tnc-settings-icon" plugin="ShortcutMenu">
+        <a href="#"></a>
+    </div>
+    <div id="ManageUserRightMenu">
+        <div class="tnc-settings">
+            @Html.AjaxAction("_ManageableDataDetail", "ControlPanel", new { area = "Common", applicationKey = BarConfig.Instance().ApplicationKey, tenantTypeId = tenantTypeId })
+            @Html.Partial(urlGetter._ManageSubMenu())
+            @Html.AjaxAction("_StatisticDataDetail", "ControlPanel", new { area = "Common", applicationKey = BarConfig.Instance().ApplicationKey, tenantTypeId = tenantTypeId })
+        </div>
+    </div>
+</div>

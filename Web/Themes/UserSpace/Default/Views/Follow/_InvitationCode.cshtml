@@ -1,0 +1,96 @@
+﻿@model PagingDataSet<InvitationCode>
+@{
+    Layout = null;
+}
+<div id="div-invitationCodes">
+    @*//todo:bianchx by libsh,Model==null怎么办*@
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var item in Model)
+        {
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            @Html.TextBox("invitationCode", SiteUrls.FullUrl(SiteUrls.Instance().Invite(item.Code)), InputWidthTypes.Long, new RouteValueDictionary { { "id", "input-copy-" + item.Code } })
+            @Html.LinkButton("复制", string.Empty, HighlightStyles.Secondary, htmlAttributes: new { id = "linkButton-copy-" + item.Code })
+            <span class="tn-text-note">过期时间： @item.ExpiredDate.ToFriendlyDate()</span>
+        </div>
+        }
+    }
+    <div class="tn-pagination">
+        @Html.AjaxPagingButton(Model, "div-invitationCodes")
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+
+        if (!$.browser.msie && i_flash) {
+            $("a[id^='linkButton-copy']").zclip({
+                path: "@Tunynet.Utilities.WebUtility.ResolveUrl(@"~/Scripts/jquery/ZeroClipboard/ZeroClipboard.swf")",
+                copy: function () {
+                    return $(this).prev().val();
+                },
+                afterCopy:function(){
+                    alert("复制完成，现在将邀请链接黏贴给您的好友吧");
+                }
+            });
+        }else{
+            $("a[id^='linkButton-copy']").click(function () {
+                copyToClipboard($(this).prev().val());
+            });
+        }
+    });
+    function copyToClipboard(txt) {
+        if (window.clipboardData) {
+
+            window.clipboardData.clearData();
+            window.clipboardData.setData("Text", txt);
+            alert("复制完成，现在将邀请链接黏贴给您的好友吧");
+        } else if (navigator.userAgent.indexOf("Opera") != -1) {
+            window.location = txt;
+        } else if (window.netscape) {
+            try {
+                netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+            } catch (e) {
+                alert("被浏览器拒绝！\n请在浏览器地址栏输入'about:config'并回车\n然后将 'signed.applets.codebase_principal_support'设置为'true'");
+            }
+            var clip = Components.classes['@@mozilla.org/widget/clipboard;1'].createInstance(Components.interfaces.nsIClipboard);
+            if (!clip)
+                return;
+            var trans = Components.classes['@@mozilla.org/widget/transferable;1'].createInstance(Components.interfaces.nsITransferable);
+            if (!trans)
+                return;
+            trans.addDataFlavor('text/unicode');
+            var str = new Object();
+            var len = new Object();
+            var str = Components.classes["@@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+            var copytext = txt;
+            str.data = copytext;
+            trans.setTransferData("text/unicode", str, copytext.length * 2);
+            var clipid = Components.interfaces.nsIClipboard;
+            if (!clip)
+                return false;
+            clip.setData(trans, null, clipid.kGlobalClipboard);
+            alert("复制完成，现在将邀请链接黏贴给您的好友吧")
+        }
+    }  
+</script>
+<script type="text/javascript"><!--
+    var i_flash;
+    // Netscape  
+    if (navigator.plugins) {
+        for (var i = 0; i < navigator.plugins.length; i++) {
+            if (navigator.plugins[i].name.toLowerCase().indexOf("shockwave flash") >= 0) {
+                i_flash = true;
+            }
+        }
+    } 
+// --></script>
+<script type="text/vbscript"><!-- 
+//IE 
+on error resume next 
+set f = CreateObject("ShockwaveFlash.ShockwaveFlash") 
+if IsObject(f) then 
+i_flash = true 
+end if 
+// --></script>

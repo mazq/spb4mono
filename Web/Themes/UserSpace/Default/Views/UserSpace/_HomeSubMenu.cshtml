@@ -1,0 +1,67 @@
+﻿@{
+    User user = ViewData.Get<User>("user", new User());
+    int contentCount = ViewData.Get<int>("contentCount", 0);
+    string userRankName = ViewData.Get<string>("userRankName", "");
+    string accessedCountString = ViewData.Get<string>("accessedCount", "0/0");
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-user-profile">
+    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+        <div class="tnc-myhome-aside">
+            <div class="tn-avatar-wrap tn-hover">
+                <div class="tn-avatar-big">
+                    @Html.ShowUserAvatar(user.UserId, AvatarSizeType.Big, false)
+                </div>
+            </div>
+            <ul class="spb-user-atten tn-helper-clearfix">
+                <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ListFollowedUsers(Url.SpaceKey())"><strong class="tn-count">@user.FollowedCount</strong><span>关注</span></a> </li>
+                <li class="tn-border-gray tn-border-right"><a href="@SiteUrls.Instance().ListFollowers(Url.SpaceKey())"><strong class="tn-count" id="userFollowerCount">@user.FollowerCount</strong><span>粉丝</span></a> </li>
+                <li><a href="#"><strong class="tn-count">99999</strong><span>内容</span></a> </li>
+            </ul>
+            <ul class="tn-side-menu tn-border-top tn-border-gray">
+                <li class="tn-border-bottom tn-border-gray tn-selected"><span class="tn-icon tn-icon-microblog"></span>
+                    @Html.Link("个人主页", SiteUrls.Instance().SpaceHome(Url.SpaceKey()), "个人主页", new { @class = "tn-menu-text" })</li>
+                <li class="tn-border-bottom tn-border-gray"><span class="tn-icon tn-icon-news"></span><a href="#" class="tn-menu-text">个人资料</a></li>
+                <li class="tn-border-bottom tn-border-gray"><span class="tn-icon tn-icon-album"></span><a href="#" class="tn-menu-text">他的微博</a></li>
+                <li class="tn-border-bottom tn-border-gray"><span class="tn-icon tn-icon-vote"></span><a href="#" class="tn-menu-text">他的日志</a></li>
+                <li class="tn-border-bottom tn-border-gray"><span class="tn-icon tn-icon-email"></span><a href="#" class="tn-menu-text">他的群组</a></li>
+                <li class="tn-border-bottom tn-border-gray"><span class="tn-icon tn-icon-answer"></span><a href="#" class="tn-menu-text">问答</a></li>
+            </ul>
+            <div class="tn-info-part">
+                <div class="spb-basic-info">
+                    <dl>
+                        <dt>用户等级：</dt>
+                        <dd>
+                            <span class="spb-user-type">
+                                <a href="@SiteUrls.Instance().MyRank(user.UserName)">@Html.UserRankIcon(user.Rank)</a></span>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>在线状态：</dt>
+                        <dd>
+                            <span class="spb-user-type">
+                                <img src="http://c.spacebuilder.cn/Themes/Shared/Styles/Icons/user_IsOffline.gif" title="离线" alt="离线"></span>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>注册日期：</dt>
+                        <dd>
+                            @user.DateCreated.ToFriendlyDate()</dd>
+                    </dl>
+                    <dl>
+                        <dt>最新访问：</dt>
+                        <dd>
+                            @user.LastActivityTime.ToFriendlyDate()</dd>
+                    </dl>
+                    <dl>
+                        <dt>被访次数：</dt>
+                        <dd>
+                            @accessedCountString</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-home-label">
+    @Html.Action("_TopUserTags")
+</div>

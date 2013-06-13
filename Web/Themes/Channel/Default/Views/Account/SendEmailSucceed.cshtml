@@ -1,0 +1,70 @@
+﻿@model SendEmailSucceedViewModel
+@{
+    Layout = "_Account";
+}
+@helper GetLink(string description, string link)
+    {
+    <a href="@link" plugin = "dialog">@description</a>
+}
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-activation">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tnc-activation-wrapper">
+            <div class="tnc-activation-icon">
+                @switch (Model.sendStatus)
+                {
+                    case SendStatus.Ok:
+                    @:<span class="tn-icon-large tn-largeicon-accept-circle"></span>
+                                            break;
+                    case SendStatus.No:
+                    @:<span class="tn-icon-large tn-largeicon-cross-circle"></span>
+                                                                break;
+                    default:
+                    @:<span class="tn-icon-large tn-largeicon-accept-circle"></span>
+                                                                                                                                                                                        break;
+                }
+            </div>
+            <div class="tnc-adcivation-box">
+                <h4>
+                    @Model.Title</h4>
+                <p class="tnc-activation-text">
+                    @if (Model.Body.IndexOf("{0}") > 0)
+                    {
+                        @Html.Raw(string.Format(Model.Body, GetLink(Model.LinkDescription, Model.link)));
+                    }
+                    else
+                    {
+                        @Html.Raw(Model.Body);
+                    }
+                </p>
+                <p>
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        if (Model.Description.IndexOf("{0}") > 0)
+                        {
+                        @Html.Raw(string.Format(Model.Description, GetLink(Model.LinkDescription, Model.link)));
+                        }
+                        else
+                        {
+                        @Html.Raw(Model.Description);
+                        }
+                    }
+                </p>
+                <p>
+                    @if (!string.IsNullOrEmpty(Model.EmailLink))
+                    {
+                        @Html.Button(Model.ButtonDescription, ButtonTypes.Button, HighlightStyles.Primary, ButtonSizes.Large, url: Model.EmailLink, htmlAttributes: new { target = "_blank" })
+                    }
+                    else
+                    {
+                        @Html.Button("站点首页", ButtonTypes.Button, HighlightStyles.Primary, ButtonSizes.Large, url: SiteUrls.Instance().SiteHome())
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+@{
+    SendEmailSucceedViewModel sendEmailSucceedViewModel = TempData["SendEmailSucceedViewModel"] as SendEmailSucceedViewModel;
+    TempData.Remove("SendEmailSucceedViewModel");
+    TempData["SendEmailSucceedViewModel"] = sendEmailSucceedViewModel;
+}

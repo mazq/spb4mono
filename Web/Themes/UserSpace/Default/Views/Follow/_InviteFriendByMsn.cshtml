@@ -1,0 +1,35 @@
+﻿@model InviteFriendByMsnEditModel
+@{
+    Layout = null;
+    ISiteSettingsManager siteSettingsManager = DIContainer.Resolve<ISiteSettingsManager>();
+    SiteSettings siteSettings = siteSettingsManager.Get();
+}
+@using (Html.BeginAjaxForm("_InviteFriendByMsn", "Follow", FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "successCallBack", OnErrorCallBack = "errorCallBack", ClearForm = false }))
+{
+    <div class="tn-form tn-label-right tnc-invite-msn">
+	    <div class="tn-content-heading tn-border-gray tn-border-bottom">
+			<h4>邀请MSN联系人</h4>
+		</div>
+        <div class="tn-form-row">
+            <label class="tn-form-label">
+            </label>
+            <span class="tn-text-note">可以导入您MSN上的联系人，@siteSettings.SiteName 不会存储您的MSN密码，请放心使用。</span>
+        </div>
+        <div class="tn-form-row">
+            @*//todo:bianchx by libsh，labelfor =_-!*@ @*//回复：修改了了。。。。*@
+            @Html.FormLabelFor(n => n.userName)
+            @Html.TextBoxFor(n => n.userName, new { autocomplete = "off", @class = "tn-textbox tn-input-long tn-border-gray" })
+            @Html.ValidationMessageFor(n => n.userName)
+        </div>
+        <div class="tn-form-row">
+            @Html.FormLabelFor(n => n.password)
+            @Html.TextBoxFor(n => n.password, new { autocomplete = "off", @class = "tn-textbox tn-input-long tn-border-gray", type = "password" })
+            @Html.ValidationMessageFor(n => n.password)
+        </div>
+        <div class="tn-form-row tn-form-row-button">
+            <label class="tn-form-label">
+            </label>
+            @Html.LinkButton("确定", string.Empty, HighlightStyles.Primary, htmlAttributes: new { id = "button-submit-msn" })
+        </div>
+    </div>
+}

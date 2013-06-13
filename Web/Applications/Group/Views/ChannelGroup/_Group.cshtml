@@ -1,0 +1,58 @@
+﻿@model GroupEntity
+@{
+    var sortBy = Request.QueryString.Get<SortBy_Group?>("sortBy", null);
+    var categoryId = Request.QueryString.Get<long?>("categoryId", null);
+    var areaCode = Request.QueryString.Get<string>("areaCode", null);
+    bool showJoinButton = ViewData.Get<bool>("showJoinButton", false);
+}
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+    <div class="tn-list-item-area-left">
+        <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)" title="@Model.GroupName" target="_blank">
+            <img src="@SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())" alt="@Model.GroupName" width="100px" />
+        </a>
+    </div>
+    <div class="tn-list-item-area-main">
+        @if (showJoinButton)
+        {
+            <div class="tn-helper-right">
+                @Html.Action("_ApplyJoinButton", "ChannelGroup", new { groupId = Model.GroupId, buttonName = "申请加入" })
+            </div>
+        }
+        <div class="tn-list-item-row tn-list-item-heading">
+            <h5 class="tn-helper-reset">
+                <a href="@SiteUrls.Instance().GroupHome(Model.GroupKey)" class="tn-user-name" title="@Model.GroupName" target="_blank">@StringUtility.Trim(Model.GroupName, 30)</a>
+                @if (Model.User != null)
+                {
+                    @:群主：<a href="@SiteUrls.Instance().UserJoinedGroups(Model.User.UserName)" title="@Model.User.DisplayName">@Model.User.DisplayName</a>
+                }
+            </h5>
+        </div>
+        <div class="tn-list-item-row tn-list-item-summary">
+            <p>
+                @if (Model.Category != null)
+                {
+                    <span>类别：<a href="@SiteUrls.Instance().FindGroup(areaCode, Model.Category.CategoryId, sortBy)" title="@(Model.Category.CategoryName)">@(Model.Category.CategoryName)</a></span>
+                }
+                <span>地区：<a href="@SiteUrls.Instance().FindGroup(Model.AreaCode, categoryId, sortBy)" title="item.AreaCode">@Formatter.FormatArea(Model.AreaCode)</a></span></p>
+            <p>
+                <span>成员：@Model.MemberCount</span> <span>内容数：@Model.ContentCount</span> <span class="tn-date tn-text-note">
+                    创建时间：@Model.DateCreated.ToUserDateString(true)</span></p>
+            <p>
+                @if (Model.TagNames != null && Model.TagNames.Count() > 0)
+                {
+                    foreach (var tag in Model.TagNames)
+                    {
+                    <a href="@SiteUrls.Instance().ListByTag(tag, sortBy)"><span>
+                        @tag
+                    </span></a>
+                    }
+                }
+            </p>
+        </div>
+        @if (Model.Description.Length > 0)
+        {
+            <div class="tn-list-item-row">
+                群组简介:@HtmlUtility.TrimHtml(Model.Description, 75)</div>
+        }
+    </div>
+</li>

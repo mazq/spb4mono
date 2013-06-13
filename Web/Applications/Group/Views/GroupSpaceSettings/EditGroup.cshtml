@@ -1,0 +1,295 @@
+﻿@model GroupEditModel
+@{
+    Layout = "manage-2cols";
+
+    Html.ViewContext.RouteData.Values["CurrentNavigationId"] = 13900190;
+    var joinWay = Model.JoinWay;
+    int groupNameLength = Model.GroupName == null ? 0 : Model.GroupName.Length;
+}
+@Html.StatusMessage()
+<div class="tn-box tn-widget tn-widget-content tn-corner-all spb-group-edit">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-main-heading tn-border-gray tn-border-bottom">
+            <h2>
+                群组设置</h2>
+        </div>
+        @using (Html.BeginForm("EditGroup", "GroupSpaceSettings", new { spaceKey = Url.SpaceKey() }, FormMethod.Post, new { enctype = "MULTIPART/FORM-DATA", id = "form-group-edit" }))
+        {
+            @Html.HiddenFor(n => n.GroupId)
+            @Html.ValidationMessageFor(n => n.GroupId)
+            @Html.HiddenFor(n => n.GroupKey)
+            @Html.ValidationMessageFor(n => n.GroupKey)
+            <div class="tn-form-box">
+                <table>
+                    <tr class="tn-name">
+                        <th>
+                            <span class="tn-form-required">*</span>
+                            名称：
+                        </th>
+                        <td>                            
+                            @Html.TextBoxFor(n => n.GroupName, new { @class = "tn-textbox tn-border-gray" })
+                            <span id="GroupNameCount" class="tn-count tn-text-note">@groupNameLength/60</span>
+                        </td>
+                        <td>@Html.ValidationMessageFor(n => n.GroupName)
+                        </td>
+                    </tr>
+                    <tr class="tn-intro">
+                        <th>
+                            简介：
+                        </th>
+                        <td>@Html.TextAreaFor(n => n.Description, new { @class = "tn-textarea tn-border-gray" })
+                        </td>
+                        <td>@Html.ValidationMessageFor(n => n.Description)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            logo：
+                        </th>
+                        <td>
+                            <input type="file" id="GroupLogo" name="GroupLogo" />
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(Model == null ? "" : Model.Logo))
+                    { 
+                        <tr>
+                            <th>
+                            </th>
+                            <td>
+                                <div class="tn-figure">
+                                    <img alt="群组头像" src="@SiteUrls.Instance().LogoUrl(Model.Logo, TenantTypeIds.Instance().Group(), ImageSizeTypeKeys.Instance().Medium())"/>
+                                    <a id="deleteGroupLogo" class="tn-edit" href="@SiteUrls.Instance()._DeleteGroupLogo(Url.SpaceKey())">
+                                        删除</a>
+                                </div>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th>
+                            <span class="tn-form-required">*</span>
+                            类别：
+                        </th>
+                        <td>                        
+                        @Html.CategoryDropDownListFor(n => n.CategoryId, TenantTypeIds.Instance().Group(), 0)
+                        </td>
+                        <td>@Html.ValidationMessageFor(n => n.CategoryId)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            地区：
+                        </th>
+                        <td>@Html.AreaDropDownListFor(n => n.AreaCode, 3)
+                        </td>
+                        <td>@Html.ValidationMessageFor(n => n.AreaCode)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            群组类型：
+                        </th>
+                        <td>
+                            <ul class="tn-radiobutton-list">
+                                <li class="tn-inline-list">
+                                    <label>
+                                        @Html.RadioButton("IsPublic", true, Model == null ? true : Model.IsPublic, new { id = "isPublic" })
+                                        公开</label>
+                                </li>
+                                <li class="tn-inline-list">
+                                    <label>
+                                        @Html.RadioButton("IsPublic", false, Model == null ? false : !Model.IsPublic, new { id = "isPrivate" })
+                                        私密</label>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            标签：
+                        </th>
+                        <td>@Html.TagSelector("RelatedTags", ViewData.Get<IEnumerable<string>>("tags", null), TenantTypeIds.Instance().Group(), Model.GroupId)
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            加入方式：
+                        </th>
+                        <td>
+                            <ul class="tn-radiobutton-list" id="joinwaylist">
+                                <li id = "direct" class="tn-inline-list" @if (!Model.IsPublic) {<text>style="display:none"</text> }>
+                                    <label>
+                                        @Html.RadioButton("JoinWay", JoinWay.Direct, Model.JoinWay == JoinWay.Direct, new { group = "joinWay", id = "isDirect" })
+                                        直接加入</label>
+                                </li>
+                                <li id="apply" class="tn-inline-list" @if (!Model.IsPublic) {<text>style="display:none"</text> }>
+                                    <label>
+                                        @Html.RadioButton("JoinWay", JoinWay.ByApply, Model.JoinWay == JoinWay.ByApply, new { group = "joinWay", id = "isApply" })
+                                        申请加入</label>
+                                </li>
+                                <li id="invite" class="tn-inline-list">
+                                    <label>
+                                        @Html.RadioButton("JoinWay", JoinWay.ByInvite, Model.JoinWay == JoinWay.ByInvite, new { group = "joinWay", id = "isInvite" })
+                                        邀请加入</label>
+                                </li>
+                                <li id="question" class="tn-inline-list"  @if (!Model.IsPublic) {<text>style="display:none"</text> }>
+                                    <label>
+                                        @Html.RadioButton("JoinWay", JoinWay.ByQuestion, Model.JoinWay == JoinWay.ByQuestion, new { group = "joinWay", id = "isQuestion" })
+                                        问题验证</label>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                        </th>
+                        <td>
+                            <div id="Direct" class="tn-widget tn-bubble tn-bubble-arrow-top spb-group-bubble spb-groupbubble-one"
+                                style="display: none">
+                                <div class="tn-bubble-arrow">
+                                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-bubble-gray">
+                                    </b>
+                                </div>
+                                <div class="tn-bubble-content tn-border-gray tn-bg-gray tn-corner-all">
+                                    <p>
+                                        用户可以直接加入群</p>
+                                </div>
+                            </div>
+                            <div id="ByApply" class="tn-widget tn-bubble tn-bubble-arrow-top spb-group-bubble spb-groupbubble-two"
+                                style="display: none">
+                                <div class="tn-bubble-arrow">
+                                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-bubble-gray">
+                                    </b>
+                                </div>
+                                <div class="tn-bubble-content tn-border-gray tn-bg-gray tn-corner-all">
+                                    <p>
+                                        用户需要管理员审核通过以后才能加入群</p>
+                                </div>
+                            </div>
+                            <div id="ByInvite" class="tn-widget tn-bubble tn-bubble-arrow-top spb-group-bubble @if(Model.IsPublic){<text>spb-groupbubble-three</text>} else {<text>spb-groupbubble-one</text>}"
+                                style="display: none">
+                                <div class="tn-bubble-arrow">
+                                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-bubble-gray">
+                                    </b>
+                                </div>
+                                <div class="tn-bubble-content tn-border-gray tn-bg-gray tn-corner-all">
+                                    <p>
+                                        用户需要通过群内成员的邀请才能加入群</p>
+                                </div>
+                            </div>
+                            <div id="ByQuestion" class="tn-widget tn-bubble tn-bubble-arrow-top spb-group-bubble spb-groupbubble-four"
+                                style="display: none">
+                                <div class="tn-bubble-arrow">
+                                    <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-bubble-gray">
+                                    </b>
+                                </div>
+                                <div class="tn-bubble-content tn-border-gray tn-bg-gray tn-corner-all">
+                                    <p>
+                                        您可以设置你一个问题，用户答对后即可加入群</p>
+                                    <p>
+                                        问题：@Html.TextBoxFor(n => n.Question, new { @class = "tn-textbox tn-border-gray", watermark = "如1+1=？", id = "groupQuestion" })
+                                        @Html.ValidationMessageFor(n => n.Question)
+                                    </p>
+                                    <p>
+                                        答案：@Html.TextBoxFor(n => n.Answer, new { @class = "tn-textbox tn-border-gray", id = "groupAnswer" })
+                                        @Html.ValidationMessageFor(n => n.Answer)
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            邀请权限：
+                        </th>
+                        <td>
+                            <ul class="tn-radiobutton-list">
+                                <li class="tn-inline-list">
+                                    <label>
+                                        @Html.RadioButton("EnableMemberInvite", true, Model == null ? true : Model.EnableMemberInvite, new { group = "authority" })
+                                        群内成员</label>
+                                </li>
+                                <li class="tn-inline-list">
+                                    <label>
+                                        @Html.RadioButton("EnableMemberInvite", false, Model == null ? false : !Model.EnableMemberInvite, new { group = "authority" })
+                                        仅管理员</label>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                        </th>
+                        <td>@Html.Button("保存", buttonType: ButtonTypes.Submit, highlightStyle: HighlightStyles.Primary, htmlAttributes: new { id = "editGroupButton" })
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //处理火狐下刷新后单选框和单选钮仍然选中问题
+        if ($.browser.mozilla) {
+            $("input[type='radio']").attr("autocomplete", "off");
+            $("input[type='checkbox']").attr("autocomplete", "off");
+        }
+
+        var validatorSettings = $('form#form-group-edit').data('validator').settings;
+        validatorSettings.ignore = "input:hidden[type='text']";
+        //        获取填写的字数
+        var form = $('form#form-group-edit');
+        $("#GroupName", form).GetTextCount('GroupNameCount', 60, true);
+
+        $("#deleteGroupLogo").click(function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            art.dialog.confirm('您确认要删除logo吗？', function () {
+                $.post(url, function (data) {
+                    art.dialog.tips(data.MessageContent, 1.5, data.MessageType, function () { window.location.reload(true) });
+                });
+            });
+        });
+
+        $("div#@(joinWay)").show();
+
+        $("#isPrivate").click(function () {
+            $("#isInvite").click();
+            $("div#ByInvite").removeClass("spb-groupbubble-three").addClass("spb-groupbubble-one");
+            $("#direct,#question,#apply").hide();
+        });
+
+        $("#isPublic").click(function () {
+            $("#isDirect").click();
+            $("div#ByInvite").removeClass("spb-groupbubble-one").addClass("spb-groupbubble-three");
+            $("#direct,#question,#apply").show();
+        });
+
+        $("div ul#joinwaylist li").click(function () {
+            var index = $(this).index();
+            $("div.spb-group-bubble").hide();
+            $("div.spb-group-bubble").eq(index).show();
+        });
+
+        $("#editGroupButton").click(function (data) {
+            if (!$("form#form-group-edit").valid())
+                return false;
+        });
+    });
+</script>

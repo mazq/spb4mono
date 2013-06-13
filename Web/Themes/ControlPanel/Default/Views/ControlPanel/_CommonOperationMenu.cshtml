@@ -1,0 +1,46 @@
+﻿@model IEnumerable<InitialNavigation>
+@{
+    IUser currentUser = UserContext.CurrentUser;
+}
+<div class="tn-block">
+    <div class="tnc-aside">
+        <div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-sidebar">
+            <div class="tn-box-content tn-widget-content tn-corner-all">
+                <div class="tnc-menu-item">
+                    <div class="tn-content-heading tn-widget-header tn-corner-top tn-border-bottom">
+                        <h4>
+                            <span class="tn-icon-file"></span>常用操作</h4>
+                        <a href="@SiteUrls.Instance().UpdateCommonOperations()">[更新]</a>
+                    </div>
+                    <ul class="tn-side-menu">
+                        @foreach (var commonOperation in Model)
+                        {
+                            if (!commonOperation.IsEnabled || !commonOperation.IsControlPanelManageable(currentUser))
+                            {
+                                continue;
+                            }
+                            
+                            <li><a class="tn-menu-text" href="@if (!string.IsNullOrWhiteSpace(commonOperation.NavigationUrl))
+                                                              {
+                                                                    @commonOperation.NavigationUrl
+                                                              }
+                                                              else
+                                                              {
+                                                                    @CachedUrlHelper.RouteUrl(commonOperation.UrlRouteName)                                                    
+                                                              }">
+                                @if (!string.IsNullOrEmpty(commonOperation.NavigationText))
+                                { 
+                                    @commonOperation.NavigationText
+                                }
+                                else
+                                {
+                                    @Tunynet.Globalization.ResourceAccessor.GetString(commonOperation.ResourceName)
+                                }</a></li>                               
+                        }
+                    </ul>
+                    @Html.Action("_RecentVisit", "ControlPanel")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

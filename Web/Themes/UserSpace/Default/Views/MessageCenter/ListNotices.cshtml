@@ -1,0 +1,108 @@
+﻿@using Tunynet.Common
+@model PagingDataSet<Tunynet.Common.Notice>
+@{
+    Layout = "_MessageCenter";
+
+    NoticeStatus? status = ViewData["status"] as NoticeStatus?;
+    int pageIndex = ViewData.Get<int>("pageIndex", 1);
+    int? unhandledCount = ViewData["unhandledCount"] as int?;
+
+    int? tempStatus = null;
+    if (status.HasValue)
+    {
+        tempStatus = (int)status;
+    }
+}
+@section Aside{
+    @Html.Action("_MessageCenter_Menu", "MessageCenter", new { subMenu = MessageCenterMenu.Notices })
+}
+@Html.Hidden("pageIndexCount", pageIndex)
+<div class="tn-box tn-widget tn-widget-content tn-corner-all tnc-notice">
+    <div class="tn-box-content tn-widget-content tn-corner-all">
+        <div class="tn-tabs tn-notice-list">
+            <ul class="tn-tabs-nav tn-border-gray tn-border-bottom tn-helper-clearfix">
+                @{string classUnhandled = "";
+                  string classHandled = "";
+                  if (status == NoticeStatus.Unhandled)
+                  { classUnhandled = "tn-tabs-selected"; }
+                  else
+                  { classHandled = "tn-tabs-selected"; } 
+                }
+                <li class="tn-widget-content tn-border-gray tn-border-trl @(classUnhandled)"><a href="@SiteUrls.Instance().ListNotices(Url.SpaceKey(), NoticeStatus.Unhandled, 1)">
+                    <span>未处理通知(<span id="noticeCount">@(unhandledCount)</span>)</span> </a></li>
+                <li class="tn-widget-content tn-border-gray tn-border-trl @(classHandled) ">
+                    @Html.Link("全部通知", SiteUrls.Instance().ListNotices(Url.SpaceKey(), null, 1), "全部通知")
+                </li>
+                <li class="tn-option">@Html.Link("通知设置", SiteUrls.Instance()._UserNoticeSettings(Url.SpaceKey()), "通知设置", new { plugin = "dialog" })</li>
+            </ul>
+            <div class="tn-tabs-panel">
+                @if (Model != null && Model.TotalRecords > 0)
+                {
+                    using (Html.BeginForm("SetAllNoticeIsHandled", "MessageCenter", new { spaceKey = Url.SpaceKey(), status = status }, FormMethod.Post, htmlAttributes: new { id = "SetHandled" }))
+                    {
+                
+                    <div class="tnc-handle-btn">
+                        @if (status != NoticeStatus.Unhandled)
+                        {
+                            @Html.LinkButton("删除全部已处理", SiteUrls.Instance().ClearAll(Url.SpaceKey(), NoticeStatus.Handled), HighlightStyles.Primary, htmlAttributes: new { @id = "DeleteAll", name = "DeleteAll" })
+                        }
+                        <a name="AllKnow" id="AllKnow" class="tn-button tn-corner-all tn-button-text-only tn-button-primary">
+                            <span class="tn-button-text">全知道了</span></a>
+                    </div>
+                    <div id="noticeForLoad" class="tnc-notices">
+                        @{
+                        Html.RenderAction("_ListNotices", new { spaceKey = Url.SpaceKey(), status = status, pageIndex = pageIndex });
+                        }
+                    </div>
+                        if (Model.TotalRecords > 30)
+                        {
+                    <div name="DivMore" class="tn-load-more tn-bg-gray tn-border-gray">
+                        <a id="showMore" name="showMore"  class="tn-action tn-action-text-icon-right" href="javascript:;">@(Html.Icon(IconTypes.SmallCollapseOpen))<span class="tn-action-text">更多信息</span></a></div>
+                        }
+
+                    }
+                }
+                else
+                {
+                    <div class="tn-box-content tn-widget-content tn-corner-bottom">
+                        <div class="tn-no-data">
+                            暂无新通知</div>
+                    </div> 
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        $(document).ready(function () {
+
+        $("a[name='showMore']").click(function (event) {
+         event.preventDefault();
+         AddPageIndexCount();
+
+         var pageIndexCount = $("#pageIndexCount").attr("value");
+         $.get('@Html.Raw(Url.Action("_ListNotices", new { spaceKey = Url.SpaceKey(), status = tempStatus }))', {pageIndex:pageIndexCount},function(data){
+                  $("#noticeForLoad").children().last().after(data);
+            });
+         if(pageIndexCount>(@(Model.TotalRecords)/30))
+         {
+         $("div[name='DivMore']").hide();
+         }
+        })
+
+        $("a[name='AllKnow']").click(function (event) {
+            $("form[id='SetHandled']").submit();
+        });
+
+        $("a[name='DeleteAll']").click(function () {
+            if (!confirm('确认要删除全部已处理通知吗？')) 
+               return false;
+        });
+
+    });
+
+    function AddPageIndexCount() {
+       var pageIndexCount = $("#pageIndexCount").attr("value");
+        $("#pageIndexCount").attr("value",parseInt(pageIndexCount) + 1);
+        }
+</script>

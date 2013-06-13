@@ -1,0 +1,54 @@
+﻿<div class="tnc-mode-icon">
+    <a class="tn-icon tn-smallicon-cross" href="javascript:void(0);" onclick="closeTipBlock();"></a>
+</div>
+<h3>
+    在线视频
+</h3>
+<div class="tnc-mode-ctn">
+    <p>
+        支持优酷、土豆、搜狐、新浪</p>
+    <div class="tn-form tn-form-single">
+        <input type="text" name="" id="videoUrlValue" class="tn-textbox tn-border-gray"  />
+       @Html.Button("添加", ButtonTypes.Submit, htmlAttributes: new { id = "videoSaveButton" })
+
+    </div>
+</div>
+<script type="text/javascript">
+    //支持 回车提交视频功能
+    $(document).ready(function () {
+        $("#videoUrlValue").keypress(function (event) {
+            var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode
+            if (keyCode == 13) {
+                $("#videoSaveButton").click();
+            }
+        });
+
+        $("#videoSaveButton").click(function () {
+            $(this).attr("disabled", true).addClass("tn-button-disabled");
+            var audioParseUrl = "@SiteUrls.Instance().ParseMedia(MediaType.Video)";
+
+            $.getJSON(audioParseUrl, { url: $("#videoUrlValue").val() }, function (data) {
+                
+                if (data.errorMessage) {
+                    var videoUrlValueVal = $("#videoUrlValue").val();
+                    $("#videoUrlValue").val(data.errorMessage).attr("style", "background:none repeat scroll 0 0 #FFFBDE");
+                    setTimeout(function () {
+                        $("#videoUrlValue").val(videoUrlValueVal).removeAttr("style");
+                        $("#videoSaveButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                    }, 2000);
+                    return false;
+                }
+                else {
+                    $("#videoSaveButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                    var content = data.Name + "-http://" + data.ShortUrl;
+                    var microblogBody = $('#microblogBody').val() + " " + content + " ";
+                    $('#microblogBody').val(microblogBody);
+
+                    $("#tipBlockDiv").hide();
+                }
+                return false;
+            });
+        });
+
+    });
+</script>

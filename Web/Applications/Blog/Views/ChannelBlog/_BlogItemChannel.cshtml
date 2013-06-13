@@ -1,0 +1,36 @@
+﻿@model BlogThread
+           
+<li class="tn-list-item tn-helper-clearfix tn-border-gray tn-border-bottom tn-border-dashed">
+@if (!string.IsNullOrEmpty(Model.FeaturedImage)){ 
+    <div class="tn-list-item-area-left"><img alt="@Model.ResolvedSubject" height="100px" width="100px" src="@SiteUrls.Instance().ImageUrl(Model.FeaturedImage,TenantTypeIds.Instance().BlogThread(),ImageSizeTypeKeys.Instance().Small())" /></div>
+}
+   
+<div class="tn-list-item-area-main">
+    <div class="tn-list-item-row tn-list-item-heading">
+        <h5 class="tn-helper-reset"> <a href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(Model.UserId), Model.ThreadId)" target="_blank">@Model.ResolvedSubject</a>
+        @if (Model.IsEssential)
+        {
+            <span title="精华" class="tn-icon-colorful tn-icon-colorful-fine tn-icon-inline"></span>
+        }
+       @if (Model.PrivacyStatus == PrivacyStatus.Private)
+       {
+            <span title="不公开" class="tn-icon-colorful tn-icon-colorful-secret tn-icon-inline"></span>
+       }
+       else if (Model.PrivacyStatus == PrivacyStatus.Part)
+       { 
+            <span title="特定用户可见" class="tn-icon tn-icon-limit tn-icon-inline"></span>
+       }        
+        </h5>
+    </div>
+    <div class="tn-list-item-row tn-list-item-summary">
+        <p>@Html.Raw(Model.Summary)</p>
+    </div>
+    <div class="tn-list-item-row tn-list-info">
+        <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(Model.UserId)" target="_blank">@Model.Author</a>
+        <em class="tn-date tn-text-note">@Model.DateCreated.ToFriendlyDate()</em> 
+        @Html.SupportOppose(TenantTypeIds.Instance().BlogThread(), Model.ThreadId, Model.UserId, AttitudeMode.Unidirection)
+        <span class="tn-action tn-comment-count"><a href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(Model.UserId), Model.ThreadId)#comment" class="tn-action-text">评论(@Model.CommentCount)</a></span>
+        <span class="tn-action tn-view-count"><a href="@SiteUrls.Instance().BlogDetail(UserIdToUserNameDictionary.GetUserName(Model.UserId), Model.ThreadId)" class="tn-action-text">浏览(@Model.HitTimes)</a></span>
+    </div>
+</div>
+</li>

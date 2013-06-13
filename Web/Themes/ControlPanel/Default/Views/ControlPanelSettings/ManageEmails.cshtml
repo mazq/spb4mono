@@ -1,0 +1,347 @@
+﻿@model EmailSettingsEditModel
+@{
+    Layout = "_ControlPanel";
+}
+<div class="tn-block tnc-ctnborder" id="all" data-model="@(Model.UserEmailAddress == null)">
+    <div class="tnc-main">
+        <div class="tnc-ctn-center">
+            <h1>
+                <span>邮件设置</span>
+            </h1>
+            @using (Html.BeginAjaxForm("SaveEmail", "ControlPanelSettings", null, FormMethod.Post, new AjaxFormOptions { OnSuccessCallBack = "OnSuccessCallBack" }, new { id = "tunr-form" }))
+            {
+                @Html.HiddenFor(n => n.UserName)
+                <div class="tnc-ctnright-list">
+                    <div class="tn-form-box">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        发件邮箱：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.UserEmailAddress, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.UserEmailAddress)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        密码：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.Password, new { type = "password", @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.Password)
+                                    </td>
+                                    <td>
+                                        <a href ="@SiteUrls.Instance().CheckEmail()" id="again">重新检测邮件配置</a>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-next">
+                                    <th>
+                                    </th>
+                                    <td class="tn-helper-right">
+                                        @Html.Button("下一步", ButtonTypes.Button, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, SiteUrls.Instance().CheckEmail(), new { id = "next" })
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-more">
+                                    <th>
+                                    </th>
+                                    <td>
+                                        <a id="more" href="#" data-more="true" title="更多设置">更多设置</a>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-fail">
+                                    <th>
+                                        服务器用户名：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.UserName, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.UserName)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-fail">
+                                    <th>
+                                        SMTP服务器：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.Host, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.Host)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-fail">
+                                    <th>
+                                        端口号：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.Port, new { @class = "tn-textbox tn-input-short tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.Port)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-fail">
+                                    <th>
+                                        是否启用SSL：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButtonFor(n => n.EnableSsl, true, new { @class = "tn-radiobutton", id = "EnableSsl" })
+                                        <label for="EnableSsl">
+                                            需要</label>
+                                        @Html.RadioButtonFor(n => n.EnableSsl, false, new { @class = "tn-radiobutton", id = "DisableSsl" })
+                                        <label for="DisableSsl">
+                                            不需要</label>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-fail">
+                                    <th>
+                                        发件人地址设置：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButtonFor(n => n.ForceSmtpUserAsFromAddress, true, new { @class = "tn-radiobutton tunr-Force", id = "EnableForce" })
+                                        <label for="EnableForce">
+                                            强制使用SMTP登录邮件地址</label>
+                                        <br />
+                                        @Html.RadioButtonFor(n => n.ForceSmtpUserAsFromAddress, false, new { @class = "tn-radiobutton tunr-Force", id = "DisableForce" })
+                                        <label for="DisableForce">
+                                            原始发件人邮件地址
+                                        </label>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-fail">
+                                    <th>
+                                        smtp服务器是否需要验证身份：
+                                    </th>
+                                    <td>
+                                        @Html.RadioButtonFor(n => n.RequireCredentials, true, new { @class = "tn-radiobutton", id = "EnableRequire" })
+                                        <label for="EnableRequire">
+                                            是</label>
+                                        @Html.RadioButtonFor(n => n.RequireCredentials, false, new { @class = "tn-radiobutton", id = "DisableRequire" })
+                                        <label for="DisableRequire">
+                                            否
+                                        </label>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        管理员Email：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.AdminEmailAddress, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.AdminEmailAddress)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        不允许回复Email：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.NoReplyAddress, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.NoReplyAddress)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        群发邮件数限制：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.BatchSendLimit, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.BatchSendLimit)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        发送失败后尝试次数：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.NumberOfTries, new { @class = "tn-textbox tn-input-long tn-border-gray" })
+                                        @Html.ValidationMessageFor(n => n.NumberOfTries)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-succeed">
+                                    <th>
+                                        邮件发送间隔：
+                                    </th>
+                                    <td>
+                                        @Html.TextBoxFor(n => n.SendTimeInterval, new { @class = "tn-textbox tn-input-short tn-border-gray" })
+                                        分钟
+                                        @Html.ValidationMessageFor(n => n.SendTimeInterval)
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr class="tunr-Submit">
+                                    <th>
+                                    </th>
+                                    <td>
+                                        @Html.Button("提交", ButtonTypes.Submit, HighlightStyles.Primary, ButtonSizes.Default, null, TextIconLayout.IconText, "#", new { id = "submit" })
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                //}
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //初始化状态
+        //如果model为空
+        if ($("#all").data("model") != "False") {
+            $(".tunr-fail").hide();
+            $(".tunr-succeed").hide();
+            $(".tunr-more").hide();
+            $(".tunr-Submit").hide();
+            $("#again").hide();
+        }
+        //如果model不为空
+        else {
+            $(".tunr-fail").hide();
+            $(".tunr-succeed").show();
+            $(".tunr-more").show();
+            $(".tunr-Submit").show();
+            $("#again").show();
+            $(".tunr-next").hide();
+        }
+
+        //点击更多
+        $("#more").click(function () {
+            var aaa = $(this).data("more");
+            if ($(this).data("more")) {
+                $(".tunr-fail").show();
+                $(".tunr-more").show();
+                $(".tunr-Submit").show();
+                $(this).data("more", !$(this).data("more"))
+            } else {
+                $(".tunr-fail").hide();
+                $(".tunr-more").show();
+                $(".tunr-Submit").show();
+                $(this).data("more", !$(this).data("more"))
+            }
+        });
+
+        //重新检测
+        $("#again").click(function (e) {
+            e.preventDefault();
+            if ($("#UserEmailAddress").val() == "") {
+                art.dialog.tips("请填写发件人邮箱", 1.5, 0);
+                return false;
+            }
+            if ($("#Password").val() == "") {
+                art.dialog.tips("请填写密码", 1.5, 0);
+                return false;
+            }
+            var mydialog = art.dialog.tips("正在检测请稍后", 600, 0);
+            $("#tunr-form").ajaxSubmit({ url: $(this).attr("href"),
+                success: function (data) {
+
+                    mydialog.close();
+                    if (data.MessageType > 0) {
+
+                        art.dialog.tips(data.MessageContent, 1.5, 1);
+                        window.location.reload(true);
+
+                        $(".tunr-fail").hide();
+                        $(".tunr-succeed").show();
+                        $(".tunr-more").show();
+                        $(".tunr-Submit").show();
+                        $("#again").show();
+                        $(".tunr-next").hide();
+                    }
+                    else {
+                        art.dialog.tips(data.MessageContent, 3, -1);
+
+                        $(".tunr-fail").show();
+                        $(".tunr-succeed").show();
+                        $(".tunr-more").show();
+                        $(".tunr-Submit").show();
+                        $("#again").show();
+                        $(".tunr-next").hide();
+                    }
+                }
+            });
+            return false;
+        });
+
+        //下一步
+        $("#next").click(function (e) {
+            e.preventDefault();
+            if ($("#UserEmailAddress").val() == "") {
+                art.dialog.tips("请填写发件人邮箱", 1.5, 0);
+                return false;
+            }
+            if ($("#Password").val() == "") {
+                art.dialog.tips("请填写密码", 1.5, 0);
+                return false;
+            }
+            var mydialog = art.dialog.tips("正在检测请稍后", 600, 0);
+            $("#tunr-form").ajaxSubmit({ url: "@SiteUrls.Instance().CheckEmail()",
+                success: function (data) {
+
+                    mydialog.close();
+                    if (data.MessageType > 0) {
+                        window.location.reload(true);
+                        art.dialog.tips(data.MessageContent, 1.5, 1);
+
+                        $(".tunr-fail").hide();
+                        $(".tunr-succeed").show();
+                        $(".tunr-more").show();
+                        $(".tunr-Submit").show();
+                        $("#again").show();
+                        $(".tunr-next").hide();
+                    }
+                    else {
+                        art.dialog.tips(data.MessageContent, 3, -1);
+
+                        $(".tunr-fail").show();
+                        $(".tunr-succeed").show();
+                        $(".tunr-more").show();
+                        $(".tunr-Submit").show();
+                        $("#again").show();
+                        $(".tunr-next").hide();
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+    //保存回调函数
+    function OnSuccessCallBack(data) {
+        if (data.MessageType > 0) {
+            art.dialog.tips(data.MessageContent, 1.5, data.MessageType);
+        }
+        else {
+            alert(data.MessageContent);
+        }
+
+    }
+</script>

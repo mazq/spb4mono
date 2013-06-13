@@ -1,0 +1,82 @@
+﻿@model PagingDataSet<Comment>
+@{
+    string tenantType = ViewData.Get<string>("tenantType", string.Empty);
+    long commentedObjectId = ViewData.Get<long>("commentedObjectId", 0);
+    bool showBefore = ViewData.Get<bool>("ShowBefore", true);
+    bool showAfter = ViewData.Get<bool>("ShowAfter", false);
+}
+@if (showBefore && showAfter)
+{
+    <div class="tn-list-header tn-helper-clearfix">
+        <h4 class="tn-text-heading">
+            评论 <span class="tn-count tn-text-note">（@Model.TotalRecords）</span></h4>
+    </div>
+}
+@if (showAfter && Model.PageIndex > 1)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        <a href="@SiteUrls.Instance()._MicroblogCommentList(tenantType, commentedObjectId, pageIndex: Model.PageIndex - 1)" >
+            更多↑</a>
+    </div>
+}
+<ul class="tn-comments" id="ul-comment-@(commentedObjectId)-0">
+    @foreach (var comment in Model)
+    {
+        if (new Authorizer().Comment_Show(comment))
+        {
+       
+        <li class="tn-comment-item tn-border-gray tn-border-top" id="li-comment-@comment.Id">
+            <a name="@comment.Id"></a>
+            <div class="tn-comment tn-helper-clearfix">
+                <div class="tn-comment-avatar">
+                    @Html.ShowUserAvatar(comment.IsAnonymous ? 0 : comment.UserId, AvatarSizeType.Small)
+                </div>
+                <div class="tn-comment-info tn-hover">
+                    <div class="tn-comment-act tn-state-hidden">
+                        @if (new Authorizer().Comment_Delete(comment))
+                        {
+                            @Html.AjaxDeleteButton(new AjaxDeleteButton().SetConfirm("确定要删除吗？").SetDeleteTarget("#li-comment-" + comment.Id).SetText("删除").SetUrl(SiteUrls.Instance()._DeleteComment(comment.Id)))
+                        }
+                        <a href="@SiteUrls.Instance()._ImpeachReport(comment.UserId, comment.GetCommentDetailUrl(), HtmlUtility.TrimHtml(comment.Body, 50))" plugin="dialog" class="tn-report">
+                            举报</a></div>
+                    <div class="tn-commentator">
+                        <h5>
+                            @if (comment.IsAnonymous)
+                            {
+                                @:匿名
+                            }
+                            else
+                            {
+                                @Html.Link(comment.Author, SiteUrls.Instance().SpaceHome(comment.UserId), comment.Author, new { @class = "tn-author" })   
+                            }
+                        </h5>
+                        <em class="tn-text-note tn-date">@comment.DateCreated.ToFriendlyDate()</em>
+                        @if (comment.IsPrivate)
+                        {
+                            <span class="tn-explain-icon"><span class="tn-icon tn-icon-colorful tn-icon-colorful-private">
+                            </span><span class="tn-icon-text">悄悄话</span></span>
+                        }
+                    </div>
+                    <p>
+                        @Html.Raw(comment.Body)
+                    </p>
+                    @if (UserContext.CurrentUser != null && !comment.IsAnonymous && (comment.User() != null))
+                    {
+                        <div class="tn-comment-feed tn-helper-clearfix">
+                            <span class="tn-reply"><a textfor="Body-comment-@commentedObjectId" class="tn-action tn-action-text-icon-right" foruser="@comment.User().NickName" href="#">
+                                <span class="tn-action-text">回复</span></a></span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </li>
+        }
+    }
+</ul>
+@if (showBefore && Model.PageIndex < Model.PageCount)
+{
+    <div class="tn-load-more tn-border-gray tn-corner-all" plugin="GetMore">
+        <a href="@SiteUrls.Instance()._MicroblogCommentList(tenantType, commentedObjectId, pageIndex: Model.PageIndex + 1)" >
+            更多↓</a>
+    </div>
+}

@@ -1,0 +1,59 @@
+﻿@{
+    Tunynet.Common.Configuration.TenantAttachmentSettings settings = ViewData.Get<Tunynet.Common.Configuration.TenantAttachmentSettings>("TenantAttachmentSettings", null);
+    string spaceKey = Url.SpaceKey();
+}
+<div id="imageContainer" class="tn-widget tn-bubble tn-bubble-arrow-top tnc-mode-windows tnc-mode-wid-one"
+    style="display: none; position: absolute;">
+    <div class="tn-bubble-arrow">
+        <b class="tn-arrow-b1 tn-border-gray"></b><b class="tn-arrow-b2 tn-widget-bubble">
+        </b>
+    </div>
+    <div class="tn-bubble-content tn-widget-content">
+        <div class=" tnc-mode-content" id="tipContainerDiv">
+            <div class="tnc-mode-icon" id="uplodaImagesDiv">
+                <a class="tn-icon tn-smallicon-cross" href="javascript:void(0);" id="closeimageContainer">
+                </a>
+            </div>
+            <h3>
+                本地上传</h3>
+            <div class="tnc-mode-ctn">
+                <div class="tnc-mode-photo-button">
+                    @Html.Uploadify("uploadImages",
+                        TenantTypeIds.Instance().Microblog(), settings.AllowedFileExtensions,
+                        buttonOptions: new ButtonOptions().SetText("上传图片")
+                                                          .SetCssClass("tnc-mode-btn-center")
+                                                          .SetWidth(150),
+                        uploadFileOptions: new UploadFileOptions().MergeUploadifyCallBack("onQueueComplete", "OnQueueComplete")
+                                                                  .SetAutoUpload(true)
+                                                                  .SetMultiple(true)
+                                                                  .SetPreventCaching(true)
+                                                                  .SetQueueId("queueManage")
+                                                                  .SetQueueSizeLimit(6)
+                                                                  .SetRemoveCompleted(true)
+                                                                  .SetUploadLimit(100)
+                                                                  .SetFileSizeLimit(settings.MaxAttachmentLength)
+                                                                  .MergeUploadifyFormData("CurrentUserIdToken", Utility.EncryptTokenForUploadfile(0.1, UserContext.CurrentUser.UserId))
+                                                                  .MergeUploadifyFormData("resize", true))
+                </div>
+                <div id="queueManage">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function OnQueueComplete(queueData) {
+        var $body = $("#microblogBody");
+        if ($body.length > 0 && !$body.text())
+            $body.text("分享图片");
+        $.cookie("microblog_PhotoExists", "true", { path: '/' });
+        $('#uploadImages').uploadify('destroy');
+        $("#uplodaImagesDiv").parent().load('@SiteUrls.Instance()._ListImages_Microblog(Url.SpaceKey())');
+    }
+    $(function () {
+        $('#closeimageContainer').click(function () {
+            $('#imageContainer').hide();
+        });
+    });
+</script>

@@ -1,0 +1,38 @@
+﻿@model IEnumerable<User>
+@{
+   
+    GenderType gender = ViewData.Get<GenderType>("gender", GenderType.NotSet);
+    string showString = "我和他都关注了";
+    if (gender == GenderType.FeMale)
+    {
+        showString = "我和她都关注了";
+    }
+    else if (gender == GenderType.NotSet)
+    {
+        showString = "我和Ta都关注了";
+    }
+}
+<div class="tn-box-header tn-widget-header tn-corner-top tn-border-bottom">
+    <div class="tn-option">
+        <a href="@SiteUrls.Instance().SpaceHomeMore(Url.SpaceKey(), 2)">更多</a></div>
+    <h3 class="tn-helper-reset">
+        @showString</h3>
+</div>
+<div class="tn-box-content tn-widget-content tn-corner-bottom ">
+    <ul class="tn-avatar-list tnc-person-flow tn-helper-clearfix">
+        @if (Model == null || Model.Count() == 0)
+        {
+            @Html.Raw("暂无")
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+            <li class="tn-avatar-item">
+                @Html.ShowUserAvatar(item.UserId, AvatarSizeType.Small, true, HyperLinkTarget._blank)
+                <a class="tn-user-name" href="@SiteUrls.Instance().SpaceHome(item.UserId)" title="@item.DisplayName" target="_blank">@item.DisplayName</a>
+            </li>
+            }
+        }
+    </ul>
+</div>

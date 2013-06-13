@@ -1,0 +1,206 @@
+﻿<div class="tnc-mode-icon">
+    <a class="tn-icon tn-smallicon-cross" href="javascript:void(0);" onclick="closeTipBlock();"></a>
+</div>
+@Html.Tabs(new TabControl().SetIsSimple(true)
+    .AddTabItem(new TabItem("搜索歌曲").SetContent(@<text>
+<div class="tnc-mode-ctn">
+    <p>
+        输入音乐或歌手名进行搜索</p>
+    <div class="tn-form tn-form-single">
+        <input type="text" name="music_keyword" id="music_keyword" class="tn-textbox tn-border-gray" />
+        @Html.Button("搜索", ButtonTypes.Submit, htmlAttributes: new { id = "music_searchButton" })
+    </div>
+    @Html.Hidden("music_page", 1)
+</div>
+<div id="music_list" style="display: none" class="tnc-mode-music">
+</div>
+</text>
+))
+  .AddTabItem(new TabItem("输入音乐链接").SetContent(@<text>
+<div class="tnc-mode-ctn">
+    <p>
+        目前支持<a target="_blank" href="http://www.xiami.com/">虾米</a> 、<a target="_blank" href="http://www.kuwo.cn/">酷我</a>及MP3格式的链接</p>
+    <div class="tn-form tn-form-single">
+        <input type="text" name="url" id="url" class="tn-textbox tn-border-gray" />
+        @Html.Button("添加", ButtonTypes.Submit, htmlAttributes: new { id = "musicUrlButton" })
+    </div>
+</div>
+</text>))
+)
+<script type="text/javascript">
+    var musicParseUrl = "@SiteUrls.Instance().ParseMedia(MediaType.Audio)";
+</script>
+@*以下代码可隔离到独立文件中*@
+<script type="text/javascript">
+    /**
+    *根据虾米 搜索音乐
+    */
+    $(document).ready(function () {
+        //支持录入框回车搜索
+        $("#music_keyword").keypress(function (event) {
+            var keyCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode
+            if (keyCode == 13) {
+                $("#music_searchButton").click();
+            }
+        });
+        //搜索歌曲
+        $("#music_searchButton").click(function () {
+            var keyword = $('#music_keyword');
+            if ($.trim(keyword.val()).length < 1) {
+                $(this).attr("disabled", true).addClass("tn-button-disabled");
+                $('#music_keyword').val("搜索内容不能为空").attr("style", "background:none repeat scroll 0 0 #FFFBDE");
+
+                setTimeout(function () {
+                    $("#music_keyword").removeAttr("style").val("");
+                    $("#music_searchButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                }, 2000);
+            }
+            var page = $('#music_page').val();
+            if (page == null) {
+                page = 1;
+            }
+            page = parseInt(page);
+            if (keyword.val() == '') {
+                keyword.focus();
+                return false;
+            }
+            $('#music_list').html('<div class="tn-loading"></div>');
+
+            $.ajax({
+                url: "http://www.xiami.com/app/nineteen/search/key/" + encodeURIComponent(keyword.val()) + "/page/" + page + "/size/1?callback=getXiamiData",
+                dataType: "jsonp",
+                success: function (data) {
+                    var json = eval(data.results);
+                    if (json.length > 0) {
+                        var totle = data.total;
+                        var num = Math.ceil(totle / 8);
+
+                        var phtml = pagerView(num, page);
+                        $('#music_list').show().html('<ul><li class="tn-title"><span>歌手</span>歌曲名</li></ul>').append(phtml);
+
+                        for (var i = 0; i < json.length; i++) {
+                            json[i].song_name = decodeURIComponent(json[i].song_name).replace(/\+|'|"/g, " ");
+                            json[i].artist_name = decodeURIComponent(json[i].artist_name).replace(/\+|'|"/g, " ");
+                            var html = '<li value="' + json[i].song_id + '"><span><a href="javascript:void(0)" title="搜索 ' + decodeURI(json[i].artist_name) + ' 的所有歌曲">' + decodeURI(json[i].artist_name) + '</a></span>' + decodeURI(json[i].song_name) + '</li>';
+                            $('#music_list ul:first').append(html);
+                        }
+
+                        $("#music_list li").click(function (e) {
+                            if ($(e.target).is("a")) {
+                                return false;
+                            }
+                            var music_id = $(this).attr("value");
+                            var url = "http://www.xiami.com/song/" + music_id;
+                            $.getJSON(musicParseUrl, { url: url }, function (data) {
+                                var content = data.Name + "-http://" + data.ShortUrl;
+
+                                var microblogBody = $('#microblogBody').val() + " " + content + " ";
+                                $('#microblogBody').val(microblogBody).focus();
+                                $("#tipBlockDiv").hide();
+                                $("#music_list").html('');
+                            });
+                            return false;
+                        });
+                        //根据歌手名重新搜索
+                        $("#music_list li").find("a").click(function (e) {
+                            $('#music_page').val(1);
+                            $('#music_keyword').val($(this).text());
+                            $("#music_searchButton").click();
+                            return false;
+                        });
+
+                    } else {
+                        $('#music_list ul:first').html("未检索到符合条件的歌曲");
+                    }
+                }
+            });
+        });
+
+    });
+
+    /**
+    * 制作虾米音乐的简单HTML分页代码 currentPage：当前页 dataCount：总页数
+    <div class="tn-pagination tn-helper-align-center"> 
+    <span class="tn-page-prev tn-page-thumb">上一页</span> 
+    <span class="tn-page-number tn-selected">1</span> 
+    <a class="tn-page-number tn-selected" href="#">2</a>
+    <a class="tn-page-number" href="#">3</a> 
+    <a class="tn-page-number" href="#">4</a> 
+    <a class="tn-page-number" href="#">5</a>
+    <a class="tn-page-next tn-page-thumb" href="#">下一页</a>
+    <a class="tn-page-next tn-page-thumb" href="#">最后一页</a>
+    </div>
+    */
+    function pagerView(dataCount, currentPage) {
+        var $musicListPager = $('<div class="tn-pagination tn-helper-align-center" id="music_pager"></div>');
+
+        var __totalPage = dataCount / 8;
+        __totalPage = __totalPage > parseInt(__totalPage) ? parseInt(__totalPage) + 1 : parseInt(__totalPage);
+        var __forLength = currentPage > 10 ? (currentPage > 1000 ? 2 : 3) : 4;
+        var __forStep = 2;
+        var __forStart = (__totalPage > 4 && currentPage > __forStep) ? (currentPage < __totalPage - __forLength ? currentPage - __forStep : __totalPage - __forLength) : 1;
+        var __forEnd = __forStart + __forLength < __totalPage + 1 ? __forStart + __forLength + 1 : __totalPage + 1;
+
+        if (currentPage > 1) {
+            $musicListPager.append('<a href="javascript:void(0)" class="tn-page-prev tn-page-thumb" title="上一页" id="page_to_' + (currentPage - 1) + '">上一页</a>');
+        }
+
+        if (__totalPage > 4 && currentPage > __forStep + 1)
+            $musicListPager.append('<a href="javascript:void(0)" title="1" id="page_to_1">1...</a>');
+
+        for (var i = __forStart; i < __forEnd; i++) {
+            if (currentPage == i) {
+                $musicListPager.append('<span class="tn-page-number tn-selected" title="' + i + '" id="page_to_' + i + '">' + i + '</span>');
+            } else {
+                $musicListPager.append('<a href="javascript:void(0)" class="tn-page-number" title="' + i + '" id="page_to_' + i + '" >' + i + '</a>');
+            }
+        }
+
+        if (__forEnd < __totalPage) $musicListPager.append('<a href="javascript:void(0)" class="tn-page-number" title="' + __totalPage + '" id="page_to_' + __totalPage + '">...' + __totalPage + '</a>');
+
+        if (currentPage < __totalPage) {
+            currentPage++
+            $musicListPager.append('<a href="javascript:void(0)" class="tn-page-next tn-page-thumb" title="下一页" id="page_to_' + currentPage + '">下一页</a>');
+        }
+        if (currentPage < __totalPage)
+            $musicListPager.append('<a href="javascript:void(0)" class="tn-page-next tn-page-thumb" title="最后一页" id="page_to_' + __totalPage + '">最后一页</a>');
+
+        $musicListPager.find("a").click(function () {
+            var page = parseInt(this.id.replace('page_to_', ''));
+            $('#music_page').val(page);
+            $("#music_searchButton").click();
+        });
+        return $musicListPager;
+    }
+
+</script>
+<script type="text/javascript">
+    /**
+    输入音乐链接
+    */
+
+    $(document).ready(function () {
+        $("#musicUrlButton").click(function () {
+            $(this).attr("disabled", true).addClass("tn-button-disabled");
+            $.getJSON(musicParseUrl, { url: $("#url").val() }, function (data) {
+
+                if (data.errorMessage) {
+                    var videoUrlValueVal = $("#url").val();
+                    $("#url").val(data.errorMessage).attr("style", "background:none repeat scroll 0 0 #FFFBDE");
+                    setTimeout(function () {
+                        $("#url").val(videoUrlValueVal).removeAttr("style");
+                        $("#musicUrlButton").removeAttr('disabled').removeClass("tn-button-disabled");
+                    }, 2000);
+                    return false;
+                }
+                var content = data.Name + "-http://" + data.ShortUrl;
+                var microblogBody = $('#microblogBody').val() + " " + content + " ";
+                $('#microblogBody').val(microblogBody).focus();
+                $("#tipBlockDiv").hide();
+                $("#musicUrlButton").removeAttr('disabled').removeClass("tn-button-disabled");
+            });
+            return false;
+        });
+    });
+    
+</script>

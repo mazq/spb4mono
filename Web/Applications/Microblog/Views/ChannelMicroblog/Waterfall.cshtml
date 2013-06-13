@@ -1,0 +1,94 @@
+﻿@{
+    Layout = "app-1col";
+
+    Html.IncludeCss("~/Applications/Microblog/Styles/app.css", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Scripts/jquery/masonry/jquery.masonry.js");
+    Html.IncludeScript("~/Scripts/jquery/masonry/jquery.infinitescroll.js");
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.List.js", ResourceRenderPriority.Last);
+    Html.IncludeScript("~/Applications/Microblog/Scripts/tunynet/jquery.spb.microblog.Create.js", ResourceRenderPriority.Last);
+
+    SortBy_Microblog sortBy = Request.QueryString.Get<SortBy_Microblog>("sortBy", SortBy_Microblog.DateCreated);
+    long tagGroupId = Request.QueryString.Get<long>("tagGroupId", 0);
+}
+@section ContentHeader{
+    @Html.Action("_Header", "ChannelMicroblog", new RouteValueDictionary { { "tab", "Square" }, { "mode", "Image" } })
+}
+<div id="water-fall-container" class="tnc-water-fall">
+</div>
+<nav id="page-nav">
+@{
+    if (tagGroupId > 0)
+    {
+      <a href="@(SiteUrls.Instance()._WaterfallGetMicroblogByTagGroup())?pageIndex=2&tagGroupId=@tagGroupId"></a>
+    }
+    else
+    {
+      <a href="@(SiteUrls.Instance()._Waterfall())?pageIndex=2&sortBy=@sortBy&mediaType=@MediaType.Image"></a>
+    }
+}
+</nav>
+<script type="text/javascript">
+    $(function () {
+        var $container = $('#water-fall-container');
+        var index = 1;
+        var image = new Image();
+        //翻页加数据
+        $container.infinitescroll({
+            navSelector: '#page-nav',    // selector for the paged navigation 
+            nextSelector: '#page-nav a',  // selector for the NEXT link (to page 2)
+            itemSelector: '.water-fall-box'     // selector for all items you'll retrieve
+        },
+          function (newElements) {
+              // hide new items while they are loading
+              var $newElems = $(newElements).css({ opacity: 0 });
+              // ensure that images load before adding to masonry layout
+              $newElems.imagesLoaded(function () {
+                  // show elems now they're ready
+                  $newElems.animate({ opacity: 1 });
+                  $container.masonry('appended', $newElems, true);
+              });
+          });
+
+        function loadData() {
+            var url = $("#page-nav a").attr("href").replace("pageIndex=2", "pageIndex=1");
+            $.get(url, function (data, status, xhr) {
+                if (status === "success") {
+                    if (data.length > 0) {
+
+                        $container.append(data);
+
+                        //注册瀑布流插件并首次加载
+                        $container.imagesLoaded(function () {
+                            $container.masonry({
+                                itemSelector: '.water-fall-box',
+                                columnWidth: function (containerWidth) {
+                                    return containerWidth / 4;
+                                },
+                                isResizable: true
+                            });
+                        });
+                    } else {
+                        var noData = $("<div class='tn-box-content tn-widget-content tn-corner-bottom'><div class='tn-no-data'>暂无数据</div></div>");
+                        $container.append(noData);
+                    }
+                }
+            });
+        }
+
+        //页面加载时加载初始化微博数据
+        loadData();
+
+        //点列表模式
+        $("#list-mode").click(function (e) {
+            e.preventDefault();
+            var url;
+            if (@(tagGroupId) != 0) {
+                url='@(Html.Raw(SiteUrls.Instance().Microblog(tagGroupId: tagGroupId)))';
+            } else {
+                url='@(Html.Raw(SiteUrls.Instance().Microblog(sortBy: sortBy)))';
+            }
+            window.location.href = url;
+        })
+
+    })
+</script>
